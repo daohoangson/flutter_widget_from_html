@@ -89,17 +89,15 @@ class HtmlStyleBuilder {
 
   HtmlStyleBuilder([this.parent, this._queue]);
 
-  /// {@template flutter_widget_from_html.enqueue}
   /// Enqueues an HTML styling callback.
   ///
   /// The callback will receive the current [HtmlStyle] being built.
   /// As a special case, declare `T=BuildContext?` to receive the [BuildContext].
-  /// {@endtemplate}
   void enqueue<T>(
-    HtmlStyle Function(HtmlStyle style, T input) callback,
-    T input,
-  ) {
-    final item = _HtmlStyleCallback(callback, input);
+    HtmlStyle Function(HtmlStyle style, T input) callback, [
+    T? input,
+  ]) {
+    final item = _HtmlStyleCallback(callback, input as T);
     final queue = _queue ??= [];
     queue.add(item);
   }

@@ -316,7 +316,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      tree.apply((style, _) => style.copyWith(), null);
+      tree.styleBuilder.enqueue((style, _) => style.copyWith(), null);
     }
 
     super.parse(tree);

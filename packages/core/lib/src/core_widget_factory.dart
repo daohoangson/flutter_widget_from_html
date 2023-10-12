@@ -609,7 +609,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..apply<BuildContext?>(TagA.defaultColor, null)
+            ..styleBuilder.enqueue<BuildContext?>(TagA.defaultColor)
             ..register(_tagA ??= TagA(this).buildOp);
         }
 
@@ -672,14 +672,16 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case 'b':
       case 'strong':
-        tree.apply(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        tree.styleBuilder
+            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
         break;
       case 'small':
-        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+        tree.styleBuilder
+            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagBr:
@@ -701,14 +703,14 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        tree.apply(TextStyleOps.fontStyle, FontStyle.italic);
+        tree.styleBuilder.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        tree.apply(
+        tree.styleBuilder.enqueue(
           TextStyleOps.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
@@ -985,26 +987,26 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
-          tree.apply(TextStyleOps.color, color);
+          tree.styleBuilder.enqueue(TextStyleOps.color, color);
         }
         break;
 
       case kCssDirection:
         final term = style.term;
         if (term != null) {
-          tree.apply(TextStyleOps.textDirection, term);
+          tree.styleBuilder.enqueue(TextStyleOps.textDirection, term);
         }
         break;
 
       case kCssFontFamily:
         final list = TextStyleOps.fontFamilyTryParse(style.values);
-        tree.apply(TextStyleOps.fontFamily, list);
+        tree.styleBuilder.enqueue(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
         final value = style.value;
         if (value != null) {
-          tree.apply(TextStyleOps.fontSize, value);
+          tree.styleBuilder.enqueue(TextStyleOps.fontSize, value);
         }
         break;
 
@@ -1013,7 +1015,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final fontStyle =
             term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
-          tree.apply(TextStyleOps.fontStyle, fontStyle);
+          tree.styleBuilder.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
@@ -1022,7 +1024,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final fontWeight =
             value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
-          tree.apply(TextStyleOps.fontWeight, fontWeight);
+          tree.styleBuilder.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
         break;
 
@@ -1038,7 +1040,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
-          tree.apply(
+          tree.styleBuilder.enqueue(
             _styleBuilderLineHeight ??= TextStyleOps.lineHeight(this),
             value,
           );
@@ -1082,7 +1084,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final whitespace =
             term != null ? TextStyleOps.whitespaceTryParse(term) : null;
         if (whitespace != null) {
-          tree.apply(TextStyleOps.whitespace, whitespace);
+          tree.styleBuilder.enqueue(TextStyleOps.whitespace, whitespace);
         }
         break;
     }

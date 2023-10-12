@@ -29,7 +29,7 @@ extension StyleTextAlign on WidgetFactory {
   static BuildTree _onParsed(BuildTree tree) {
     final textAlign = tree.textAlignData.textAlign;
     if (textAlign != null) {
-      tree.apply(_textAlign, textAlign);
+      tree.styleBuilder.enqueue(_textAlign, textAlign);
     }
     return tree;
   }
