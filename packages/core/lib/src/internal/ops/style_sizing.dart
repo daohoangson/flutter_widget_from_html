@@ -11,7 +11,7 @@ extension GetSizing on CssLength {
   CssSizingValue? getSizing(HtmlStyle style) {
     final value = getValue(style);
     if (value != null) {
-      return CssSizingValue.px(value);
+      return CssSizingValue.value(value);
     }
 
     switch (unit) {
