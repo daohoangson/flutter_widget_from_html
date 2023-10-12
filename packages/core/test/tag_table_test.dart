@@ -549,8 +549,10 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
+  });
 
-    testWidgets('#171: background-color', (WidgetTester tester) async {
+  group('background', () {
+    testWidgets('#171: cell color', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/171
       const html = '<table><tr>'
           '<td style="background-color: #f00">Foo</td>'
@@ -566,6 +568,59 @@ Future<void> main() async {
           '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
           ']]]]]',
+        ),
+      );
+    });
+
+    testWidgets('#1028: row color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/171
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td>Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('overwrites row color', (WidgetTester tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td style="background-color: #0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FF00FF00,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
         ),
       );
     });
