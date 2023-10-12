@@ -599,8 +599,8 @@ Future<void> main() async {
           Center(
             child: CssSizing(
               key: key,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: 2),
             ),
           ),
@@ -616,8 +616,8 @@ Future<void> main() async {
             child: CssSizing(
               key: key,
               preferredAxis: Axis.vertical,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: 2),
             ),
           ),
@@ -633,8 +633,8 @@ Future<void> main() async {
             child: CssSizing(
               key: key,
               preferredAxis: Axis.vertical,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: 20),
             ),
           ),
@@ -649,8 +649,8 @@ Future<void> main() async {
           Center(
             child: CssSizing(
               key: key,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: .5),
             ),
           ),
@@ -666,8 +666,8 @@ Future<void> main() async {
             child: CssSizing(
               key: key,
               preferredAxis: Axis.vertical,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: .5),
             ),
           ),
@@ -682,8 +682,8 @@ Future<void> main() async {
           Center(
             child: CssSizing(
               key: key,
-              preferredHeight: const CssSizingValue.value(100),
-              preferredWidth: const CssSizingValue.value(100),
+              preferredHeight: const CssSizingValue.px(100),
+              preferredWidth: const CssSizingValue.px(100),
               child: const AspectRatio(aspectRatio: .05),
             ),
           ),

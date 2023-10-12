@@ -335,8 +335,8 @@ abstract class CssSizingValue {
   /// Creates a percentage value.
   const factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
 
-  /// Creates a fixed value.
-  const factory CssSizingValue.value(double _) = _CssSizingValue;
+  /// Creates a fixed value in pixel.
+  const factory CssSizingValue.px(double _) = _CssSizingValue;
 }
 
 class _CssSizingAuto extends CssSizingValue {
