@@ -3,16 +3,16 @@ part of '../core_ops.dart';
 const kCssMargin = 'margin';
 
 Widget _marginHorizontalBuilder(
-  Widget w,
-  CssLengthBox b,
+  Widget widget,
+  CssLengthBox box,
   InheritedProperties resolved,
 ) =>
     Padding(
       padding: EdgeInsets.only(
-        left: max(b.getValueLeft(resolved) ?? 0.0, 0.0),
-        right: max(b.getValueRight(resolved) ?? 0.0, 0.0),
+        left: max(box.getValueLeft(resolved) ?? 0.0, 0.0),
+        right: max(box.getValueRight(resolved) ?? 0.0, 0.0),
       ),
-      child: w,
+      child: widget,
     );
 
 class StyleMargin {

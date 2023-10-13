@@ -19,7 +19,7 @@ class InheritedProperties {
     required this.style,
   });
 
-  /// Creates the root HTML styling set.
+  /// Creates the root properties set.
   factory InheritedProperties.root([
     Iterable<dynamic> deps = const [],
     TextStyle? widgetStyle,
@@ -85,9 +85,9 @@ class InheritanceResolvers {
 
   InheritedProperties? _cachedParent;
   InheritedProperties? _cachedResolved;
-  List<_InheritanceResolverCallbackWithInput>? _queue;
+  List<_InheritanceResolverCallbackWithInput>? _callbacks;
 
-  InheritanceResolvers([this.parent, this._queue]);
+  InheritanceResolvers([this.parent, this._callbacks]);
 
   /// {@template flutter_widget_from_html.inherit}
   /// Enqueues an inherited property resolver callback.
@@ -100,18 +100,18 @@ class InheritanceResolvers {
     T? input,
   ]) {
     final item = _InheritanceResolverCallbackWithInput(callback, input as T);
-    final queue = _queue ??= [];
-    queue.add(item);
+    final list = _callbacks ??= [];
+    list.add(item);
   }
 
   /// Creates a copy with the given fields replaced with the new values.
   InheritanceResolvers copyWith({InheritanceResolvers? parent}) =>
-      InheritanceResolvers(parent ?? this.parent, _queue?.toList());
+      InheritanceResolvers(parent ?? this.parent, _callbacks?.toList());
 
   /// Returns `true` if this shares same callbacks with [other].
   bool isIdenticalWith(InheritanceResolvers other) {
     var thiz = this;
-    while (thiz._queue == null) {
+    while (thiz._callbacks == null) {
       final thisParent = thiz.parent;
       if (thisParent == null) {
         break;
@@ -121,7 +121,7 @@ class InheritanceResolvers {
     }
 
     var othez = other;
-    while (othez._queue == null) {
+    while (othez._callbacks == null) {
       final otherParent = othez.parent;
       if (otherParent == null) {
         break;
@@ -136,8 +136,8 @@ class InheritanceResolvers {
   /// Resolve an [InheritedProperties] by calling callbacks on top of parent properties.
   InheritedProperties resolve(BuildContext context) {
     final parentResolved = parent!.resolve(context);
-    final queue = _queue;
-    if (queue == null) {
+    final list = _callbacks;
+    if (list == null) {
       return parentResolved;
     }
 
@@ -147,9 +147,8 @@ class InheritanceResolvers {
     }
 
     var resolving = parentResolved.copyWith(parent: parentResolved);
-    final l = queue.length;
-    for (var i = 0; i < l; i++) {
-      resolving = queue[i](context, resolving);
+    for (final callback in list) {
+      resolving = callback(context, resolving);
       assert(
         identical(resolving.parent, parentResolved),
         'The inherited properties set should be modified by calling copyWith() '
