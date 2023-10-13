@@ -578,9 +578,15 @@ class Explainer {
       return '[HtmlSummary:child=${child != null ? _widget(child) : null}]';
     }
 
-    if (widget.runtimeType.toString() == 'HtmlStyleWidget' &&
-        widget is InheritedWidget) {
-      return _widget(widget.child);
+    if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'TshWidget') {
+        // v0.5+
+        return _widget(widget.child);
+      }
+      if (widget.runtimeType.toString() == 'HtmlStyleWidget') {
+        // v0.11+
+        return _widget(widget.child);
+      }
     }
 
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
