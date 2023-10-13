@@ -3,10 +3,10 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:test/test.dart';
 
 void main() {
-  group('HtmlStyle', () {
-    group('value', () {
+  group('InheritedProperties', () {
+    group('get', () {
       final dep1 = _Dep1();
-      final style = HtmlStyle.root(
+      final resolved = InheritedProperties.root(
         [
           const TextScaleFactor(1.0),
           TextDirection.ltr,
@@ -17,12 +17,12 @@ void main() {
       );
 
       test('returns value', () {
-        final dep = style.value<_Dep1>();
+        final dep = resolved.get<_Dep1>();
         expect(dep, equals(dep1));
       });
 
       test('returns null', () {
-        expect(style.value<_Dep2>(), isNull);
+        expect(resolved.get<_Dep2>(), isNull);
       });
     });
   });

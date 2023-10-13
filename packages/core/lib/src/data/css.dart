@@ -103,23 +103,23 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border? getBorder(HtmlStyle style) {
-    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(style);
+  Border? getBorder(InheritedProperties resolved) {
+    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(resolved);
     final left = CssBorderSide._copyWith(
       _all,
       _left ??
-          (style.textDirection == TextDirection.ltr
+          (resolved.textDirection == TextDirection.ltr
               ? _inlineStart
               : _inlineEnd),
-    )?._getValue(style);
+    )?._getValue(resolved);
     final right = CssBorderSide._copyWith(
       _all,
       _right ??
-          (style.textDirection == TextDirection.ltr
+          (resolved.textDirection == TextDirection.ltr
               ? _inlineEnd
               : _inlineStart),
-    )?._getValue(style);
-    final top = CssBorderSide._copyWith(_all, _top)?._getValue(style);
+    )?._getValue(resolved);
+    final top = CssBorderSide._copyWith(_all, _top)?._getValue(resolved);
     if (bottom == null && left == null && right == null && top == null) {
       return null;
     }
@@ -133,11 +133,11 @@ class CssBorder {
   }
 
   /// Calculates [BorderRadius].
-  BorderRadius? getBorderRadius(HtmlStyle style) {
-    final topLeft = radiusTopLeft._getValue(style);
-    final topRight = radiusTopRight._getValue(style);
-    final bottomLeft = radiusBottomLeft._getValue(style);
-    final bottomRight = radiusBottomRight._getValue(style);
+  BorderRadius? getBorderRadius(InheritedProperties resolved) {
+    final topLeft = radiusTopLeft._getValue(resolved);
+    final topRight = radiusTopRight._getValue(resolved);
+    final bottomLeft = radiusBottomLeft._getValue(resolved);
+    final bottomRight = radiusBottomRight._getValue(resolved);
     if (topLeft == null &&
         topRight == null &&
         bottomLeft == null &&
@@ -167,11 +167,11 @@ class CssRadius {
   /// A radius with [x] and [y] values set to zero.
   static const zero = CssRadius(CssLength.zero, CssLength.zero);
 
-  Radius? _getValue(HtmlStyle style) => this == zero
+  Radius? _getValue(InheritedProperties resolved) => this == zero
       ? null
       : Radius.elliptical(
-          x.getValue(style) ?? 0.0,
-          y.getValue(style) ?? 0.0,
+          x.getValue(resolved) ?? 0.0,
+          y.getValue(resolved) ?? 0.0,
         );
 }
 
@@ -198,17 +198,17 @@ class CssBorderSide {
   /// Border will use the default text color so [color] is not required.
   bool get isNoOp => style == null || width?.isPositive != true;
 
-  BorderSide? _getValue(HtmlStyle style) {
+  BorderSide? _getValue(InheritedProperties resolved) {
     if (identical(this, none)) {
       return null;
     }
 
-    final scopedColor = color ?? style.textStyle.color;
+    final scopedColor = color ?? resolved.style.color;
     if (scopedColor == null) {
       return null;
     }
 
-    final scopedWidth = width?.getValue(style);
+    final scopedWidth = width?.getValue(resolved);
     if (scopedWidth == null) {
       return null;
     }
@@ -216,7 +216,7 @@ class CssBorderSide {
     return BorderSide(
       color: scopedColor,
       // TODO: add proper support for other border styles
-      style: this.style != null ? BorderStyle.solid : BorderStyle.none,
+      style: style != null ? BorderStyle.solid : BorderStyle.none,
       width: scopedWidth,
     );
   }
@@ -260,7 +260,7 @@ class CssLength {
 
   /// Calculates value in logical pixel.
   double? getValue(
-    HtmlStyle style, {
+    InheritedProperties resolved, {
     double? baseValue,
     double? scaleFactor,
   }) {
@@ -271,7 +271,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= style.textStyle.fontSize;
+        baseValue ??= resolved.style.fontSize;
         if (baseValue == null) {
           return null;
         }
@@ -367,18 +367,18 @@ class CssLengthBox {
       _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
-  double? getValueLeft(HtmlStyle style) => (_left ??
-          (style.textDirection == TextDirection.ltr
+  double? getValueLeft(InheritedProperties resolved) => (_left ??
+          (resolved.textDirection == TextDirection.ltr
               ? _inlineStart
               : _inlineEnd))
-      ?.getValue(style);
+      ?.getValue(resolved);
 
   /// Calculates the right value taking text direction into account.
-  double? getValueRight(HtmlStyle style) => (_right ??
-          (style.textDirection == TextDirection.ltr
+  double? getValueRight(InheritedProperties resolved) => (_right ??
+          (resolved.textDirection == TextDirection.ltr
               ? _inlineEnd
               : _inlineStart))
-      ?.getValue(style);
+      ?.getValue(resolved);
 
   @override
   String toString() {

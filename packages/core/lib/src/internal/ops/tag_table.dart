@@ -82,14 +82,14 @@ class TagTable {
 
     return WidgetPlaceholder(
       builder: (context, _) {
-        final tableStyle = tableTree.styleBuilder.build(context);
+        final resolved = tableTree.inheritanceResolvers.resolve(context);
 
         return ValignBaselineContainer(
           child: HtmlTable(
-            border: border.getBorder(tableStyle),
+            border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
-            borderSpacing: borderSpacing?.getValue(tableStyle) ?? 0.0,
-            textDirection: tableStyle.textDirection,
+            borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
+            textDirection: resolved.textDirection,
             children: List.from(
               data.builders.map((f) => f(context)).where((e) => e != null),
               growable: false,
@@ -169,8 +169,8 @@ class TagTable {
         data.builders.add((context) {
           Widget? child = cell.child;
 
-          final cellStyle = cellTree.styleBuilder.build(context);
-          final border = cssBorder.getBorder(cellStyle);
+          final resolved = cellTree.inheritanceResolvers.resolve(context);
+          final border = cssBorder.getBorder(resolved);
           if (border != null) {
             child = wf.buildPadding(cellTree, cell.child, border.dimensions);
           }
@@ -189,7 +189,7 @@ class TagTable {
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
-            width: cell.width?.getSizing(cellStyle),
+            width: cell.width?.getSizing(resolved),
             child: child,
           );
         });

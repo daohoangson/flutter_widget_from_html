@@ -1049,7 +1049,7 @@ class _NullListMarkerWidgetFactory extends WidgetFactory {
   @override
   Widget? buildListMarker(
     BuildTree tree,
-    HtmlStyle style,
+    InheritedProperties resolved,
     String listStyleType,
     int index,
   ) {

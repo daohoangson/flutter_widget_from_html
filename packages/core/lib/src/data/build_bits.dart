@@ -111,6 +111,12 @@ abstract class BuildBit {
 }
 
 abstract class BuildTreeProperties {
+  /// {@macro flutter_widget_from_html.inherit}
+  void inherit<T>(
+    InheritanceResolverCallback<T> callback, [
+    T? input,
+  ]);
+
   /// Gets non-inherited property of type [T].
   ///
   /// These values are not passed down to sub-trees.
@@ -131,8 +137,8 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// The associated DOM element.
   final dom.Element element;
 
-  /// The associated [HtmlStyle] builder.
-  final HtmlStyleBuilder styleBuilder;
+  /// The [InheritedProperties] resolvers.
+  final InheritanceResolvers inheritanceResolvers;
 
   final _children = <BuildBit>[];
 
@@ -141,7 +147,7 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// Creates a tree.
   BuildTree({
     required this.element,
-    required this.styleBuilder,
+    required this.inheritanceResolvers,
   });
 
   /// The list of bits including direct children and sub-tree's.
@@ -251,6 +257,13 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// Gets a styling declaration by [property].
   css.Declaration? getStyle(String property);
 
+  @override
+  void inherit<T>(
+    InheritanceResolverCallback<T> callback, [
+    T? input,
+  ]) =>
+      inheritanceResolvers.enqueue(callback, input);
+
   /// Prepends [bit].
   ///
   /// See also: [append].
@@ -286,7 +299,7 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
     }
 
     final sb = _buffers[this] = StringBuffer();
-    sb.writeln('BuildTree#$hashCode $styleBuilder:');
+    sb.writeln('BuildTree#$hashCode $inheritanceResolvers:');
 
     const indent = '  ';
     for (final child in children) {

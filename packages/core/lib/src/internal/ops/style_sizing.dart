@@ -8,8 +8,8 @@ const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
 extension GetSizing on CssLength {
-  CssSizingValue? getSizing(HtmlStyle style) {
-    final value = getValue(style);
+  CssSizingValue? getSizing(InheritedProperties resolved) {
+    final value = getValue(resolved);
     if (value != null) {
       return CssSizingValue.value(value);
     }
@@ -108,9 +108,9 @@ class StyleSizing {
     }
 
     return placeholder.wrapWith((context, child) {
-      final textDirection = subTree.styleBuilder.build(context).textDirection;
+      final dir = subTree.inheritanceResolvers.resolve(context).textDirection;
       return _MinWidthZero(
-        textDirection: textDirection,
+        textDirection: dir,
         child: child,
       );
     });
@@ -127,7 +127,8 @@ class StyleSizing {
     }
 
     return placeholder.wrapWith(
-      (context, child) => _build(context, child, input, tree.styleBuilder),
+      (context, child) =>
+          _build(context, child, input, tree.inheritanceResolvers),
     );
   }
 
@@ -158,7 +159,8 @@ class StyleSizing {
       return;
     }
 
-    placeholder.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
+    placeholder
+        .wrapWith((c, w) => _build(c, w, input, tree.inheritanceResolvers));
   }
 
   static void skip(BuildTree tree) {
@@ -170,7 +172,7 @@ class StyleSizing {
     BuildContext context,
     Widget child,
     _StyleSizingInput input,
-    HtmlStyleBuilder styleBuilder,
+    InheritanceResolvers inheritanceResolvers,
   ) {
     if (input.maxHeight == null &&
         input.maxWidth == null &&
@@ -186,15 +188,15 @@ class StyleSizing {
       return CssBlock(child: child);
     }
 
-    final style = styleBuilder.build(context);
+    final resolved = inheritanceResolvers.resolve(context);
     return CssSizing(
-      maxHeight: input.maxHeight?.getSizing(style),
-      maxWidth: input.maxWidth?.getSizing(style),
-      minHeight: input.minHeight?.getSizing(style),
-      minWidth: input.minWidth?.getSizing(style),
+      maxHeight: input.maxHeight?.getSizing(resolved),
+      maxWidth: input.maxWidth?.getSizing(resolved),
+      minHeight: input.minHeight?.getSizing(resolved),
+      minWidth: input.minWidth?.getSizing(resolved),
       preferredAxis: input.preferredAxis,
-      preferredHeight: input.preferredHeight?.getSizing(style),
-      preferredWidth: input.preferredWidth?.getSizing(style),
+      preferredHeight: input.preferredHeight?.getSizing(resolved),
+      preferredWidth: input.preferredWidth?.getSizing(resolved),
       child: child,
     );
   }

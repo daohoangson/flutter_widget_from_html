@@ -36,9 +36,9 @@ class CoreBuildTree extends BuildTree {
     this.customStylesBuilder,
     this.customWidgetBuilder,
     required super.element,
+    required super.inheritanceResolvers,
     BuildTree? parent,
     Iterable<_CoreBuildOp> parentOps = const [],
-    required super.styleBuilder,
     required this.wf,
   })  : _parent = parent,
         _parentOps = parentOps;
@@ -46,14 +46,14 @@ class CoreBuildTree extends BuildTree {
   factory CoreBuildTree.root({
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
-    required HtmlStyleBuilder styleBuilder,
+    required InheritanceResolvers inheritanceResolvers,
     required WidgetFactory wf,
   }) =>
       CoreBuildTree._(
         customStylesBuilder: customStylesBuilder,
         customWidgetBuilder: customWidgetBuilder,
         element: _rootElement,
-        styleBuilder: styleBuilder,
+        inheritanceResolvers: inheritanceResolvers,
         wf: wf,
       );
 
@@ -115,21 +115,23 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree copyWith({
     bool copyContents = true,
     dom.Element? element,
+    InheritanceResolvers? inheritanceResolvers,
     BuildTree? parent,
-    HtmlStyleBuilder? styleBuilder,
   }) {
     final copiedParent = parent ?? this.parent;
-    final sb = styleBuilder ??
-        this.styleBuilder.copyWith(parent: copiedParent.styleBuilder);
+    final scopedInheritanceResolvers = inheritanceResolvers ??
+        this
+            .inheritanceResolvers
+            .copyWith(parent: copiedParent.inheritanceResolvers);
     final copied = CoreBuildTree._(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
+      inheritanceResolvers: scopedInheritanceResolvers,
       parent: copiedParent,
       parentOps: copiedParent is CoreBuildTree
           ? _prepareParentOps(copiedParent._parentOps, copiedParent)
           : const [],
-      styleBuilder: sb,
       wf: wf,
     );
 
@@ -188,8 +190,8 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree sub({dom.Element? element}) => copyWith(
         copyContents: false,
         element: element,
+        inheritanceResolvers: inheritanceResolvers.sub(),
         parent: this,
-        styleBuilder: styleBuilder.sub(),
       );
 
   void _addBitsFromNode(dom.Node domNode) {

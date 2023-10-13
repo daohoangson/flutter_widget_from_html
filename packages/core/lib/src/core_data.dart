@@ -8,8 +8,8 @@ import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
-part 'data/html_style.dart';
 part 'data/image.dart';
+part 'data/inherited_properties.dart';
 part 'data/lockable_list.dart';
 part 'data/normal_line_height.dart';
 

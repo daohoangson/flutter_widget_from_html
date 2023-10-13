@@ -583,8 +583,8 @@ class Explainer {
         // v0.5+
         return _widget(widget.child);
       }
-      if (widget.runtimeType.toString() == 'HtmlStyleWidget') {
-        // v0.11+
+      if (widget.runtimeType.toString() == '_RootWidget') {
+        // v0.14+
         return _widget(widget.child);
       }
     }

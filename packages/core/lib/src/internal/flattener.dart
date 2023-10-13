@@ -15,18 +15,18 @@ class Flattener implements Flattened {
   final _widgets = <WidgetPlaceholder>[];
 
   List<InlineSpan? Function(BuildContext, {bool? isLast})>? _childrenBuilder;
+  late InheritanceResolvers _firstInheritanceResolvers;
   late List<_String> _firstStrings;
-  late HtmlStyleBuilder _firstStyleBuilder;
 
   late BuildBit _bit;
+  late InheritanceResolvers _inheritanceResolvers;
   var _swallowWhitespace = false;
   late List<_String> _strings;
-  late HtmlStyleBuilder _styleBuilder;
 
   Flattener(this.wf, this.tree) {
     _loopSubTree(tree, flatten: false);
 
-    _resetLoop(tree.styleBuilder);
+    _resetLoop(tree.inheritanceResolvers);
     for (final bit in tree.bits) {
       _loop(bit);
     }
@@ -44,16 +44,16 @@ class Flattener implements Flattened {
     _saveSpan();
 
     final scopedTree = _bit.parent;
-    final scopedStyleBuilder = _styleBuilder;
+    final scopedInheritanceResolvers = _inheritanceResolvers;
     final placeholder = WidgetPlaceholder.lazy(
       child,
       debugLabel: '${scopedTree.element.localName}--Flattener.inlineWidget',
     );
 
     placeholder.wrapWith((context, widget) {
-      final style = scopedStyleBuilder.build(context);
-      final recognizer = style.gestureRecognizer;
-      if (recognizer != null && _needsInlineRecognizer(context, style)) {
+      final resolved = scopedInheritanceResolvers.resolve(context);
+      final recognizer = resolved.gestureRecognizer;
+      if (recognizer != null && _needsInlineRecognizer(context, resolved)) {
         return wf.buildGestureDetector(scopedTree, widget, recognizer);
       }
 
@@ -77,10 +77,10 @@ class Flattener implements Flattened {
       value,
       debugLabel: '${_bit.parent.element.localName}--Flattener.widget',
     );
-    final scopedStyleBuilder = _styleBuilder;
+    final scopedInheritanceResolvers = _inheritanceResolvers;
     placeholder.wrapWith((context, child) {
-      final style = scopedStyleBuilder.build(context);
-      final recognizer = style.gestureRecognizer;
+      final resolved = scopedInheritanceResolvers.resolve(context);
+      final recognizer = resolved.gestureRecognizer;
       final detector = recognizer != null
           ? wf.buildGestureDetector(tree, child, recognizer)
           : null;
@@ -108,13 +108,13 @@ class Flattener implements Flattened {
     }
   }
 
-  void _resetLoop(HtmlStyleBuilder styleBuilder) {
+  void _resetLoop(InheritanceResolvers inheritanceResolvers) {
     _childrenBuilder = [];
+    _firstInheritanceResolvers = inheritanceResolvers;
     _firstStrings = [];
-    _firstStyleBuilder = styleBuilder;
 
+    _inheritanceResolvers = _firstInheritanceResolvers;
     _strings = _firstStrings;
-    _styleBuilder = _firstStyleBuilder;
   }
 
   void _loopSubTree(BuildTree someTree, {required bool flatten}) {
@@ -131,14 +131,15 @@ class Flattener implements Flattened {
 
   void _loop(BuildBit bit) {
     _bit = bit;
-    final thisStyleBulder = bit.effectiveStyleBulder ?? _styleBuilder;
+    final thisInheritanceResolvers =
+        bit.effectiveInheritanceResolvers ?? _inheritanceResolvers;
     if (_childrenBuilder == null) {
-      _resetLoop(thisStyleBulder);
+      _resetLoop(thisInheritanceResolvers);
     }
-    if (!thisStyleBulder.hasSameStyleWith(_styleBuilder)) {
+    if (!thisInheritanceResolvers.isIdenticalWith(_inheritanceResolvers)) {
       _saveSpan();
     }
-    _styleBuilder = thisStyleBulder;
+    _inheritanceResolvers = thisInheritanceResolvers;
 
     bit.flatten(this);
 
@@ -161,14 +162,14 @@ class Flattener implements Flattened {
 
   void _saveSpan() {
     if (_strings != _firstStrings && _strings.isNotEmpty) {
-      final scopedStyleBuilder = _styleBuilder;
+      final scopedInheritanceResolvers = _inheritanceResolvers;
       final scopedStrings = _strings;
 
       _childrenBuilder?.add(
         (context, {bool? isLast}) {
-          final style = scopedStyleBuilder.build(context);
+          final resolved = scopedInheritanceResolvers.resolve(context);
           final text = scopedStrings.toText(
-            style.whitespace,
+            resolved.whitespace,
             isFirst: false,
             isLast: isLast != false,
           );
@@ -177,10 +178,10 @@ class Flattener implements Flattened {
           }
 
           return wf.buildTextSpan(
-            recognizer: _needsInlineRecognizer(context, style)
-                ? style.gestureRecognizer
+            recognizer: _needsInlineRecognizer(context, resolved)
+                ? resolved.gestureRecognizer
                 : null,
-            style: style.textStyle,
+            style: resolved.style,
             text: text,
           );
         },
@@ -203,11 +204,11 @@ class Flattener implements Flattened {
       return;
     }
     final scopedStrings = _firstStrings;
-    final scopedStyleBulder = _firstStyleBuilder;
+    final scopedInheritanceResolvers = _firstInheritanceResolvers;
 
     final placeholder = WidgetPlaceholder(
       builder: (context, _) {
-        final style = scopedStyleBulder.build(context);
+        final resolved = scopedInheritanceResolvers.resolve(context);
         final children = <InlineSpan>[];
 
         var isLast_ = true;
@@ -220,7 +221,7 @@ class Flattener implements Flattened {
         }
 
         final text = scopedStrings.toText(
-          style.whitespace,
+          resolved.whitespace,
           isFirst: true,
           isLast: isLast_,
         );
@@ -236,7 +237,7 @@ class Flattener implements Flattened {
             span = WidgetSpan(
               child: HeightPlaceholder(
                 oneEm,
-                scopedStyleBulder,
+                scopedInheritanceResolvers,
                 debugLabel: '${tree.element.localName}--$oneEm',
               ),
             );
@@ -244,10 +245,10 @@ class Flattener implements Flattened {
         } else {
           span = wf.buildTextSpan(
             children: children,
-            recognizer: _needsInlineRecognizer(context, style)
-                ? style.gestureRecognizer
+            recognizer: _needsInlineRecognizer(context, resolved)
+                ? resolved.gestureRecognizer
                 : null,
-            style: style.textStyle,
+            style: resolved.style,
             text: text,
           );
         }
@@ -256,12 +257,12 @@ class Flattener implements Flattened {
           return widget0;
         }
 
-        final TextAlign textAlign = style.value() ?? TextAlign.start;
+        final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
         if (span is WidgetSpan && textAlign == TextAlign.start) {
           return span.child;
         }
 
-        return wf.buildText(tree, style, span);
+        return wf.buildText(tree, resolved, span);
       },
       debugLabel: '${tree.element.localName}--text',
     );
@@ -270,27 +271,33 @@ class Flattener implements Flattened {
     _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
-  bool _needsInlineRecognizer(BuildContext context, HtmlStyle style) {
-    final rootStyle = tree.styleBuilder.build(context);
-    return style.gestureRecognizer != null &&
-        !identical(style.gestureRecognizer, rootStyle.gestureRecognizer);
+  bool _needsInlineRecognizer(
+    BuildContext context,
+    InheritedProperties resolved,
+  ) {
+    final rootProperties = tree.inheritanceResolvers.resolve(context);
+    return resolved.gestureRecognizer != null &&
+        !identical(
+          resolved.gestureRecognizer,
+          rootProperties.gestureRecognizer,
+        );
   }
 }
 
 extension on BuildBit {
-  HtmlStyleBuilder? get effectiveStyleBulder {
-    // the below code will find the best style for this whitespace bit
+  InheritanceResolvers? get effectiveInheritanceResolvers {
+    // the below code will find the best resolvers for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = this.parent;
     if (this is! WhitespaceBit) {
-      return parent.styleBuilder;
+      return parent.inheritanceResolvers;
     }
     if (this == parent.first) {
       return null;
     }
 
     // complicated: whitespace at the end of a tag, try to merge with the next
-    // unless it has unrelated style (e.g. next bit is a sibling)
+    // unless it has unrelated styling (e.g. next bit is a sibling)
     if (this == parent.last) {
       final next = nextNonWhitespace;
       if (next != null) {
@@ -300,7 +307,7 @@ extension on BuildBit {
         }
 
         if (tree.parent == next.parent) {
-          return next.parent.styleBuilder;
+          return next.parent.inheritanceResolvers;
         } else {
           return null;
         }
@@ -308,7 +315,7 @@ extension on BuildBit {
     }
 
     // fallback to parent's
-    return parent.styleBuilder;
+    return parent.inheritanceResolvers;
   }
 
   BuildBit? get nextNonWhitespace {

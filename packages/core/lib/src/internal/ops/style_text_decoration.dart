@@ -17,7 +17,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationLine) {
       final line = TextDecorationLine.tryParse(value);
       if (line != null) {
-        tree.styleBuilder.enqueue(textDecorationLine, line);
+        tree.inherit(textDecorationLine, line);
         continue;
       }
     }
@@ -26,7 +26,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationStyle) {
       final tds = tryParseTextDecorationStyle(value);
       if (tds != null) {
-        tree.styleBuilder.enqueue(textDecorationStyle, tds);
+        tree.inherit(textDecorationStyle, tds);
         continue;
       }
     }
@@ -35,7 +35,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationColor) {
       final color = tryParseColor(value);
       if (color != null) {
-        tree.styleBuilder.enqueue(textDecorationColor, color);
+        tree.inherit(textDecorationColor, color);
         continue;
       }
     }
@@ -45,36 +45,42 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationWidth) {
       final length = tryParseCssLength(value);
       if (length != null && length.unit == CssLengthUnit.percentage) {
-        tree.styleBuilder
-            .enqueue(textDecorationThickness, length.number / 100.0);
+        tree.inherit(textDecorationThickness, length.number / 100.0);
         continue;
       }
     }
   }
 }
 
-HtmlStyle textDecorationColor(HtmlStyle style, Color v) => style.copyWith(
-      textStyle: style.textStyle.copyWith(
-        decorationColor: v,
+InheritedProperties textDecorationColor(
+  InheritedProperties resolving,
+  Color value,
+) =>
+    resolving.copyWith(
+      style: resolving.style.copyWith(
+        decorationColor: value,
         debugLabel: 'fwfh: $kCssTextDecorationColor',
       ),
     );
 
-HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
-  final parent = p.parent?.textStyle.decoration;
+InheritedProperties textDecorationLine(
+  InheritedProperties resolving,
+  TextDecorationLine value,
+) {
+  final parent = resolving.parent?.style.decoration;
   final parentOverline = parent?.contains(TextDecoration.overline) == true;
   final parentLineThrough =
       parent?.contains(TextDecoration.lineThrough) == true;
   final parentUnderline = parent?.contains(TextDecoration.underline) == true;
 
-  final current = p.textStyle.decoration;
+  final current = resolving.style.decoration;
   final currentOverline = current?.contains(TextDecoration.overline) == true;
   final currentLineThrough =
       current?.contains(TextDecoration.lineThrough) == true;
   final currentUnderline = current?.contains(TextDecoration.underline) == true;
 
   final list = <TextDecoration>[];
-  if (parentOverline || (v.over ?? currentOverline)) {
+  if (parentOverline || (value.over ?? currentOverline)) {
     // 1. Honor parent's styling if the line decoration is turned on
     // 2. Then apply incoing value (if set)
     // 3. Finally fallback to the current styling
@@ -85,32 +91,39 @@ HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
     // > then a child element can't remove the decoration.
     list.add(TextDecoration.overline);
   }
-  if (parentLineThrough || (v.strike ?? currentLineThrough)) {
+  if (parentLineThrough || (value.strike ?? currentLineThrough)) {
     list.add(TextDecoration.lineThrough);
   }
-  if (parentUnderline || (v.under ?? currentUnderline)) {
+  if (parentUnderline || (value.under ?? currentUnderline)) {
     list.add(TextDecoration.underline);
   }
 
   final combined = TextDecoration.combine(list);
-  return p.copyWith(
-    textStyle: p.textStyle.copyWith(
+  return resolving.copyWith(
+    style: resolving.style.copyWith(
       decoration: combined,
       debugLabel: 'fwfh: $kCssTextDecorationLine',
     ),
   );
 }
 
-HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
-    style.copyWith(
-      textStyle: style.textStyle.copyWith(
+InheritedProperties textDecorationStyle(
+  InheritedProperties resolving,
+  TextDecorationStyle v,
+) =>
+    resolving.copyWith(
+      style: resolving.style.copyWith(
         decorationStyle: v,
         debugLabel: 'fwfh: $kCssTextDecorationStyle',
       ),
     );
 
-HtmlStyle textDecorationThickness(HtmlStyle style, double v) => style.copyWith(
-      textStyle: style.textStyle.copyWith(
+InheritedProperties textDecorationThickness(
+  InheritedProperties resolving,
+  double v,
+) =>
+    resolving.copyWith(
+      style: resolving.style.copyWith(
         decorationThickness: v,
         debugLabel: 'fwfh: $kCssTextDecorationThickness',
       ),

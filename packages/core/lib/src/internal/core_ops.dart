@@ -16,6 +16,7 @@ import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
+import 'text_ops.dart' as text_ops;
 
 part 'ops/anchor.dart';
 part 'ops/column.dart';

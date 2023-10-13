@@ -70,22 +70,22 @@ class TagLi {
     int i,
   ) {
     final tree = itemTree.sub()
-      ..maxLines = 1
-      ..styleBuilder.enqueue(TextStyleOps.whitespace, CssWhitespace.nowrap);
+      ..inherit(text_ops.whitespace, CssWhitespace.nowrap)
+      ..maxLines = 1;
     final listData = listTree.listData;
     final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
     final index = listData.markerReversed
         ? (listData.markerStart ?? listData.items) - i
         : (listData.markerStart ?? 1) + i;
-    final style = tree.styleBuilder.build(context);
-    final marker = wf.buildListMarker(tree, style, listStyleType, index);
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final marker = wf.buildListMarker(tree, resolved, listStyleType, index);
     if (marker == null) {
       return child;
     }
 
     return HtmlListItem(
       marker: marker,
-      textDirection: style.textDirection,
+      textDirection: resolved.textDirection,
       child: child,
     );
   }

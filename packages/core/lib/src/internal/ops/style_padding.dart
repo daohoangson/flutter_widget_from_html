@@ -2,17 +2,19 @@ part of '../core_ops.dart';
 
 const kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(BuildTree tree, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineAfter(BuildTree tree, CssLengthBox box) =>
     WidgetPlaceholder(
-      builder: (c, _) =>
-          _paddingInlineSizedBox(b.getValueRight(tree.styleBuilder.build(c))),
+      builder: (context, _) => _paddingInlineSizedBox(
+        box.getValueRight(tree.inheritanceResolvers.resolve(context)),
+      ),
       debugLabel: '${tree.element.localName}--paddingInlineAfter',
     );
 
-WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox box) =>
     WidgetPlaceholder(
-      builder: (c, _) =>
-          _paddingInlineSizedBox(b.getValueLeft(tree.styleBuilder.build(c))),
+      builder: (context, _) => _paddingInlineSizedBox(
+        box.getValueLeft(tree.inheritanceResolvers.resolve(context)),
+      ),
       debugLabel: '${tree.element.localName}--paddingInlineBefore',
     );
 
@@ -64,15 +66,15 @@ class StylePadding {
     Widget child,
     CssLengthBox padding,
   ) {
-    final style = tree.styleBuilder.build(context);
+    final resolved = tree.inheritanceResolvers.resolve(context);
     return wf.buildPadding(
       tree,
       child,
       EdgeInsets.fromLTRB(
-        max(padding.getValueLeft(style) ?? 0.0, 0.0),
-        max(padding.top?.getValue(style) ?? 0.0, 0.0),
-        max(padding.getValueRight(style) ?? 0.0, 0.0),
-        max(padding.bottom?.getValue(style) ?? 0.0, 0.0),
+        max(padding.getValueLeft(resolved) ?? 0.0, 0.0),
+        max(padding.top?.getValue(resolved) ?? 0.0, 0.0),
+        max(padding.getValueRight(resolved) ?? 0.0, 0.0),
+        max(padding.bottom?.getValue(resolved) ?? 0.0, 0.0),
       ),
     );
   }

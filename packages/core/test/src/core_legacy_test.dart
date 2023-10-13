@@ -134,7 +134,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└ColumnPlaceholder(root--column)\n'
             ' └Column()\n'
             '  ├RichText(text: "Foo")\n'
@@ -164,7 +164,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└ColumnPlaceholder(div--column)\n'
             ' └CssBlock()\n'
             '  └Column()\n'
@@ -193,7 +193,7 @@ void main() {
           ),
           useExplainer: false,
         );
-        expect(explained, contains('HtmlStyleWidget'));
+        expect(explained, contains('_RootWidget'));
         expect(explained, contains('└WidgetPlaceholder(root--text)'));
         expect(explained, contains('└RichText(text: "bar\u{fffc}")'));
         expect(
@@ -242,7 +242,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└ColumnPlaceholder(root--column)\n'
             ' └Column()\n'
             '  ├RichText(text: "Foo")\n'
@@ -269,7 +269,7 @@ void main() {
           ),
           useExplainer: false,
         );
-        expect(explained, contains('HtmlStyleWidget'));
+        expect(explained, contains('_RootWidget'));
         expect(explained, contains('└WidgetPlaceholder(root--text)'));
         expect(explained, contains('└RichText(text: "bar\u{fffc}")'));
         expect(
@@ -299,7 +299,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└WidgetPlaceholder(span--text)\n'
             ' └RichText(text: "Foo")\n\n',
           ),
@@ -323,7 +323,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└WidgetPlaceholder(span--lazy)\n'
             ' └SizedBox.shrink()\n\n',
           ),
@@ -347,7 +347,7 @@ void main() {
         expect(
           explained,
           equals(
-            'HtmlStyleWidget\n'
+            '_RootWidget\n'
             '└WidgetPlaceholder(span--lazy)\n'
             ' └Text("Hi")\n'
             '  └RichText(text: "Hi")\n\n',
@@ -414,7 +414,7 @@ void main() {
   group('TextStyleHtml', () {
     group('getDependency', () {
       final dep1 = _LegacyTextStyleHtmlDep1();
-      final style = HtmlStyle.root(
+      final style = InheritedProperties.root(
         [
           const TextScaleFactor(1.0),
           TextDirection.ltr,

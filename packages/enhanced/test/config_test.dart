@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../fwfh_url_launcher/test/mock_url_launcher_platform.dart';
@@ -51,7 +50,7 @@ void main() {
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, startsWith('HtmlStyleWidget'));
+      expect(explained, startsWith('_RootWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
@@ -86,8 +85,8 @@ void main() {
         );
 
     void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
-      final widget1 = (built1! as HtmlStyleWidget).child;
-      final widget2 = (built2! as HtmlStyleWidget).child;
+      final widget1 = (built1! as InheritedWidget).child;
+      final widget2 = (built2! as InheritedWidget).child;
       expect(widget1 == widget2, matcher);
     }
 

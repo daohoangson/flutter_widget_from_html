@@ -77,7 +77,7 @@ extension TagRuby on WidgetFactory {
         );
         break;
       case kTagRt:
-        subTree.styleBuilder.enqueue(TextStyleOps.fontSizeEm, .5);
+        subTree.inherit(text_ops.fontSizeEm, .5);
         break;
     }
   }

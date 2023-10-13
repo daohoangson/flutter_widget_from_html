@@ -27,13 +27,17 @@ class StyleBackground {
             return;
           }
 
-          tree.styleBuilder.enqueue(_color, color);
+          tree.inherit(_color, color);
         },
         priority: BoxModel.background,
       );
 
-  static HtmlStyle _color(HtmlStyle style, Color color) => style.copyWith(
-        textStyle: style.textStyle.copyWith(
+  static InheritedProperties _color(
+    InheritedProperties resolving,
+    Color color,
+  ) =>
+      resolving.copyWith(
+        style: resolving.style.copyWith(
           background: Paint()..color = color,
           debugLabel: 'fwfh: $kCssBackgroundColor',
         ),

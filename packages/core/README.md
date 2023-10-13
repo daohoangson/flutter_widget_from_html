@@ -238,27 +238,28 @@ flowchart TD
 
 Notes:
 
-- Styling can be changed with `HtmlStyleBuilder`, register your callback to be called when the build context is ready.
-  - The first parameter is a `HtmlStyle` which is immutable and is calculated from the root down to each element, the callback must return a new `HtmlStyle` by calling `copyWith`. It's recommended to return the same object if no change is needed.
+- Styling can be changed with `inherit`, register your resolver to be called when the build context is ready.
+  - The first parameter is a `InheritedProperties` which is immutable and is calculated from the root down to each element, the callback must return a new `InheritedProperties` by calling `copyWith`. It's recommended to return the same object if no change is needed.
   - Optionally, pass any object on enqueue and your callback will receive it as the second parameter.
 
 ```dart
-// example 1: simple callback setting text color
-tree.apply(
-  (style, _) => style.copyWith(
-    textStyle: style.textStyle.copyWith(
+// example 1: simple resolver setting text color
+tree.inherit(
+  (resolving, _) => resolving.copyWith(
+    style: resolving.style.copyWith(
       color: Colors.red,
     ),
   ),
   null,
 );
 
-// example 2: callback using second param to set alignment
-HtmlStyle callback(HtmlStyle style, TextAlign value) =>
-  style.copyWith(textAlign: value)
-
-// example 2 (continue): register with some value
-tree.apply(callback, TextAlign.justify);
+// example 2: resolver uses a second param to set alignment
+InheritedProperties resolver(InheritedProperties resolving, TextAlign value) =>
+  resolving.copyWith<TextAlign>(value: value)
+// enqueue with some value
+tree.inherit(resolver, TextAlign.justify);
+// get the TextAlign during rendering later
+final value = resolved.get<TextAlign>();
 ```
 
 - Other complicated styling are supported via `BuildOp`
@@ -278,7 +279,7 @@ tree.register(BuildOp(
 ));
 ```
 
-- Each tree may have as many style builder callbacks and build ops as needed.
+- Each tree may have as many inherited property resolvers and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 
