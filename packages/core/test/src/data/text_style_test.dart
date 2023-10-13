@@ -21,12 +21,6 @@ void main() {
         expect(dep, equals(dep1));
       });
 
-      test('returns dependency', () {
-        // ignore: deprecated_member_use_from_same_package
-        final dep = style.getDependency<_Dep1>();
-        expect(dep, equals(dep1));
-      });
-
       test('returns null', () {
         expect(style.value<_Dep2>(), isNull);
       });

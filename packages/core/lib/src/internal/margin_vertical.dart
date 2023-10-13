@@ -11,20 +11,13 @@ class HeightPlaceholder extends WidgetPlaceholder {
   HeightPlaceholder(
     CssLength height,
     this.styleBuilder, {
-    String? debugLabel,
-    Key? key,
-  }) : super(
-          builder: (c, w) => _build(c, w, height, styleBuilder),
-          debugLabel: debugLabel,
-          key: key,
-        ) {
+    super.debugLabel,
+    super.key,
+  }) : super(builder: (c, w) => _build(c, w, height, styleBuilder)) {
     _heights.add(height);
   }
 
   CssLength get height => _heights.first;
-
-  @override
-  bool get isEmpty => false;
 
   @override
   Widget build(BuildContext context) {

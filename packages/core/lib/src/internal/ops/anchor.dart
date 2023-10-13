@@ -11,7 +11,7 @@ class Anchor {
       : anchor = GlobalKey(debugLabel: id),
         registry = wf._registry;
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: 'anchor#$id',
         onParsed: (tree) {
@@ -21,7 +21,7 @@ class Anchor {
         onRenderInline: (tree) {
           final widget = WidgetPlaceholder(
             builder: (context, _) => SizedBox(
-              height: tree.styleBuilder.build(context).fontSize,
+              height: tree.styleBuilder.build(context).textStyle.fontSize,
               key: anchor,
             ),
             debugLabel: '${tree.element.localName}--anchor#$id',
@@ -342,18 +342,17 @@ class _BodyItemWidget extends ProxyWidget {
   final AnchorRegistry registry;
 
   const _BodyItemWidget({
-    required Widget child,
+    required super.child,
     required this.index,
     required this.registry,
-    Key? key,
-  }) : super(key: key, child: child);
+  });
 
   @override
   Element createElement() => _BodyItemElement(this);
 }
 
 class _BodyItemElement extends ProxyElement {
-  _BodyItemElement(_BodyItemWidget widget) : super(widget);
+  _BodyItemElement(_BodyItemWidget super.widget);
 
   _BodyItemWidget get bodyItem => widget as _BodyItemWidget;
 

@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 class HtmlRuby extends MultiChildRenderObjectWidget {
   /// Creates a RUBY widget.
   HtmlRuby({
-    Key? key,
+    super.key,
     Widget? rt,
     Widget? ruby,
   }) : super(
@@ -15,7 +15,6 @@ class HtmlRuby extends MultiChildRenderObjectWidget {
             if (ruby != null) ruby,
             if (rt != null) rt,
           ],
-          key: key,
         );
 
   @override

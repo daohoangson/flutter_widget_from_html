@@ -25,7 +25,7 @@ void main() {
 
   testWidgets('renders IMG tag with .svg', (WidgetTester tester) async {
     const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
-    const assetName = 'test/images/logo.svg';
+    const assetName = 'test/images/icon.svg';
     const html = '<img src="asset:$assetName" />';
     final explained = await explain(tester, html);
     expect(

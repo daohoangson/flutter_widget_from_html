@@ -303,7 +303,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--String')) {
       tree.register(
-        BuildOp.v1(
+        BuildOp(
           onParsed: (tree) => tree..append(_OutputStringBit(tree)),
         ),
       );
@@ -311,12 +311,12 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--Widget')) {
       tree.register(
-        BuildOp.v1(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
+        BuildOp(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
       );
     }
 
     if (classes.contains('custom')) {
-      tree.apply((style, _) => style.copyWith(), null);
+      tree.styleBuilder.enqueue((style, _) => style.copyWith(), null);
     }
 
     super.parse(tree);

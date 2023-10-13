@@ -61,17 +61,17 @@ class StyleSizing {
   }
 
   factory StyleSizing() => const StyleSizing._(
-        blockOp: BuildOp.v1(
+        blockOp: BuildOp.v2(
           alwaysRenderBlock: true,
           debugLabel: 'display: block',
         ),
-        childOp: BuildOp.v1(
+        childOp: BuildOp.v2(
           alwaysRenderBlock: false,
           debugLabel: 'sizing (min-width=0)',
           onRenderBlock: _childZero,
           priority: BoxModel.sizingMinWidthZero,
         ),
-        sizingOp: BuildOp.v1(
+        sizingOp: BuildOp.v2(
           alwaysRenderBlock: false,
           debugLabel: 'sizing',
           onRenderBlock: _sizingBlock,
@@ -284,16 +284,13 @@ extension on BuildTree {
 
 class _MinWidthZero extends ConstraintsTransformBox {
   const _MinWidthZero({
-    required Widget child,
-    Key? key,
+    super.child,
     required TextDirection textDirection,
   }) : super(
           alignment: textDirection == TextDirection.ltr
               ? Alignment.topLeft
               : Alignment.topRight,
           constraintsTransform: transform,
-          key: key,
-          child: child,
         );
 
   static BoxConstraints transform(BoxConstraints bc) =>

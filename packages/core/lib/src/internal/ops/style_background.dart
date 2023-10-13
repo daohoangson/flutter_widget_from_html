@@ -8,7 +8,7 @@ class StyleBackground {
 
   StyleBackground(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: kCssBackground,
         onRenderBlock: (tree, placeholder) {
@@ -27,13 +27,17 @@ class StyleBackground {
             return;
           }
 
-          tree.apply(_color, color);
+          tree.styleBuilder.enqueue(_color, color);
         },
         priority: BoxModel.background,
       );
 
-  static HtmlStyle _color(HtmlStyle style, Color color) =>
-      style.mergeWith(TextStyle(background: Paint()..color = color));
+  static HtmlStyle _color(HtmlStyle style, Color color) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          background: Paint()..color = color,
+          debugLabel: 'fwfh: $kCssBackgroundColor',
+        ),
+      );
 
   static Color? _parseColor(BuildTree tree) {
     Color? color;

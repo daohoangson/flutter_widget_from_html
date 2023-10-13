@@ -2,6 +2,7 @@ part of '../core_parser.dart';
 
 const kCssBorder = 'border';
 const kCssBorderInherit = 'inherit';
+const kCssBorderNone = 'none';
 
 const kCssBorderRadius = 'border-radius';
 const kCssBorderRadiusSuffix = 'radius';
@@ -42,9 +43,20 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
   }
 
   TextDecorationStyle? borderStyle;
-  CssLength? width;
   Color? color;
+  // TODO: look for official document regarding this default value
+  // WebKit & Blink seem to follow the same (hidden?) specs
+  var width = const CssLength(1);
   for (final expression in style.values) {
+    final value =
+        expression is css.LiteralTerm ? expression.valueAsString : null;
+    if (value == kCssBorderNone) {
+      borderStyle = null;
+      color = null;
+      width = CssLength.zero;
+      break;
+    }
+
     final parsedStyle = tryParseTextDecorationStyle(expression);
     if (parsedStyle != null) {
       borderStyle = parsedStyle;
@@ -64,16 +76,14 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
     }
   }
 
-  final borderSide = borderStyle == null
-      ? CssBorderSide.none
-      : CssBorderSide(
-          color: color,
-          style: borderStyle,
-          width: width,
-        );
+  final borderSide = CssBorderSide(
+    color: color,
+    style: borderStyle,
+    width: width,
+  );
 
   if (suffix.isEmpty) {
-    return CssBorder(all: borderSide);
+    return border.copyWith(all: borderSide);
   }
 
   switch (suffix) {

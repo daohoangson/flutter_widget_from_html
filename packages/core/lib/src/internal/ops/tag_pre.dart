@@ -7,7 +7,7 @@ class TagPre {
 
   TagPre(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagPre,
         defaultStyles: _defaultStyles,
         onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
@@ -16,7 +16,7 @@ class TagPre {
         priority: Priority.tagPre,
       );
 
-  static StylesMap _defaultStyles(BuildTree _) {
+  static StylesMap _defaultStyles(dom.Element _) {
     return const {
       kCssDisplay: kCssDisplayBlock,
       kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2',

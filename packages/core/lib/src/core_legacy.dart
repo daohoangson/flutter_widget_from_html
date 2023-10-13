@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
@@ -25,6 +24,22 @@ extension LegacyWidgetFactory on WidgetFactory {
 /// A legacy HTML styling set.
 @Deprecated('Use HtmlStyle instead.')
 typedef TextStyleHtml = HtmlStyle;
+
+extension LegacyTextStyleHtml on TextStyleHtml {
+  /// The input [TextStyle].
+  @Deprecated('Use .textStyle instead.')
+  TextStyle get style => textStyle;
+
+  /// Gets dependency by type [T].
+  @Deprecated('Use .value instead.')
+  T getDependency<T>() {
+    final dep = value<T>();
+    if (dep != null) {
+      return dep;
+    }
+    throw StateError('The $T dependency could not be found');
+  }
+}
 
 /// A legacy HTML styling builder.
 @Deprecated('Use HtmlStyleBuilder instead.')

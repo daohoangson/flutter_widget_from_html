@@ -691,7 +691,7 @@ Future<void> main() async {
       );
     });
 
-    testWidgets('#112: LI has empty A', (WidgetTester tester) async {
+    testWidgets('LI has empty A', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/112
       const html = '''
 <ol>
@@ -1015,7 +1015,7 @@ Future<void> main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key? key}) : super(key: key);
+  const _Golden(this.contents);
 
   @override
   Widget build(BuildContext _) => Scaffold(

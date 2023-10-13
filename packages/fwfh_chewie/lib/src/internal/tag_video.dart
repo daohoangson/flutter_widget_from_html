@@ -20,9 +20,26 @@ class TagVideo {
 
   TagVideo(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagVideo,
-        onChild: (tree, subTree) {
+        onRenderBlock: (tree, placeholder) {
+          if (defaultTargetPlatform != TargetPlatform.android &&
+              defaultTargetPlatform != TargetPlatform.iOS &&
+              !kIsWeb) {
+            // these are the chewie's supported platforms
+            // https://pub.dev/packages/chewie/versions/1.2.2
+            return placeholder;
+          }
+
+          final attrs = tree.element.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url != null) {
+            tree.sourceUrls = [...tree.sourceUrls, url];
+          }
+
+          return _buildPlayer(tree) ?? placeholder;
+        },
+        onVisitChild: (tree, subTree) {
           final e = subTree.element;
           if (e.localName != kTagVideoSource) {
             return;
@@ -37,29 +54,12 @@ class TagVideo {
             return;
           }
 
-          tree.videoData.urls.add(url);
-        },
-        onRenderBlock: (tree, placeholder) {
-          if (defaultTargetPlatform != TargetPlatform.android &&
-              defaultTargetPlatform != TargetPlatform.iOS &&
-              !kIsWeb) {
-            // these are the chewie's supported platforms
-            // https://pub.dev/packages/chewie/versions/1.2.2
-            return placeholder;
-          }
-
-          final attrs = tree.element.attributes;
-          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-          if (url != null) {
-            tree.videoData.urls.add(url);
-          }
-
-          return _buildPlayer(tree) ?? placeholder;
+          tree.sourceUrls = [...tree.sourceUrls, url];
         },
       );
 
   Widget? _buildPlayer(BuildTree tree) {
-    final sourceUrls = tree.videoData.urls;
+    final sourceUrls = tree.sourceUrls;
     if (sourceUrls.isEmpty) {
       return null;
     }
@@ -79,11 +79,16 @@ class TagVideo {
 }
 
 extension on BuildTree {
-  _TagVideoData get videoData =>
-      getNonInheritedProperty<_TagVideoData>() ??
-      setNonInheritedProperty<_TagVideoData>(_TagVideoData());
+  Iterable<String> get sourceUrls =>
+      value<_TagVideoData>()?.sourceUrls ?? const [];
+
+  set sourceUrls(Iterable<String> v) {
+    value(_TagVideoData(v));
+  }
 }
 
+@immutable
 class _TagVideoData {
-  final urls = <String>[];
+  final Iterable<String> sourceUrls;
+  const _TagVideoData(this.sourceUrls);
 }

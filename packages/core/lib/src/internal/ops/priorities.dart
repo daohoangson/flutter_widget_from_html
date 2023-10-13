@@ -8,7 +8,7 @@ part of '../core_ops.dart';
 /// User's build op has a default priority of 10 so they should run
 /// after our early ops and before our normal ops.
 class Priority {
-  static const _baseEarly00 = -3000000000000000;
+  static const _baseEarly000 = -3000000000000000;
   static const _baseNormal00 = 1000000000000000;
   static const _baseBoxModel = 5000000000000000;
   static const _step = 1000000000;
@@ -34,7 +34,7 @@ class Priority {
 class Early {
   static const _step = Priority._step;
 
-  static const attributeAlign = Priority._baseEarly00 + _step;
+  static const attributeAlign = Priority._baseEarly000 + _step;
   static const attributeDir = attributeAlign + _step;
   static const cssTextAlign = attributeDir + _step;
   static const tagAcronym = cssTextAlign + _step;

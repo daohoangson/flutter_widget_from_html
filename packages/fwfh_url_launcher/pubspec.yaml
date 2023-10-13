@@ -4,14 +4,14 @@ description: WidgetFactory extension to launch A tag via url_launcher plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=2.2.0"
-  sdk: ">=2.13.0 <4.0.0"
+  flutter: ">=3.7.0"
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ">=0.8.0 <0.14.0"
-  url_launcher: ^6.0.0
+  url_launcher: ^6.1.0
 
 dependency_overrides:
   flutter_widget_from_html_core:
@@ -21,5 +21,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
-  plugin_platform_interface: any
   url_launcher_platform_interface: any
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - fwfh

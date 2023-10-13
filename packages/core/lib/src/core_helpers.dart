@@ -9,6 +9,7 @@ import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
 export 'external/csslib.dart';
+export 'external/text_scale_factor.dart';
 export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_details.dart';
@@ -102,10 +103,9 @@ class WidgetPlaceholder extends StatelessWidget {
     WidgetPlaceholderBuilder? builder,
     Widget? child,
     this.debugLabel,
-    Key? key,
+    super.key,
   })  : _builders = builder != null ? [builder] : [],
-        _firstChild = child,
-        super(key: key);
+        _firstChild = child;
 
   /// Whether this placeholder renders anything.
   bool get isEmpty => _firstChild == null && _builders.isEmpty;

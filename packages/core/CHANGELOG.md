@@ -1,3 +1,23 @@
+## 0.13.1-alpha.2
+
+- Improve legacy support (#1051)
+
+## 0.13.1-alpha.1
+
+- Remove `BuildTree.apply` (#1027)
+- Restore optional second param for `HtmlStyleBuilder.enqueue` (#1027)
+
+## 0.13.0-alpha.5
+
+- Expose core legacy in enhanced package (#1027)
+- Fix border 0 is still being rendered (#1045)
+
+## 0.13.0-alpha.2
+
+- Fix inline `white-space: nowrap`. (#944)
+- Remove package `fwfh_text_style` (#935)
+- Remove guess dry sizes logic from `HtmlTable` (#972)
+
 ## 0.13.0-alpha.1
 
 - Implement `BuildOp.v1` constructor (#930)
@@ -48,6 +68,29 @@ Major breaking changes if you have custom rendering:
 - Added: HtmlStyle, HtmlStyleBuilder
 - Removed: BuildMetadata, RebuildTriggers
 - Changed: BuildBit, WidgetPlaceholder
+
+## 0.10.6
+
+- Fix border 0 is still being rendered (#1045)
+
+## 0.10.5
+
+- Replace the deprecated `DecoderCallback` in tests (#1014)
+- Assume HTTPS for protocol relative URL without base (#1016)
+- Add screenshots, funding and topics to pubspec files (#1010)
+
+## 0.10.4
+
+- Add support for Flutter 3.13 (#995)
+- Remove package `fwfh_text_style` (#1009)
+
+## 0.10.3
+
+- Fix `border-radius` being overwritten by `border` (#966)
+
+## 0.10.2
+
+- Fix 100% width TD in recursive TABLEs (#952)
 
 ## 0.10.1
 

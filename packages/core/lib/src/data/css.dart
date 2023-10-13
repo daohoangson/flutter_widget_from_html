@@ -42,13 +42,13 @@ class CssBorder {
 
   /// Returns `true` if all sides are unset, all radius are zero.
   bool get isNoOp =>
-      (_all == null || _all == CssBorderSide.none) &&
-      (_bottom == null || _bottom == CssBorderSide.none) &&
-      (_inlineEnd == null || _inlineEnd == CssBorderSide.none) &&
-      (_inlineStart == null || _inlineStart == CssBorderSide.none) &&
-      (_left == null || _left == CssBorderSide.none) &&
-      (_right == null || _right == CssBorderSide.none) &&
-      (_top == null || _top == CssBorderSide.none) &&
+      (_all?.isNoOp != false) &&
+      (_bottom?.isNoOp != false) &&
+      (_inlineEnd?.isNoOp != false) &&
+      (_inlineStart?.isNoOp != false) &&
+      (_left?.isNoOp != false) &&
+      (_right?.isNoOp != false) &&
+      (_top?.isNoOp != false) &&
       radiusBottomLeft == CssRadius.zero &&
       radiusBottomRight == CssRadius.zero &&
       radiusTopLeft == CssRadius.zero &&
@@ -56,6 +56,7 @@ class CssBorder {
 
   /// Creates a copy of this border with the sides from [other].
   CssBorder copyFrom(CssBorder other) => copyWith(
+        all: other._all,
         bottom: other._bottom,
         inlineEnd: other._inlineEnd,
         inlineStart: other._inlineStart,
@@ -71,6 +72,7 @@ class CssBorder {
   /// Creates a copy of this border but with the given fields
   /// replaced with the new values.
   CssBorder copyWith({
+    CssBorderSide? all,
     CssBorderSide? bottom,
     CssBorderSide? inlineEnd,
     CssBorderSide? inlineStart,
@@ -84,13 +86,16 @@ class CssBorder {
   }) =>
       CssBorder(
         inherit: inherit,
-        all: _all,
-        bottom: CssBorderSide._copyWith(_bottom, bottom),
-        inlineEnd: CssBorderSide._copyWith(_inlineEnd, inlineEnd),
-        inlineStart: CssBorderSide._copyWith(_inlineStart, inlineStart),
-        left: CssBorderSide._copyWith(_left, left),
-        right: CssBorderSide._copyWith(_right, right),
-        top: CssBorderSide._copyWith(_top, top),
+        all: CssBorderSide._copyWith(_all, all),
+        bottom: all != null ? null : CssBorderSide._copyWith(_bottom, bottom),
+        inlineEnd:
+            all != null ? null : CssBorderSide._copyWith(_inlineEnd, inlineEnd),
+        inlineStart: all != null
+            ? null
+            : CssBorderSide._copyWith(_inlineStart, inlineStart),
+        left: all != null ? null : CssBorderSide._copyWith(_left, left),
+        right: all != null ? null : CssBorderSide._copyWith(_right, right),
+        top: all != null ? null : CssBorderSide._copyWith(_top, top),
         radiusBottomLeft: radiusBottomLeft ?? this.radiusBottomLeft,
         radiusBottomRight: radiusBottomRight ?? this.radiusBottomRight,
         radiusTopLeft: radiusTopLeft ?? this.radiusTopLeft,
@@ -188,27 +193,51 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(HtmlStyle style) => identical(this, none)
-      ? null
-      : BorderSide(
-          color: color ?? style.color ?? const BorderSide().color,
-          // TODO: add proper support for other border styles
-          style: this.style != null ? BorderStyle.solid : BorderStyle.none,
-          // TODO: look for official document regarding this default value
-          // WebKit & Blink seem to follow the same (hidden?) specs
-          width: width?.getValue(style) ?? 1.0,
-        );
+  /// Returns `true` if either [style] or [width] is invalid.
+  ///
+  /// Border will use the default text color so [color] is not required.
+  bool get isNoOp => style == null || width?.isPositive != true;
 
-  static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
-      base == null || value == none
-          ? value
-          : value == null
-              ? base
-              : CssBorderSide(
-                  color: value.color ?? base.color,
-                  style: value.style ?? base.style,
-                  width: value.width ?? base.width,
-                );
+  BorderSide? _getValue(HtmlStyle style) {
+    if (identical(this, none)) {
+      return null;
+    }
+
+    final scopedColor = color ?? style.textStyle.color;
+    if (scopedColor == null) {
+      return null;
+    }
+
+    final scopedWidth = width?.getValue(style);
+    if (scopedWidth == null) {
+      return null;
+    }
+
+    return BorderSide(
+      color: scopedColor,
+      // TODO: add proper support for other border styles
+      style: this.style != null ? BorderStyle.solid : BorderStyle.none,
+      width: scopedWidth,
+    );
+  }
+
+  static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) {
+    final copied = base == null || value == none
+        ? value
+        : value == null
+            ? base
+            : CssBorderSide(
+                color: value.color ?? base.color,
+                style: value.style ?? base.style,
+                width: value.width ?? base.width,
+              );
+
+    if (copied?.isNoOp == true) {
+      return none;
+    }
+
+    return copied;
+  }
 }
 
 /// A length measurement.
@@ -242,7 +271,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= style.fontSize;
+        baseValue ??= style.textStyle.fontSize;
         if (baseValue == null) {
           return null;
         }
@@ -251,8 +280,6 @@ class CssLength {
         effectiveScaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
-        // TODO: remove ignore https://github.com/passsy/dart-lint/issues/27
-        // ignore: invariant_booleans
         if (baseValue == null) {
           return null;
         }

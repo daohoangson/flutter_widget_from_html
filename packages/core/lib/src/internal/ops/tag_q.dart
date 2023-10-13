@@ -3,7 +3,7 @@ part of '../core_ops.dart';
 const kTagQ = 'q';
 
 extension TagQ on WidgetFactory {
-  BuildOp get tagQ => const BuildOp.v1(
+  BuildOp get tagQ => const BuildOp.v2(
         debugLabel: kTagQ,
         onParsed: _onParsed,
         priority: Priority.tagQ,

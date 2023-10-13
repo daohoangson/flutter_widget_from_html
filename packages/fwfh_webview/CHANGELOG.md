@@ -1,3 +1,11 @@
+## 0.13.1-alpha.2
+
+- Improve legacy support (#1051)
+
+## 0.13.0-alpha.2
+
+- Add support for flutter_widget_from_html_core@0.13.0-alpha.2 (#1026)
+
 ## 0.13.0-alpha.1
 
 - Add support for flutter_widget_from_html_core@0.13.0 (#930)
@@ -15,6 +23,15 @@
 
 - Add support for flutter_widget_from_html_core@0.11.0 (#899)
 - Requires Flutter 3.7
+
+## 0.9.0+2
+
+- Add support for fullscreen webview in Android (#1022)
+
+## 0.8.0
+
+- Assume HTTPS for protocol relative URL without base (#1016)
+- Add screenshots, funding and topics to pubspec files (#1010)
 
 ## 0.7.0+2
 

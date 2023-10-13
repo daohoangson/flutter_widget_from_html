@@ -10,6 +10,10 @@
 
 - Add support for flutter_widget_from_html_core@0.11.0 (#899)
 
+## 0.9.0+3
+
+- Add screenshots, funding and topics to pubspec files (#1010)
+
 ## 0.9.0+2
 
 - Add support for Flutter 3.10 (#889)

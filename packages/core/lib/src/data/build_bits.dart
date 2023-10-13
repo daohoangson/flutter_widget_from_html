@@ -204,7 +204,7 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// - `HtmlWidget.customStylesBuilder`
   /// - [BuildOp.defaultStyles]
   /// - Attribute `style` of [dom.Element]
-  Iterable<css.Declaration> get styles;
+  LockableList<css.Declaration> get styles;
 
   /// Adds an inline style.
   @Deprecated('Use BuildOp.defaultStyles instead.')
@@ -213,13 +213,6 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// Gets a styling declaration by [key].
   @Deprecated('Use .getStyle instead.')
   css.Declaration? operator [](String key) => getStyle(key);
-
-  /// {@macro flutter_widget_from_html.enqueue}
-  void apply<T>(
-    HtmlStyle Function(HtmlStyle style, T input) callback,
-    T input,
-  ) =>
-      styleBuilder.enqueue(callback, input);
 
   /// Appends [bit].
   ///
@@ -368,8 +361,7 @@ abstract class WidgetBit<T> extends BuildBit {
 }
 
 class _WidgetBitBlock extends WidgetBit<Widget> {
-  const _WidgetBitBlock(BuildTree parent, WidgetPlaceholder child)
-      : super._(parent, child);
+  const _WidgetBitBlock(super.parent, super.child) : super._();
 
   @override
   bool? get isInline => false;
@@ -390,11 +382,11 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
   final TextBaseline baseline;
 
   const _WidgetBitInline(
-    BuildTree parent,
-    WidgetPlaceholder child,
+    super.parent,
+    super.child,
     this.alignment,
     this.baseline,
-  ) : super._(parent, child);
+  ) : super._();
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>

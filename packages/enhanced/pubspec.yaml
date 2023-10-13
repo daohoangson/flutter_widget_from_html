@@ -1,5 +1,5 @@
 name: flutter_widget_from_html
-version: 0.13.0-alpha.1
+version: 0.13.1-alpha.2
 description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
@@ -10,13 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.13.0-alpha.1
+  flutter_widget_from_html_core: ^0.13.1-alpha.2
   fwfh_cached_network_image: ^0.13.0-alpha.1
-  fwfh_chewie: ^0.13.0-alpha.1
-  fwfh_just_audio: ^0.13.0-alpha.1
-  fwfh_svg: ^0.13.0-alpha.1
+  fwfh_chewie: ^0.13.1-alpha.2
+  fwfh_just_audio: ^0.13.1-alpha.2
+  fwfh_svg: ^0.13.1-alpha.2
   fwfh_url_launcher: ^0.13.0-alpha.1
-  fwfh_webview: ^0.13.0-alpha.1
+  fwfh_webview: ^0.13.1-alpha.2
   html: ^0.15.0
 
 dependency_overrides:
@@ -41,8 +41,26 @@ dev_dependencies:
     sdk: flutter
   golden_toolkit: ^0.15.0
   lint: any
-  mocktail: ^0.3.0
+  mocktail: ^1.0.0
 
 flutter:
   assets:
     - test/images/
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+screenshots:
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen1.gif
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen2.gif
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen3.gif
+
+topics:
+  - widget
+  - html
+  - css
+  - fwfh

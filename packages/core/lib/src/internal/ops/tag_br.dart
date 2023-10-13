@@ -3,7 +3,7 @@ part of '../core_ops.dart';
 const kTagBr = 'br';
 
 extension TagBr on WidgetFactory {
-  BuildOp get tagBr => const BuildOp.v1(
+  BuildOp get tagBr => const BuildOp.v2(
         debugLabel: kTagBr,
         onParsed: _onParsed,
         priority: Priority.tagBr,

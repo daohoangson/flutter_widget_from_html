@@ -955,7 +955,7 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onRenderBlock inline', (tester) async {
+    testWidgets('renders onRenderBlock inline', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/646
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
@@ -971,7 +971,7 @@ Future<void> main() async {
       expect(explained, equals('[Text:Bar]'));
     });
 
-    testWidgets('#799: inline block with bg, v-align', (tester) async {
+    testWidgets('inline block with bg, v-align', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/799
       const html = '<span style="background-color: #FF6600; '
           'display: inline-block; vertical-align: middle">Foo</span>';
@@ -1505,11 +1505,34 @@ Future<void> main() async {
       expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=2.0+i:bar))]'));
     });
 
-    testWidgets('renders child element (normal)', (WidgetTester tester) async {
-      const html = '<span style="line-height: 1">Foo '
-          '<em style="line-height: normal">bar</em></span>';
-      final e = await explain(tester, html);
-      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
+    group('reset to normal', () {
+      testWidgets('cannot reset to null', (tester) async {
+        const html = '<span style="line-height: 2">Foo '
+            '<em style="line-height: normal">bar</em></span>';
+        final explained = await explain(
+          tester,
+          html,
+          // ignore: avoid_redundant_argument_values
+          height: null,
+        );
+        expect(
+          explained,
+          equals('[RichText:(:(+height=2.0:Foo )(+height=2.0+i:bar))]'),
+        );
+      });
+
+      testWidgets('reset to 1', (tester) async {
+        const html = '<span style="line-height: 2">Foo '
+            '<em style="line-height: normal">bar</em></span>';
+        final explained = await explain(tester, html, height: 1);
+        expect(
+          explained,
+          equals(
+            '[RichText:(+height=1.0:(+height=2.0:Foo )'
+            '(+height=1.0+i:bar))]',
+          ),
+        );
+      });
     });
   });
 
@@ -1693,7 +1716,7 @@ class _InlineOnRenderBlockFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.localName == 'span') {
-      tree.register(BuildOp.v1(onRenderBlock: (_, __) => const Text('Bar')));
+      tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Bar')));
     }
     super.parse(tree);
   }

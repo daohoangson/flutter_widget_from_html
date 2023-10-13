@@ -9,7 +9,7 @@ class TagA {
 
   TagA(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: 'a[href]',
         defaultStyles: _defaultStyles,
         onParsed: (tree) {
@@ -27,12 +27,20 @@ class TagA {
             return tree;
           }
 
-          return tree..apply(_builder, recognizer);
+          return tree..styleBuilder.enqueue(_builder, recognizer);
         },
         priority: Priority.tagA,
       );
 
-  static StylesMap _defaultStyles(BuildTree _) {
+  static HtmlStyle defaultColor(HtmlStyle style, BuildContext? context) =>
+      style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          color: Theme.of(context!).colorScheme.primary,
+          debugLabel: 'fwfh: a[href] default color',
+        ),
+      );
+
+  static StylesMap _defaultStyles(dom.Element _) {
     return const {
       kCssTextDecoration: kCssTextDecorationUnderline,
     };

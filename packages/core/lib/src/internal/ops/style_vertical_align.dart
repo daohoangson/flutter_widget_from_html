@@ -15,7 +15,7 @@ class StyleVerticalAlign {
 
   StyleVerticalAlign(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: kCssVerticalAlign,
         onParsed: (tree) {
@@ -92,7 +92,7 @@ class StyleVerticalAlign {
     EdgeInsets padding,
   ) {
     final style = tree.styleBuilder.build(context);
-    final fontSize = style.fontSize;
+    final fontSize = style.textStyle.fontSize;
     if (fontSize == null) {
       return child;
     }

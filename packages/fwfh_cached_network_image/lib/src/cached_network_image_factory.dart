@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -9,22 +12,22 @@ mixin CachedNetworkImageFactory on WidgetFactory {
   BaseCacheManager? get cacheManager => null;
 
   @override
-  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
     final url = src.url;
     if (!url.startsWith(RegExp('https?://'))) {
-      return super.buildImageWidget(tree, src);
+      return super.buildImageWidget(meta, src);
     }
 
     return CachedNetworkImage(
       cacheManager: cacheManager,
       errorWidget: (context, _, error) =>
-          onErrorBuilder(context, tree, error, src) ?? widget0,
+          onErrorBuilder(context, meta, error, src) ?? widget0,
       fit: BoxFit.fill,
       imageUrl: url,
       progressIndicatorBuilder: (context, _, progress) {
         final t = progress.totalSize;
         final v = t != null && t > 0 ? progress.downloaded / t : null;
-        return onLoadingBuilder(context, tree, v, src) ?? widget0;
+        return onLoadingBuilder(context, meta, v, src) ?? widget0;
       },
     );
   }

@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_cache_manager: ^3.0.0
-  flutter_widget_from_html_core: ">0.11.0-0 <0.14.0"
+  flutter_widget_from_html_core: ">0.8.0 <0.14.0"
 
 dependency_overrides:
   flutter_widget_from_html_core:
@@ -23,4 +23,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
-  mocktail: ^0.3.0
+  mocktail: ^1.0.0
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - img
+  - fwfh

@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -17,7 +20,7 @@ mixin SvgFactory on WidgetFactory {
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
-  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
     final url = src.url;
 
     BytesLoader? bytesLoader;
@@ -34,10 +37,10 @@ mixin SvgFactory on WidgetFactory {
     }
 
     if (bytesLoader == null) {
-      return super.buildImageWidget(tree, src);
+      return super.buildImageWidget(meta, src);
     }
 
-    return _buildSvgPicture(tree, src, bytesLoader);
+    return _buildSvgPicture(meta, src, bytesLoader);
   }
 
   /// Returns an [SvgAssetLoader].
@@ -84,28 +87,28 @@ mixin SvgFactory on WidgetFactory {
   }
 
   @override
-  void parse(BuildTree tree) {
-    final localName = tree.element.localName;
-
-    switch (localName) {
+  void parse(BuildMetadata meta) {
+    switch (meta.element.localName) {
       case 'svg':
-        tree.register(
-          _tagSvg ??= BuildOp.v1(
-            debugLabel: localName,
-            onRenderBlock: (tree, _) {
-              final bytesLoader = SvgStringLoader(tree.element.outerHtml);
-              return _buildSvgPicture(tree, const ImageSource(''), bytesLoader);
+        meta.register(
+          _tagSvg ??= BuildOp(
+            // TODO: set debugLabel when our minimum core version >= 1.0
+            onWidgets: (meta, widgets) {
+              final bytesLoader = SvgStringLoader(meta.element.outerHtml);
+              const src = ImageSource('');
+              final built = _buildSvgPicture(meta, src, bytesLoader);
+              return [built];
             },
           ),
         );
         break;
     }
 
-    return super.parse(tree);
+    return super.parse(meta);
   }
 
   Widget _buildSvgPicture(
-    BuildTree tree,
+    BuildMetadata meta,
     ImageSource src,
     BytesLoader bytesLoader,
   ) {
@@ -119,7 +122,7 @@ mixin SvgFactory on WidgetFactory {
       fit: BoxFit.fill,
       height: src.height,
       placeholderBuilder: (context) {
-        final loading = onLoadingBuilder(context, tree, null, src);
+        final loading = onLoadingBuilder(context, meta, null, src);
         if (loading != null) {
           return loading;
         }

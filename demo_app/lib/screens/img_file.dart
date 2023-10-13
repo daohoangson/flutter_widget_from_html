@@ -24,11 +24,11 @@ class ImgFileScreen extends StatelessWidget {
           body: const TabBarView(
             children: <Widget>[
               _ImgFileTab(
-                assetKey: 'logos/android.png',
+                assetKey: 'logos/icon.png',
                 fileExtension: 'png',
               ),
               _ImgFileTab(
-                assetKey: 'packages/fwfh_svg/test/images/logo.svg',
+                assetKey: 'packages/fwfh_svg/test/images/icon.svg',
                 fileExtension: 'svg',
               ),
             ],
@@ -96,7 +96,8 @@ class _ImgFileState extends State<_ImgFileTab> {
                   }
 
                   final file = snapshot.requireData;
-                  final html = '<img src="file://${file.path}" />';
+                  final html =
+                      '<img src="file://${file.path}" width="48" height="48" />';
 
                   return Padding(
                     padding: const EdgeInsets.all(8.0),

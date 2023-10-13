@@ -30,22 +30,18 @@ class CoreBuildTree extends BuildTree {
   final _isInlines = <bool>[];
   final BuildTree? _parent;
   final Iterable<_CoreBuildOp> _parentOps;
-  final _styles = <css.Declaration>[];
+  final _styles = _LockableDeclarations();
 
   CoreBuildTree._({
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    required dom.Element element,
+    required super.element,
     BuildTree? parent,
     Iterable<_CoreBuildOp> parentOps = const [],
-    required HtmlStyleBuilder styleBuilder,
+    required super.styleBuilder,
     required this.wf,
   })  : _parent = parent,
-        _parentOps = parentOps,
-        super(
-          element: element,
-          styleBuilder: styleBuilder,
-        );
+        _parentOps = parentOps;
 
   factory CoreBuildTree.root({
     CustomStylesBuilder? customStylesBuilder,
@@ -71,7 +67,7 @@ class CoreBuildTree extends BuildTree {
   BuildTree get parent => _parent!;
 
   @override
-  Iterable<css.Declaration> get styles => _styles;
+  LockableList<css.Declaration> get styles => _styles;
 
   @override
   void operator []=(String key, String value) {
@@ -163,7 +159,12 @@ class CoreBuildTree extends BuildTree {
 
   @override
   css.Declaration? getStyle(String property) {
-    for (final style in _styles.reversed) {
+    final values = _styles._values;
+    if (values == null) {
+      return null;
+    }
+
+    for (final style in values.reversed) {
       if (style.property == property) {
         // TODO: add support for `!important`
         // https://github.com/daohoangson/flutter_widget_from_html/issues/773
@@ -295,7 +296,7 @@ class CoreBuildTree extends BuildTree {
     wf.parse(this);
 
     for (final op in _parentOps) {
-      op.onChild(this);
+      op.onVisitChild(this);
     }
 
     for (final op in _buildOps) {
@@ -312,8 +313,12 @@ class CoreBuildTree extends BuildTree {
       _styles.addAll(elementStyles);
     }
 
-    for (final style in _styles) {
-      wf.parseStyle(this, style);
+    _styles._isLocked = true;
+    final values = _styles._values;
+    if (values != null) {
+      for (final style in values.toList(growable: false)) {
+        wf.parseStyle(this, style);
+      }
     }
 
     wf.parseStyleDisplay(this, getStyle(kCssDisplay)?.term);
@@ -326,7 +331,7 @@ Iterable<_CoreBuildOp> _prepareParentOps(
 ) {
   // try to reuse existing list if possible
   final newOps = builder._buildOps
-      .where((op) => op.op.onChild != null)
+      .where((op) => op.op.onVisitChild != null)
       .toList(growable: false);
   return newOps.isNotEmpty == true
       ? List.unmodifiable([...ops, ...newOps])
@@ -344,7 +349,7 @@ class _CoreBuildOp {
   const _CoreBuildOp(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
-    final map = op.defaultStyles?.call(tree);
+    final map = op.defaultStyles?.call(tree.element);
     if (map == null) {
       return null;
     }
@@ -353,8 +358,6 @@ class _CoreBuildOp {
     final styleSheet = css.parse('*{$str}');
     return styleSheet.collectDeclarations();
   }
-
-  void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
   BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
 
@@ -365,6 +368,8 @@ class _CoreBuildOp {
 
   void onRenderedBlock(WidgetPlaceholder placeholder) =>
       op.onRenderedBlock?.call(tree, placeholder);
+
+  void onVisitChild(BuildTree subTree) => op.onVisitChild?.call(tree, subTree);
 
   static int _compare(_CoreBuildOp a0, _CoreBuildOp b0) {
     final a = a0.op;
@@ -382,6 +387,46 @@ class _CoreBuildOp {
     } else {
       return cmp;
     }
+  }
+}
+
+class _LockableDeclarations extends LockableList<css.Declaration> {
+  var _isLocked = false;
+  List<css.Declaration>? _values;
+
+  @override
+  bool get isLocked => _isLocked;
+
+  @override
+  Iterator<css.Declaration> get iterator =>
+      _values?.iterator ?? const <css.Declaration>[].iterator;
+
+  @override
+  void add(css.Declaration value) {
+    assert(!_isLocked, 'Adding after being locked is undeterministic.');
+    _values ??= [];
+    _values?.add(value);
+  }
+
+  @override
+  void addAll(Iterable<css.Declaration> iterable) {
+    assert(!_isLocked, 'Adding after being locked is undeterministic.');
+    _values ??= [];
+    _values?.addAll(iterable);
+  }
+
+  @override
+  void insert(int index, css.Declaration element) {
+    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
+    _values ??= [];
+    _values?.insert(index, element);
+  }
+
+  @override
+  void insertAll(int index, Iterable<css.Declaration> iterable) {
+    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
+    _values ??= [];
+    _values?.insertAll(index, iterable);
   }
 }
 

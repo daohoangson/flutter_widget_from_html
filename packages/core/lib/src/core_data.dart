@@ -10,8 +10,10 @@ part 'data/build_bits.dart';
 part 'data/css.dart';
 part 'data/html_style.dart';
 part 'data/image.dart';
-part 'data/line_height.dart';
-part 'data/text_scale_factor.dart';
+part 'data/lockable_list.dart';
+part 'data/normal_line_height.dart';
+
+const _defaultPriority = 10;
 
 /// A collection of style's key and value pairs.
 typedef StylesMap = Map<String, String>;
@@ -23,32 +25,15 @@ typedef StylesMap = Map<String, String>;
 /// below just changes the color:
 ///
 /// ```dart
-/// BuildOp.v1(
-///   defaultStyles: (_) => {'color': 'red'},
+/// BuildOp(
+///   defaultStyles: (domElement) => {'color': 'red'},
 /// )
 /// ```
 ///
 /// Note: op must be registered early for this to work e.g.
-/// in [WidgetFactory.parse] or [onChild].
+/// in [WidgetFactory.parse] or [onVisitChild].
 /// {@endtemplate}
-typedef DefaultStyles = StylesMap Function(BuildTree tree);
-
-/// {@template flutter_widget_from_html.onChild}
-/// The callback that will be called before processing a child element.
-///
-/// Please note that all children and grandchildren etc. will trigger this,
-/// it's easy to check whether an element is direct child:
-///
-/// ```dart
-/// BuildOp.v1(
-///   onChild: (tree, subTree) {
-///     if (!subTree.element.parent != tree.element) return;
-///     subTree.doSomething();
-///   },
-/// );
-/// ```
-/// {@endtemplate}
-typedef OnChild = void Function(BuildTree tree, BuildTree subTree);
+typedef DefaultStyles = StylesMap Function(dom.Element element);
 
 /// {@template flutter_widget_from_html.onParsed}
 /// The callback that will be called when child elements have been processed.
@@ -84,6 +69,23 @@ typedef OnRenderInline = void Function(BuildTree tree);
 /// {@endtemplate}
 typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 
+/// {@template flutter_widget_from_html.onVisitChild}
+/// The callback that will be called before processing a child element.
+///
+/// Please note that all children and grandchildren etc. will trigger this,
+/// use `element` to check whether a subtree is direct child:
+///
+/// ```dart
+/// BuildOp(
+///   onVisitChild: (tree, subTree) {
+///     if (subTree.element.parent != tree.element) return;
+///     subTree.doSomething();
+///   },
+/// );
+/// ```
+/// {@endtemplate}
+typedef OnVisitChild = void Function(BuildTree tree, BuildTree subTree);
+
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
@@ -101,9 +103,6 @@ class BuildOp {
   /// {@macro flutter_widget_from_html.defaultStyles}
   final DefaultStyles? defaultStyles;
 
-  /// {@macro flutter_widget_from_html.onChild}
-  final OnChild? onChild;
-
   /// {@macro flutter_widget_from_html.onParsed}
   final OnParsed? onParsed;
 
@@ -116,70 +115,94 @@ class BuildOp {
   /// {@macro flutter_widget_from_html.onRenderedBlock}
   final OnRenderedBlock? onRenderedBlock;
 
+  /// {@macro flutter_widget_from_html.onVisitChild}
+  final OnVisitChild? onVisitChild;
+
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
   final int priority;
 
-  /// Creates a legacy build op.
-  @Deprecated('Use BuildOp.v1 instead.')
+  /// Creates a build op.
   factory BuildOp({
-    Map<String, String> Function(dom.Element element)? defaultStyles,
+    bool? alwaysRenderBlock,
+    String? debugLabel,
+    DefaultStyles? defaultStyles,
+    OnParsed? onParsed,
+    OnRenderBlock? onRenderBlock,
+    OnRenderInline? onRenderInline,
+    OnRenderedBlock? onRenderedBlock,
+    OnVisitChild? onVisitChild,
+    int priority = _defaultPriority,
+
+    // legacy v1 parameters
+    @Deprecated('Use onVisitChild instead.')
     void Function(BuildMetadata subTree)? onChild,
+    @Deprecated('Use onParsed instead.')
     void Function(BuildMetadata meta, BuildTree tree)? onTree,
+    @Deprecated('Use onRenderInline instead.')
     void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening,
+    @Deprecated('Use onRenderBlock instead.')
     Iterable<Widget>? Function(
-      BuildTree tree,
-      Iterable<WidgetPlaceholder> children,
+      BuildMetadata meta,
+      Iterable<WidgetPlaceholder> widgets,
     )? onWidgets,
+    @Deprecated('Use alwaysRenderBlock instead.')
     bool onWidgetsIsOptional = false,
-    int priority = 10,
   }) {
-    return BuildOp.v1(
-      alwaysRenderBlock: onWidgetsIsOptional ? null : (onWidgets != null),
-      defaultStyles:
-          defaultStyles != null ? (tree) => defaultStyles(tree.element) : null,
-      onChild: onChild != null ? (_, subTree) => onChild(subTree) : null,
-      onParsed: onTree != null
-          ? (tree) {
-              onTree(tree, tree);
-              return tree;
-            }
-          : null,
-      onRenderBlock: onWidgets != null
-          ? (tree, placeholder) {
-              final children = onWidgets(tree, [placeholder]);
-              switch (children?.length) {
-                case null:
-                  return placeholder;
-                case 0:
-                  return widget0;
-                case 1:
-                  return children?.first ?? widget0;
-                default:
-                  throw UnsupportedError(
-                    'onWidgets must return exactly 1 widget, got ${children?.length}',
-                  );
+    final onRenderBlockOrOnWidgets = onRenderBlock ??
+        (onWidgets != null
+            ? (tree, placeholder) {
+                final children = onWidgets(tree, [placeholder]);
+                switch (children?.length) {
+                  case null:
+                    return placeholder;
+                  case 0:
+                    return widget0;
+                  case 1:
+                    return children?.first ?? widget0;
+                  default:
+                    throw UnsupportedError(
+                      'onWidgets must return exactly 1 widget, got ${children?.length}',
+                    );
+                }
               }
-            }
-          : null,
-      onRenderInline: onTreeFlattening != null
-          ? (tree) => onTreeFlattening(tree, tree)
-          : null,
+            : null);
+
+    return BuildOp.v2(
+      alwaysRenderBlock: alwaysRenderBlock ??
+          (onWidgetsIsOptional ? null : (onRenderBlockOrOnWidgets != null)),
+      debugLabel: debugLabel,
+      defaultStyles: defaultStyles,
+      onParsed: onParsed ??
+          (onTree != null
+              ? (tree) {
+                  onTree(tree, tree);
+                  return tree;
+                }
+              : null),
+      onRenderBlock: onRenderBlockOrOnWidgets,
+      onRenderInline: onRenderInline ??
+          (onTreeFlattening != null
+              ? (tree) => onTreeFlattening(tree, tree)
+              : null),
+      onRenderedBlock: onRenderedBlock,
+      onVisitChild: onVisitChild ??
+          (onChild != null ? (_, subTree) => onChild(subTree) : null),
       priority: priority,
     );
   }
 
-  /// Creates a build op.
-  const BuildOp.v1({
+  /// Creates a second generation build op.
+  const BuildOp.v2({
     this.alwaysRenderBlock,
     this.debugLabel,
     this.defaultStyles,
-    this.onChild,
     this.onParsed,
     this.onRenderBlock,
     this.onRenderInline,
     this.onRenderedBlock,
-    this.priority = 10,
+    this.onVisitChild,
+    this.priority = _defaultPriority,
   });
 }

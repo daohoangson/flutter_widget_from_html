@@ -11,7 +11,7 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
   /// Creates a list item widget.
   HtmlListItem({
     Widget? child,
-    Key? key,
+    super.key,
     Widget? marker,
     required this.textDirection,
   }) : super(
@@ -21,7 +21,6 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
                   if (marker != null) marker,
                 ]
               : const [],
-          key: key,
         );
 
   @override

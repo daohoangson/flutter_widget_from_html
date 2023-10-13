@@ -5,11 +5,10 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
         Divider,
-        Theme,
-        ThemeData,
         Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
 
 import 'core_data.dart';
@@ -408,8 +407,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// - [TextDirection] via [Directionality.of]
   /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
+  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   ///
   /// It's recommended to use [HtmlStyle.value] instead of
   /// obtaining dependencies from [BuildContext] for performance reason.
@@ -611,7 +610,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..apply<BuildContext?>(tagAColor, null)
+            ..styleBuilder.enqueue<BuildContext?>(TagA.defaultColor)
             ..register(_tagA ??= TagA(this).buildOp);
         }
 
@@ -624,7 +623,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'abbr':
       case kTagAcronym:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagAcronym,
             defaultStyles: _tagAcronym,
             priority: Early.tagAcronym,
@@ -634,7 +633,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagAddress:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagAddress,
             defaultStyles: _tagAddress,
             priority: Early.tagAddress,
@@ -653,7 +652,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'section':
       case kTagDiv:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagDiv,
             defaultStyles: _cssDisplayBlock,
             priority: Early.tagDiv,
@@ -664,7 +663,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'blockquote':
       case kTagFigure:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagFigure,
             defaultStyles: _tagFigure,
             priority: Early.tagFigure,
@@ -674,14 +673,16 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case 'b':
       case 'strong':
-        tree.apply(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        tree.styleBuilder
+            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
         break;
       case 'small':
-        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+        tree.styleBuilder
+            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagBr:
@@ -690,7 +691,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagCenter:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagCenter,
             defaultStyles: _tagCenter,
             priority: Early.tagCenter,
@@ -703,14 +704,14 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        tree.apply(TextStyleOps.fontStyle, FontStyle.italic);
+        tree.styleBuilder.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        tree.apply(
+        tree.styleBuilder.enqueue(
           TextStyleOps.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
@@ -725,7 +726,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagDd:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagDd,
             defaultStyles: _tagDd,
             priority: Early.tagDd,
@@ -734,7 +735,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagDt:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagDt,
             defaultStyles: _tagDt,
             priority: Early.tagDt,
@@ -746,7 +747,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 's':
       case kTagStrike:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagStrike,
             defaultStyles: _cssTextDecorationLineThrough,
             priority: Early.tagStrike,
@@ -760,7 +761,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case 'hr':
         tree.register(
-          _tagHr ??= BuildOp.v1(
+          _tagHr ??= BuildOp(
             debugLabel: localName,
             defaultStyles: (_) => {
               kCssDisplay: kCssDisplayBlock,
@@ -774,7 +775,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagH1:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH1,
             defaultStyles: _tagH1,
             priority: Early.tagH1,
@@ -783,7 +784,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagH2:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH2,
             defaultStyles: _tagH2,
             priority: Early.tagH2,
@@ -792,7 +793,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagH3:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH3,
             defaultStyles: _tagH3,
             priority: Early.tagH3,
@@ -801,7 +802,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagH4:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH4,
             defaultStyles: _tagH4,
             priority: Early.tagH4,
@@ -810,7 +811,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagH5:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH5,
             defaultStyles: _tagH5,
             priority: Early.tagH5,
@@ -819,7 +820,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagH6:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagH6,
             defaultStyles: _tagH6,
             priority: Early.tagH6,
@@ -838,7 +839,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagMark:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagMark,
             defaultStyles: _tagMark,
             priority: Early.tagMark,
@@ -848,7 +849,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagP:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagP,
             defaultStyles: _tagP,
             priority: Early.tagP,
@@ -867,7 +868,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'style':
       case kTagScript:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagScript,
             defaultStyles: _cssDisplayNone,
             priority: Early.tagScript,
@@ -877,7 +878,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kTagSub:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagSub,
             defaultStyles: _tagSub,
             priority: Early.tagSub,
@@ -886,7 +887,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagSup:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagSup,
             defaultStyles: _tagSup,
             priority: Early.tagSup,
@@ -898,7 +899,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final tagTable = _tagTable ??= TagTable(this);
         tree
           ..register(
-            const BuildOp.v1(
+            const BuildOp.v2(
               debugLabel: kTagTable,
               defaultStyles: _cssDisplayTable,
               priority: Early.tagTableDisplayTable,
@@ -909,7 +910,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagTableCell:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagTableCell,
             defaultStyles: _cssVerticalAlignMiddle,
             priority: Early.tagTableCellDefaultStyles,
@@ -918,7 +919,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagTableHeaderCell:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagTableHeaderCell,
             defaultStyles: _tagTableHeaderCell,
             priority: Early.tagTableHeaderCellDefaultStyles,
@@ -927,7 +928,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
       case kTagTableCaption:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagTableCaption,
             defaultStyles: _cssTextAlignCenter,
             priority: Early.tagTableCaptionTextAlignCenter,
@@ -938,7 +939,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'u':
       case kTagIns:
         tree.register(
-          const BuildOp.v1(
+          const BuildOp.v2(
             debugLabel: kTagIns,
             defaultStyles: _cssTextDecorationUnderline,
             priority: Early.tagIns,
@@ -951,7 +952,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       switch (attribute.key) {
         case kAttributeAlign:
           tree.register(
-            const BuildOp.v1(
+            const BuildOp.v2(
               debugLabel: kAttributeAlign,
               defaultStyles: _cssTextAlignFromAttribute,
               priority: Early.attributeAlign,
@@ -960,7 +961,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           break;
         case kAttributeDir:
           tree.register(
-            const BuildOp.v1(
+            const BuildOp.v2(
               debugLabel: kAttributeDir,
               defaultStyles: _cssDirectionFromAttribute,
               priority: Early.attributeDir,
@@ -987,26 +988,26 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
-          tree.apply(TextStyleOps.color, color);
+          tree.styleBuilder.enqueue(TextStyleOps.color, color);
         }
         break;
 
       case kCssDirection:
         final term = style.term;
         if (term != null) {
-          tree.apply(TextStyleOps.textDirection, term);
+          tree.styleBuilder.enqueue(TextStyleOps.textDirection, term);
         }
         break;
 
       case kCssFontFamily:
         final list = TextStyleOps.fontFamilyTryParse(style.values);
-        tree.apply(TextStyleOps.fontFamily, list);
+        tree.styleBuilder.enqueue(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
         final value = style.value;
         if (value != null) {
-          tree.apply(TextStyleOps.fontSize, value);
+          tree.styleBuilder.enqueue(TextStyleOps.fontSize, value);
         }
         break;
 
@@ -1015,7 +1016,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final fontStyle =
             term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
-          tree.apply(TextStyleOps.fontStyle, fontStyle);
+          tree.styleBuilder.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
@@ -1024,7 +1025,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final fontWeight =
             value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
-          tree.apply(TextStyleOps.fontWeight, fontWeight);
+          tree.styleBuilder.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
         break;
 
@@ -1040,7 +1041,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
-          tree.apply(
+          tree.styleBuilder.enqueue(
             _styleBuilderLineHeight ??= TextStyleOps.lineHeight(this),
             value,
           );
@@ -1084,7 +1085,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final whitespace =
             term != null ? TextStyleOps.whitespaceTryParse(term) : null;
         if (whitespace != null) {
-          tree.apply(TextStyleOps.whitespace, whitespace);
+          tree.styleBuilder.enqueue(TextStyleOps.whitespace, whitespace);
         }
         break;
     }
@@ -1132,16 +1133,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     _widget = widget is HtmlWidget ? widget : null;
   }
 
-  /// Use [ThemeData.colorScheme] primary for hyperlink's text color.
-  HtmlStyle tagAColor(HtmlStyle style, BuildContext? context) {
-    if (context == null) {
-      return style;
-    }
-
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    return style.mergeWith(TextStyle(color: primaryColor));
-  }
-
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String? urlFull(String url) {
     if (url.isEmpty) {
@@ -1161,6 +1152,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     final baseUrl = _widget?.baseUrl;
     if (baseUrl == null) {
+      if (uri.hasAuthority) {
+        // special handling for protocol relative URL without base: assume HTTPS
+        return Uri(scheme: 'https').resolveUri(uri).toString();
+      }
+
       return null;
     }
 
@@ -1169,129 +1165,129 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   // TODO: switch to use constant function literal when available
   // https://github.com/dart-lang/language/issues/1048
-  static StylesMap _cssDirectionFromAttribute(BuildTree tree) {
-    final value = tree.element.attributes[kAttributeDir];
+  static StylesMap _cssDirectionFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeDir];
     return value != null ? {kCssDirection: value} : const {};
   }
 
-  static StylesMap _cssDisplayBlock(BuildTree _) =>
+  static StylesMap _cssDisplayBlock(dom.Element _) =>
       {kCssDisplay: kCssDisplayBlock};
 
-  static StylesMap _cssDisplayNone(BuildTree _) =>
+  static StylesMap _cssDisplayNone(dom.Element _) =>
       {kCssDisplay: kCssDisplayNone};
 
-  static StylesMap _cssDisplayTable(BuildTree _) =>
+  static StylesMap _cssDisplayTable(dom.Element _) =>
       {kCssDisplay: kCssDisplayTable};
 
-  static StylesMap _cssTextAlignCenter(BuildTree _) =>
+  static StylesMap _cssTextAlignCenter(dom.Element _) =>
       {kCssTextAlign: kCssTextAlignCenter};
 
-  static StylesMap _cssTextAlignFromAttribute(BuildTree tree) {
-    final value = tree.element.attributes[kAttributeAlign];
+  static StylesMap _cssTextAlignFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeAlign];
     return value != null ? {kCssTextAlign: value} : const {};
   }
 
-  static StylesMap _cssTextDecorationLineThrough(BuildTree _) =>
+  static StylesMap _cssTextDecorationLineThrough(dom.Element _) =>
       {kCssTextDecorationLine: kCssTextDecorationLineThrough};
 
-  static StylesMap _cssTextDecorationUnderline(BuildTree _) =>
+  static StylesMap _cssTextDecorationUnderline(dom.Element _) =>
       {kCssTextDecorationLine: kCssTextDecorationUnderline};
 
-  static StylesMap _cssVerticalAlignMiddle(BuildTree _) =>
+  static StylesMap _cssVerticalAlignMiddle(dom.Element _) =>
       {kCssVerticalAlign: kCssVerticalAlignMiddle};
 
-  static StylesMap _tagAcronym(BuildTree _) => {
+  static StylesMap _tagAcronym(dom.Element _) => {
         kCssTextDecorationLine: kCssTextDecorationUnderline,
         kCssTextDecorationStyle: kCssTextDecorationStyleDotted,
       };
 
-  static StylesMap _tagAddress(BuildTree _) => {
+  static StylesMap _tagAddress(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontStyle: kCssFontStyleItalic,
       };
 
-  static StylesMap _tagCenter(BuildTree _) => {
+  static StylesMap _tagCenter(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssTextAlign: kCssTextAlignWebkitCenter,
       };
 
-  static StylesMap _tagDd(BuildTree _) => {
+  static StylesMap _tagDd(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssMargin: '0 0 1em 40px',
       };
 
-  static StylesMap _tagDt(BuildTree _) => {
+  static StylesMap _tagDt(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontWeight: kCssFontWeightBold,
       };
 
-  static StylesMap _tagFigure(BuildTree _) => {
+  static StylesMap _tagFigure(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssMargin: '1em 40px',
       };
 
-  static StylesMap _tagH1(BuildTree _) => {
+  static StylesMap _tagH1(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontSize: '2em',
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '0.67em 0',
       };
 
-  static StylesMap _tagH2(BuildTree _) => {
+  static StylesMap _tagH2(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontSize: '1.5em',
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '0.83em 0',
       };
 
-  static StylesMap _tagH3(BuildTree _) => {
+  static StylesMap _tagH3(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontSize: '1.17em',
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '1em 0',
       };
 
-  static StylesMap _tagH4(BuildTree _) => {
+  static StylesMap _tagH4(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '1.33em 0',
       };
 
-  static StylesMap _tagH5(BuildTree _) => {
+  static StylesMap _tagH5(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontSize: '0.83em',
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '1.67em 0',
       };
 
-  static StylesMap _tagH6(BuildTree _) => {
+  static StylesMap _tagH6(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssFontSize: '0.67em',
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '2.33em 0',
       };
 
-  static StylesMap _tagMark(BuildTree _) => {
+  static StylesMap _tagMark(dom.Element _) => {
         kCssBackgroundColor: '#ff0',
         kCssColor: '#000',
       };
 
-  static StylesMap _tagP(BuildTree _) => {
+  static StylesMap _tagP(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssMargin: '1em 0',
       };
 
-  static StylesMap _tagSub(BuildTree _) => {
+  static StylesMap _tagSub(dom.Element _) => {
         kCssVerticalAlign: kCssVerticalAlignSub,
         kCssFontSize: kCssFontSizeSmaller,
       };
 
-  static StylesMap _tagSup(BuildTree _) => {
+  static StylesMap _tagSup(dom.Element _) => {
         kCssVerticalAlign: kCssVerticalAlignSuper,
         kCssFontSize: kCssFontSizeSmaller,
       };
 
-  static StylesMap _tagTableHeaderCell(BuildTree _) => {
+  static StylesMap _tagTableHeaderCell(dom.Element _) => {
         kCssFontWeight: kCssFontWeightBold,
         kCssVerticalAlign: kCssVerticalAlignMiddle,
       };

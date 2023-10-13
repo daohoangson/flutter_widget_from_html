@@ -9,8 +9,7 @@ final _logger = Logger('fwfh.CssSizing');
 /// A CSS block.
 class CssBlock extends SingleChildRenderObjectWidget {
   /// Creates a CSS block.
-  const CssBlock({required Widget child, Key? key})
-      : super(child: child, key: key);
+  const CssBlock({super.child, super.key});
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
@@ -57,8 +56,8 @@ class CssSizing extends SingleChildRenderObjectWidget {
 
   /// Creates a CSS sizing.
   const CssSizing({
-    Widget? child,
-    Key? key,
+    super.child,
+    super.key,
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
@@ -66,7 +65,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  }) : super(child: child, key: key);
+  });
 
   @override
   RenderObject createRenderObject(BuildContext _) => _RenderCssSizing(

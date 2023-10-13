@@ -145,14 +145,20 @@ Future<void> main() async {
       const html =
           '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
       const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
   });
 
@@ -225,8 +231,13 @@ Future<void> main() async {
       const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(borderCollapse: true, borderSpacing: 2.0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains(
+          'HtmlTable(border: all(BorderSide), borderCollapse: true, borderSpacing: 2.0)',
+        ),
+      );
     });
   });
 
@@ -379,6 +390,57 @@ Future<void> main() async {
     });
   });
 
+  group('width', () {
+    testWidgets('renders without width', (WidgetTester tester) async {
+      const html = '<table><tr><td>Foo</td></tr></table>';
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders width: 50px', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 50px">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 50.0)'),
+      );
+    });
+
+    testWidgets('renders width: 100%', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 100%">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
+    });
+
+    testWidgets('renders width: 100% within TABLE', (tester) async {
+      const html = '<table><tr><td>'
+          '<table><tr><td style="width: 100%">'
+          'Foo'
+          '</td></tr></table>'
+          '</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
+    });
+  });
+
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
       const html = '<table><tbody>'
@@ -487,8 +549,10 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
+  });
 
-    testWidgets('#171: background-color', (WidgetTester tester) async {
+  group('background', () {
+    testWidgets('cell color', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/171
       const html = '<table><tr>'
           '<td style="background-color: #f00">Foo</td>'
@@ -504,6 +568,59 @@ Future<void> main() async {
           '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
           ']]]]]',
+        ),
+      );
+    });
+
+    testWidgets('row color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td>Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('overwrites row color', (WidgetTester tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td style="background-color: #0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FF00FF00,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
         ),
       );
     });
@@ -724,7 +841,12 @@ Future<void> main() async {
       await tester.pumpAndSettle();
 
       expect(
-        key.renderBox.getDryLayout(const BoxConstraints()),
+        key.renderBox.getDryLayout(
+          const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          ),
+        ),
         equals(const Size(100, 50)),
       );
     });
@@ -861,16 +983,30 @@ Future<void> main() async {
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
-              // TODO: doesn't match browser output
-              'valign_baseline_computeDryLayout': '''
-<div style="width: 100px; height: 100px;">
-  <table border="1">
-    <tr>
-      <td valign="baseline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</td>
-      <td valign="baseline"><div style="margin: 10px">Foo</div></td>
-    </tr>
-  </table>
-</div>''',
+              'row_color': '''
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/1028 -->
+<table style="border-collapse: collapse;">
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Points</th>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Jill</td>
+    <td>Smith</td>
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td>
+    <td>94</td>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Adam</td>
+    <td>Johnson</td>
+    <td>67</td>
+  </tr>
+</table>''',
               'rtl': '''
 <table dir="rtl">
   <tr>
@@ -972,6 +1108,18 @@ Future<void> main() async {
   <tr>
     <td style="background: red; width: 30%">Foo</td>
     <td style="background: green; width: 70%">Bar</td>
+  </tr>
+</table>''',
+              'width_in_percent_100_nested': '''
+<table border="1">
+  <tr>
+    <td>
+      <table border="1">
+        <tr>
+          <td style="width: 100%">Foo</td>
+        </tr>
+      </table>
+    </td>
   </tr>
 </table>''',
               'width_in_px': '''
@@ -1127,7 +1275,7 @@ Future<void> main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key? key}) : super(key: key);
+  const _Golden(this.contents);
 
   @override
   Widget build(BuildContext _) => Scaffold(

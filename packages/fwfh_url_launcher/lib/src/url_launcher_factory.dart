@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,14 +11,18 @@ mixin UrlLauncherFactory on WidgetFactory {
       return result;
     }
 
-    // TODO: remove lint ignores when mininum url_launcher version >= 6.1.0
-    // ignore: deprecated_member_use
-    final ok = await canLaunch(url);
-    if (!ok) {
+    try {
+      final uri = Uri.parse(url);
+      final ok = await canLaunchUrl(uri);
+      if (!ok) {
+        debugPrint('Could not launch "$url": unsupported');
+        return false;
+      }
+
+      return await launchUrl(uri);
+    } catch (error) {
+      debugPrint('Could not launch "$url": $error');
       return false;
     }
-
-    // ignore: deprecated_member_use
-    return launch(url);
   }
 }

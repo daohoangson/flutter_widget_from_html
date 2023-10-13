@@ -8,8 +8,7 @@ typedef Baselines = Map<int, List<_ValignBaselineRenderObject>>;
 class ValignBaselineContainer extends StatefulWidget {
   final Widget child;
 
-  const ValignBaselineContainer({required this.child, Key? key})
-      : super(key: key);
+  const ValignBaselineContainer({required this.child, super.key});
 
   @override
   State<ValignBaselineContainer> createState() => _ValignBaselineState();
@@ -21,10 +20,10 @@ class ValignBaseline extends SingleChildRenderObjectWidget {
 
   /// Creates a `valign=baseline` widget.
   const ValignBaseline({
-    required Widget child,
+    required Widget super.child,
     required this.index,
-    Key? key,
-  }) : super(child: child, key: key);
+    super.key,
+  });
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -68,8 +67,7 @@ class _ValignBaselineInheritedWidget extends InheritedWidget {
 }
 
 class _ValignBaselineClearer extends SingleChildRenderObjectWidget {
-  const _ValignBaselineClearer({required Widget child, Key? key})
-      : super(child: child, key: key);
+  const _ValignBaselineClearer({required Widget super.child});
 
   @override
   RenderObject createRenderObject(BuildContext context) =>

@@ -37,24 +37,24 @@ class TagTable {
   late final BuildOp tableOp;
 
   TagTable(this.wf) {
-    borderOp = const BuildOp.v1(
+    borderOp = const BuildOp.v2(
       debugLabel: '$kTagTable--$kAttributeBorder',
       defaultStyles: _borderDefaultStyles,
-      onChild: _onBorderChild,
+      onVisitChild: _onBorderChild,
       priority: Priority.tagTableAttributeBorder,
     );
 
-    cellPaddingOp = const BuildOp.v1(
+    cellPaddingOp = const BuildOp.v2(
       debugLabel: '$kTagTable--$kAttributeCellPadding',
-      onChild: _onCellPaddingChild,
+      onVisitChild: _onCellPaddingChild,
       priority: Priority.tagTableAttributeCellPadding,
     );
 
-    tableOp = BuildOp.v1(
+    tableOp = BuildOp(
       debugLabel: kTagTable,
-      onChild: _onTableChild,
       onParsed: _onTableParsed,
       onRenderBlock: _onTableRenderBlock,
+      onVisitChild: _onTableChild,
       priority: Early.tagTableRenderBlock,
     );
   }
@@ -197,16 +197,19 @@ class TagTable {
     }
   }
 
-  static StylesMap _borderDefaultStyles(BuildTree tree) {
-    final data = tree.tableData;
+  static StylesMap _borderDefaultStyles(dom.Element element) {
+    final attrs = element.attributes;
+    final border = element.attributeBorder;
+    final borderSpacing = tryParseDoubleFromMap(attrs, kAttributeCellSpacing);
+
     return {
-      if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
+      if (border > 0.0) kCssBorder: '${border}px solid black',
       kCssBorderCollapse: kCssBorderCollapseSeparate,
-      kCssBorderSpacing: '${data.borderSpacing}px',
+      kCssBorderSpacing: '${borderSpacing ?? 2.0}px',
     };
   }
 
-  static StylesMap _cssBorderInherit(BuildTree _) =>
+  static StylesMap _cssBorderInherit(dom.Element _) =>
       {kCssBorder: kCssBorderInherit};
 
   static String? _getCssDisplayValue(BuildTree tree) {
@@ -239,13 +242,12 @@ class TagTable {
   }
 
   static void _onBorderChild(BuildTree tableTree, BuildTree subTree) {
-    final data = tableTree.tableData;
-    if (data.border > 0) {
+    if (tableTree.element.attributeBorder > 0) {
       switch (subTree.element.localName) {
         case kTagTableCell:
         case kTagTableHeaderCell:
           subTree.register(
-            const BuildOp.v1(
+            const BuildOp.v2(
               debugLabel: '$kTagTable--$kAttributeBorder--child',
               defaultStyles: _cssBorderInherit,
               priority: Early.tagTableAttributeBorderChild,
@@ -258,11 +260,12 @@ class TagTable {
   static void _onCellPaddingChild(BuildTree tableTree, BuildTree subTree) {
     if (subTree.element.localName == 'td' ||
         subTree.element.localName == 'th') {
-      final data = tableTree.tableData;
+      final attrs = tableTree.element.attributes;
+      final cellPadding = tryParseDoubleFromMap(attrs, kAttributeCellPadding);
       subTree.register(
-        BuildOp.v1(
+        BuildOp(
           debugLabel: '$kTagTable--$kAttributeCellPadding--child',
-          defaultStyles: (_) => {kCssPadding: '${data.cellPadding}px'},
+          defaultStyles: (_) => {kCssPadding: '${cellPadding ?? 1.0}px'},
           priority: Early.tagTableAttributeCellPaddingChild,
         ),
       );
@@ -279,7 +282,7 @@ class TagTable {
     switch (which) {
       case kCssDisplayTableCaption:
         subTree.register(
-          BuildOp.v1(
+          BuildOp(
             alwaysRenderBlock: true,
             debugLabel: kTagTableCaption,
             onRenderedBlock: (_, block) => data.captions.add(block),
@@ -313,18 +316,21 @@ class TagTable {
 }
 
 extension on BuildTree {
-  _TagTableData get tableData =>
-      getNonInheritedProperty<_TagTableData>() ??
-      setNonInheritedProperty<_TagTableData>(_parse());
+  _TagTableData get tableData {
+    final existing = value<_TagTableData>();
+    if (existing != null) {
+      return existing;
+    }
 
-  _TagTableData _parse() {
-    final attrs = element.attributes;
-    return _TagTableData(
-      border: tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
-      borderSpacing: tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
-      cellPadding: tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
-    );
+    final newData = _TagTableData();
+    value(newData);
+    return newData;
   }
+}
+
+extension on dom.Element {
+  double get attributeBorder =>
+      tryParseDoubleFromMap(attributes, kAttributeBorder) ?? 0.0;
 }
 
 class _TagTableRow {
@@ -334,12 +340,13 @@ class _TagTableRow {
   late final BuildOp _cellOp;
 
   _TagTableRow() {
-    _rowOp = BuildOp.v1(
+    _rowOp = BuildOp(
+      alwaysRenderBlock: true,
       debugLabel: kTagTableRow,
-      onChild: _onRowChild,
+      onVisitChild: _onRowChild,
       priority: Priority.tagTableRow,
     );
-    _cellOp = BuildOp.v1(
+    _cellOp = BuildOp(
       alwaysRenderBlock: true,
       debugLabel: kTagTableCell,
       onRenderedBlock: _onCellRenderedBlock,
@@ -353,6 +360,11 @@ class _TagTableRow {
     }
     if (TagTable._getCssDisplayValue(cellTree) != kCssDisplayTableCell) {
       return;
+    }
+
+    for (final style in rowTree.styles) {
+      // forward all row styles to its cells, this is quite dangerous...
+      cellTree.styles.add(style);
     }
 
     _registerCellOp(cellTree);
@@ -377,7 +389,7 @@ class _TagTableRow {
   void _registerCellOp(BuildTree cellTree) {
     if (cellTree.element.attributes.containsKey(kAttributeValign)) {
       cellTree.register(
-        const BuildOp.v1(
+        const BuildOp.v2(
           debugLabel: kTagTableCell,
           defaultStyles: _cssVerticalAlignFromAttribute,
           priority: Early.tagTableCellAttributeValign,
@@ -390,8 +402,8 @@ class _TagTableRow {
     StyleSizing.skip(cellTree);
   }
 
-  static StylesMap _cssVerticalAlignFromAttribute(BuildTree tree) {
-    final value = tree.element.attributes[kAttributeValign];
+  static StylesMap _cssVerticalAlignFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeValign];
     return value != null ? {kCssVerticalAlign: value} : const {};
   }
 }
@@ -402,9 +414,9 @@ class _TagTableRowGroup {
   late final BuildOp _groupOp;
 
   _TagTableRowGroup(String debugLabel) {
-    _groupOp = BuildOp.v1(
+    _groupOp = BuildOp(
       debugLabel: debugLabel,
-      onChild: _onGroupChild,
+      onVisitChild: _onGroupChild,
       priority: Priority.tagTableRowGroup,
     );
   }
@@ -438,10 +450,6 @@ class _TagTableRowGroup {
 }
 
 class _TagTableData {
-  final double border;
-  final double borderSpacing;
-  final double cellPadding;
-
   final bodies = <_TagTableRowGroup>[];
   final captions = <Widget>[];
   final footer = _TagTableRowGroup(kCssDisplayTableFooterGroup);
@@ -451,12 +459,6 @@ class _TagTableData {
   final cells = <int, Map<int, int>>{};
   int columns = 0;
   int rows = 0;
-
-  _TagTableData({
-    required this.border,
-    required this.borderSpacing,
-    required this.cellPadding,
-  });
 
   _TagTableRowGroup get latestBody =>
       bodies.isNotEmpty ? bodies.last : newBody();

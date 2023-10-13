@@ -1,3 +1,7 @@
+## 0.13.1-alpha.2
+
+- Improve legacy support (#1051)
+
 ## 0.13.0-alpha.1
 
 - Add support for flutter_widget_from_html_core@0.13.0 (#930)
@@ -14,6 +18,10 @@
 
 - Add support for flutter_widget_from_html_core@0.11.0 (#899)
 - Requires Flutter 3.7
+
+## 0.7.1+4
+
+- Add screenshots, funding and topics to pubspec files (#1010)
 
 ## 0.7.1+2
 

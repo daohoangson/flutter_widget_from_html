@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use_from_same_package
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -405,7 +403,7 @@ void main() {
     setUp(mockUrlLauncherPlatform);
 
     testWidgets('triggers callback (returns false)', (tester) async {
-      const href = 'returns-false';
+      const href = 'http://domain.com/can-launch/returns-false';
       final urls = <String>[];
 
       await explain(
@@ -447,7 +445,7 @@ void main() {
     });
 
     testWidgets('triggers callback (async false)', (tester) async {
-      const href = 'async-false';
+      const href = 'http://domain.com/can-launch/async-false';
       final urls = <String>[];
 
       await explain(
@@ -489,7 +487,7 @@ void main() {
     });
 
     testWidgets('default handler', (WidgetTester tester) async {
-      const href = 'default';
+      const href = 'http://domain.com/can-launch/default';
       await explain(
         tester,
         const HtmlWidget('<a href="$href">Tap me</a>'),

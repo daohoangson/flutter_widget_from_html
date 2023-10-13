@@ -7,9 +7,12 @@
 Flutter package to render html as widgets that focuses on correctness and extensibility.
 Supports [70+ most popular tags](https://demo.fwfh.dev/supported/tags.html).
 
-| [Live demo](https://demo.fwfh.dev/#/helloworldcore)                                                                                                                 |                                                                                                                                                                     |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
+| [Live demo](https://demo.fwfh.dev/#/helloworldcore)                                                                                 |                                                                                                                                     |
+|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/core/example/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/core/example/HelloWorldCoreScreen2.jpg) |
+
+
+
 
 ## Getting Started
 
@@ -17,7 +20,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.13.0-0
+  flutter_widget_from_html_core: ^0.13.1-0
 ```
 
 ## Usage
@@ -261,10 +264,10 @@ tree.apply(callback, TextAlign.justify);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-tree.register(BuildOp.v1(
+tree.register(BuildOp(
   onParsed: (tree) {
     // can be used to change text, inline contents, etc.
-    tree.append(...);
+    return tree..append(...);
   },
   onRenderBlock: (tree, child) {
     // use this to render special widget, wrap it into something else, etc.
@@ -308,10 +311,10 @@ class SmilieScreen extends StatelessWidget {
 }
 
 class _SmiliesWidgetFactory extends WidgetFactory {
-  final smilieOp = BuildOp.v1(
+  final smilieOp = BuildOp(
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
-      tree.addText(kSmilies[alt] ?? alt);
+      return tree..addText(kSmilies[alt] ?? alt ?? '');
     },
   );
 

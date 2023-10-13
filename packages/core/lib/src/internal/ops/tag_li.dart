@@ -29,21 +29,21 @@ class TagLi {
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagUnorderedList,
         defaultStyles: _defaultStyles,
-        onChild: (listTree, subTree) {
+        onVisitChild: (listTree, subTree) {
           final element = subTree.element;
 
           switch (element.localName) {
             case kTagOrderedList:
             case kTagUnorderedList:
-              subTree.increaseListDepth();
+              element.elementDepth = subTree.increaseListDepth();
               break;
             case kTagLi:
               if (element.parent == listTree.element) {
                 subTree.register(
-                  BuildOp.v1(
+                  BuildOp(
                     debugLabel: kTagLi,
                     onRenderBlock: (itemTree, placeholder) {
                       final i = listTree.increaseListItems() - 1;
@@ -71,7 +71,7 @@ class TagLi {
   ) {
     final tree = itemTree.sub()
       ..maxLines = 1
-      ..apply(TextStyleOps.whitespace, CssWhitespace.nowrap);
+      ..styleBuilder.enqueue(TextStyleOps.whitespace, CssWhitespace.nowrap);
     final listData = listTree.listData;
     final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
     final index = listData.markerReversed
@@ -90,10 +90,10 @@ class TagLi {
     );
   }
 
-  static StylesMap _defaultStyles(BuildTree tree) {
-    final attrs = tree.element.attributes;
-    final depth = tree.listData.depth;
-    final listStyleType = tree.element.localName == kTagOrderedList
+  static StylesMap _defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
+    final depth = element.elementDepth;
+    final listStyleType = element.localName == kTagOrderedList
         ? (_listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
             kCssListStyleTypeDecimal)
         : depth == 0
@@ -136,28 +136,41 @@ extension on BuildTree {
 }
 
 extension on BuildTree {
-  _TagLiListData get listData =>
-      getNonInheritedProperty<_TagLiListData>() ??
-      setNonInheritedProperty<_TagLiListData>(_parse());
+  _TagLiListData get listData {
+    final existing = value<_TagLiListData>();
+    if (existing != null) {
+      return existing;
+    }
+
+    final attrs = element.attributes;
+    final newData = _TagLiListData(
+      markerReversed: attrs.containsKey(kAttributeOlReversed),
+      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
+    );
+    value(newData);
+    return newData;
+  }
 
   String get listStyleType =>
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
-  int increaseListDepth() => setNonInheritedProperty<_TagLiListData>(
-        listData.copyWith(depth: listData.depth + 1),
-      ).depth;
-
-  int increaseListItems() => setNonInheritedProperty<_TagLiListData>(
-        listData.copyWith(items: listData.items + 1),
-      ).items;
-
-  _TagLiListData _parse() {
-    final attrs = element.attributes;
-    return _TagLiListData(
-      markerReversed: attrs.containsKey(kAttributeOlReversed),
-      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
-    );
+  int increaseListDepth() {
+    final newData = listData.copyWith(dataDepth: listData.dataDepth + 1);
+    value(newData);
+    return newData.dataDepth;
   }
+
+  int increaseListItems() {
+    final newData = listData.copyWith(items: listData.items + 1);
+    value(newData);
+    return newData.items;
+  }
+}
+
+extension on dom.Element {
+  static final _depths = Expando<int>();
+  int get elementDepth => _depths[this] ?? 0;
+  set elementDepth(int value) => _depths[this] = value;
 }
 
 @immutable
@@ -165,24 +178,24 @@ class _TagLiListData {
   final bool markerReversed;
   final int? markerStart;
 
-  final int depth;
+  final int dataDepth;
   final int items;
 
   const _TagLiListData({
     required this.markerReversed,
     this.markerStart,
-    this.depth = 0,
+    this.dataDepth = 0,
     this.items = 0,
   });
 
   _TagLiListData copyWith({
-    int? depth,
+    int? dataDepth,
     int? items,
   }) {
     return _TagLiListData(
       markerReversed: markerReversed,
       markerStart: markerStart,
-      depth: depth ?? this.depth,
+      dataDepth: dataDepth ?? this.dataDepth,
       items: items ?? this.items,
     );
   }

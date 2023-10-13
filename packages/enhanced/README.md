@@ -7,9 +7,9 @@
 Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe
 and [70+ other tags](https://demo.fwfh.dev/supported/tags.html).
 
-| [Live demo](https://demo.fwfh.dev/#/helloworld)                                                                                                                 |                                                                                                                                                                 |                                                                                                                                                                 |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen3.gif) |
+| [Live demo](https://demo.fwfh.dev/#/helloworld)                                                                                     |                                                                                                                                     |                                                                                                                                     |
+|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen3.gif) |
 
 This package supports most common HTML tags for easy usage.
 If you don't want to include all of its dependencies in your build, it's possible to use [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) with a subset of the mixins to control your app size:
@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.13.0-0
+  flutter_widget_from_html: ^0.13.1-0
 ```
 
 ### Platform specific configuration
