@@ -36,12 +36,14 @@ class TagA {
     InheritedProperties resolving,
     BuildContext? context,
   ) =>
-      resolving.copyWith(
-        style: resolving.style.copyWith(
-          color: Theme.of(context!).colorScheme.primary,
-          debugLabel: 'fwfh: a[href] default color',
-        ),
-      );
+      context == null
+          ? resolving
+          : resolving.copyWith(
+              style: resolving.style.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                debugLabel: 'fwfh: a[href] default color',
+              ),
+            );
 
   static StylesMap _defaultStyles(dom.Element _) {
     return const {

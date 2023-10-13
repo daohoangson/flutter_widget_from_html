@@ -20,10 +20,10 @@ class InheritedProperties {
   });
 
   /// Creates the root HTML styling set.
-  factory InheritedProperties.root(
-    Iterable<dynamic> deps,
+  factory InheritedProperties.root([
+    Iterable<dynamic> deps = const [],
     TextStyle? widgetStyle,
-  ) {
+  ]) {
     var style = _get<TextStyle>(deps) ?? const TextStyle();
     style = style.merge(widgetStyle);
 

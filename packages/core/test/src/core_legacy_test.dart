@@ -414,15 +414,7 @@ void main() {
   group('TextStyleHtml', () {
     group('getDependency', () {
       final dep1 = _LegacyTextStyleHtmlDep1();
-      final style = InheritedProperties.root(
-        [
-          const TextScaleFactor(1.0),
-          TextDirection.ltr,
-          const TextStyle(inherit: false),
-          dep1,
-        ],
-        null,
-      );
+      final style = InheritedProperties.root([dep1]);
 
       test('returns value', () {
         final dep = style.getDependency<_LegacyTextStyleHtmlDep1>();
