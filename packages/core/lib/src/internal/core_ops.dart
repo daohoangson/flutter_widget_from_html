@@ -80,3 +80,7 @@ const kCssWhitespace = 'white-space';
 const kCssWhitespaceNormal = 'normal';
 const kCssWhitespaceNowrap = 'nowrap';
 const kCssWhitespacePre = 'pre';
+
+extension on InheritedProperties {
+  TextDirection get directionOrLtr => get() ?? TextDirection.ltr;
+}

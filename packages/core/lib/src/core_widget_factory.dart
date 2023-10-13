@@ -349,10 +349,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       overflow: tree.overflow,
       selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
-      softWrap: resolved.whitespace != CssWhitespace.nowrap,
+      softWrap: resolved.get<CssWhitespace>() != CssWhitespace.nowrap,
       text: text,
       textAlign: resolved.get() ?? TextAlign.start,
-      textDirection: resolved.textDirection,
+      textDirection: resolved.get(),
     );
 
     if (selectionRegistrar != null) {

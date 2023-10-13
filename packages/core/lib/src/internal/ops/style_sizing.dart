@@ -108,7 +108,7 @@ class StyleSizing {
     }
 
     return placeholder.wrapWith((context, child) {
-      final dir = subTree.inheritanceResolvers.resolve(context).textDirection;
+      final dir = subTree.inheritanceResolvers.resolve(context).directionOrLtr;
       return _MinWidthZero(
         textDirection: dir,
         child: child,

@@ -205,7 +205,7 @@ double? _fontSizeTryParseCssLength(InheritedProperties resolved, CssLength v) =>
     v.getValue(
       resolved,
       baseValue: resolved.parent?.style.fontSize,
-      scaleFactor: resolved.textScaleFactor,
+      scaleFactor: resolved.get<TextScaleFactor>()?.value,
     );
 
 double? _fontSizeTryParseTerm(InheritedProperties resolved, String value) {
@@ -278,7 +278,7 @@ double? _lineHeightTryParse(
   final lengthValue = length.getValue(
     resolved,
     baseValue: fontSize,
-    scaleFactor: resolved.textScaleFactor,
+    scaleFactor: resolved.get<TextScaleFactor>()?.value,
   );
   if (lengthValue == null) {
     return null;

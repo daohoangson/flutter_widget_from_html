@@ -85,7 +85,7 @@ class TagLi {
 
     return HtmlListItem(
       marker: marker,
-      textDirection: resolved.textDirection,
+      textDirection: resolved.directionOrLtr,
       child: child,
     );
   }

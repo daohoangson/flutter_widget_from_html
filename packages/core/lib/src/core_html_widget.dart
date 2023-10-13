@@ -117,7 +117,7 @@ class HtmlWidget extends StatefulWidget {
 
 /// State for a [HtmlWidget].
 class HtmlWidgetState extends State<HtmlWidget> {
-  late final _RootPropertiesResolvers _rootPropertiesResolvers;
+  late final InheritanceResolvers _rootResolvers;
   late final WidgetFactory _wf;
 
   Widget? _cache;
@@ -132,7 +132,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   CoreBuildTree get _rootTree => CoreBuildTree.root(
         customStylesBuilder: widget.customStylesBuilder,
         customWidgetBuilder: widget.customWidgetBuilder,
-        inheritanceResolvers: _rootPropertiesResolvers,
+        inheritanceResolvers: _rootResolvers,
         wf: _wf,
       );
 
@@ -140,7 +140,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   void initState() {
     super.initState();
 
-    _rootPropertiesResolvers = _RootPropertiesResolvers(this);
+    _rootResolvers = _RootResolvers(this);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.reset(this);
@@ -259,10 +259,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
       _RootWidget(resolved: _rootProperties, child: child);
 }
 
-class _RootPropertiesResolvers extends InheritanceResolvers {
+class _RootResolvers extends InheritanceResolvers {
   final HtmlWidgetState state;
 
-  _RootPropertiesResolvers(this.state);
+  _RootResolvers(this.state);
 
   @override
   InheritedProperties resolve(BuildContext context) {

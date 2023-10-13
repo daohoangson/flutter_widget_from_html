@@ -169,7 +169,7 @@ class Flattener implements Flattened {
         (context, {bool? isLast}) {
           final resolved = scopedInheritanceResolvers.resolve(context);
           final text = scopedStrings.toText(
-            resolved.whitespace,
+            resolved.whitespaceOrNormal,
             isFirst: false,
             isLast: isLast != false,
           );
@@ -221,7 +221,7 @@ class Flattener implements Flattened {
         }
 
         final text = scopedStrings.toText(
-          resolved.whitespace,
+          resolved.whitespaceOrNormal,
           isFirst: true,
           isLast: isLast_,
         );
@@ -326,6 +326,10 @@ extension on BuildBit {
 
     return next;
   }
+}
+
+extension on InheritedProperties {
+  CssWhitespace get whitespaceOrNormal => get() ?? CssWhitespace.normal;
 }
 
 @immutable

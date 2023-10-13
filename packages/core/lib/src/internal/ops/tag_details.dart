@@ -45,7 +45,7 @@ class TagDetails {
                     HtmlSummary(style: textStyle, child: summary),
                     HtmlDetailsContents(child: child),
                   ],
-                  dir: resolved.textDirection,
+                  dir: resolved.directionOrLtr,
                 ),
               );
             },

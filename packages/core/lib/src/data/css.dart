@@ -104,20 +104,15 @@ class CssBorder {
 
   /// Calculates [Border].
   Border? getBorder(InheritedProperties resolved) {
+    final isRtl = resolved.isRtl;
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(resolved);
     final left = CssBorderSide._copyWith(
       _all,
-      _left ??
-          (resolved.textDirection == TextDirection.ltr
-              ? _inlineStart
-              : _inlineEnd),
+      _left ?? (isRtl ? _inlineEnd : _inlineStart),
     )?._getValue(resolved);
     final right = CssBorderSide._copyWith(
       _all,
-      _right ??
-          (resolved.textDirection == TextDirection.ltr
-              ? _inlineEnd
-              : _inlineStart),
+      _right ?? (isRtl ? _inlineStart : _inlineEnd),
     )?._getValue(resolved);
     final top = CssBorderSide._copyWith(_all, _top)?._getValue(resolved);
     if (bottom == null && left == null && right == null && top == null) {
@@ -367,18 +362,14 @@ class CssLengthBox {
       _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
-  double? getValueLeft(InheritedProperties resolved) => (_left ??
-          (resolved.textDirection == TextDirection.ltr
-              ? _inlineStart
-              : _inlineEnd))
-      ?.getValue(resolved);
+  double? getValueLeft(InheritedProperties resolved) =>
+      (_left ?? (resolved.isRtl ? _inlineEnd : _inlineStart))
+          ?.getValue(resolved);
 
   /// Calculates the right value taking text direction into account.
-  double? getValueRight(InheritedProperties resolved) => (_right ??
-          (resolved.textDirection == TextDirection.ltr
-              ? _inlineEnd
-              : _inlineStart))
-      ?.getValue(resolved);
+  double? getValueRight(InheritedProperties resolved) =>
+      (_right ?? (resolved.isRtl ? _inlineStart : _inlineEnd))
+          ?.getValue(resolved);
 
   @override
   String toString() {
@@ -451,4 +442,8 @@ enum CssWhitespace {
   /// Sequences of white space are preserved.
   /// Lines are only broken at newline characters in the source and at `BR`s.
   pre,
+}
+
+extension on InheritedProperties {
+  bool get isRtl => get<TextDirection>() == TextDirection.rtl;
 }

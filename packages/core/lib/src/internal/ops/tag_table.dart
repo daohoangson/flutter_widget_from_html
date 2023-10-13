@@ -89,7 +89,7 @@ class TagTable {
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
-            textDirection: resolved.textDirection,
+            textDirection: resolved.directionOrLtr,
             children: List.from(
               data.builders.map((f) => f(context)).where((e) => e != null),
               growable: false,

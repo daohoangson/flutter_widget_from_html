@@ -30,7 +30,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
         context,
         widgets,
         crossAxisAlignment: resolved.columnCrossAxisAlignment,
-        dir: resolved.textDirection,
+        dir: resolved.directionOrLtr,
       );
       return isBody ? wf.buildBodyWidget(context, built) : built;
     } finally {
@@ -100,7 +100,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
             context,
             contents,
             crossAxisAlignment: resolved.columnCrossAxisAlignment,
-            dir: resolved.textDirection,
+            dir: resolved.directionOrLtr,
           )
         : null;
 
@@ -127,7 +127,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
 extension on InheritedProperties {
   CrossAxisAlignment get columnCrossAxisAlignment {
-    final isLtr = textDirection == TextDirection.ltr;
+    final isRtl = get<TextDirection>() == TextDirection.rtl;
     final textAlign = get<TextAlign>() ?? TextAlign.start;
     switch (textAlign) {
       case TextAlign.center:
@@ -137,9 +137,9 @@ extension on InheritedProperties {
       case TextAlign.justify:
         return CrossAxisAlignment.stretch;
       case TextAlign.left:
-        return isLtr ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+        return isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start;
       case TextAlign.right:
-        return isLtr ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+        return isRtl ? CrossAxisAlignment.start : CrossAxisAlignment.end;
       case TextAlign.start:
         return CrossAxisAlignment.start;
     }

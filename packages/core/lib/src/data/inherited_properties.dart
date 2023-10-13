@@ -24,12 +24,12 @@ class InheritedProperties {
     Iterable<dynamic> deps,
     TextStyle? widgetStyle,
   ) {
-    var style = _get<TextStyle>(deps)!;
+    var style = _get<TextStyle>(deps) ?? const TextStyle();
     style = style.merge(widgetStyle);
 
-    final tsf = _get<TextScaleFactor>(deps)!;
+    final tsf = _get<TextScaleFactor>(deps);
     final fontSize = style.fontSize;
-    if (tsf.value != 1.0 && fontSize != null) {
+    if (tsf != null && tsf.value != 1.0 && fontSize != null) {
       style = style.copyWith(
         debugLabel: 'fwfh: fontSize *= textScaleFactor',
         fontSize: fontSize * tsf.value,
@@ -44,21 +44,6 @@ class InheritedProperties {
       style: style,
     );
   }
-
-  /// The text direction.
-  ///
-  /// This inherited property is always available via [WidgetFactory.getDependencies].
-  TextDirection get textDirection => get()!;
-
-  /// The number of font pixels for each logical pixel.
-  ///
-  /// This inherited property is always available via [WidgetFactory.getDependencies].
-  double get textScaleFactor => get<TextScaleFactor>()!.value;
-
-  /// The whitespace behavior.
-  ///
-  /// This inherited property is always available via [WidgetFactory.getDependencies].
-  CssWhitespace get whitespace => get()!;
 
   /// Creates a copy with the given fields replaced with the new values.
   InheritedProperties copyWith<T>({
