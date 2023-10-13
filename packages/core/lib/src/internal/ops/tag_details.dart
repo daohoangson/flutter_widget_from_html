@@ -10,50 +10,8 @@ class TagDetails {
 
   TagDetails(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagDetails,
-        onChild: (detailsTree, subTree) {
-          final e = subTree.element;
-          if (e.parent != detailsTree.element) {
-            return;
-          }
-          if (e.localName != kTagSummary) {
-            return;
-          }
-
-          subTree.register(
-            BuildOp.v1(
-              debugLabel: kTagSummary,
-              onParsed: (summaryTree) {
-                if (summaryTree.isEmpty) {
-                  return summaryTree;
-                }
-
-                final marker = WidgetBit.inline(
-                  summaryTree,
-                  WidgetPlaceholder(
-                    builder: (context, child) {
-                      final style = summaryTree.styleBuilder.build(context);
-                      return HtmlDetailsMarker(style: style.textStyle);
-                    },
-                    debugLabel: '$kTagSummary--inlineMarker',
-                  ),
-                );
-                return summaryTree..prepend(marker);
-              },
-              onRenderBlock: (_, placeholder) {
-                final summaries = detailsTree.summaries;
-                if (summaries.isNotEmpty) {
-                  return placeholder;
-                }
-
-                summaries.add(placeholder);
-                return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
-              },
-              priority: Late.tagSummary,
-            ),
-          );
-        },
         onRenderBlock: (tree, placeholder) {
           final attrs = tree.element.attributes;
           final open = attrs.containsKey(kAttributeDetailsOpen);
@@ -91,6 +49,48 @@ class TagDetails {
                 ),
               );
             },
+          );
+        },
+        onVisitChild: (detailsTree, subTree) {
+          final e = subTree.element;
+          if (e.parent != detailsTree.element) {
+            return;
+          }
+          if (e.localName != kTagSummary) {
+            return;
+          }
+
+          subTree.register(
+            BuildOp(
+              debugLabel: kTagSummary,
+              onParsed: (summaryTree) {
+                if (summaryTree.isEmpty) {
+                  return summaryTree;
+                }
+
+                final marker = WidgetBit.inline(
+                  summaryTree,
+                  WidgetPlaceholder(
+                    builder: (context, child) {
+                      final style = summaryTree.styleBuilder.build(context);
+                      return HtmlDetailsMarker(style: style.textStyle);
+                    },
+                    debugLabel: '$kTagSummary--inlineMarker',
+                  ),
+                );
+                return summaryTree..prepend(marker);
+              },
+              onRenderBlock: (_, placeholder) {
+                final summaries = detailsTree.summaries;
+                if (summaries.isNotEmpty) {
+                  return placeholder;
+                }
+
+                summaries.add(placeholder);
+                return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
+              },
+              priority: Late.tagSummary,
+            ),
           );
         },
         priority: Priority.tagDetails,

@@ -20,7 +20,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.13.0-0
+  flutter_widget_from_html_core: ^0.13.1-0
 ```
 
 ## Usage
@@ -264,7 +264,7 @@ tree.apply(callback, TextAlign.justify);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-tree.register(BuildOp.v1(
+tree.register(BuildOp(
   onParsed: (tree) {
     // can be used to change text, inline contents, etc.
     return tree..append(...);
@@ -311,7 +311,7 @@ class SmilieScreen extends StatelessWidget {
 }
 
 class _SmiliesWidgetFactory extends WidgetFactory {
-  final smilieOp = BuildOp.v1(
+  final smilieOp = BuildOp(
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
       return tree..addText(kSmilies[alt] ?? alt ?? '');

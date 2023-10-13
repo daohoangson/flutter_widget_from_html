@@ -20,25 +20,8 @@ class TagVideo {
 
   TagVideo(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagVideo,
-        onChild: (tree, subTree) {
-          final e = subTree.element;
-          if (e.localName != kTagVideoSource) {
-            return;
-          }
-          if (e.parent != tree.element) {
-            return;
-          }
-
-          final attrs = e.attributes;
-          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-          if (url == null) {
-            return;
-          }
-
-          tree.sourceUrls = [...tree.sourceUrls, url];
-        },
         onRenderBlock: (tree, placeholder) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
@@ -55,6 +38,23 @@ class TagVideo {
           }
 
           return _buildPlayer(tree) ?? placeholder;
+        },
+        onVisitChild: (tree, subTree) {
+          final e = subTree.element;
+          if (e.localName != kTagVideoSource) {
+            return;
+          }
+          if (e.parent != tree.element) {
+            return;
+          }
+
+          final attrs = e.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url == null) {
+            return;
+          }
+
+          tree.sourceUrls = [...tree.sourceUrls, url];
         },
       );
 

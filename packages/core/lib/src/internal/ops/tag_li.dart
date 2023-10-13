@@ -29,21 +29,21 @@ class TagLi {
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagUnorderedList,
         defaultStyles: _defaultStyles,
-        onChild: (listTree, subTree) {
+        onVisitChild: (listTree, subTree) {
           final element = subTree.element;
 
           switch (element.localName) {
             case kTagOrderedList:
             case kTagUnorderedList:
-              subTree.increaseListDepth();
+              element.elementDepth = subTree.increaseListDepth();
               break;
             case kTagLi:
               if (element.parent == listTree.element) {
                 subTree.register(
-                  BuildOp.v1(
+                  BuildOp(
                     debugLabel: kTagLi,
                     onRenderBlock: (itemTree, placeholder) {
                       final i = listTree.increaseListItems() - 1;
@@ -90,10 +90,10 @@ class TagLi {
     );
   }
 
-  static StylesMap _defaultStyles(BuildTree tree) {
-    final attrs = tree.element.attributes;
-    final depth = tree.listData.depth;
-    final listStyleType = tree.element.localName == kTagOrderedList
+  static StylesMap _defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
+    final depth = element.elementDepth;
+    final listStyleType = element.localName == kTagOrderedList
         ? (_listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
             kCssListStyleTypeDecimal)
         : depth == 0
@@ -155,9 +155,9 @@ extension on BuildTree {
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
   int increaseListDepth() {
-    final newData = listData.copyWith(depth: listData.depth + 1);
+    final newData = listData.copyWith(dataDepth: listData.dataDepth + 1);
     value(newData);
-    return newData.depth;
+    return newData.dataDepth;
   }
 
   int increaseListItems() {
@@ -167,29 +167,35 @@ extension on BuildTree {
   }
 }
 
+extension on dom.Element {
+  static final _depths = Expando<int>();
+  int get elementDepth => _depths[this] ?? 0;
+  set elementDepth(int value) => _depths[this] = value;
+}
+
 @immutable
 class _TagLiListData {
   final bool markerReversed;
   final int? markerStart;
 
-  final int depth;
+  final int dataDepth;
   final int items;
 
   const _TagLiListData({
     required this.markerReversed,
     this.markerStart,
-    this.depth = 0,
+    this.dataDepth = 0,
     this.items = 0,
   });
 
   _TagLiListData copyWith({
-    int? depth,
+    int? dataDepth,
     int? items,
   }) {
     return _TagLiListData(
       markerReversed: markerReversed,
       markerStart: markerStart,
-      depth: depth ?? this.depth,
+      dataDepth: dataDepth ?? this.dataDepth,
       items: items ?? this.items,
     );
   }

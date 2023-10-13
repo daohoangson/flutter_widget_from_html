@@ -1,7 +1,7 @@
 part of '../core_ops.dart';
 
 extension StyleDisplayInlineBlock on WidgetFactory {
-  BuildOp get displayInlineBlock => const BuildOp.v1(
+  BuildOp get displayInlineBlock => const BuildOp.v2(
         debugLabel: 'display: inline-block',
         onParsed: _onParsed,
         priority: Late.displayInlineBlock,
@@ -24,7 +24,7 @@ extension StyleDisplayInlineBlock on WidgetFactory {
 }
 
 extension StyleDisplayNone on WidgetFactory {
-  BuildOp get displayNone => const BuildOp.v1(
+  BuildOp get displayNone => const BuildOp.v2(
         debugLabel: 'display: none',
         onParsed: _onParsed,
         priority: Late.displayNone,

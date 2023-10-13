@@ -15,7 +15,7 @@ class TagImg {
 
   TagImg(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: kTagImg,
         defaultStyles: _defaultStyles,
@@ -56,8 +56,8 @@ class TagImg {
     );
   }
 
-  static StylesMap _defaultStyles(BuildTree tree) {
-    final attrs = tree.element.attributes;
+  static StylesMap _defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
     final height = attrs[kAttributeImgHeight];
     final width = attrs[kAttributeImgWidth];
     return {

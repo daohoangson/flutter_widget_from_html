@@ -14,13 +14,13 @@ void main() {
         expect(tree.styles.isLocked, isFalse);
       });
 
-      test('is unlocked in onChild', () {
+      test('is unlocked in onVisitChild', () {
         final list = <bool>[];
         final tree = _newTree(
           wf: _WidgetFactory(
             onParse: (tree) => tree.register(
-              BuildOp.v1(
-                onChild: (_, subTree) => list.add(subTree.styles.isLocked),
+              BuildOp(
+                onVisitChild: (_, subTree) => list.add(subTree.styles.isLocked),
               ),
             ),
           ),

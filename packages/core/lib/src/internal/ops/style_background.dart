@@ -8,7 +8,7 @@ class StyleBackground {
 
   StyleBackground(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: kCssBackground,
         onRenderBlock: (tree, placeholder) {

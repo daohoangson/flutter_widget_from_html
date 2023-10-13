@@ -9,7 +9,7 @@ class TagA {
 
   TagA(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: 'a[href]',
         defaultStyles: _defaultStyles,
         onParsed: (tree) {
@@ -40,7 +40,7 @@ class TagA {
         ),
       );
 
-  static StylesMap _defaultStyles(BuildTree _) {
+  static StylesMap _defaultStyles(dom.Element _) {
     return const {
       kCssTextDecoration: kCssTextDecorationUnderline,
     };
