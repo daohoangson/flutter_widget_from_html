@@ -136,34 +136,27 @@ extension on BuildTree {
 }
 
 extension on BuildTree {
-  _TagLiListData get listData {
-    final existing = value<_TagLiListData>();
-    if (existing != null) {
-      return existing;
-    }
-
-    final attrs = element.attributes;
-    final newData = _TagLiListData(
-      markerReversed: attrs.containsKey(kAttributeOlReversed),
-      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
-    );
-    value(newData);
-    return newData;
-  }
+  _TagLiListData get listData =>
+      getNonInheritedProperty<_TagLiListData>() ??
+      setNonInheritedProperty<_TagLiListData>(_parse());
 
   String get listStyleType =>
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
-  int increaseListDepth() {
-    final newData = listData.copyWith(dataDepth: listData.dataDepth + 1);
-    value(newData);
-    return newData.dataDepth;
-  }
+  int increaseListDepth() => setNonInheritedProperty<_TagLiListData>(
+        listData.copyWith(dataDepth: listData.dataDepth + 1),
+      ).dataDepth;
 
-  int increaseListItems() {
-    final newData = listData.copyWith(items: listData.items + 1);
-    value(newData);
-    return newData.items;
+  int increaseListItems() => setNonInheritedProperty<_TagLiListData>(
+        listData.copyWith(items: listData.items + 1),
+      ).items;
+
+  _TagLiListData _parse() {
+    final attrs = element.attributes;
+    return _TagLiListData(
+      markerReversed: attrs.containsKey(kAttributeOlReversed),
+      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
+    );
   }
 }
 

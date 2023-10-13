@@ -34,7 +34,7 @@ class TagVideo {
           final attrs = tree.element.attributes;
           final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
           if (url != null) {
-            tree.sourceUrls = [...tree.sourceUrls, url];
+            tree.videoData.urls.add(url);
           }
 
           return _buildPlayer(tree) ?? placeholder;
@@ -54,12 +54,12 @@ class TagVideo {
             return;
           }
 
-          tree.sourceUrls = [...tree.sourceUrls, url];
+          tree.videoData.urls.add(url);
         },
       );
 
   Widget? _buildPlayer(BuildTree tree) {
-    final sourceUrls = tree.sourceUrls;
+    final sourceUrls = tree.videoData.urls;
     if (sourceUrls.isEmpty) {
       return null;
     }
@@ -79,16 +79,12 @@ class TagVideo {
 }
 
 extension on BuildTree {
-  Iterable<String> get sourceUrls =>
-      value<_TagVideoData>()?.sourceUrls ?? const [];
-
-  set sourceUrls(Iterable<String> v) {
-    value(_TagVideoData(v));
-  }
+  _TagVideoData get videoData =>
+      getNonInheritedProperty<_TagVideoData>() ??
+      setNonInheritedProperty<_TagVideoData>(_TagVideoData());
 }
 
 @immutable
 class _TagVideoData {
-  final Iterable<String> sourceUrls;
-  const _TagVideoData(this.sourceUrls);
+  final urls = <String>[];
 }

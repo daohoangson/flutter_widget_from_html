@@ -316,16 +316,9 @@ class TagTable {
 }
 
 extension on BuildTree {
-  _TagTableData get tableData {
-    final existing = value<_TagTableData>();
-    if (existing != null) {
-      return existing;
-    }
-
-    final newData = _TagTableData();
-    value(newData);
-    return newData;
-  }
+  _TagTableData get tableData =>
+      getNonInheritedProperty<_TagTableData>() ??
+      setNonInheritedProperty<_TagTableData>(_TagTableData());
 }
 
 extension on dom.Element {
