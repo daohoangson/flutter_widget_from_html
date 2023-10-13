@@ -150,9 +150,28 @@ class BuildOp {
     @Deprecated('Use alwaysRenderBlock instead.')
     bool onWidgetsIsOptional = false,
   }) {
+    final onRenderBlockOrOnWidgets = onRenderBlock ??
+        (onWidgets != null
+            ? (tree, placeholder) {
+                final children = onWidgets(tree, [placeholder]);
+                switch (children?.length) {
+                  case null:
+                    return placeholder;
+                  case 0:
+                    return widget0;
+                  case 1:
+                    return children?.first ?? widget0;
+                  default:
+                    throw UnsupportedError(
+                      'onWidgets must return exactly 1 widget, got ${children?.length}',
+                    );
+                }
+              }
+            : null);
+
     return BuildOp.v2(
       alwaysRenderBlock: alwaysRenderBlock ??
-          (onWidgetsIsOptional ? null : (onWidgets != null)),
+          (onWidgetsIsOptional ? null : (onRenderBlockOrOnWidgets != null)),
       debugLabel: debugLabel,
       defaultStyles: defaultStyles,
       onParsed: onParsed ??
@@ -162,24 +181,7 @@ class BuildOp {
                   return tree;
                 }
               : null),
-      onRenderBlock: onRenderBlock ??
-          (onWidgets != null
-              ? (tree, placeholder) {
-                  final children = onWidgets(tree, [placeholder]);
-                  switch (children?.length) {
-                    case null:
-                      return placeholder;
-                    case 0:
-                      return widget0;
-                    case 1:
-                      return children?.first ?? widget0;
-                    default:
-                      throw UnsupportedError(
-                        'onWidgets must return exactly 1 widget, got ${children?.length}',
-                      );
-                  }
-                }
-              : null),
+      onRenderBlock: onRenderBlockOrOnWidgets,
       onRenderInline: onRenderInline ??
           (onTreeFlattening != null
               ? (tree) => onTreeFlattening(tree, tree)
