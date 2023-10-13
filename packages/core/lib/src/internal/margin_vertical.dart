@@ -20,9 +20,6 @@ class HeightPlaceholder extends WidgetPlaceholder {
   CssLength get height => _heights.first;
 
   @override
-  bool get isEmpty => false;
-
-  @override
   Widget build(BuildContext context) {
     if (context._skipBuildOrZero > 0) {
       return this;
