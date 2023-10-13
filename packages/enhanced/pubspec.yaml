@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   flutter_widget_from_html_core: ^0.13.1-alpha.2
   fwfh_cached_network_image: ^0.13.0-alpha.1
-  fwfh_chewie: ^0.13.0-alpha.1
+  fwfh_chewie: ^0.13.1-alpha.2
   fwfh_just_audio: ^0.13.0-alpha.1
   fwfh_svg: ^0.13.0-alpha.1
   fwfh_url_launcher: ^0.13.0-alpha.1
