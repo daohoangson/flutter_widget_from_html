@@ -15,7 +15,7 @@ const kCssTextAlignWebkitCenter = '-webkit-center';
 const kTagCenter = 'center';
 
 extension StyleTextAlign on WidgetFactory {
-  BuildOp get styleTextAlign => const BuildOp.v1(
+  BuildOp get styleTextAlign => const BuildOp.v2(
         alwaysRenderBlock: false,
         debugLabel: kCssTextAlign,
         onParsed: _onParsed,

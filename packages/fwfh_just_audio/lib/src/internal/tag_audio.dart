@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -17,26 +20,26 @@ class TagAudio {
 
   TagAudio(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
-        debugLabel: kTagAudio,
-        onRenderBlock: (tree, placeholder) {
+  BuildOp get buildOp => BuildOp(
+        // TODO: set debugLabel when our minimum core version >= 1.0
+        onWidgets: (meta, widgets) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               defaultTargetPlatform != TargetPlatform.macOS &&
               !kIsWeb) {
             // these are the just_audio's supported platforms
             // https://pub.dev/packages/just_audio/versions/0.9.5
-            return placeholder;
+            return widgets;
           }
 
-          final attrs = tree.element.attributes;
+          final attrs = meta.element.attributes;
           final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
           if (url == null) {
-            return placeholder;
+            return widgets;
           }
 
           final built = wf.buildAudioPlayer(
-            tree,
+            meta,
             url,
             autoplay: attrs.containsKey(kAttributeAudioAutoplay),
             loop: attrs.containsKey(kAttributeAudioLoop),
@@ -44,7 +47,8 @@ class TagAudio {
             preload: attrs.containsKey(kAttributeAudioPreload) &&
                 attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
           );
-          return built ?? placeholder;
+
+          return listOrNull(built) ?? widgets;
         },
       );
 }

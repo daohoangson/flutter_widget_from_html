@@ -6,14 +6,14 @@ const kAttributeFontFace = 'face';
 const kAttributeFontSize = 'size';
 
 extension TagFont on WidgetFactory {
-  BuildOp get tagFont => const BuildOp.v1(
+  BuildOp get tagFont => const BuildOp.v2(
         debugLabel: kTagFont,
         defaultStyles: _defaultStyles,
         priority: Priority.tagFont,
       );
 
-  static StylesMap _defaultStyles(BuildTree tree) {
-    final attrs = tree.element.attributes;
+  static StylesMap _defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
     final color = attrs[kAttributeFontColor];
     final fontFace = attrs[kAttributeFontFace];
     final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];

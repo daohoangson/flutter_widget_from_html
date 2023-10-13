@@ -296,7 +296,7 @@ class CoreBuildTree extends BuildTree {
     wf.parse(this);
 
     for (final op in _parentOps) {
-      op.onChild(this);
+      op.onVisitChild(this);
     }
 
     for (final op in _buildOps) {
@@ -331,7 +331,7 @@ Iterable<_CoreBuildOp> _prepareParentOps(
 ) {
   // try to reuse existing list if possible
   final newOps = builder._buildOps
-      .where((op) => op.op.onChild != null)
+      .where((op) => op.op.onVisitChild != null)
       .toList(growable: false);
   return newOps.isNotEmpty == true
       ? List.unmodifiable([...ops, ...newOps])
@@ -349,7 +349,7 @@ class _CoreBuildOp {
   const _CoreBuildOp(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
-    final map = op.defaultStyles?.call(tree);
+    final map = op.defaultStyles?.call(tree.element);
     if (map == null) {
       return null;
     }
@@ -358,8 +358,6 @@ class _CoreBuildOp {
     final styleSheet = css.parse('*{$str}');
     return styleSheet.collectDeclarations();
   }
-
-  void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
   BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
 
@@ -370,6 +368,8 @@ class _CoreBuildOp {
 
   void onRenderedBlock(WidgetPlaceholder placeholder) =>
       op.onRenderedBlock?.call(tree, placeholder);
+
+  void onVisitChild(BuildTree subTree) => op.onVisitChild?.call(tree, subTree);
 
   static int _compare(_CoreBuildOp a0, _CoreBuildOp b0) {
     final a = a0.op;

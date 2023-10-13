@@ -5,37 +5,15 @@ const kTagRp = 'rp';
 const kTagRt = 'rt';
 
 extension TagRuby on WidgetFactory {
-  BuildOp get tagRuby => const BuildOp.v1(
+  BuildOp get tagRuby => const BuildOp.v2(
         debugLabel: kTagRuby,
-        onChild: _onChild,
         onParsed: _onParsed,
+        onVisitChild: _onVisitChild,
         priority: Priority.tagRuby,
       );
 
-  static StylesMap _cssDisplayNone(BuildTree _) =>
+  static StylesMap _cssDisplayNone(dom.Element _) =>
       {kCssDisplay: kCssDisplayNone};
-
-  static void _onChild(BuildTree tree, BuildTree subTree) {
-    final e = subTree.element;
-    if (e.parent != tree.element) {
-      return;
-    }
-
-    switch (e.localName) {
-      case kTagRp:
-        subTree.register(
-          const BuildOp.v1(
-            debugLabel: kTagRp,
-            defaultStyles: _cssDisplayNone,
-            priority: Early.tagRp,
-          ),
-        );
-        break;
-      case kTagRt:
-        subTree.styleBuilder.enqueue(TextStyleOps.fontSizeEm, .5);
-        break;
-    }
-  }
 
   static BuildTree _onParsed(BuildTree tree) {
     final replacement = tree.parent.sub();
@@ -80,6 +58,28 @@ extension TagRuby on WidgetFactory {
     }
 
     return replacement;
+  }
+
+  static void _onVisitChild(BuildTree tree, BuildTree subTree) {
+    final e = subTree.element;
+    if (e.parent != tree.element) {
+      return;
+    }
+
+    switch (e.localName) {
+      case kTagRp:
+        subTree.register(
+          const BuildOp.v2(
+            debugLabel: kTagRp,
+            defaultStyles: _cssDisplayNone,
+            priority: Early.tagRp,
+          ),
+        );
+        break;
+      case kTagRt:
+        subTree.styleBuilder.enqueue(TextStyleOps.fontSizeEm, .5);
+        break;
+    }
   }
 }
 

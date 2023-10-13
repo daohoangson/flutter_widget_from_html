@@ -264,7 +264,7 @@ tree.apply(callback, TextAlign.justify);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-tree.register(BuildOp.v1(
+tree.register(BuildOp(
   onParsed: (tree) {
     // can be used to change text, inline contents, etc.
     return tree..append(...);
@@ -311,7 +311,7 @@ class SmilieScreen extends StatelessWidget {
 }
 
 class _SmiliesWidgetFactory extends WidgetFactory {
-  final smilieOp = BuildOp.v1(
+  final smilieOp = BuildOp(
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
       return tree..addText(kSmilies[alt] ?? alt ?? '');

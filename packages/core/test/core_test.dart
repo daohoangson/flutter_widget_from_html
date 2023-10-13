@@ -1716,7 +1716,7 @@ class _InlineOnRenderBlockFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.localName == 'span') {
-      tree.register(BuildOp.v1(onRenderBlock: (_, __) => const Text('Bar')));
+      tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Bar')));
     }
     super.parse(tree);
   }

@@ -11,7 +11,7 @@ class Anchor {
       : anchor = GlobalKey(debugLabel: id),
         registry = wf._registry;
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         alwaysRenderBlock: false,
         debugLabel: 'anchor#$id',
         onParsed: (tree) {

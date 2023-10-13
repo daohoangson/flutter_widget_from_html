@@ -29,10 +29,10 @@ class TagLi {
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp.v1(
+  BuildOp get buildOp => BuildOp(
         debugLabel: kTagUnorderedList,
         defaultStyles: _defaultStyles,
-        onChild: (listTree, subTree) {
+        onVisitChild: (listTree, subTree) {
           final element = subTree.element;
 
           switch (element.localName) {
@@ -43,7 +43,7 @@ class TagLi {
             case kTagLi:
               if (element.parent == listTree.element) {
                 subTree.register(
-                  BuildOp.v1(
+                  BuildOp(
                     debugLabel: kTagLi,
                     onRenderBlock: (itemTree, placeholder) {
                       final i = listTree.increaseListItems() - 1;
