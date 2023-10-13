@@ -39,21 +39,18 @@ const kCssLineHeightNormal = 'normal';
 
 extension BuildTreeEllipsis on BuildTree {
   _BuildTreeEllipsis get _ellipsis =>
-      getNonInheritedProperty<_BuildTreeEllipsis>() ??
-      setNonInheritedProperty<_BuildTreeEllipsis>(const _BuildTreeEllipsis());
+      getNonInherited<_BuildTreeEllipsis>() ??
+      setNonInherited(const _BuildTreeEllipsis());
 
   int get maxLines => _ellipsis.maxLines;
 
-  set maxLines(int value) => setNonInheritedProperty<_BuildTreeEllipsis>(
-        _ellipsis.copyWith(maxLines: value),
-      );
+  set maxLines(int value) =>
+      setNonInherited<_BuildTreeEllipsis>(_ellipsis.copyWith(maxLines: value));
 
   TextOverflow get overflow => _ellipsis.overflow;
 
   set overflow(TextOverflow value) =>
-      setNonInheritedProperty<_BuildTreeEllipsis>(
-        _ellipsis.copyWith(overflow: value),
-      );
+      setNonInherited<_BuildTreeEllipsis>(_ellipsis.copyWith(overflow: value));
 }
 
 @immutable

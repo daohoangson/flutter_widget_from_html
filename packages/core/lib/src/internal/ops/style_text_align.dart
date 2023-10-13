@@ -52,8 +52,8 @@ extension StyleTextAlign on WidgetFactory {
 
 extension on BuildTree {
   _StyleTextAlignData get textAlignData =>
-      getNonInheritedProperty<_StyleTextAlignData>() ??
-      setNonInheritedProperty<_StyleTextAlignData>(_parse());
+      getNonInherited<_StyleTextAlignData>() ??
+      setNonInherited<_StyleTextAlignData>(_parse());
 
   _StyleTextAlignData _parse() {
     final term = getStyle(kCssTextAlign)?.term;

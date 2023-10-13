@@ -137,17 +137,17 @@ extension on BuildTree {
 
 extension on BuildTree {
   _TagLiListData get listData =>
-      getNonInheritedProperty<_TagLiListData>() ??
-      setNonInheritedProperty<_TagLiListData>(_parse());
+      getNonInherited<_TagLiListData>() ??
+      setNonInherited<_TagLiListData>(_parse());
 
   String get listStyleType =>
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
-  int increaseListDepth() => setNonInheritedProperty<_TagLiListData>(
+  int increaseListDepth() => setNonInherited<_TagLiListData>(
         listData.copyWith(dataDepth: listData.dataDepth + 1),
       ).dataDepth;
 
-  int increaseListItems() => setNonInheritedProperty<_TagLiListData>(
+  int increaseListItems() => setNonInherited<_TagLiListData>(
         listData.copyWith(items: listData.items + 1),
       ).items;
 

@@ -300,11 +300,10 @@ mixin AnchorWidgetFactory on WidgetFactoryResetter {
 }
 
 extension on BuildTree {
-  List<Key>? get anchors => getNonInheritedProperty<_BuildTreeAnchors>()?.keys;
+  List<Key>? get anchors => getNonInherited<_BuildTreeAnchors>()?.keys;
 
   void addAnchor(Key anchor) {
-    final keys = anchors ??
-        setNonInheritedProperty<_BuildTreeAnchors>(_BuildTreeAnchors()).keys;
+    final keys = anchors ?? setNonInherited(_BuildTreeAnchors()).keys;
     keys.add(anchor);
 
     if (hasParent) {

@@ -186,8 +186,8 @@ class StyleSizing {
 
 extension on BuildTree {
   _StyleSizingInput? get sizingInput {
-    final input = getNonInheritedProperty<_StyleSizingInput>() ??
-        setNonInheritedProperty<_StyleSizingInput>(_parse());
+    final input = getNonInherited<_StyleSizingInput>() ??
+        setNonInherited<_StyleSizingInput>(_parse());
 
     if (input.maxHeight == null &&
         input.maxWidth == null &&

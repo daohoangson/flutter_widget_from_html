@@ -80,8 +80,7 @@ class TagVideo {
 
 extension on BuildTree {
   _TagVideoData get videoData =>
-      getNonInheritedProperty<_TagVideoData>() ??
-      setNonInheritedProperty<_TagVideoData>(_TagVideoData());
+      getNonInherited<_TagVideoData>() ?? setNonInherited(_TagVideoData());
 }
 
 @immutable

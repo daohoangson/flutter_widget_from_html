@@ -317,8 +317,7 @@ class TagTable {
 
 extension on BuildTree {
   _TagTableData get tableData =>
-      getNonInheritedProperty<_TagTableData>() ??
-      setNonInheritedProperty<_TagTableData>(_TagTableData());
+      getNonInherited<_TagTableData>() ?? setNonInherited(_TagTableData());
 }
 
 extension on dom.Element {

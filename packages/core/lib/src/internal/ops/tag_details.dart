@@ -100,8 +100,7 @@ class TagDetails {
 
 extension on BuildTree {
   _TagDetailsData get detailsData =>
-      getNonInheritedProperty<_TagDetailsData>() ??
-      setNonInheritedProperty<_TagDetailsData>(_TagDetailsData());
+      getNonInherited<_TagDetailsData>() ?? setNonInherited(_TagDetailsData());
 }
 
 class _TagDetailsData {

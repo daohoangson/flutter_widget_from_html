@@ -110,28 +110,8 @@ abstract class BuildBit {
   String toString() => '$runtimeType#$hashCode';
 }
 
-abstract class BuildTreeProperties {
-  /// {@macro flutter_widget_from_html.inherit}
-  void inherit<T>(
-    InheritanceResolverCallback<T> callback, [
-    T? input,
-  ]);
-
-  /// Gets non-inherited property of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
-  T? getNonInheritedProperty<T>();
-
-  /// Sets non-inherited property of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
-  T setNonInheritedProperty<T>(T value);
-}
-
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit implements BuildTreeProperties {
+abstract class BuildTree extends BuildBit {
   static final _buffers = Expando<StringBuffer>();
 
   /// The associated DOM element.
@@ -243,8 +223,11 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
     target._nonInheritedProperties.addAll(_nonInheritedProperties);
   }
 
-  @override
-  T? getNonInheritedProperty<T>() {
+  /// Gets non-inherited property of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
+  T? getNonInherited<T>() {
     for (final property in _nonInheritedProperties) {
       if (property is T) {
         return property;
@@ -257,7 +240,7 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// Gets a styling declaration by [property].
   css.Declaration? getStyle(String property);
 
-  @override
+  /// {@macro flutter_widget_from_html.inherit}
   void inherit<T>(
     InheritanceResolverCallback<T> callback, [
     T? input,
@@ -276,8 +259,11 @@ abstract class BuildTree extends BuildBit implements BuildTreeProperties {
   /// Registers a build op.
   void register(BuildOp op);
 
-  @override
-  T setNonInheritedProperty<T>(T value) {
+  /// Sets non-inherited property of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
+  T setNonInherited<T>(T value) {
     final index = _nonInheritedProperties.indexWhere((p) => p is T);
     if (index == -1) {
       _nonInheritedProperties.add(value);
