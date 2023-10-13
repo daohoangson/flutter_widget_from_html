@@ -7,24 +7,6 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
-extension GetSizing on CssLength {
-  CssSizingValue? getSizing(InheritedProperties resolved) {
-    final value = getValue(resolved);
-    if (value != null) {
-      return CssSizingValue.value(value);
-    }
-
-    switch (unit) {
-      case CssLengthUnit.auto:
-        return const CssSizingValue.auto();
-      case CssLengthUnit.percentage:
-        return CssSizingValue.percentage(number);
-      default:
-        return null;
-    }
-  }
-}
-
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
 
@@ -281,6 +263,24 @@ extension on BuildTree {
       preferredHeight: preferredHeight,
       preferredWidth: preferredWidth,
     );
+  }
+}
+
+extension on CssLength {
+  CssSizingValue? getSizing(InheritedProperties resolved) {
+    final value = getValue(resolved);
+    if (value != null) {
+      return CssSizingValue.value(value);
+    }
+
+    switch (unit) {
+      case CssLengthUnit.auto:
+        return const CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(number);
+      default:
+        return null;
+    }
   }
 }
 

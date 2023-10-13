@@ -73,8 +73,8 @@ class StyleVerticalAlign {
 
           return placeholder.wrapWith((context, child) {
             final resolved = tree.inheritanceResolvers.resolve(context);
-            final dir = resolved.directionOrLtr;
-            final alignment = _tryParseAlignmentGeometry(dir, value);
+            final alignment =
+                _tryParseAlignmentGeometry(resolved.directionOrLtr, value);
             if (alignment == null) {
               return child;
             }

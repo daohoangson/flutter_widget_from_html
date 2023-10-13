@@ -45,7 +45,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   BuildOp? _tagLi;
   BuildOp? _tagPre;
   TagTable? _tagTable;
-  InheritanceResolverCallback<css.Expression>? _styleLineHeight;
   HtmlWidget? _widget;
 
   /// Builds [Align].
@@ -1044,7 +1043,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
-          tree.inherit(_styleLineHeight ??= text_ops.lineHeight(this), value);
+          tree.inherit(text_ops.lineHeight, value);
         }
         break;
 

@@ -109,22 +109,22 @@ InheritedProperties textDecorationLine(
 
 InheritedProperties textDecorationStyle(
   InheritedProperties resolving,
-  TextDecorationStyle v,
+  TextDecorationStyle value,
 ) =>
     resolving.copyWith(
       style: resolving.style.copyWith(
-        decorationStyle: v,
+        decorationStyle: value,
         debugLabel: 'fwfh: $kCssTextDecorationStyle',
       ),
     );
 
 InheritedProperties textDecorationThickness(
   InheritedProperties resolving,
-  double v,
+  double value,
 ) =>
     resolving.copyWith(
       style: resolving.style.copyWith(
-        decorationThickness: v,
+        decorationThickness: value,
         debugLabel: 'fwfh: $kCssTextDecorationThickness',
       ),
     );

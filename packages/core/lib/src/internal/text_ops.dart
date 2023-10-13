@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
 import '../core_helpers.dart';
-import '../core_widget_factory.dart';
 import 'core_ops.dart';
 import 'core_parser.dart';
 
@@ -51,6 +50,67 @@ InheritedProperties fontSizeTerm(InheritedProperties resolving, String v) =>
       ),
     );
 
+double? _fontSizeTryParse(InheritedProperties resolved, css.Expression v) {
+  final length = tryParseCssLength(v);
+  if (length != null) {
+    final lengthValue = _fontSizeTryParseCssLength(resolved, length);
+    if (lengthValue != null) {
+      return lengthValue;
+    }
+  }
+
+  if (v is css.LiteralTerm) {
+    return _fontSizeTryParseTerm(resolved, v.valueAsString);
+  }
+
+  return null;
+}
+
+double? _fontSizeTryParseCssLength(InheritedProperties resolved, CssLength v) =>
+    v.getValue(
+      resolved,
+      baseValue: resolved.parent?.style.fontSize,
+      scaleFactor: resolved.get<TextScaleFactor>()?.value,
+    );
+
+double? _fontSizeTryParseTerm(InheritedProperties resolved, String value) {
+  switch (value) {
+    case kCssFontSizeXxLarge:
+      return _fontSizeMultiplyRootWith(resolved, 2.0);
+    case kCssFontSizeXLarge:
+      return _fontSizeMultiplyRootWith(resolved, 1.5);
+    case kCssFontSizeLarge:
+      return _fontSizeMultiplyRootWith(resolved, 1.125);
+    case kCssFontSizeMedium:
+      return _fontSizeMultiplyRootWith(resolved, 1);
+    case kCssFontSizeSmall:
+      return _fontSizeMultiplyRootWith(resolved, .8125);
+    case kCssFontSizeXSmall:
+      return _fontSizeMultiplyRootWith(resolved, .625);
+    case kCssFontSizeXxSmall:
+      return _fontSizeMultiplyRootWith(resolved, .5625);
+
+    case kCssFontSizeLarger:
+      return _fontSizeMultiplyWith(resolved.parent?.style.fontSize, 1.2);
+    case kCssFontSizeSmaller:
+      return _fontSizeMultiplyWith(resolved.parent?.style.fontSize, 15 / 18);
+  }
+
+  return null;
+}
+
+double? _fontSizeMultiplyRootWith(InheritedProperties resolved, double value) {
+  var root = resolved;
+  for (InheritedProperties? x = root; x != null; x = x.parent) {
+    root = x;
+  }
+
+  return _fontSizeMultiplyWith(root.style.fontSize, value);
+}
+
+double? _fontSizeMultiplyWith(double? fontSize, double value) =>
+    fontSize != null ? fontSize * value : null;
+
 InheritedProperties fontStyle(InheritedProperties resolving, FontStyle v) =>
     resolving.copyWith(
       style: resolving.style.copyWith(
@@ -67,33 +127,72 @@ InheritedProperties fontWeight(InheritedProperties resolving, FontWeight v) =>
       ),
     );
 
-InheritanceResolverCallback<css.Expression> lineHeight(WidgetFactory wf) =>
-    (resolving, expression) {
-      final height = _lineHeightTryParse(wf, resolving, expression);
-      if (height == null) {
-        return resolving;
-      }
+InheritedProperties lineHeight(
+  InheritedProperties resolving,
+  css.Expression expression,
+) {
+  final height = _lineHeightTryParse(resolving, expression);
+  if (height == null) {
+    return resolving;
+  }
 
-      if (height == -1) {
-        final normal = resolving.get<NormalLineHeight>();
-        if (normal == null) {
-          return resolving;
-        }
-        return resolving.copyWith(
-          style: resolving.style.copyWith(
-            debugLabel: 'fwfh: $kCssLineHeight normal',
-            height: normal.value,
-          ),
-        );
-      }
+  if (height == -1) {
+    final normal = resolving.get<NormalLineHeight>();
+    if (normal == null) {
+      return resolving;
+    }
+    return resolving.copyWith(
+      style: resolving.style.copyWith(
+        debugLabel: 'fwfh: $kCssLineHeight normal',
+        height: normal.value,
+      ),
+    );
+  }
 
-      return resolving.copyWith(
-        style: resolving.style.copyWith(
-          debugLabel: 'fwfh: $kCssLineHeight $height',
-          height: height,
-        ),
-      );
-    };
+  return resolving.copyWith(
+    style: resolving.style.copyWith(
+      debugLabel: 'fwfh: $kCssLineHeight $height',
+      height: height,
+    ),
+  );
+}
+
+double? _lineHeightTryParse(InheritedProperties resolved, css.Expression v) {
+  if (v is css.LiteralTerm) {
+    if (v is css.NumberTerm) {
+      final number = v.number.toDouble();
+      if (number > 0) {
+        return number;
+      }
+    }
+
+    switch (v.valueAsString) {
+      case kCssLineHeightNormal:
+        return -1;
+    }
+  }
+
+  final fontSize = resolved.style.fontSize;
+  if (fontSize == null) {
+    return null;
+  }
+
+  final length = tryParseCssLength(v);
+  if (length == null) {
+    return null;
+  }
+
+  final lengthValue = length.getValue(
+    resolved,
+    baseValue: fontSize,
+    scaleFactor: resolved.get<TextScaleFactor>()?.value,
+  );
+  if (lengthValue == null) {
+    return null;
+  }
+
+  return lengthValue / fontSize;
+}
 
 InheritedProperties textDirection(InheritedProperties resolving, String v) {
   switch (v) {
@@ -183,106 +282,4 @@ CssWhitespace? whitespaceTryParse(String value) {
   }
 
   return null;
-}
-
-double? _fontSizeTryParse(InheritedProperties resolved, css.Expression v) {
-  final length = tryParseCssLength(v);
-  if (length != null) {
-    final lengthValue = _fontSizeTryParseCssLength(resolved, length);
-    if (lengthValue != null) {
-      return lengthValue;
-    }
-  }
-
-  if (v is css.LiteralTerm) {
-    return _fontSizeTryParseTerm(resolved, v.valueAsString);
-  }
-
-  return null;
-}
-
-double? _fontSizeTryParseCssLength(InheritedProperties resolved, CssLength v) =>
-    v.getValue(
-      resolved,
-      baseValue: resolved.parent?.style.fontSize,
-      scaleFactor: resolved.get<TextScaleFactor>()?.value,
-    );
-
-double? _fontSizeTryParseTerm(InheritedProperties resolved, String value) {
-  switch (value) {
-    case kCssFontSizeXxLarge:
-      return _fontSizeMultiplyRootWith(resolved, 2.0);
-    case kCssFontSizeXLarge:
-      return _fontSizeMultiplyRootWith(resolved, 1.5);
-    case kCssFontSizeLarge:
-      return _fontSizeMultiplyRootWith(resolved, 1.125);
-    case kCssFontSizeMedium:
-      return _fontSizeMultiplyRootWith(resolved, 1);
-    case kCssFontSizeSmall:
-      return _fontSizeMultiplyRootWith(resolved, .8125);
-    case kCssFontSizeXSmall:
-      return _fontSizeMultiplyRootWith(resolved, .625);
-    case kCssFontSizeXxSmall:
-      return _fontSizeMultiplyRootWith(resolved, .5625);
-
-    case kCssFontSizeLarger:
-      return _fontSizeMultiplyWith(resolved.parent?.style.fontSize, 1.2);
-    case kCssFontSizeSmaller:
-      return _fontSizeMultiplyWith(resolved.parent?.style.fontSize, 15 / 18);
-  }
-
-  return null;
-}
-
-double? _fontSizeMultiplyRootWith(InheritedProperties resolved, double value) {
-  var root = resolved;
-  for (InheritedProperties? x = root; x != null; x = x.parent) {
-    root = x;
-  }
-
-  return _fontSizeMultiplyWith(root.style.fontSize, value);
-}
-
-double? _fontSizeMultiplyWith(double? fontSize, double value) =>
-    fontSize != null ? fontSize * value : null;
-
-double? _lineHeightTryParse(
-  WidgetFactory wf,
-  InheritedProperties resolved,
-  css.Expression expression,
-) {
-  if (expression is css.LiteralTerm) {
-    if (expression is css.NumberTerm) {
-      final number = expression.number.toDouble();
-      if (number > 0) {
-        return number;
-      }
-    }
-
-    switch (expression.valueAsString) {
-      case kCssLineHeightNormal:
-        return -1;
-    }
-  }
-
-  final fontSize = resolved.style.fontSize;
-  if (fontSize == null) {
-    return null;
-  }
-
-  final length = tryParseCssLength(expression);
-  if (length == null) {
-    return null;
-  }
-
-  final lengthValue = length.getValue(
-    resolved,
-    baseValue: fontSize,
-    scaleFactor: resolved.get<TextScaleFactor>()?.value,
-  );
-  if (lengthValue == null) {
-    return null;
-  }
-
-  return lengthValue / fontSize;
 }
