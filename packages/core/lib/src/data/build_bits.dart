@@ -110,7 +110,7 @@ abstract class BuildBit {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit {
+abstract class BuildTree extends BuildBit with NonInheritedPropertiesOwner {
   static final _buffers = Expando<StringBuffer>();
 
   /// The associated DOM element.
@@ -120,8 +120,6 @@ abstract class BuildTree extends BuildBit {
   final InheritanceResolvers inheritanceResolvers;
 
   List<BuildBit>? _children;
-
-  List<dynamic>? _nonInherited;
 
   /// Creates a tree.
   BuildTree({
@@ -223,31 +221,6 @@ abstract class BuildTree extends BuildBit {
   /// Builds widget from bits.
   WidgetPlaceholder? build();
 
-  @protected
-  void copyTo(BuildTree target) {
-    final src = _nonInherited;
-    if (src != null) {
-      final dest = target._nonInherited;
-      if (dest != null) {
-        dest.addAll(src);
-      } else {
-        target._nonInherited = [...src];
-      }
-    }
-  }
-
-  /// Gets non-inherited property of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
-  T? getNonInherited<T>() {
-    final filtered = _nonInherited?.whereType<T>();
-    if (filtered?.isNotEmpty == true) {
-      return filtered?.first;
-    }
-    return null;
-  }
-
   /// Gets a styling declaration by [property].
   css.Declaration? getStyle(String property);
 
@@ -270,21 +243,6 @@ abstract class BuildTree extends BuildBit {
 
   /// Registers a build op.
   void register(BuildOp op);
-
-  /// Sets non-inherited property of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
-  T setNonInherited<T>(T value) {
-    final list = _nonInherited ??= [];
-    final index = list.indexWhere((p) => p is T);
-    if (index == -1) {
-      list.add(value);
-    } else {
-      list[index] = value;
-    }
-    return value;
-  }
 
   /// Creates a sub tree without [append]ing.
   BuildTree sub();

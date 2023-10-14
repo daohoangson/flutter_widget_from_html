@@ -138,7 +138,7 @@ class CoreBuildTree extends BuildTree {
     );
 
     if (copyContents) {
-      copyTo(copied);
+      copied.addAllNonInherited(this);
 
       for (final bit in children) {
         copied.append(bit.copyWith(parent: copied));

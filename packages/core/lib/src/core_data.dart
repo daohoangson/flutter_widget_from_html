@@ -11,6 +11,7 @@ part 'data/css.dart';
 part 'data/image.dart';
 part 'data/inherited_properties.dart';
 part 'data/lockable_list.dart';
+part 'data/non_inherited_properties.dart';
 part 'data/normal_line_height.dart';
 
 const _defaultPriority = 10;
