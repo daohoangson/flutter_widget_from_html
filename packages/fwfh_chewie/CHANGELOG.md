@@ -1,3 +1,7 @@
+## 0.14.0-alpha.1
+
+- Requires flutter_widget_from_html_core@0.14.0 (#948)
+
 ## 0.13.1-alpha.2
 
 - Improve legacy support (#1051)
