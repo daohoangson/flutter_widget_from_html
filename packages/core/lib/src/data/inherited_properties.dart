@@ -52,7 +52,7 @@ class InheritedProperties {
     T? value,
   }) {
     return InheritedProperties._(
-      value != null ? _values.copyWith<T>(value) : _values,
+      value != null ? [..._values.where((e) => e is! T), value] : _values,
       parent: parent ?? this.parent,
       style: style ?? this.style,
     );
@@ -166,10 +166,6 @@ class InheritanceResolvers {
   @override
   String toString() => 'inheritanceResolvers#$hashCode'
       '${parent != null ? '(parent=#${parent.hashCode})' : ''}';
-}
-
-extension on Iterable<dynamic> {
-  Iterable<dynamic> copyWith<T>(T value) => [...where((e) => e is! T), value];
 }
 
 @immutable

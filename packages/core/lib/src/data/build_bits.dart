@@ -1,7 +1,6 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
-@immutable
 abstract class BuildBit {
   /// Creates a build bit.
   const BuildBit();
@@ -122,7 +121,7 @@ abstract class BuildTree extends BuildBit {
 
   final _children = <BuildBit>[];
 
-  final _nonInheritedProperties = <dynamic>[];
+  List<dynamic>? _nonInherited;
 
   /// Creates a tree.
   BuildTree({
@@ -220,7 +219,15 @@ abstract class BuildTree extends BuildBit {
 
   @protected
   void copyTo(BuildTree target) {
-    target._nonInheritedProperties.addAll(_nonInheritedProperties);
+    final src = _nonInherited;
+    if (src != null) {
+      final dest = target._nonInherited;
+      if (dest != null) {
+        dest.addAll(src);
+      } else {
+        target._nonInherited = [...src];
+      }
+    }
   }
 
   /// Gets non-inherited property of type [T].
@@ -228,12 +235,10 @@ abstract class BuildTree extends BuildBit {
   /// These values are not passed down to sub-trees.
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
   T? getNonInherited<T>() {
-    for (final property in _nonInheritedProperties) {
-      if (property is T) {
-        return property;
-      }
+    final filtered = _nonInherited?.whereType<T>();
+    if (filtered?.isNotEmpty == true) {
+      return filtered?.first;
     }
-
     return null;
   }
 
@@ -264,11 +269,12 @@ abstract class BuildTree extends BuildBit {
   /// These values are not passed down to sub-trees.
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
   T setNonInherited<T>(T value) {
-    final index = _nonInheritedProperties.indexWhere((p) => p is T);
+    final list = _nonInherited ??= [];
+    final index = list.indexWhere((p) => p is T);
     if (index == -1) {
-      _nonInheritedProperties.add(value);
+      list.add(value);
     } else {
-      _nonInheritedProperties[index] = value;
+      list[index] = value;
     }
     return value;
   }
