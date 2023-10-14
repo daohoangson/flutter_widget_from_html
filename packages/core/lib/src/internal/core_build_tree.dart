@@ -27,10 +27,11 @@ class CoreBuildTree extends BuildTree {
   final WidgetFactory wf;
 
   final _buildOps = SplayTreeSet<_CoreBuildOp>(_CoreBuildOp._compare);
-  final _isInlines = <bool>[];
   final BuildTree? _parent;
   final Iterable<_CoreBuildOp> _parentOps;
   final _styles = _LockableDeclarations();
+
+  bool? _isInline;
 
   CoreBuildTree._({
     this.customStylesBuilder,
@@ -61,7 +62,7 @@ class CoreBuildTree extends BuildTree {
   bool get hasParent => _parent != null;
 
   @override
-  bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
+  bool? get isInline => _isInline;
 
   @override
   BuildTree get parent => _parent!;
@@ -216,7 +217,7 @@ class CoreBuildTree extends BuildTree {
       ..addBitsFromNodes(element.nodes);
 
     final isBlock = subBuilder._buildOps.where(_renderBlock).isNotEmpty;
-    subBuilder._isInlines.add(!isBlock);
+    subBuilder._isInline = !isBlock;
 
     BuildTree subTree = subBuilder;
     for (final op in subBuilder._buildOps) {
