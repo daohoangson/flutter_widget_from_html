@@ -26,7 +26,7 @@ abstract class BuildBit {
       if (!x.hasParent) {
         return null;
       }
-      final siblings = x.parent._children;
+      final siblings = x.parent._children ?? const [];
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -64,7 +64,7 @@ abstract class BuildBit {
       if (!x.hasParent) {
         return null;
       }
-      final siblings = x.parent._children;
+      final siblings = x.parent._children ?? const [];
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -119,7 +119,7 @@ abstract class BuildTree extends BuildBit {
   /// The [InheritedProperties] resolvers.
   final InheritanceResolvers inheritanceResolvers;
 
-  final _children = <BuildBit>[];
+  List<BuildBit>? _children;
 
   List<dynamic>? _nonInherited;
 
@@ -141,7 +141,7 @@ abstract class BuildTree extends BuildBit {
   }
 
   /// The list of direct children.
-  Iterable<BuildBit> get children => _children;
+  Iterable<BuildBit> get children => _children ?? const [];
 
   /// The first bit (recursively).
   BuildBit? get first {
@@ -172,7 +172,12 @@ abstract class BuildTree extends BuildBit {
 
   /// The last bit (recursively).
   BuildBit? get last {
-    for (final child in _children.reversed) {
+    final scopedChildren = _children;
+    if (scopedChildren == null) {
+      return null;
+    }
+
+    for (final child in scopedChildren.reversed) {
       final last = child is BuildTree ? child.last : child;
       if (last != null) {
         return last;
@@ -204,7 +209,8 @@ abstract class BuildTree extends BuildBit {
   /// See also: [prepend].
   T append<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    _children.add(child);
+    final scopedChildren = _children ??= [];
+    scopedChildren.add(child);
     return bit;
   }
 
@@ -257,7 +263,8 @@ abstract class BuildTree extends BuildBit {
   /// See also: [append].
   T prepend<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    _children.insert(0, child);
+    final scopedChildren = _children ??= [];
+    scopedChildren.insert(0, child);
     return bit;
   }
 
