@@ -34,9 +34,10 @@ class StyleVerticalAlign {
             return tree;
           }
 
+          _skipBuilding[tree] = true;
           final placeholder = WidgetPlaceholder(
-            builder: (context, child) => tree.build(),
             debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
+            child: tree.build(),
           );
 
           if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
@@ -51,7 +52,6 @@ class StyleVerticalAlign {
             );
           }
 
-          _skipBuilding[tree] = true;
           return parent.sub()
             ..append(
               WidgetBit.inline(

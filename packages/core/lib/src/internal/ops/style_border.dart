@@ -28,11 +28,11 @@ class StyleBorder {
                 tree,
                 WidgetPlaceholder(
                   builder: (context, child) {
-                    Widget? built = tree.build() ?? child;
-                    built = _buildBorder(tree, context, built, border);
+                    final built = _buildBorder(tree, context, child, border);
                     return built ?? child;
                   },
                   debugLabel: '${tree.element.localName}--$kCssBorder',
+                  child: tree.build(),
                 ),
                 alignment: PlaceholderAlignment.baseline,
               ),
