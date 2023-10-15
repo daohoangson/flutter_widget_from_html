@@ -72,6 +72,7 @@ class InheritedProperties {
   }
 }
 
+/// A callback to resolve an [InheritedProperties].
 typedef InheritanceResolverCallback<T> = InheritedProperties Function(
   InheritedProperties resolving,
   T input,
@@ -87,12 +88,13 @@ class InheritanceResolvers {
   InheritedProperties? _cachedResolved;
   List<_InheritanceResolverCallbackWithInput>? _callbacks;
 
+  /// Creates a set of resolvers for [InheritedProperties].
   InheritanceResolvers([this.parent, this._callbacks]);
 
   /// {@template flutter_widget_from_html.inherit}
   /// Enqueues an inherited property resolver callback.
   ///
-  /// The callback will receive the [InheritedProperties] being built.
+  /// The callback will receive the [InheritedProperties] being resolved.
   /// As a special case, declare `T=BuildContext?` to receive the [BuildContext].
   /// {@endtemplate}
   void enqueue<T>(
@@ -133,11 +135,11 @@ class InheritanceResolvers {
     return identical(thiz, othez);
   }
 
-  /// Resolve an [InheritedProperties] by calling callbacks on top of parent properties.
+  /// Resolve an [InheritedProperties] by calling callbacks on top of parent's values.
   InheritedProperties resolve(BuildContext context) {
     final parentResolved = parent!.resolve(context);
-    final list = _callbacks;
-    if (list == null) {
+    final scopedCallbacks = _callbacks;
+    if (scopedCallbacks == null) {
       return parentResolved;
     }
 
@@ -147,7 +149,7 @@ class InheritanceResolvers {
     }
 
     var resolving = parentResolved.copyWith(parent: parentResolved);
-    for (final callback in list) {
+    for (final callback in scopedCallbacks) {
       resolving = callback(context, resolving);
       assert(
         identical(resolving.parent, parentResolved),
@@ -156,8 +158,12 @@ class InheritanceResolvers {
       );
     }
 
+    // keep track of both the parent and the resolved set
+    // so we can skip resolving if the parent is unchanged
     _cachedParent = parentResolved;
-    return _cachedResolved = resolving;
+    _cachedResolved = resolving;
+
+    return resolving;
   }
 
   /// Creates a sub set.

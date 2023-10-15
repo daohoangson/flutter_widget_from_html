@@ -3,42 +3,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('NonInheritedPropertiesOwner', () {
-    group('addAllNonInherited', () {
-      test('add value to empty list', () {
-        final owner1 = _Owner();
-        final value1 = _Value1();
-        owner1.setNonInherited(value1);
-
-        final owner2 = _Owner();
-        owner2._addAllNonInherited(owner1);
-        expect(owner2.nonInheritedValues, equals([value1]));
-      });
-
-      test('add values to empty list', () {
-        final owner1 = _Owner();
-        final value1 = _Value1();
-        final value2 = _Value2();
-        owner1.setNonInherited(value1);
-        owner1.setNonInherited(value2);
-
-        final owner2 = _Owner();
-        owner2._addAllNonInherited(owner1);
-        expect(owner2.nonInheritedValues, equals([value1, value2]));
-      });
-
-      test('add value to non-empty list', () {
-        final owner1 = _Owner();
-        final value1 = _Value1();
-        owner1.setNonInherited(value1);
-
-        final owner2 = _Owner();
-        final value2 = _Value2();
-        owner2.setNonInherited(value2);
-        owner2._addAllNonInherited(owner1);
-        expect(owner2.nonInheritedValues, equals([value2, value1]));
-      });
-    });
-
     group('getNonInherited', () {
       test('return value', () {
         final owner1 = _Owner();
@@ -66,6 +30,42 @@ void main() {
       });
     });
 
+    group('setNonInheriteds', () {
+      test('add value to empty list', () {
+        final owner1 = _Owner();
+        final value1 = _Value1();
+        owner1.setNonInherited(value1);
+
+        final owner2 = _Owner();
+        owner2.setNonInheriteds(owner1);
+        expect(owner2.nonInheritedValues, equals([value1]));
+      });
+
+      test('add values to empty list', () {
+        final owner1 = _Owner();
+        final value1 = _Value1();
+        final value2 = _Value2();
+        owner1.setNonInherited(value1);
+        owner1.setNonInherited(value2);
+
+        final owner2 = _Owner();
+        owner2.setNonInheriteds(owner1);
+        expect(owner2.nonInheritedValues, equals([value1, value2]));
+      });
+
+      test('add value to non-empty list', () {
+        final owner1 = _Owner();
+        final value1 = _Value1();
+        owner1.setNonInherited(value1);
+
+        final owner2 = _Owner();
+        final value2 = _Value2();
+        owner2.setNonInherited(value2);
+        owner2.setNonInheriteds(owner1);
+        expect(owner2.nonInheritedValues, equals([value2, value1]));
+      });
+    });
+
     group('setNonInherited', () {
       test('add value', () {
         final owner1 = _Owner();
@@ -90,11 +90,7 @@ void main() {
   });
 }
 
-class _Owner with NonInheritedPropertiesOwner {
-  void _addAllNonInherited(NonInheritedPropertiesOwner other) {
-    addAllNonInherited(other);
-  }
-}
+class _Owner with NonInheritedPropertiesOwner {}
 
 class _Value1 {}
 

@@ -7,8 +7,17 @@ mixin NonInheritedPropertiesOwner {
   @visibleForTesting
   List<dynamic>? nonInheritedValues;
 
-  @protected
-  void addAllNonInherited(NonInheritedPropertiesOwner other) {
+  /// Gets non-inherited property of type [T].
+  T? getNonInherited<T>() {
+    final filtered = nonInheritedValues?.whereType<T>();
+    if (filtered?.isNotEmpty == true) {
+      return filtered?.first;
+    }
+    return null;
+  }
+
+  /// Sets all non-inherited from another [NonInheritedPropertiesOwner].
+  void setNonInheriteds(NonInheritedPropertiesOwner other) {
     final src = other.nonInheritedValues;
     if (src != null) {
       final dest = nonInheritedValues;
@@ -18,15 +27,6 @@ mixin NonInheritedPropertiesOwner {
         nonInheritedValues = [...src];
       }
     }
-  }
-
-  /// Gets non-inherited property of type [T].
-  T? getNonInherited<T>() {
-    final filtered = nonInheritedValues?.whereType<T>();
-    if (filtered?.isNotEmpty == true) {
-      return filtered?.first;
-    }
-    return null;
   }
 
   /// Sets non-inherited property of type [T].
