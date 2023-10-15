@@ -318,7 +318,7 @@ class CoreBuildTree extends BuildTree {
       for (final op in scopedBuildOps) {
         final defaultStyles = op.defaultStyles;
         if (defaultStyles != null) {
-          _styles.insertAll(0, defaultStyles);
+          _styles.addAll(defaultStyles);
         }
       }
     }
@@ -432,20 +432,6 @@ class _LockableDeclarations extends LockableList<css.Declaration> {
     assert(!_isLocked, 'Adding after being locked is undeterministic.');
     _values ??= [];
     _values?.addAll(iterable);
-  }
-
-  @override
-  void insert(int index, css.Declaration element) {
-    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
-    _values ??= [];
-    _values?.insert(index, element);
-  }
-
-  @override
-  void insertAll(int index, Iterable<css.Declaration> iterable) {
-    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
-    _values ??= [];
-    _values?.insertAll(index, iterable);
   }
 }
 

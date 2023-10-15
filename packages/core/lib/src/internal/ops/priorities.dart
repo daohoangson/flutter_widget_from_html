@@ -63,10 +63,10 @@ class Early {
       tagTableAttributeBorderChild + _step;
   static const tagTableCaptionTextAlignCenter =
       tagTableAttributeCellPaddingChild - _step;
-  static const tagTableCellAttributeValign =
+  static const tagTableCellValignDefault =
       tagTableCaptionTextAlignCenter + _step;
-  static const tagTableCellDefaultStyles = tagTableCellAttributeValign + _step;
-  static const tagTableDisplayTable = tagTableCellDefaultStyles + _step;
+  static const tagTableCellValignParsed = tagTableCellValignDefault + _step;
+  static const tagTableDisplayTable = tagTableCellValignParsed + _step;
   static const tagTableHeaderCellDefaultStyles = tagTableDisplayTable + _step;
   static const tagTableRenderBlock = tagTableHeaderCellDefaultStyles + _step;
 }

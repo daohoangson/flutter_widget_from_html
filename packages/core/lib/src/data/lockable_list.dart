@@ -10,10 +10,4 @@ abstract class LockableList<T> extends Iterable<T> {
 
   /// Appends all objects of [iterable] to the end of this list.
   void addAll(Iterable<T> iterable);
-
-  /// Inserts [element] at position [index] in this list.
-  void insert(int index, T element);
-
-  /// Inserts all objects of [iterable] at position [index] in this list.
-  void insertAll(int index, Iterable<T> iterable);
 }
