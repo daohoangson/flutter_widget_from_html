@@ -130,8 +130,6 @@ class HtmlWidgetState extends State<HtmlWidget> {
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
   CoreBuildTree get _rootTree => CoreBuildTree.root(
-        customStylesBuilder: widget.customStylesBuilder,
-        customWidgetBuilder: widget.customWidgetBuilder,
         inheritanceResolvers: _rootResolvers,
         wf: _wf,
       );

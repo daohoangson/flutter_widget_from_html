@@ -22,8 +22,6 @@ final _logger = Logger('fwfh.CoreBuildTree');
 final _rootElement = dom.Element.tag('root');
 
 class CoreBuildTree extends BuildTree {
-  final CustomStylesBuilder? customStylesBuilder;
-  final CustomWidgetBuilder? customWidgetBuilder;
   final WidgetFactory wf;
 
   final BuildTree? _parent;
@@ -34,8 +32,6 @@ class CoreBuildTree extends BuildTree {
   bool? _isInline;
 
   CoreBuildTree._({
-    this.customStylesBuilder,
-    this.customWidgetBuilder,
     required super.element,
     required super.inheritanceResolvers,
     BuildTree? parent,
@@ -45,14 +41,10 @@ class CoreBuildTree extends BuildTree {
         _parentOps = parentOps;
 
   factory CoreBuildTree.root({
-    CustomStylesBuilder? customStylesBuilder,
-    CustomWidgetBuilder? customWidgetBuilder,
     required InheritanceResolvers inheritanceResolvers,
     required WidgetFactory wf,
   }) =>
       CoreBuildTree._(
-        customStylesBuilder: customStylesBuilder,
-        customWidgetBuilder: customWidgetBuilder,
         element: _rootElement,
         inheritanceResolvers: inheritanceResolvers,
         wf: wf,
@@ -126,8 +118,6 @@ class CoreBuildTree extends BuildTree {
             .inheritanceResolvers
             .copyWith(parent: copiedParent.inheritanceResolvers);
     final copied = CoreBuildTree._(
-      customStylesBuilder: customStylesBuilder,
-      customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
       inheritanceResolvers: scopedInheritanceResolvers,
       parent: copiedParent,
@@ -213,7 +203,7 @@ class CoreBuildTree extends BuildTree {
     }
 
     final element = domNode as dom.Element;
-    final customWidget = customWidgetBuilder?.call(element);
+    final customWidget = wf.customWidgetBuilder(element);
     if (customWidget != null) {
       append(WidgetBit.block(this, customWidget));
       _logger.fine('Custom widget for ${element.localName?.toUpperCase()} tag');
@@ -293,7 +283,7 @@ class CoreBuildTree extends BuildTree {
   }
 
   void _customStylesBuilder() {
-    final map = customStylesBuilder?.call(element);
+    final map = wf.customStylesBuilder(element);
     if (map == null) {
       return;
     }
