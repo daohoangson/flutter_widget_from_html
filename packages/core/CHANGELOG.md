@@ -1,3 +1,10 @@
+## 0.14.1-alpha.1
+
+- Add support for `InlineCustomWidget` via `customWidgetBuilder` to render simple widget inline (#1056)
+- Add support for `BuildOp.inline` to render complicated widget inline (#1056)
+- BREAKING: Append `defaultStyles` instead of prepend (#1055)
+- BREAKING: Change default alignment of inline widget from `bottom` to `baseline` (#1056)
+
 ## 0.14.0-alpha.1
 
 - Refactor build tree properties (#948)

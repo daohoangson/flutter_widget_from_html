@@ -71,13 +71,14 @@ class TagDetails {
                 final marker = WidgetBit.inline(
                   summaryTree,
                   WidgetPlaceholder(
-                    builder: (context, child) {
+                    builder: (context, _) {
                       final resolved =
                           summaryTree.inheritanceResolvers.resolve(context);
                       return HtmlDetailsMarker(style: resolved.style);
                     },
                     debugLabel: '$kTagSummary--inlineMarker',
                   ),
+                  alignment: PlaceholderAlignment.bottom,
                 );
                 return summaryTree..prepend(marker);
               },

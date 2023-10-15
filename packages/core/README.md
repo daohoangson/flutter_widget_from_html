@@ -20,7 +20,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.14.0-0
+  flutter_widget_from_html_core: ^0.14.1-0
 ```
 
 ## Usage
@@ -262,7 +262,7 @@ tree.inherit(resolver, TextAlign.justify);
 final value = resolved.get<TextAlign>();
 ```
 
-- Other complicated styling are supported via `BuildOp`
+- Other complicated styling are supported via `BuildOp` or `BuildOp.inline`
 
 ```dart
 tree.register(BuildOp(

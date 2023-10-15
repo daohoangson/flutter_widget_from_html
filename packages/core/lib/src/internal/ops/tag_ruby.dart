@@ -47,7 +47,6 @@ extension TagRuby on WidgetFactory {
             ),
             debugLabel: kTagRuby,
           ),
-          alignment: PlaceholderAlignment.baseline,
         ),
       );
     }

@@ -27,8 +27,7 @@ class Anchor {
             debugLabel: '${tree.element.localName}--anchor#$id',
           );
 
-          const baseline = PlaceholderAlignment.baseline;
-          tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
+          tree.prepend(WidgetBit.inline(tree, widget));
         },
         onRenderBlock: (_, placeholder) => placeholder.wrapWith(
           (_, child) => SizedBox(key: anchor, child: child),

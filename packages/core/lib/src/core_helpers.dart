@@ -7,6 +7,7 @@ import 'package:html/dom.dart' as dom;
 import 'core_data.dart';
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
+import 'widgets/inline_custom_widget.dart';
 
 export 'external/csslib.dart';
 export 'external/text_scale_factor.dart';
@@ -17,6 +18,7 @@ export 'widgets/html_list_item.dart';
 export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
+export 'widgets/inline_custom_widget.dart';
 export 'widgets/valign_baseline.dart';
 
 /// The default character threshold to build widget tree asynchronously.
@@ -27,6 +29,7 @@ const kShouldBuildAsync = 10000;
 /// A no op widget.
 const widget0 = SizedBox.shrink();
 
+/// {@template flutter_widget_from_html.customStylesBuilder}
 /// A callback to specify custom styling.
 ///
 /// The returned `Map` will be applied as inline styles.
@@ -40,14 +43,20 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
+/// {@endtemplate}
 typedef CustomStylesBuilder = StylesMap? Function(dom.Element element);
 
+/// {@template flutter_widget_from_html.customWidgetBuilder}
 /// A callback to render custom widget for a DOM element.
 ///
 /// This is suitable for fairly simple widget. Please note that
 /// you have to handle the DOM element and its children manually,
 /// if the children have HTML styling etc., they won't be processed at all.
 /// For those needs, a custom [WidgetFactory] is the way to go.
+///
+/// By default, the widget will be rendered as a block element.
+/// Wrap custom widget in a [InlineCustomWidget] to make it inline.
+/// {@endtemplate}
 typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
 /// A callback to scroll the anchor identified by [id] into the viewport.

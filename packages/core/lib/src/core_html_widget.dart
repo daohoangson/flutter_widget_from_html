@@ -26,10 +26,10 @@ class HtmlWidget extends StatefulWidget {
   /// [html] has at least [kShouldBuildAsync] characters.
   final bool? buildAsync;
 
-  /// The callback to specify custom stylings.
+  /// {@macro flutter_widget_from_html.customStylesBuilder}
   final CustomStylesBuilder? customStylesBuilder;
 
-  /// The callback to render a custom widget.
+  /// {@macro flutter_widget_from_html.customWidgetBuilder}
   final CustomWidgetBuilder? customWidgetBuilder;
 
   /// Controls whether the built widget tree is cached between rebuilds.
@@ -130,8 +130,6 @@ class HtmlWidgetState extends State<HtmlWidget> {
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
   CoreBuildTree get _rootTree => CoreBuildTree.root(
-        customStylesBuilder: widget.customStylesBuilder,
-        customWidgetBuilder: widget.customWidgetBuilder,
         inheritanceResolvers: _rootResolvers,
         wf: _wf,
       );

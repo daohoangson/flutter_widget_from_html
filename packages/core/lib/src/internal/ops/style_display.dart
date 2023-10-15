@@ -14,10 +14,9 @@ extension StyleDisplayInlineBlock on WidgetFactory {
         WidgetBit.inline(
           parent,
           WidgetPlaceholder(
-            builder: (_, __) => tree.build(),
             debugLabel: kCssDisplayInlineBlock,
+            child: tree.build(),
           ),
-          alignment: PlaceholderAlignment.baseline,
         ),
       );
   }

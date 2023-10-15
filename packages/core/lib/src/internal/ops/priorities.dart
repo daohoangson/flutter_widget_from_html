@@ -8,13 +8,15 @@ part of '../core_ops.dart';
 /// User's build op has a default priority of 10 so they should run
 /// after our early ops and before our normal ops.
 class Priority {
-  static const _baseEarly000 = -3000000000000000;
+  static const _baseEarly00 = -3000000000000000;
   static const _baseNormal00 = 1000000000000000;
   static const _baseBoxModel = 5000000000000000;
+  static const _baseLate0000 = 9000000000000000;
   static const _step = 1000000000;
-  static const _max = 9007199254740991;
+  static const max = 9007199254740991;
 
-  static const tagA = _baseNormal00 + _step;
+  static const first = _baseNormal00;
+  static const tagA = first + _step;
   static const tagBr = tagA + _step;
   static const tagDetails = tagBr + _step;
   static const tagFont = tagDetails + _step;
@@ -34,7 +36,8 @@ class Priority {
 class Early {
   static const _step = Priority._step;
 
-  static const attributeAlign = Priority._baseEarly000 + _step;
+  static const first = Priority._baseEarly00;
+  static const attributeAlign = first + _step;
   static const attributeDir = attributeAlign + _step;
   static const cssTextAlign = attributeDir + _step;
   static const tagAcronym = cssTextAlign + _step;
@@ -80,7 +83,8 @@ class Early {
 class BoxModel {
   static const _step = Priority._step;
 
-  static const sizing = Priority._baseBoxModel + _step;
+  static const first = Priority._baseBoxModel;
+  static const sizing = first + _step;
   static const verticalAlign = sizing + _step;
   static const padding = verticalAlign + _step;
   static const border = padding + _step;
@@ -92,8 +96,9 @@ class BoxModel {
 class Late {
   static const _step = Priority._step;
 
-  static const anchor = displayInlineBlock - _step;
-  static const displayInlineBlock = tagSummary - _step;
-  static const tagSummary = displayNone - _step;
-  static const displayNone = Priority._max;
+  static const first = Priority._baseLate0000;
+  static const anchor = first + _step;
+  static const displayInlineBlock = anchor + _step;
+  static const tagSummary = displayInlineBlock + _step;
+  static const displayNone = tagSummary + _step;
 }

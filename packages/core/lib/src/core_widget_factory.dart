@@ -390,6 +390,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   Widget? buildTooltip(BuildTree tree, Widget child, String message) =>
       Tooltip(message: message, child: child);
 
+  StylesMap? customStylesBuilder(dom.Element element) =>
+      _widget?.customStylesBuilder?.call(element);
+
+  Widget? customWidgetBuilder(dom.Element element) =>
+      _widget?.customWidgetBuilder?.call(element);
+
   @override
   void dispose() {
     super.dispose();

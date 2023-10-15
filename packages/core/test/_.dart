@@ -589,6 +589,11 @@ class Explainer {
       }
     }
 
+    if (widget.runtimeType.toString() == 'InlineCustomWidget') {
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
+    }
+
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
       // ignore: avoid_dynamic_calls
       return _widget((widget as dynamic).child as Widget);

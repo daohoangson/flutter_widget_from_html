@@ -41,11 +41,10 @@ class StyleMargin {
               ),
             if (margin.mayHaveLeft || margin.mayHaveRight)
               placeholder.wrapWith(
-                (context, child) => _marginHorizontalBuilder(
-                  child,
-                  margin,
-                  inheritanceResolvers.resolve(context),
-                ),
+                (context, child) {
+                  final resolved = inheritanceResolvers.resolve(context);
+                  return _marginHorizontalBuilder(child, margin, resolved);
+                },
               )
             else
               placeholder,
@@ -64,14 +63,15 @@ class StyleMargin {
             return;
           }
 
+          const bottom = PlaceholderAlignment.bottom;
           if (margin.mayHaveLeft) {
             final before = _paddingInlineBefore(tree, margin);
-            tree.prepend(WidgetBit.inline(tree, before));
+            tree.prepend(WidgetBit.inline(tree, before, alignment: bottom));
           }
 
           if (margin.mayHaveRight) {
             final after = _paddingInlineAfter(tree, margin);
-            tree.append(WidgetBit.inline(tree, after));
+            tree.append(WidgetBit.inline(tree, after, alignment: bottom));
           }
         },
         priority: BoxModel.margin,

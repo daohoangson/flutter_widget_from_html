@@ -316,7 +316,7 @@ abstract class WidgetBit<T> extends BuildBit {
   static WidgetBit<InlineSpan> inline(
     BuildTree parent,
     Widget child, {
-    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
+    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
   }) =>
       _WidgetBitInline(
@@ -402,7 +402,7 @@ class WhitespaceBit extends BuildBit {
 abstract class Flattened {
   /// Renders inline widget.
   void inlineWidget({
-    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
+    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
     required Widget child,
   });

@@ -285,24 +285,50 @@ void main() {
   });
 
   group('customWidgetBuilder', () {
-    Widget? customWidgetBuilder(dom.Element _) => const Text('Bar');
-    const html = 'Foo <span>bar</span>';
+    group('block widget', () {
+      Widget? customWidgetBuilder(dom.Element _) => const Text('Bar');
+      const html = 'Foo <span>bar</span>';
 
-    testWidgets('renders without value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Foo bar)]'));
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Foo bar)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final e = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customWidgetBuilder: customWidgetBuilder,
+            key: helper.hwKey,
+          ),
+        );
+        expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+      });
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final e = await explain(
-        tester,
-        HtmlWidget(
-          html,
-          customWidgetBuilder: customWidgetBuilder,
-          key: helper.hwKey,
-        ),
-      );
-      expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+    group('inline widget', () {
+      Widget? customWidgetBuilder(dom.Element _) =>
+          const InlineCustomWidget(child: Text('Bar'));
+
+      const html = 'Foo <span>bar</span>';
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Foo bar)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customWidgetBuilder: customWidgetBuilder,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[RichText:(:Foo [Text:Bar])]'));
+      });
     });
   });
 
