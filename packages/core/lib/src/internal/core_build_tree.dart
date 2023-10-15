@@ -433,20 +433,6 @@ class _LockableDeclarations extends LockableList<css.Declaration> {
     _values ??= [];
     _values?.addAll(iterable);
   }
-
-  @override
-  void insert(int index, css.Declaration element) {
-    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
-    _values ??= [];
-    _values?.insert(index, element);
-  }
-
-  @override
-  void insertAll(int index, Iterable<css.Declaration> iterable) {
-    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
-    _values ??= [];
-    _values?.insertAll(index, iterable);
-  }
 }
 
 class _WidgetPlaceholderDefault extends StatelessWidget

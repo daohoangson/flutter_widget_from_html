@@ -43,7 +43,6 @@ void main() {
       group('modifications', () {
         final red = _parseCss('color: red').first;
         final green = _parseCss('color: green').first;
-        final blue = _parseCss('color: blue').first;
 
         test('add value', () {
           final tree = _newTree();
@@ -51,29 +50,17 @@ void main() {
           expect(tree.styles.toList(), [red]);
         });
 
+        test('add value one by one', () {
+          final tree = _newTree();
+          tree.styles.add(red);
+          tree.styles.add(green);
+          expect(tree.styles.toList(), [red, green]);
+        });
+
         test('add all values', () {
           final tree = _newTree();
           tree.styles.addAll([red, green]);
           expect(tree.styles.toList(), [red, green]);
-        });
-
-        test('insert value', () {
-          final tree = _newTree();
-          tree.styles.insert(0, red);
-          expect(tree.styles.toList(), [red]);
-        });
-
-        test('insert all values', () {
-          final tree = _newTree();
-          tree.styles.insertAll(0, [red, green]);
-          expect(tree.styles.toList(), [red, green]);
-        });
-
-        test('insert into the middle', () {
-          final tree = _newTree();
-          tree.styles.addAll([red, blue]);
-          tree.styles.insert(1, green);
-          expect(tree.styles.toList(), [red, green, blue]);
         });
 
         test('throw error while being locked', () {
