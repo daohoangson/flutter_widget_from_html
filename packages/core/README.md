@@ -262,7 +262,7 @@ tree.inherit(resolver, TextAlign.justify);
 final value = resolved.get<TextAlign>();
 ```
 
-- Other complicated styling are supported via `BuildOp`
+- Other complicated styling are supported via `BuildOp` or `BuildOp.inline`
 
 ```dart
 tree.register(BuildOp(
