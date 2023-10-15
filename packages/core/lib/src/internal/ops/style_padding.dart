@@ -47,14 +47,15 @@ class StylePadding {
             return;
           }
 
+          const bottom = PlaceholderAlignment.bottom;
           if (padding.mayHaveLeft) {
             final before = _paddingInlineBefore(tree, padding);
-            tree.prepend(WidgetBit.inline(tree, before));
+            tree.prepend(WidgetBit.inline(tree, before, alignment: bottom));
           }
 
           if (padding.mayHaveRight) {
             final after = _paddingInlineAfter(tree, padding);
-            tree.append(WidgetBit.inline(tree, after));
+            tree.append(WidgetBit.inline(tree, after, alignment: bottom));
           }
         },
         priority: BoxModel.padding,

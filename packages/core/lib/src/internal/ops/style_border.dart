@@ -34,7 +34,6 @@ class StyleBorder {
                   debugLabel: '${tree.element.localName}--$kCssBorder',
                   child: tree.build(),
                 ),
-                alignment: PlaceholderAlignment.baseline,
               ),
             );
         },

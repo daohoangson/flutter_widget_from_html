@@ -327,7 +327,7 @@ void main() {
             key: helper.hwKey,
           ),
         );
-        expect(explained, equals('[RichText:(:Foo [Text:Bar]@bottom)]'));
+        expect(explained, equals('[RichText:(:Foo [Text:Bar])]'));
       });
     });
   });

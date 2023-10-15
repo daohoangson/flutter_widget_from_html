@@ -206,7 +206,14 @@ class CoreBuildTree extends BuildTree {
     final customWidget = wf.customWidgetBuilder(element);
     if (customWidget != null) {
       if (customWidget is InlineCustomWidget) {
-        append(WidgetBit.inline(this, customWidget));
+        append(
+          WidgetBit.inline(
+            this,
+            customWidget,
+            alignment: customWidget.alignment,
+            baseline: customWidget.baseline,
+          ),
+        );
         _logger.fine('Custom inline widget: ${element.localName} tag');
       } else {
         append(WidgetBit.block(this, customWidget));

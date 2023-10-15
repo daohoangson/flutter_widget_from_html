@@ -78,6 +78,7 @@ class TagDetails {
                     },
                     debugLabel: '$kTagSummary--inlineMarker',
                   ),
+                  alignment: PlaceholderAlignment.bottom,
                 );
                 return summaryTree..prepend(marker);
               },

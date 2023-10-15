@@ -17,7 +17,6 @@ extension StyleDisplayInlineBlock on WidgetFactory {
             debugLabel: kCssDisplayInlineBlock,
             child: tree.build(),
           ),
-          alignment: PlaceholderAlignment.baseline,
         ),
       );
   }

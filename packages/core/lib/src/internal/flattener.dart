@@ -37,7 +37,7 @@ class Flattener implements Flattened {
 
   @override
   void inlineWidget({
-    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
+    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
     required Widget child,
   }) {
