@@ -318,7 +318,7 @@ class CoreBuildTree extends BuildTree {
       for (final op in scopedBuildOps) {
         final defaultStyles = op.defaultStyles;
         if (defaultStyles != null) {
-          _styles.insertAll(0, defaultStyles);
+          _styles.addAll(defaultStyles);
         }
       }
     }
