@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
@@ -277,6 +278,16 @@ void main() {
       const html = '<a>test</a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:test)]'));
+    });
+  });
+
+  group('error handling', () {
+    group('defaultColor', () {
+      test('returns resolving itself if context is null', () {
+        const resolving = InheritedProperties([]);
+        final actual = TagA.defaultColor(resolving, null);
+        expect(actual, equals(resolving));
+      });
     });
   });
 }

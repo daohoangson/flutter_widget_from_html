@@ -101,7 +101,7 @@ CoreBuildTree _newTree({
   WidgetFactory? wf,
 }) =>
     CoreBuildTree.root(
-      styleBuilder: HtmlStyleBuilder(),
+      inheritanceResolvers: InheritanceResolvers(),
       wf: wf ?? _WidgetFactory(),
     );
 

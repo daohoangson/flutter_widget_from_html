@@ -66,15 +66,15 @@ class StyleVerticalAlign {
             return placeholder;
           }
 
-          final v = tree.getStyle(kCssVerticalAlign)?.term;
-          if (v == null) {
+          final value = tree.getStyle(kCssVerticalAlign)?.term;
+          if (value == null) {
             return placeholder;
           }
 
           return placeholder.wrapWith((context, child) {
-            final style = tree.styleBuilder.build(context);
+            final resolved = tree.inheritanceResolvers.resolve(context);
             final alignment =
-                _tryParseAlignmentGeometry(style.textDirection, v);
+                _tryParseAlignmentGeometry(resolved.directionOrLtr, value);
             if (alignment == null) {
               return child;
             }
@@ -91,8 +91,8 @@ class StyleVerticalAlign {
     Widget child,
     EdgeInsets padding,
   ) {
-    final style = tree.styleBuilder.build(context);
-    final fontSize = style.textStyle.fontSize;
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final fontSize = resolved.style.fontSize;
     if (fontSize == null) {
       return child;
     }

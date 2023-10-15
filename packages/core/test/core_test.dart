@@ -222,7 +222,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          'HtmlStyleWidget\n'
+          '_RootWidget\n'
           '└ColumnPlaceholder(root--column)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'

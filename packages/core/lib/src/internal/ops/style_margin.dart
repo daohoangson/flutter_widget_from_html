@@ -2,13 +2,17 @@ part of '../core_ops.dart';
 
 const kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, HtmlStyle style) =>
+Widget _marginHorizontalBuilder(
+  Widget widget,
+  CssLengthBox box,
+  InheritedProperties resolved,
+) =>
     Padding(
       padding: EdgeInsets.only(
-        left: max(b.getValueLeft(style) ?? 0.0, 0.0),
-        right: max(b.getValueRight(style) ?? 0.0, 0.0),
+        left: max(box.getValueLeft(resolved) ?? 0.0, 0.0),
+        right: max(box.getValueRight(resolved) ?? 0.0, 0.0),
       ),
-      child: w,
+      child: widget,
     );
 
 class StyleMargin {
@@ -27,12 +31,12 @@ class StyleMargin {
 
           final marginTop = margin.top;
           final marginBottom = margin.bottom;
-          final styleBuilder = tree.styleBuilder;
+          final inheritanceResolvers = tree.inheritanceResolvers;
           final column = wf.buildColumnPlaceholder(tree, [
             if (marginTop != null && marginTop.isPositive)
               HeightPlaceholder(
                 marginTop,
-                styleBuilder,
+                inheritanceResolvers,
                 debugLabel: '${tree.element.localName}--marginTop',
               ),
             if (margin.mayHaveLeft || margin.mayHaveRight)
@@ -40,7 +44,7 @@ class StyleMargin {
                 (context, child) => _marginHorizontalBuilder(
                   child,
                   margin,
-                  styleBuilder.build(context),
+                  inheritanceResolvers.resolve(context),
                 ),
               )
             else
@@ -48,7 +52,7 @@ class StyleMargin {
             if (marginBottom != null && marginBottom.isPositive)
               HeightPlaceholder(
                 marginBottom,
-                styleBuilder,
+                inheritanceResolvers,
                 debugLabel: '${tree.element.localName}--marginBottom',
               ),
           ]);

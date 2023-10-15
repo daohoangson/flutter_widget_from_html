@@ -19,6 +19,7 @@ import 'internal/core_parser.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
+import 'internal/text_ops.dart' as text_ops;
 
 final _logger = Logger('fwfh.WidgetFactory');
 
@@ -44,7 +45,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   BuildOp? _tagLi;
   BuildOp? _tagPre;
   TagTable? _tagTable;
-  HtmlStyle Function(HtmlStyle, css.Expression)? _styleBuilderLineHeight;
   HtmlWidget? _widget;
 
   /// Builds [Align].
@@ -300,14 +300,14 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Builds marker widget for a list item.
   Widget? buildListMarker(
     BuildTree tree,
-    HtmlStyle style,
+    InheritedProperties resolved,
     String listStyleType,
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final textStyle = style.textStyle;
+    final textStyle = resolved.style;
     if (text.isNotEmpty) {
-      return buildText(tree, style, TextSpan(style: textStyle, text: text));
+      return buildText(tree, resolved, TextSpan(style: textStyle, text: text));
     }
 
     switch (listStyleType) {
@@ -334,20 +334,24 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) {
+  Widget? buildText(
+    BuildTree tree,
+    InheritedProperties resolved,
+    InlineSpan text,
+  ) {
     const selectionColorDefault = DefaultSelectionStyle.defaultColor;
-    final selectionRegistrar = style.value<SelectionRegistrar>();
-    final selectionStyle = style.value<DefaultSelectionStyle>();
+    final selectionRegistrar = resolved.get<SelectionRegistrar>();
+    final selectionStyle = resolved.get<DefaultSelectionStyle>();
 
     Widget built = RichText(
       maxLines: tree.maxLines > 0 ? tree.maxLines : null,
       overflow: tree.overflow,
       selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
-      softWrap: style.whitespace != CssWhitespace.nowrap,
+      softWrap: resolved.get<CssWhitespace>() != CssWhitespace.nowrap,
       text: text,
-      textAlign: style.value() ?? TextAlign.start,
-      textDirection: style.textDirection,
+      textAlign: resolved.get() ?? TextAlign.start,
+      textDirection: resolved.get(),
     );
 
     if (selectionRegistrar != null) {
@@ -401,24 +405,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   /// Returns [context]-based dependencies.
   ///
-  /// Includes these by default:
-  ///
-  /// - [CssWhitespace.normal]
-  /// - [TextDirection] via [Directionality.of]
-  /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
-  /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
-  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
-  ///
-  /// It's recommended to use [HtmlStyle.value] instead of
+  /// It's recommended to use [InheritedProperties.get] instead of
   /// obtaining dependencies from [BuildContext] for performance reason.
   ///
   /// ```dart
   /// // avoid doing this:
-  /// final widgetValue = Directionality.of(context);
+  /// final direction = Directionality.of(context);
   ///
   /// // do this:
-  /// final buildOpValue = style.textDirection;
+  /// final direction = resolved.get<TextDirection>();
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) {
     final selectionRegistrar = SelectionContainer.maybeOf(context);
@@ -427,8 +422,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       Directionality.maybeOf(context) ?? TextDirection.ltr,
       DefaultSelectionStyle.of(context),
       DefaultTextStyle.of(context).style,
-      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
       if (selectionRegistrar != null) selectionRegistrar,
+
+      // performance critical
+      // avoid adding broad dependencies like MediaQuery.of(context)
+      // because it may invalidate our root properties too often
+      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
     ];
   }
 
@@ -610,7 +609,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..styleBuilder.enqueue<BuildContext?>(TagA.defaultColor)
+            ..inherit<BuildContext?>(TagA.defaultColor)
             ..register(_tagA ??= TagA(this).buildOp);
         }
 
@@ -673,16 +672,14 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case 'b':
       case 'strong':
-        tree.styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.inherit(text_ops.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        tree.styleBuilder
-            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        tree.inherit(text_ops.fontSizeTerm, kCssFontSizeLarger);
         break;
       case 'small':
-        tree.styleBuilder
-            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+        tree.inherit(text_ops.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagBr:
@@ -704,15 +701,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        tree.styleBuilder.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
+        tree.inherit(text_ops.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        tree.styleBuilder.enqueue(
-          TextStyleOps.fontFamily,
+        tree.inherit(
+          text_ops.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
         break;
@@ -988,44 +985,44 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.color, color);
+          tree.inherit(text_ops.color, color);
         }
         break;
 
       case kCssDirection:
         final term = style.term;
         if (term != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.textDirection, term);
+          tree.inherit(text_ops.textDirection, term);
         }
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(style.values);
-        tree.styleBuilder.enqueue(TextStyleOps.fontFamily, list);
+        final list = text_ops.fontFamilyTryParse(style.values);
+        tree.inherit(text_ops.fontFamily, list);
         break;
 
       case kCssFontSize:
         final value = style.value;
         if (value != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontSize, value);
+          tree.inherit(text_ops.fontSize, value);
         }
         break;
 
       case kCssFontStyle:
         final term = style.term;
         final fontStyle =
-            term != null ? TextStyleOps.fontStyleTryParse(term) : null;
+            term != null ? text_ops.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontStyle, fontStyle);
+          tree.inherit(text_ops.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
         final value = style.value;
         final fontWeight =
-            value != null ? TextStyleOps.fontWeightTryParse(value) : null;
+            value != null ? text_ops.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontWeight, fontWeight);
+          tree.inherit(text_ops.fontWeight, fontWeight);
         }
         break;
 
@@ -1041,10 +1038,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
-          tree.styleBuilder.enqueue(
-            _styleBuilderLineHeight ??= TextStyleOps.lineHeight(this),
-            value,
-          );
+          tree.inherit(text_ops.lineHeight, value);
         }
         break;
 
@@ -1083,9 +1077,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssWhitespace:
         final term = style.term;
         final whitespace =
-            term != null ? TextStyleOps.whitespaceTryParse(term) : null;
+            term != null ? text_ops.whitespaceTryParse(term) : null;
         if (whitespace != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.whitespace, whitespace);
+          tree.inherit(text_ops.whitespace, whitespace);
         }
         break;
     }

@@ -208,9 +208,9 @@ void main() {
       expect(
         helper.simplifyHashCode(text.toString()),
         equals(
-          'BuildTree#0 styleBuilder#1(parent=#2):\n'
+          'BuildTree#0 inheritanceResolvers#1(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#3 styleBuilder#4(parent=#1):\n'
+          '  BuildTree#3 inheritanceResolvers#4(parent=#1):\n'
           '    "2"\n'
           '  "3"',
         ),
@@ -220,15 +220,15 @@ void main() {
       expect(
         helper.simplifyHashCode('$text\n\n$copied'),
         equals(
-          'BuildTree#0 styleBuilder#1(parent=#2):\n'
+          'BuildTree#0 inheritanceResolvers#1(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#3 styleBuilder#4(parent=#1):\n'
+          '  BuildTree#3 inheritanceResolvers#4(parent=#1):\n'
           '    "2"\n'
           '  "3"\n'
           '\n'
-          'BuildTree#5 styleBuilder#6(parent=#2):\n'
+          'BuildTree#5 inheritanceResolvers#6(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#7 styleBuilder#8(parent=#6):\n'
+          '  BuildTree#7 inheritanceResolvers#8(parent=#6):\n'
           '    "2"\n'
           '  "3"',
         ),
@@ -278,12 +278,12 @@ void main() {
     expect(
       helper.simplifyHashCode(text.toString()),
       equals(
-        'BuildTree#0 styleBuilder#1:\n'
+        'BuildTree#0 inheritanceResolvers#1:\n'
         '  "1"\n'
         '  Whitespace[32]#2\n'
-        '  BuildTree#3 styleBuilder#4(parent=#1):\n'
+        '  BuildTree#3 inheritanceResolvers#4(parent=#1):\n'
         '    "(2.1)"\n'
-        '    BuildTree#5 styleBuilder#6(parent=#4):\n'
+        '    BuildTree#5 inheritanceResolvers#6(parent=#4):\n'
         '      "(2.2.1)"\n'
         '      "(2.2.2)"\n'
         '    "(2.3)"\n'
@@ -316,7 +316,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      tree.styleBuilder.enqueue((style, _) => style.copyWith(), null);
+      tree.inherit((style, _) => style.copyWith(), null);
     }
 
     super.parse(tree);
@@ -343,8 +343,7 @@ class _CustomBit extends BuildBit {
   void flatten(Flattened _) => throw UnimplementedError();
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
-      throw UnimplementedError();
+  BuildBit copyWith({BuildTree? parent}) => throw UnimplementedError();
 }
 
 class _OutputStringBit extends BuildBit {
@@ -375,7 +374,7 @@ class _OutputWidgetBit extends BuildBit {
       f.widget(WidgetPlaceholder(child: const Text('foo')));
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
+  BuildBit copyWith({BuildTree? parent}) =>
       _OutputWidgetBit(parent ?? this.parent);
 }
 
@@ -390,6 +389,6 @@ String _data(BuildTree text) => text.bits
     .join();
 
 BuildTree _text() => CoreBuildTree.root(
-      styleBuilder: HtmlStyleBuilder(),
+      inheritanceResolvers: InheritanceResolvers(),
       wf: WidgetFactory(),
     );

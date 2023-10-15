@@ -24,13 +24,13 @@ class ColumnPlaceholder extends WidgetPlaceholder {
     context.skipBuildHeightPlaceholder = true;
 
     try {
-      final style = tree.styleBuilder.build(context);
+      final resolved = tree.inheritanceResolvers.resolve(context);
       final widgets = _buildWidgets(context);
       final built = wf.buildColumnWidget(
         context,
         widgets,
-        crossAxisAlignment: style.columnCrossAxisAlignment,
-        dir: style.textDirection,
+        crossAxisAlignment: resolved.columnCrossAxisAlignment,
+        dir: resolved.directionOrLtr,
       );
       return isBody ? wf.buildBodyWidget(context, built) : built;
     } finally {
@@ -94,13 +94,13 @@ class ColumnPlaceholder extends WidgetPlaceholder {
       }
     }
 
-    final style = tree.styleBuilder.build(context);
+    final resolved = tree.inheritanceResolvers.resolve(context);
     final column = contents.isNotEmpty
         ? wf.buildColumnWidget(
             context,
             contents,
-            crossAxisAlignment: style.columnCrossAxisAlignment,
-            dir: style.textDirection,
+            crossAxisAlignment: resolved.columnCrossAxisAlignment,
+            dir: resolved.directionOrLtr,
           )
         : null;
 
@@ -125,11 +125,11 @@ class ColumnPlaceholder extends WidgetPlaceholder {
   }
 }
 
-extension on HtmlStyle {
+extension on InheritedProperties {
   CrossAxisAlignment get columnCrossAxisAlignment {
-    final isLtr = textDirection == TextDirection.ltr;
-    final TextAlign? textAlign = value();
-    switch (textAlign ?? TextAlign.start) {
+    final isRtl = get<TextDirection>() == TextDirection.rtl;
+    final textAlign = get<TextAlign>() ?? TextAlign.start;
+    switch (textAlign) {
       case TextAlign.center:
         return CrossAxisAlignment.center;
       case TextAlign.end:
@@ -137,9 +137,9 @@ extension on HtmlStyle {
       case TextAlign.justify:
         return CrossAxisAlignment.stretch;
       case TextAlign.left:
-        return isLtr ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+        return isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start;
       case TextAlign.right:
-        return isLtr ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+        return isRtl ? CrossAxisAlignment.start : CrossAxisAlignment.end;
       case TextAlign.start:
         return CrossAxisAlignment.start;
     }

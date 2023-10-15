@@ -27,18 +27,23 @@ class TagA {
             return tree;
           }
 
-          return tree..styleBuilder.enqueue(_builder, recognizer);
+          return tree..inherit(_builder, recognizer);
         },
         priority: Priority.tagA,
       );
 
-  static HtmlStyle defaultColor(HtmlStyle style, BuildContext? context) =>
-      style.copyWith(
-        textStyle: style.textStyle.copyWith(
-          color: Theme.of(context!).colorScheme.primary,
-          debugLabel: 'fwfh: a[href] default color',
-        ),
-      );
+  static InheritedProperties defaultColor(
+    InheritedProperties resolving,
+    BuildContext? context,
+  ) =>
+      context == null
+          ? resolving
+          : resolving.copyWith(
+              style: resolving.style.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                debugLabel: 'fwfh: a[href] default color',
+              ),
+            );
 
   static StylesMap _defaultStyles(dom.Element _) {
     return const {
@@ -46,11 +51,14 @@ class TagA {
     };
   }
 
-  static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
-      style.copyWith<GestureRecognizer>(value: value);
+  static InheritedProperties _builder(
+    InheritedProperties resolving,
+    GestureRecognizer value,
+  ) =>
+      resolving.copyWith<GestureRecognizer>(value: value);
 }
 
-extension GestureRecognizerGetter on HtmlStyle {
+extension GestureRecognizerGetter on InheritedProperties {
   /// The [GestureRecognizer] for inline spans.
-  GestureRecognizer? get gestureRecognizer => value();
+  GestureRecognizer? get gestureRecognizer => get();
 }

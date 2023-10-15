@@ -1,7 +1,6 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
-@immutable
 abstract class BuildBit {
   /// Creates a build bit.
   const BuildBit();
@@ -27,7 +26,7 @@ abstract class BuildBit {
       if (!x.hasParent) {
         return null;
       }
-      final siblings = x.parent._children;
+      final siblings = x.parent._children ?? const [];
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -65,7 +64,7 @@ abstract class BuildBit {
       if (!x.hasParent) {
         return null;
       }
-      final siblings = x.parent._children;
+      final siblings = x.parent._children ?? const [];
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -111,23 +110,21 @@ abstract class BuildBit {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit {
+abstract class BuildTree extends BuildBit with NonInheritedPropertiesOwner {
   static final _buffers = Expando<StringBuffer>();
-
-  final _children = <BuildBit>[];
 
   /// The associated DOM element.
   final dom.Element element;
 
-  /// The associated [HtmlStyle] builder.
-  final HtmlStyleBuilder styleBuilder;
+  /// The [InheritedProperties] resolvers.
+  final InheritanceResolvers inheritanceResolvers;
 
-  final _values = <dynamic>[];
+  List<BuildBit>? _children;
 
   /// Creates a tree.
   BuildTree({
     required this.element,
-    required this.styleBuilder,
+    required this.inheritanceResolvers,
   });
 
   /// The list of bits including direct children and sub-tree's.
@@ -142,7 +139,7 @@ abstract class BuildTree extends BuildBit {
   }
 
   /// The list of direct children.
-  Iterable<BuildBit> get children => _children;
+  Iterable<BuildBit> get children => _children ?? const [];
 
   /// The first bit (recursively).
   BuildBit? get first {
@@ -173,7 +170,12 @@ abstract class BuildTree extends BuildBit {
 
   /// The last bit (recursively).
   BuildBit? get last {
-    for (final child in _children.reversed) {
+    final scopedChildren = _children;
+    if (scopedChildren == null) {
+      return null;
+    }
+
+    for (final child in scopedChildren.reversed) {
       final last = child is BuildTree ? child.last : child;
       if (last != null) {
         return last;
@@ -205,7 +207,8 @@ abstract class BuildTree extends BuildBit {
   /// See also: [prepend].
   T append<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    _children.add(child);
+    final scopedChildren = _children ??= [];
+    scopedChildren.add(child);
     return bit;
   }
 
@@ -218,20 +221,23 @@ abstract class BuildTree extends BuildBit {
   /// Builds widget from bits.
   WidgetPlaceholder? build();
 
-  @protected
-  void copyTo(BuildTree target) {
-    target._values.addAll(_values);
-  }
-
   /// Gets a styling declaration by [property].
   css.Declaration? getStyle(String property);
+
+  /// {@macro flutter_widget_from_html.inherit}
+  void inherit<T>(
+    InheritanceResolverCallback<T> callback, [
+    T? input,
+  ]) =>
+      inheritanceResolvers.enqueue(callback, input);
 
   /// Prepends [bit].
   ///
   /// See also: [append].
   T prepend<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    _children.insert(0, child);
+    final scopedChildren = _children ??= [];
+    scopedChildren.insert(0, child);
     return bit;
   }
 
@@ -250,7 +256,7 @@ abstract class BuildTree extends BuildBit {
     }
 
     final sb = _buffers[this] = StringBuffer();
-    sb.writeln('BuildTree#$hashCode $styleBuilder:');
+    sb.writeln('BuildTree#$hashCode $inheritanceResolvers:');
 
     const indent = '  ';
     for (final child in children) {
@@ -261,32 +267,6 @@ abstract class BuildTree extends BuildBit {
     _buffers[this] = null;
 
     return str;
-  }
-
-  /// Gets or sets value of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  T? value<T>([T? newValue]) {
-    if (newValue == null) {
-      // read mode
-      for (final oldValue in _values) {
-        if (oldValue is T) {
-          return oldValue;
-        }
-      }
-
-      return null;
-    } else {
-      // write mode
-      final index = _values.indexWhere((e) => e is T);
-      if (index == -1) {
-        _values.add(newValue);
-      } else {
-        _values[index] = newValue;
-      }
-
-      return newValue;
-    }
   }
 }
 

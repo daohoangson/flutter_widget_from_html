@@ -70,22 +70,22 @@ class TagLi {
     int i,
   ) {
     final tree = itemTree.sub()
-      ..maxLines = 1
-      ..styleBuilder.enqueue(TextStyleOps.whitespace, CssWhitespace.nowrap);
+      ..inherit(text_ops.whitespace, CssWhitespace.nowrap)
+      ..maxLines = 1;
     final listData = listTree.listData;
     final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
     final index = listData.markerReversed
         ? (listData.markerStart ?? listData.items) - i
         : (listData.markerStart ?? 1) + i;
-    final style = tree.styleBuilder.build(context);
-    final marker = wf.buildListMarker(tree, style, listStyleType, index);
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final marker = wf.buildListMarker(tree, resolved, listStyleType, index);
     if (marker == null) {
       return child;
     }
 
     return HtmlListItem(
       marker: marker,
-      textDirection: style.textDirection,
+      textDirection: resolved.directionOrLtr,
       child: child,
     );
   }
@@ -136,34 +136,27 @@ extension on BuildTree {
 }
 
 extension on BuildTree {
-  _TagLiListData get listData {
-    final existing = value<_TagLiListData>();
-    if (existing != null) {
-      return existing;
-    }
-
-    final attrs = element.attributes;
-    final newData = _TagLiListData(
-      markerReversed: attrs.containsKey(kAttributeOlReversed),
-      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
-    );
-    value(newData);
-    return newData;
-  }
+  _TagLiListData get listData =>
+      getNonInherited<_TagLiListData>() ??
+      setNonInherited<_TagLiListData>(_parse());
 
   String get listStyleType =>
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
-  int increaseListDepth() {
-    final newData = listData.copyWith(dataDepth: listData.dataDepth + 1);
-    value(newData);
-    return newData.dataDepth;
-  }
+  int increaseListDepth() => setNonInherited<_TagLiListData>(
+        listData.copyWith(dataDepth: listData.dataDepth + 1),
+      ).dataDepth;
 
-  int increaseListItems() {
-    final newData = listData.copyWith(items: listData.items + 1);
-    value(newData);
-    return newData.items;
+  int increaseListItems() => setNonInherited<_TagLiListData>(
+        listData.copyWith(items: listData.items + 1),
+      ).items;
+
+  _TagLiListData _parse() {
+    final attrs = element.attributes;
+    return _TagLiListData(
+      markerReversed: attrs.containsKey(kAttributeOlReversed),
+      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
+    );
   }
 }
 

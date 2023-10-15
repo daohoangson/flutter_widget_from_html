@@ -26,19 +26,20 @@ class CoreBuildTree extends BuildTree {
   final CustomWidgetBuilder? customWidgetBuilder;
   final WidgetFactory wf;
 
-  final _buildOps = SplayTreeSet<_CoreBuildOp>(_CoreBuildOp._compare);
-  final _isInlines = <bool>[];
   final BuildTree? _parent;
   final Iterable<_CoreBuildOp> _parentOps;
   final _styles = _LockableDeclarations();
+
+  SplayTreeSet<_CoreBuildOp>? _buildOps;
+  bool? _isInline;
 
   CoreBuildTree._({
     this.customStylesBuilder,
     this.customWidgetBuilder,
     required super.element,
+    required super.inheritanceResolvers,
     BuildTree? parent,
     Iterable<_CoreBuildOp> parentOps = const [],
-    required super.styleBuilder,
     required this.wf,
   })  : _parent = parent,
         _parentOps = parentOps;
@@ -46,14 +47,14 @@ class CoreBuildTree extends BuildTree {
   factory CoreBuildTree.root({
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
-    required HtmlStyleBuilder styleBuilder,
+    required InheritanceResolvers inheritanceResolvers,
     required WidgetFactory wf,
   }) =>
       CoreBuildTree._(
         customStylesBuilder: customStylesBuilder,
         customWidgetBuilder: customWidgetBuilder,
         element: _rootElement,
-        styleBuilder: styleBuilder,
+        inheritanceResolvers: inheritanceResolvers,
         wf: wf,
       );
 
@@ -61,7 +62,7 @@ class CoreBuildTree extends BuildTree {
   bool get hasParent => _parent != null;
 
   @override
-  bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
+  bool? get isInline => _isInline;
 
   @override
   BuildTree get parent => _parent!;
@@ -85,12 +86,13 @@ class CoreBuildTree extends BuildTree {
   WidgetPlaceholder? build() {
     final children = Flattener(wf, this).widgets;
     final column = wf.buildColumnPlaceholder(this, children);
-    if (column == null && _buildOps.isEmpty) {
+    if (column == null && _buildOps == null) {
       return null;
     }
 
     var placeholder = column ?? const _WidgetPlaceholderDefault();
-    for (final op in _buildOps) {
+    final Iterable<_CoreBuildOp> ops = _buildOps ?? const [];
+    for (final op in ops) {
       placeholder = WidgetPlaceholder.lazy(
         op.onRenderBlock(placeholder),
         debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
@@ -104,7 +106,7 @@ class CoreBuildTree extends BuildTree {
     // TODO: avoid special handling of anchors
     Anchor.wrapWidgetAnchors(this, placeholder);
 
-    for (final op in _buildOps) {
+    for (final op in ops) {
       op.onRenderedBlock(placeholder);
     }
 
@@ -115,33 +117,38 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree copyWith({
     bool copyContents = true,
     dom.Element? element,
+    InheritanceResolvers? inheritanceResolvers,
     BuildTree? parent,
-    HtmlStyleBuilder? styleBuilder,
   }) {
     final copiedParent = parent ?? this.parent;
-    final sb = styleBuilder ??
-        this.styleBuilder.copyWith(parent: copiedParent.styleBuilder);
+    final scopedInheritanceResolvers = inheritanceResolvers ??
+        this
+            .inheritanceResolvers
+            .copyWith(parent: copiedParent.inheritanceResolvers);
     final copied = CoreBuildTree._(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
+      inheritanceResolvers: scopedInheritanceResolvers,
       parent: copiedParent,
       parentOps: copiedParent is CoreBuildTree
           ? _prepareParentOps(copiedParent._parentOps, copiedParent)
           : const [],
-      styleBuilder: sb,
       wf: wf,
     );
 
     if (copyContents) {
-      copyTo(copied);
+      copied.setNonInheriteds(this);
 
       for (final bit in children) {
         copied.append(bit.copyWith(parent: copied));
       }
 
-      for (final op in _buildOps) {
-        copied.register(op.op);
+      final scopedBuildOps = _buildOps;
+      if (scopedBuildOps != null) {
+        for (final op in scopedBuildOps) {
+          copied.register(op.op);
+        }
       }
 
       copied._styles.addAll(_styles);
@@ -152,8 +159,11 @@ class CoreBuildTree extends BuildTree {
 
   @override
   void flatten(Flattened _) {
-    for (final op in _buildOps) {
-      op.onRenderInline();
+    final scopedBuildOps = _buildOps;
+    if (scopedBuildOps != null) {
+      for (final op in scopedBuildOps) {
+        op.onRenderInline();
+      }
     }
   }
 
@@ -177,7 +187,8 @@ class CoreBuildTree extends BuildTree {
 
   @override
   void register(BuildOp op) {
-    _buildOps.add(_CoreBuildOp(this, op));
+    final scopedBuildOps = _buildOps ??= _CoreBuildOp._newSet();
+    scopedBuildOps.add(_CoreBuildOp(this, op));
     _logger.finest(
       'Registered ${op.debugLabel ?? 'a build op'} '
       'for ${element.localName?.toUpperCase()} tag',
@@ -188,8 +199,8 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree sub({dom.Element? element}) => copyWith(
         copyContents: false,
         element: element,
+        inheritanceResolvers: inheritanceResolvers.sub(),
         parent: this,
-        styleBuilder: styleBuilder.sub(),
       );
 
   void _addBitsFromNode(dom.Node domNode) {
@@ -213,12 +224,15 @@ class CoreBuildTree extends BuildTree {
       .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
-    final isBlock = subBuilder._buildOps.where(_renderBlock).isNotEmpty;
-    subBuilder._isInlines.add(!isBlock);
+    final subBuildOps = subBuilder._buildOps;
+    final isBlock = subBuildOps?.where(_renderBlock).isNotEmpty == true;
+    subBuilder._isInline = !isBlock;
 
     BuildTree subTree = subBuilder;
-    for (final op in subBuilder._buildOps) {
-      subTree = op.onParsed(subTree);
+    if (subBuildOps != null) {
+      for (final op in subBuildOps) {
+        subTree = op.onParsed(subTree);
+      }
     }
 
     if (isBlock) {
@@ -299,10 +313,13 @@ class CoreBuildTree extends BuildTree {
       op.onVisitChild(this);
     }
 
-    for (final op in _buildOps) {
-      final defaultStyles = op.defaultStyles;
-      if (defaultStyles != null) {
-        _styles.insertAll(0, defaultStyles);
+    final scopedBuildOps = _buildOps;
+    if (scopedBuildOps != null) {
+      for (final op in scopedBuildOps) {
+        final defaultStyles = op.defaultStyles;
+        if (defaultStyles != null) {
+          _styles.insertAll(0, defaultStyles);
+        }
       }
     }
 
@@ -331,9 +348,9 @@ Iterable<_CoreBuildOp> _prepareParentOps(
 ) {
   // try to reuse existing list if possible
   final newOps = builder._buildOps
-      .where((op) => op.op.onVisitChild != null)
+      ?.where((op) => op.op.onVisitChild != null)
       .toList(growable: false);
-  return newOps.isNotEmpty == true
+  return newOps != null && newOps.isNotEmpty == true
       ? List.unmodifiable([...ops, ...newOps])
       : ops;
 }
@@ -370,6 +387,8 @@ class _CoreBuildOp {
       op.onRenderedBlock?.call(tree, placeholder);
 
   void onVisitChild(BuildTree subTree) => op.onVisitChild?.call(tree, subTree);
+
+  static SplayTreeSet<_CoreBuildOp> _newSet() => SplayTreeSet(_compare);
 
   static int _compare(_CoreBuildOp a0, _CoreBuildOp b0) {
     final a = a0.op;

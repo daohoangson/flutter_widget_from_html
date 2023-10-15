@@ -29,7 +29,7 @@ extension StyleTextAlign on WidgetFactory {
   static BuildTree _onParsed(BuildTree tree) {
     final textAlign = tree.textAlignData.textAlign;
     if (textAlign != null) {
-      tree.styleBuilder.enqueue(_textAlign, textAlign);
+      tree.inherit(_textAlign, textAlign);
     }
     return tree;
   }
@@ -43,24 +43,20 @@ extension StyleTextAlign on WidgetFactory {
     return placeholder.wrapWith(_center);
   }
 
-  static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
-      style.copyWith(value: value);
+  static InheritedProperties _textAlign(
+    InheritedProperties resolving,
+    TextAlign value,
+  ) =>
+      resolving.copyWith(value: value);
 }
 
 extension on BuildTree {
-  _StyleTextAlignData get textAlignData {
-    final existing = value<_StyleTextAlignData>();
-    if (existing != null) {
-      return existing;
-    }
+  _StyleTextAlignData get textAlignData =>
+      getNonInherited<_StyleTextAlignData>() ??
+      setNonInherited<_StyleTextAlignData>(_parse());
 
-    final newData = _parse(this);
-    value(newData);
-    return newData;
-  }
-
-  static _StyleTextAlignData _parse(BuildTree tree) {
-    final term = tree.getStyle(kCssTextAlign)?.term;
+  _StyleTextAlignData _parse() {
+    final term = getStyle(kCssTextAlign)?.term;
     if (term == null) {
       return const _StyleTextAlignData(null, null);
     }

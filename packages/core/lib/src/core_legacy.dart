@@ -11,8 +11,9 @@ typedef BuildMetadata = BuildTree;
 
 extension BuildMetadataLegacy on BuildMetadata {
   /// The associated [HtmlStyle] builder.
-  @Deprecated('Use .styleBuilder instead.')
-  TextStyleBuilder get tsb => styleBuilder;
+  @Deprecated('Use .inherit to quickly enqueue callbacks or '
+      '.inheritanceResolvers to access the resolvers directly.')
+  TextStyleBuilder get tsb => inheritanceResolvers;
 }
 
 extension LegacyWidgetFactory on WidgetFactory {
@@ -22,18 +23,14 @@ extension LegacyWidgetFactory on WidgetFactory {
 }
 
 /// A legacy HTML styling set.
-@Deprecated('Use HtmlStyle instead.')
-typedef TextStyleHtml = HtmlStyle;
+@Deprecated('Use InheritedProperties instead.')
+typedef TextStyleHtml = InheritedProperties;
 
 extension LegacyTextStyleHtml on TextStyleHtml {
-  /// The input [TextStyle].
-  @Deprecated('Use .textStyle instead.')
-  TextStyle get style => textStyle;
-
   /// Gets dependency by type [T].
-  @Deprecated('Use .value instead.')
+  @Deprecated('Use .get instead.')
   T getDependency<T>() {
-    final dep = value<T>();
+    final dep = get<T>();
     if (dep != null) {
       return dep;
     }
@@ -42,8 +39,8 @@ extension LegacyTextStyleHtml on TextStyleHtml {
 }
 
 /// A legacy HTML styling builder.
-@Deprecated('Use HtmlStyleBuilder instead.')
-typedef TextStyleBuilder<T> = HtmlStyleBuilder;
+@Deprecated('Use InheritanceResolvers instead.')
+typedef TextStyleBuilder<T> = InheritanceResolvers;
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
 @Deprecated('Use BuildOp.onRenderBlock instead.')

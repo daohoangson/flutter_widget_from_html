@@ -18,14 +18,14 @@ class TagDetails {
 
           return placeholder.wrapWith(
             (context, child) {
-              final style = tree.styleBuilder.build(context);
-              final textStyle = style.textStyle;
-              final summaries = tree.summaries;
+              final resolved = tree.inheritanceResolvers.resolve(context);
+              final textStyle = resolved.style;
+              final summaries = tree.detailsData.summaries;
               final summary = summaries.isNotEmpty
                   ? summaries.first
                   : wf.buildText(
                       tree,
-                      style,
+                      resolved,
                       TextSpan(
                         children: [
                           WidgetSpan(
@@ -42,10 +42,10 @@ class TagDetails {
                 child: wf.buildColumnWidget(
                   context,
                   [
-                    HtmlSummary(style: style.textStyle, child: summary),
+                    HtmlSummary(style: textStyle, child: summary),
                     HtmlDetailsContents(child: child),
                   ],
-                  dir: style.textDirection,
+                  dir: resolved.directionOrLtr,
                 ),
               );
             },
@@ -72,8 +72,9 @@ class TagDetails {
                   summaryTree,
                   WidgetPlaceholder(
                     builder: (context, child) {
-                      final style = summaryTree.styleBuilder.build(context);
-                      return HtmlDetailsMarker(style: style.textStyle);
+                      final resolved =
+                          summaryTree.inheritanceResolvers.resolve(context);
+                      return HtmlDetailsMarker(style: resolved.style);
                     },
                     debugLabel: '$kTagSummary--inlineMarker',
                   ),
@@ -81,12 +82,12 @@ class TagDetails {
                 return summaryTree..prepend(marker);
               },
               onRenderBlock: (_, placeholder) {
-                final summaries = detailsTree.summaries;
-                if (summaries.isNotEmpty) {
+                final data = detailsTree.detailsData;
+                if (data.summaries.isNotEmpty) {
                   return placeholder;
                 }
 
-                summaries.add(placeholder);
+                data.summaries.add(placeholder);
                 return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
               },
               priority: Late.tagSummary,
@@ -98,16 +99,8 @@ class TagDetails {
 }
 
 extension on BuildTree {
-  List<Widget> get summaries {
-    final existing = value<_TagDetailsData>();
-    if (existing != null) {
-      return existing.summaries;
-    }
-
-    final newData = _TagDetailsData();
-    value(newData);
-    return newData.summaries;
-  }
+  _TagDetailsData get detailsData =>
+      getNonInherited<_TagDetailsData>() ?? setNonInherited(_TagDetailsData());
 }
 
 class _TagDetailsData {

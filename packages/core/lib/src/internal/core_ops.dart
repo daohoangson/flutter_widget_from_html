@@ -16,6 +16,7 @@ import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
+import 'text_ops.dart' as text_ops;
 
 part 'ops/anchor.dart';
 part 'ops/column.dart';
@@ -23,6 +24,7 @@ part 'ops/priorities.dart';
 part 'ops/style_background.dart';
 part 'ops/style_border.dart';
 part 'ops/style_display.dart';
+part 'ops/style_ellipsis.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
@@ -39,7 +41,6 @@ part 'ops/tag_pre.dart';
 part 'ops/tag_q.dart';
 part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
-part 'ops/text_style.dart';
 
 const kAttributeId = 'id';
 
@@ -69,13 +70,25 @@ const kTagSub = 'sub';
 const kTagSup = 'sup';
 const kTagTt = 'tt';
 
+const kCssDirection = 'direction';
+const kCssDirectionLtr = 'ltr';
+const kCssDirectionRtl = 'rtl';
+const kAttributeDir = 'dir';
+
 const kCssDisplay = 'display';
 const kCssDisplayBlock = 'block';
 const kCssDisplayInline = 'inline';
 const kCssDisplayInlineBlock = 'inline-block';
 const kCssDisplayNone = 'none';
 
+const kCssLineHeight = 'line-height';
+const kCssLineHeightNormal = 'normal';
+
 const kCssWhitespace = 'white-space';
 const kCssWhitespaceNormal = 'normal';
 const kCssWhitespaceNowrap = 'nowrap';
 const kCssWhitespacePre = 'pre';
+
+extension on InheritedProperties {
+  TextDirection get directionOrLtr => get() ?? TextDirection.ltr;
+}

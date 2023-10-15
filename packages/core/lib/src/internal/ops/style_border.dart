@@ -63,9 +63,9 @@ class StyleBorder {
     Widget child,
     CssBorder cssBorder,
   ) {
-    final style = tree.styleBuilder.build(context);
-    final border = cssBorder.getBorder(style);
-    final borderRadius = cssBorder.getBorderRadius(style);
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final border = cssBorder.getBorder(resolved);
+    final borderRadius = cssBorder.getBorderRadius(resolved);
     return wf.buildDecoration(
       tree,
       child,

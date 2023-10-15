@@ -11,7 +11,6 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/core_build_tree.dart';
-import 'internal/html_style_widget.dart';
 
 final _logger = Logger('fwfh.HtmlWidget');
 
@@ -118,12 +117,12 @@ class HtmlWidget extends StatefulWidget {
 
 /// State for a [HtmlWidget].
 class HtmlWidgetState extends State<HtmlWidget> {
-  late final _RootStyleBuilder _rootStyleBuilder;
+  late final InheritanceResolvers _rootResolvers;
   late final WidgetFactory _wf;
 
   Widget? _cache;
   Future<Widget>? _future;
-  HtmlStyle? _rootStyle;
+  InheritedProperties? _rootProperties;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
@@ -133,7 +132,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   CoreBuildTree get _rootTree => CoreBuildTree.root(
         customStylesBuilder: widget.customStylesBuilder,
         customWidgetBuilder: widget.customWidgetBuilder,
-        styleBuilder: _rootStyleBuilder,
+        inheritanceResolvers: _rootResolvers,
         wf: _wf,
       );
 
@@ -141,7 +140,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   void initState() {
     super.initState();
 
-    _rootStyleBuilder = _RootStyleBuilder(this);
+    _rootResolvers = _RootResolvers(this);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.reset(this);
@@ -160,7 +159,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _rootStyle = null;
+
+    // performance critical
+    _rootProperties = null;
   }
 
   @override
@@ -174,7 +175,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
     }
 
     if (widget.textStyle != oldWidget.textStyle) {
-      _rootStyle = null;
+      // performance critical
+      _rootProperties = null;
     }
 
     if (needsRebuild) {
@@ -257,28 +259,41 @@ class HtmlWidgetState extends State<HtmlWidget> {
           : child;
 
   Widget _wrapper(Widget child) =>
-      HtmlStyleWidget(style: _rootStyle, child: child);
+      _RootWidget(resolved: _rootProperties, child: child);
 }
 
-class _RootStyleBuilder extends HtmlStyleBuilder {
+class _RootResolvers extends InheritanceResolvers {
   final HtmlWidgetState state;
 
-  _RootStyleBuilder(this.state);
+  _RootResolvers(this.state);
 
   @override
-  HtmlStyle build(BuildContext context) {
-    context.dependOnInheritedWidgetOfExactType<HtmlStyleWidget>();
+  InheritedProperties resolve(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<_RootWidget>();
 
-    final built = state._rootStyle;
-    if (built != null) {
-      return built;
+    final existing = state._rootProperties;
+    if (existing != null) {
+      return existing;
     }
 
-    return state._rootStyle = HtmlStyle.root(
+    return state._rootProperties = InheritedProperties.root(
       state._wf.getDependencies(state.context),
       state.widget.textStyle,
     );
   }
+}
+
+class _RootWidget extends InheritedWidget {
+  final InheritedProperties? resolved;
+
+  const _RootWidget({
+    required super.child,
+    required this.resolved,
+  });
+
+  @override
+  bool updateShouldNotify(_RootWidget oldWidget) =>
+      resolved == null || resolved != oldWidget.resolved;
 }
 
 Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
