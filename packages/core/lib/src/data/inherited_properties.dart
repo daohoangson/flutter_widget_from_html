@@ -136,9 +136,11 @@ class InheritanceResolvers {
   }
 
   /// Resolves an [InheritedProperties] by calling callbacks on top of parent's values.
+  ///
+  /// If the parent's values are unchanged, the cached resolved set will be used.
   InheritedProperties resolve(BuildContext context) {
     final parentResolved =
-        parent?.resolve(context) ?? InheritedProperties([context]);
+        parent?.resolve(context) ?? const InheritedProperties([]);
     final scopedCallbacks = _callbacks;
     if (scopedCallbacks == null) {
       return parentResolved;
@@ -159,8 +161,9 @@ class InheritanceResolvers {
       );
     }
 
-    // keep track of both the parent and the resolved set
-    // so we can skip resolving if the parent is unchanged
+    // performance critical
+    // keep track of both the parent's and the resolved set -> skip resolving if possible
+    // under normal circumstances, the root properties shouldn't be invalidated a lot
     _cachedParent = parentResolved;
     _cachedResolved = resolving;
 

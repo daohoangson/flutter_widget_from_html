@@ -159,6 +159,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // performance critical
     _rootProperties = null;
   }
 
@@ -173,6 +175,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
     }
 
     if (widget.textStyle != oldWidget.textStyle) {
+      // performance critical
       _rootProperties = null;
     }
 

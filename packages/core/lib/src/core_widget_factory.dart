@@ -405,24 +405,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   /// Returns [context]-based dependencies.
   ///
-  /// Includes these by default:
-  ///
-  /// - [CssWhitespace.normal]
-  /// - [TextDirection] via [Directionality.of]
-  /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
-  /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
-  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
-  ///
   /// It's recommended to use [InheritedProperties.get] instead of
   /// obtaining dependencies from [BuildContext] for performance reason.
   ///
   /// ```dart
   /// // avoid doing this:
-  /// final widgetValue = Directionality.of(context);
+  /// final direction = Directionality.of(context);
   ///
   /// // do this:
-  /// final buildOpValue = style.textDirection;
+  /// final direction = resolved.get<TextDirection>();
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) {
     final selectionRegistrar = SelectionContainer.maybeOf(context);
@@ -431,8 +422,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       Directionality.maybeOf(context) ?? TextDirection.ltr,
       DefaultSelectionStyle.of(context),
       DefaultTextStyle.of(context).style,
-      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
       if (selectionRegistrar != null) selectionRegistrar,
+
+      // performance critical
+      // avoid adding broad dependencies like MediaQuery.of(context)
+      // because it may invalidate our root properties too often
+      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
     ];
   }
 
