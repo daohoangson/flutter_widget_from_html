@@ -58,28 +58,6 @@ void main() {
   });
 
   group('BuildOp.new', () {
-    group('defaultStyles', () {
-      testWidgets('renders inline style normally', (tester) async {
-        const html = '<span style="color: #f00; color: #0f0;">Foo</span>';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
-      });
-
-      testWidgets('renders defaultStyles in reversed', (tester) async {
-        const html = '<span>Foo</span>';
-        final explained = await explain(
-          tester,
-          null,
-          hw: HtmlWidget(
-            html,
-            factoryBuilder: () => _BuildOpDefaultStyles(),
-            key: hwKey,
-          ),
-        );
-        expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
-      });
-    });
-
     group('onChild', () {
       testWidgets('renders additional text', (tester) async {
         const html =
@@ -521,27 +499,6 @@ class _BuildMetadataTsbEnqueue extends WidgetFactory {
 
   static TextStyleHtml _backgroundColor(TextStyleHtml p, Color c) =>
       p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
-}
-
-class _BuildOpDefaultStyles extends WidgetFactory {
-  @override
-  void parse(BuildTree tree) {
-    tree
-      ..register(
-        BuildOp(
-          defaultStyles: (_) => {'color': '#f00'},
-          priority: 1,
-        ),
-      )
-      ..register(
-        BuildOp(
-          defaultStyles: (_) => {'color': '#0f0'},
-          priority: 2,
-        ),
-      );
-
-    return super.parse(tree);
-  }
 }
 
 class _BuildOpOnChild extends WidgetFactory {

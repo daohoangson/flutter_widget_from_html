@@ -384,7 +384,7 @@ class _TagTableRow {
         const BuildOp.v2(
           debugLabel: kTagTableCell,
           defaultStyles: _cssVerticalAlignFromAttribute,
-          priority: Early.tagTableCellAttributeValign,
+          priority: Early.tagTableCellValignParsed,
         ),
       );
     }

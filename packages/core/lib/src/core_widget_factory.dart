@@ -910,7 +910,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           const BuildOp.v2(
             debugLabel: kTagTableCell,
             defaultStyles: _cssVerticalAlignMiddle,
-            priority: Early.tagTableCellDefaultStyles,
+            priority: Early.tagTableCellValignDefault,
           ),
         );
         break;
