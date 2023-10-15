@@ -284,7 +284,7 @@ void main() {
   group('error handling', () {
     group('defaultColor', () {
       test('returns resolving itself if context is null', () {
-        final resolving = InheritedProperties.root();
+        const resolving = InheritedProperties([]);
         final actual = TagA.defaultColor(resolving, null);
         expect(actual, equals(resolving));
       });

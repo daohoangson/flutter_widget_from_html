@@ -11,12 +11,12 @@ class InheritedProperties {
   /// The [TextStyle].
   final TextStyle style;
 
-  final Iterable<dynamic> _values;
+  final Iterable<dynamic> values;
 
-  const InheritedProperties._(
-    this._values, {
+  const InheritedProperties(
+    this.values, {
     this.parent,
-    required this.style,
+    this.style = const TextStyle(),
   });
 
   /// Creates the root properties set.
@@ -36,7 +36,7 @@ class InheritedProperties {
       );
     }
 
-    return InheritedProperties._(
+    return InheritedProperties(
       [
         ...deps,
         NormalLineHeight(style.height),
@@ -51,8 +51,8 @@ class InheritedProperties {
     TextStyle? style,
     T? value,
   }) {
-    return InheritedProperties._(
-      value != null ? [..._values.where((e) => e is! T), value] : _values,
+    return InheritedProperties(
+      value != null ? [...values.where((e) => e is! T), value] : values,
       parent: parent ?? this.parent,
       style: style ?? this.style,
     );
@@ -62,7 +62,7 @@ class InheritedProperties {
   ///
   /// The initial set of values are populated by [WidgetFactory.getDependencies].
   /// Parser and builder may use [BuildTree.inherit] to enqueue more.
-  T? get<T>() => _get(_values);
+  T? get<T>() => _get(values);
 
   static T? _get<T>(Iterable<dynamic> values) {
     for (final value in values.whereType<T>()) {
@@ -135,9 +135,10 @@ class InheritanceResolvers {
     return identical(thiz, othez);
   }
 
-  /// Resolve an [InheritedProperties] by calling callbacks on top of parent's values.
+  /// Resolves an [InheritedProperties] by calling callbacks on top of parent's values.
   InheritedProperties resolve(BuildContext context) {
-    final parentResolved = parent!.resolve(context);
+    final parentResolved =
+        parent?.resolve(context) ?? InheritedProperties([context]);
     final scopedCallbacks = _callbacks;
     if (scopedCallbacks == null) {
       return parentResolved;
