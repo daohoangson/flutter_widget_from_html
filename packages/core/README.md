@@ -224,7 +224,7 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 
 The HTML string is parsed into DOM elements and each element is visited once to prepare `BuildTree`s.
 
-![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/df9decd/docs/flowchart.svg)
+![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/138c333/docs/flowchart.png)
 
 Notes:
 
