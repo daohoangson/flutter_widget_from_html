@@ -11,7 +11,7 @@ There are two ways to alter the output widget tree.
 
 ## customStylesBuilder
 
-For text style changes like color, italic, etc., use `customStylesBuilder` to specify inline styles (see supported list above) for each DOM element. Some common conditionals:
+For text style changes like color, italic, etc., use `customStylesBuilder` to specify inline styles for each DOM element. Some common conditionals:
 
 - If HTML tag is H1 `element.localName == 'h1'`
 - If the element has `foo` CSS class `element.classes.contains('foo')`
@@ -50,9 +50,11 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 
 <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />
 
-# Custom factory
+Notes:
+  - By default, the custom widget will take the full width
+  - Wrap it in `InlineCustomWidget` to inline with surrounding text
 
-<table style="width: 100%"><tr><td style="width: 50%">
+# Custom factory
 
 The HTML string is first parsed into DOM elements, and each element is traversed to construct the fwfh's build tree before being "flattened" into Flutter widgets. Central to this entire process is the `WidgetFactory` instance, which can be readily replaced with your own implementation.
 
@@ -73,8 +75,6 @@ HtmlWidget(
 ```
 
 The most common integration point is `WidgetFactory.parse`, invoked individually for each element. Within this function, you have the option to adjust text styles using `BuildTree.inherit` or to register `BuildOp` for highly custom rendering.
-
-</td><td style="width: 50%">
 
 ```mermaid
 flowchart TD
@@ -109,8 +109,6 @@ flowchart TD
         ---> bitOK
 ```
 
-</td></tr></table>
-
 ## Inherited properties
 
 You can modify inherited properties, including text styles, using the `inherit` function and registering your resolver callback to be invoked once the `BuildContext` is prepared. Here's how it works:
@@ -142,7 +140,6 @@ tree.inherit(
 
 Notes:
   - Use the `resolving.copyWith<Foo>(value: foo)` method to store various data types within the tree. Children elements can access this value through `resolved.get<Foo>()`.
-  - Each element can enqueue as many resolver callbacks and set as many inherted properties as required.
 
 ## Build ops
 
