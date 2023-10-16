@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -54,6 +55,35 @@ void main() {
         ),
       );
       expect(explained, contains('#12345678'));
+    });
+
+    testWidgets('tsb.build', (tester) async {
+      const html = '<span class="build-op">Foo</span>';
+      final buildOp = BuildOp(
+        onTree: (_, tree) => tree.append(
+          WidgetBit.block(
+            tree,
+            WidgetPlaceholder(
+              builder: (context, child) {
+                final style = tree.tsb.build(context).style;
+                final colored = style.copyWith(color: const Color(0x00abcdef));
+                return Text('hi', style: colored);
+              },
+            ),
+          ),
+        ),
+      );
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _BuildOpWidgetFactory(buildOp),
+          key: hwKey,
+        ),
+        useExplainer: false,
+      );
+      expect(explained, contains('0x00abcdef'));
     });
   });
 

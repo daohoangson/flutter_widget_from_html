@@ -42,6 +42,12 @@ extension LegacyTextStyleHtml on TextStyleHtml {
 @Deprecated('Use InheritanceResolvers instead.')
 typedef TextStyleBuilder<T> = InheritanceResolvers;
 
+extension LegacyTextStyleBuilder on TextStyleBuilder {
+  /// Builds a [TextStyleHtml] by calling queued callbacks.
+  @Deprecated('Use .resolve instead.')
+  TextStyleHtml build(BuildContext context) => resolve(context);
+}
+
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
 @Deprecated('Use BuildOp.onRenderBlock instead.')
 Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
