@@ -17,11 +17,10 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - name: Setup Flutter
-        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
+        uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # v2.11.0
         with:
-          cache: true
           channel: beta
       - run: ./tool/test.sh --coverage
       - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3

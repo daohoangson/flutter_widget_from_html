@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+import '../../core/test/_.dart' as helper;
 import '_.dart';
 import 'mock_webview_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
   const src = 'http://domain.com';
@@ -110,6 +113,37 @@ void main() {
     const html = '<iframe src="$src" width="400" height="300"></iframe>';
     final explained = await explain(tester, html);
     expect(explained, equals('[WebView:url=$src,aspectRatio=1.33]'));
+  });
+
+  group('gestureTapCallback', () {
+    testWidgets('triggers callback', (tester) async {
+      const html = '<iframe src="http://domain.com/iframe"></iframe>';
+      final urls = <String>[];
+      await helper.explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => WebViewWidgetFactory(),
+          onTapUrl: (url) {
+            urls.add(url);
+            return false;
+          },
+        ),
+      );
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      await FakeWebViewController.instance?.onNavigationRequest(
+        url: 'http://domain.com/tap',
+        isMainFrame: true,
+      );
+      expect(urls, equals(['http://domain.com/tap']));
+    });
   });
 
   group('sandbox', () {

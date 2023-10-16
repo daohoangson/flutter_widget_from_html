@@ -16,11 +16,11 @@ jobs:
     name: Unit test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - uses: actions/dependency-review-action@6c5ccdad469c9f8a2996bfecaec55a631a347034 # v3.1.0
         if: github.base_ref
       - name: Setup Flutter
-        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
+        uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # v2.11.0
         with:
           cache: true
       - run: dart format --set-exit-if-changed --output none .
@@ -32,13 +32,67 @@ jobs:
           path: demo_app/test/failures/
       - uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
 
-  integration_test:
-    name: Integration test
+  integration_test_android:
+    strategy:
+      matrix:
+        include:
+          - api-level: 30
+            arch: x86
+            channel: canary
+            target: aosp_atd
+    name: Integration test (Android)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
       - name: Setup Flutter
-        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
+        uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # v2.11.0
+        with:
+          cache: true
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+        with:
+          # only update gradle cache from demo_app.yml jobs
+          cache-read-only: false
+
+      - name: AVD cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          channel: ${{ matrix.channel }}
+          target: ${{ matrix.target }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+      - name: Run tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          channel: ${{ matrix.channel }}
+          target: ${{ matrix.target }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./tool/integration.sh
+
+  integration_test_ios:
+    name: Integration test (iOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+      - name: Setup Flutter
+        uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # v2.11.0
         with:
           cache: true
 
@@ -57,5 +111,5 @@ jobs:
           echo "_deviceTypeId=$_deviceTypeId"
 
           xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runtimeId" | xargs xcrun simctl boot
-      - name: Run tests on iOS
+      - name: Run tests on iOS simulator
         run: ./tool/integration.sh
