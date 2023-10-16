@@ -206,7 +206,6 @@ class CoreBuildTree extends BuildTree {
     final customWidget = wf.customWidgetBuilder(element);
     if (customWidget != null) {
       if (customWidget is InlineCustomWidget) {
-        // mmd: appendWidgetBitInline
         append(
           WidgetBit.inline(
             this,
