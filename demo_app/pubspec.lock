@@ -259,14 +259,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.14.2"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.14.2"
   frontend_server_client:
     dependency: transitive
     description:
@@ -286,42 +286,42 @@ packages:
       path: "../packages/fwfh_cached_network_image"
       relative: true
     source: path
-    version: "0.13.0-alpha.1"
+    version: "0.14.2"
   fwfh_chewie:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_chewie"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.14.2"
   fwfh_just_audio:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_just_audio"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.14.2"
   fwfh_svg:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_svg"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.8.0+4"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_url_launcher"
       relative: true
     source: path
-    version: "0.13.0-alpha.1"
+    version: "0.9.0+4"
   fwfh_webview:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_webview"
       relative: true
     source: path
-    version: "0.13.1-alpha.2"
+    version: "0.14.2"
   glob:
     dependency: transitive
     description:
@@ -523,10 +523,10 @@ packages:
     dependency: transitive
     description:
       name: package_info_plus
-      sha256: "6ff267fcd9d48cb61c8df74a82680e8b82e940231bb5f68356672fde0397334a"
+      sha256: "7e76fad405b3e4016cd39d08f455a4eb5199723cf594cd1b8916d47140d93017"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.0"
+    version: "4.2.0"
   package_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -1000,10 +1000,10 @@ packages:
     dependency: transitive
     description:
       name: wakelock_plus
-      sha256: "268e56b9c63f850406f54e9acb2a7d2ddf83c26c8ff9e7a125a96c3a513bf65f"
+      sha256: f45a6c03aa3f8322e0a9d7f4a0482721c8789cb41d555407367650b8f9c26018
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.1.3"
   wakelock_plus_platform_interface:
     dependency: transitive
     description:
