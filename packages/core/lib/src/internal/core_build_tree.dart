@@ -206,6 +206,7 @@ class CoreBuildTree extends BuildTree {
     final customWidget = wf.customWidgetBuilder(element);
     if (customWidget != null) {
       if (customWidget is InlineCustomWidget) {
+        // mmd: appendWidgetBitInline
         append(
           WidgetBit.inline(
             this,
@@ -216,6 +217,7 @@ class CoreBuildTree extends BuildTree {
         );
         _logger.fine('Custom inline widget: ${element.localName} tag');
       } else {
+        // mmd: appendWidgetBitBlock
         append(WidgetBit.block(this, customWidget));
         _logger.fine('Custom block widget: ${element.localName} tag');
       }
@@ -240,6 +242,7 @@ class CoreBuildTree extends BuildTree {
     if (isBlock) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
+        // mmd: appendBuiltSubTree
         append(WidgetBit.block(this, builtSubTree));
       }
     } else {
