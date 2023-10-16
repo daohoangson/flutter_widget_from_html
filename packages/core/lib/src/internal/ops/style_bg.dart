@@ -42,7 +42,12 @@ class StyleBg {
           _skipBuilding[meta] = true;
           return listOrNull(
             wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildDecoration(meta, child, color: color, bgImageUrl: bgImageUrl),
+                  (_, child) => wf.buildDecoration(
+                    meta,
+                    child,
+                    color: color,
+                    bgImageUrl: bgImageUrl,
+                  ),
                 ),
           );
         },

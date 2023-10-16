@@ -158,7 +158,10 @@ class WidgetFactory {
     String? bgImageUrl,
     bool isBorderBox = true,
   }) {
-    if (border == null && borderRadius == null && color == null && bgImageUrl == null) {
+    if (border == null &&
+        borderRadius == null &&
+        color == null &&
+        bgImageUrl == null) {
       return child;
     }
 
@@ -172,7 +175,7 @@ class WidgetFactory {
       border: border,
       borderRadius: borderRadius,
       color: color,
-      image: _buildDecorationImage(bgImageUrl)
+      image: _buildDecorationImage(bgImageUrl),
     );
 
     if (!isBorderBox || container != null) {
@@ -197,7 +200,7 @@ class WidgetFactory {
     }
 
     ImageProvider? provider;
-    
+
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
     } else if (url.startsWith('data:image/')) {
@@ -207,7 +210,7 @@ class WidgetFactory {
     } else {
       provider = imageProviderFromNetwork(url);
     }
-    
+
     if (provider == null) {
       return null;
     }
