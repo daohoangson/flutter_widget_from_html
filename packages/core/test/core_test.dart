@@ -663,6 +663,59 @@ Future<void> main() async {
     });
   });
 
+  group('background-image', () {
+    testWidgets('asset', (WidgetTester tester) async {
+      const assetName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(asset:$assetName)">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[DecoratedBox:bgimage='
+          '[DecorationImage:image='
+          '[AssetImage:assetName=test/images/logo.png]],child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('data uri', (WidgetTester tester) async {
+      const html = '<div style="background-image: url($kDataUri)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[DecoratedBox:bgimage='
+          '[DecorationImage:image='
+          '[MemoryImage:size=42]],child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('file', (WidgetTester tester) async {
+      const fileName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(file:$fileName)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[DecoratedBox:bgimage='
+          '[DecorationImage:image='
+          '[FileImage:file=/test/images/logo.png]],child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+  });
+
   group('color (inline style)', () {
     testWidgets('renders hex values', (WidgetTester tester) async {
       const html = '<span style="color: #F00">red</span>'

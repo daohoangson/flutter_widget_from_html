@@ -284,10 +284,44 @@ class Explainer {
       if (borderRadius != null && borderRadius is BorderRadius) {
         attr.add('radius=${_borderRadius(borderRadius)}');
       }
+
+      final image = d.image;
+      if (image != null) {
+        attr.add("bgimage=${_decorationImage(image)}");
+      }
     }
 
     return attr;
   }
+
+  String _decorationImage(DecorationImage decorationImage) =>
+      '[DecorationImage:image=${_imageProvider(decorationImage.image)}]';
+
+  String _imageProvider(ImageProvider provider) {
+    if (provider is AssetImage) {
+      return _assetImage(provider);
+    }
+    if (provider is FileImage) {
+      return _fileImage(provider);
+    }
+    if (provider is MemoryImage) {
+      return _memoryImage(provider);
+    }
+    if (provider is NetworkImage) {
+      return _networkImage(provider);
+    }
+    return provider.toString();
+  }
+
+  String _assetImage(AssetImage image) =>
+      '[AssetImage:assetName=${image.assetName}]';
+
+  String _fileImage(FileImage image) => '[FileImage:file=${image.file.path}]';
+
+  String _networkImage(NetworkImage image) => '[NetworkImage:url=${image.url}]';
+
+  String _memoryImage(MemoryImage image) =>
+      '[MemoryImage:size=${image.bytes.length}]';
 
   String _color(Color c) => '#${_colorHex(c.alpha)}'
       '${_colorHex(c.red)}'
