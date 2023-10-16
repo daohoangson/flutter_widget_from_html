@@ -224,17 +224,7 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 
 The HTML string is parsed into DOM elements and each element is visited once to prepare `BuildTree`s.
 
-```mermaid
-flowchart TD
-    _addBitsFromNode[/process DOM element/] --> ifIsText{TEXT?} --->|yes\n\nBuildTree.addText\nBuildTree.addWhitespace| bitOK( )
-
-    ifIsText --->|no| ifCustomWidget{customWidget?} -->|yes\n\nHtmlWidget.\ncustomWidgetBuilder| customWidget[/render custom widget/] --> bitOK
-
-    ifCustomWidget -->|no| _parseEverything[/parse styles/] -->|WidgetFactory.parse\nBuildOp.defaultStyles\nHtmlWidget.customStylesBuilder\nWidgetFactory.parseStyle\nWidgetFactory.parseStyleDisplay| _parseOK( ) ~~~ _addBitsFromNodeOK
-    _parseOK -.->|process children\nelements recursively| _addBitsFromNode -.->|BuildOp.onChild| _addBitsFromNodeOK( ) -->|BuildOp.onParsed| ifIsBlock{block\nelement?} -->|no| appendSubTree>ready for\ninline rendering] -->|BuildOp.\nonRenderInline| bitOK
-
-    ifIsBlock -->|yes\n\nBuildOp\n.onRenderBlock| appendBuiltSubTree[/render block/] --> bitOK
-```
+![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/df9decd/docs/flowchart.svg)
 
 Notes:
 
