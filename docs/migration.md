@@ -33,7 +33,7 @@ abstract class Flattened {
 }
 ```
 
-Instead of returning `String` for text, `WidgetSpan` for inline, `Widget` for block, you must call the appropriate method on `Flattened`.
+In the past, the `buildBit` method returned results in a dynamic manner. The flattener would automatically interpret `String` as text, `WidgetSpan` as inline elements, and `Widget` as block elements. This approach was prone to errors and potentially risky. With the introduction of the `flatten` method, you are now required to call the specific method that corresponds to the intended action, making the process more controlled and less error-prone.
 
 ### detach, insertAfter and insertBefore
 
@@ -67,17 +67,25 @@ final newOp = BuildOp(
 
 ## BuildOp
 
+### BuildOp.new
+
 We made changes to the `BuildOp` that allow you to use the old methods and properties, but they are marked as deprecated. It's a good idea to switch to the new methods as soon as possible.
 
 <table><tr><th>Before</th><th>After</th></tr><tr><td>
 
 ```dart
 final oldOp = BuildOp({
-  defaultStyles: (dom.Element element) => {'color': 'red'},
+  defaultStyles: (dom.Element element) {
+    final Map<String, String> styles = {'color': 'red'};
+    return styles;
+  },
   onChild: (BuildMetadata childMeta) {},
   onTree: (BuildMetadata meta, BuildTree tree) {},
   onTreeFlattening: (BuildMetadata meta, BuildTree tree) {},
-  onWidgets: (BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) => [Container()],
+  onWidgets: (BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) {
+    final Iterable<Widget> results = [Container()];
+    return results;
+  },
   onWidgetsIsOptional: false,
   priority: 10,
 })
@@ -89,9 +97,14 @@ final oldOp = BuildOp({
 final newOp = BuildOp(
   alwaysRenderBlock: true,
   debugLabel: 'v0.14',
-  defaultStyles: (dom.Element element) => {'color': 'red'},
+  defaultStyles: (dom.Element element) {
+    final StylesMap styles = {'color': 'red'};
+    return styles;
+  },
   onParsed: (BuildTree tree) => tree,
-  onRenderBlock: (BuildTree tree, WidgetPlaceholder placeholder) => Container(),
+  onRenderBlock: (BuildTree tree, WidgetPlaceholder placeholder) {
+    return Container();
+  },
   onRenderInline: (BuildTree tree) {},
   onRenderedBlock: (BuildTree tree, Widget block) {},
   onVisitChild: (BuildTree tree, BuildTree subTree) {},
@@ -102,10 +115,14 @@ final newOp = BuildOp(
 </td></tr></table>
 
 - `BuildMetadata` and `BuildTree` have been merged together so the callback signatures no longer require two arguments
-- he roles of the callbacks are mostly the same, but we've changed their names to make them easier to understand
+- The roles of the callbacks are mostly the same, but we've changed their names to make them easier to understand
 - The `defaultStyles` callback still has the same signature, but now the styles are added at the end of the list instead of the beginning
 - `onTree` is now `onParsed` and allow you to return a new tree
 - `onWidgets` is now `onRenderBlock`, and children widgets have been parsed into a single `WidgetPlaceholder`. This callback can wrap the placeholder or returning a new one as needed
+
+### BuildOp.inline
+
+In this version, we've introduce a new factory to simplify the rendering of custom inline widgets. If you were previously using `onTree` along with `detach`, `insertAfter`, or `insertBefore` for this purpose, we suggest giving `BuildOp.inline` a try for a more app developer friendly approach. As we continue improving things in the future, `BuildOp.inline` should be kept up to date and running smoothly.
 
 ## TextStyleHtml
 
