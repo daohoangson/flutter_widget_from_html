@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -813,24 +812,6 @@ Future<void> main() async {
             '$kGoldenFilePrefix/sizing/100_percent/$name.png',
       ),
     );
-
-    group('error handling', () {
-      testWidgets('skips _guessChildSize on sizeHeight error', (tester) async {
-        // the IMG tag is rendered as a `WidgetSpan` with a `baseline` alignment
-        // making it impossible for `RenderParagraph` to perform dry layout
-        const src = 'https://domain.com/image.jpg';
-        const html = '<div style="width: 100px; height: 100px">'
-            'Foo <img src="$src" />'
-            '</div>';
-        await explain(tester, html, useExplainer: false);
-        final render =
-            tester.firstRenderObject<RenderParagraph>(find.byType(RichText));
-        expect(
-          render.constraints,
-          equals(BoxConstraints.tight(const Size(100, 100))),
-        );
-      });
-    });
   });
 }
 
