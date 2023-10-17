@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -548,6 +549,30 @@ Future<void> main() async {
       const html = '<table></table>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
+    });
+
+    group('getMinIntrinsicWidth', () {
+      String buildHtml(String style) => '<div style="width: 20px">'
+          '<table><tr><td>Foo foo foo '
+          '<span style="$style">bar</span>'
+          '</td></tr></table></div>';
+
+      testWidgets('measure when crowded', (t) async {
+        final explained = await explain(t, buildHtml('vertical-align: bottom'));
+        expect(explained, contains('[RichText:(:bar)]@bottom)'));
+
+        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
+        expect(render.size, equals(const Size(17, 48)));
+      });
+
+      testWidgets("crowded but couldn't measure baseline alignment", (t) async {
+        // https://github.com/daohoangson/flutter_widget_from_html/issues/1066
+        final explained = await explain(t, buildHtml('display: inline-block'));
+        expect(explained, contains('[RichText:(:bar)])'));
+
+        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
+        expect(render.size, equals(const Size(70, 12)));
+      });
     });
   });
 

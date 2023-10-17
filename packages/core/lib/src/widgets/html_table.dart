@@ -494,9 +494,17 @@ class _TableRenderLayouter {
       }
     }
 
-    // table is too crowded
-    // get min width to avoid breaking line in the middle of a word
-    return child.getMinIntrinsicWidth(double.infinity);
+    try {
+      // table is too crowded
+      // get min width to avoid breaking line in the middle of a word
+      final w = child.getMinIntrinsicWidth(double.infinity);
+      return w;
+    } catch (error, stackTrace) {
+      // TODO: render horizontal scroll view
+      const message = "Could not measure child's min intrinsic width";
+      _logger.warning(message, error, stackTrace);
+      return null;
+    }
   }
 
   _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
