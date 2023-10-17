@@ -1,3 +1,9 @@
+## 0.14.3
+
+- Write migration docs from v0.10 to v0.14 (#1065)
+- Fix Flutter badge SVG urls (#1065)
+- Fix broken table (#1067)
+
 ## 0.14.2
 
 - Add support for `display: table-cell` without row (#905)

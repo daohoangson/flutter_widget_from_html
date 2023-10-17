@@ -14,7 +14,7 @@ void main() {
         explained,
         equals(
           '[HtmlDetails:open=false,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:$summaryDetails))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:$summaryDetails))]],'
           '[HtmlDetailsContents:child=[RichText:(:Foo)]]'
           ']]',
         ),
@@ -28,7 +28,7 @@ void main() {
         explained,
         equals(
           '[HtmlDetails:open=true,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:$summaryDetails))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:$summaryDetails))]],'
           '[HtmlDetailsContents:child=[RichText:(:Foo)]]'
           ']]',
         ),
@@ -72,7 +72,7 @@ void main() {
         explained,
         equals(
           '[HtmlDetails:open=false,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Foo))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo))]],'
           '[HtmlDetailsContents:child=[RichText:(:Bar)]]'
           ']]',
         ),
@@ -86,7 +86,7 @@ void main() {
         explained,
         equals(
           '[HtmlDetails:open=true,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Foo))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo))]],'
           '[HtmlDetailsContents:child=[RichText:(:Bar)]]'
           ']]',
         ),
@@ -128,11 +128,11 @@ void main() {
         equals(
           '[Column:children='
           '[HtmlDetails:open=true,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Foo1))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo1))]],'
           '[HtmlDetailsContents:child=[RichText:(:Foo2)]]'
           ']],'
           '[HtmlDetails:open=true,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Bar1))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Bar1))]],'
           '[HtmlDetailsContents:child=[RichText:(:Bar2)]]'
           ']]]',
         ),
@@ -147,9 +147,9 @@ void main() {
         explained,
         equals(
           '[HtmlDetails:open=false,child=[Column:children='
-          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:One))]],'
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:One))]],'
           '[HtmlDetailsContents:child=[Column:children='
-          '[RichText:(:[HtmlDetailsMarker]@bottom(:Two))],'
+          '[RichText:(:[HtmlDetailsMarker]@middle(:Two))],'
           '[RichText:(:Foo)]'
           ']]]]',
         ),

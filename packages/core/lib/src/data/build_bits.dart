@@ -302,6 +302,17 @@ abstract class WidgetBit<T> extends BuildBit {
 
   const WidgetBit._(this.parent, this.child);
 
+  /// How the placeholder aligns vertically with the text.
+  ///
+  /// See [ui.PlaceholderAlignment] for details on each mode.
+  PlaceholderAlignment? get alignment => null;
+
+  /// The [TextBaseline] to align against when using [ui.PlaceholderAlignment.baseline],
+  /// [ui.PlaceholderAlignment.aboveBaseline], and [ui.PlaceholderAlignment.belowBaseline].
+  ///
+  /// This is ignored when using other alignment modes.
+  TextBaseline? get baseline => null;
+
   /// Creates a block widget.
   static WidgetBit<Widget> block(BuildTree parent, Widget child) =>
       _WidgetBitBlock(
@@ -348,7 +359,10 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
 }
 
 class _WidgetBitInline extends WidgetBit<InlineSpan> {
+  @override
   final PlaceholderAlignment alignment;
+
+  @override
   final TextBaseline baseline;
 
   const _WidgetBitInline(

@@ -200,6 +200,20 @@ class BuildOp {
       BuildOp.v2(
         debugLabel: debugLabel,
         onParsed: (tree) {
+          final bits = [...tree.bits];
+          if (bits.length == 1) {
+            final bit = bits.first;
+            if (bit is WidgetBit &&
+                bit.isInline == true &&
+                bit.alignment == alignment &&
+                bit.baseline == baseline) {
+              // tree has exactly 1 inline bit & all configurations match
+              // let's reuse the existing placeholder
+              bit.child.wrapWith((_, w) => onRenderInlineBlock(tree, w));
+              return tree;
+            }
+          }
+
           final parent = tree.parent;
           return parent.sub()
             ..append(

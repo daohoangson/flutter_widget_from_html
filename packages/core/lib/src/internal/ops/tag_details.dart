@@ -5,6 +5,10 @@ const kAttributeDetailsOpen = 'open';
 const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
+// use middle alignment as an early optimization
+// baseline alignment may cause issue with getDrySize, getMinIntrinsicWidth, etc.
+const _markerMarkerAlignment = PlaceholderAlignment.middle;
+
 class TagDetails {
   final WidgetFactory wf;
 
@@ -29,6 +33,7 @@ class TagDetails {
                       TextSpan(
                         children: [
                           WidgetSpan(
+                            alignment: _markerMarkerAlignment,
                             child: HtmlDetailsMarker(style: textStyle),
                           ),
                           // TODO: i18n
@@ -78,7 +83,7 @@ class TagDetails {
                     },
                     debugLabel: '$kTagSummary--inlineMarker',
                   ),
-                  alignment: PlaceholderAlignment.bottom,
+                  alignment: _markerMarkerAlignment,
                 );
                 return summaryTree..prepend(marker);
               },

@@ -549,6 +549,30 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
+
+    group('getMinIntrinsicWidth', () {
+      String buildHtml(String style) => '<div style="width: 30px">'
+          '<table><tr><td>Foo foo foo '
+          '<span style="$style">bar</span>'
+          '</td></tr></table></div>';
+
+      testWidgets('measure when crowded', (t) async {
+        final explained = await explain(t, buildHtml('vertical-align: bottom'));
+        expect(explained, contains('[RichText:(:bar)]@bottom)'));
+
+        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
+        expect(render.size.width, lessThan(30));
+      });
+
+      testWidgets("crowded but couldn't measure baseline alignment", (t) async {
+        // https://github.com/daohoangson/flutter_widget_from_html/issues/1066
+        final explained = await explain(t, buildHtml('display: inline-block'));
+        expect(explained, contains('[RichText:(:bar)])'));
+
+        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
+        expect(render.size.width, greaterThan(30));
+      });
+    });
   });
 
   group('background', () {
