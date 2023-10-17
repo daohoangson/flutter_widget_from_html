@@ -99,25 +99,60 @@ void main() {
         );
       });
 
-      testWidgets('works with inline-block', (WidgetTester tester) async {
+      group('works with inline-block', () {
         const html = 'Hello <span class="inlineBuildOp" '
             'style="display: inline-block">foo</span>';
-        final explained = await explain(
-          tester,
-          html,
-          inlineBuildOp: BuildOp.inline(
-            onRenderInlineBlock: (tree, child) {
-              return ColoredBox(
-                color: Colors.green,
-                child: child,
-              );
-            },
-          ),
-        );
-        expect(
-          explained,
-          equals('[RichText:(:Hello [ColoredBox:child=[RichText:(:foo)]])]'),
-        );
+
+        testWidgets('reuse placeholder', (WidgetTester tester) async {
+          final e1 = await explain(
+            tester,
+            html,
+            inlineBuildOp: BuildOp.inline(
+              debugLabel: 'inlineBuildOp',
+              onRenderInlineBlock: (tree, child) {
+                return ColoredBox(
+                  color: Colors.green,
+                  child: child,
+                );
+              },
+            ),
+          );
+          expect(
+            e1,
+            equals('[RichText:(:Hello [ColoredBox:child=[RichText:(:foo)]])]'),
+          );
+
+          final e2 = await helper.explainWithoutPumping(useExplainer: false);
+          expect(e2, isNot(contains('WidgetPlaceholder(inlineBuildOp)')));
+          expect(e2, contains('WidgetPlaceholder(inline-block)'));
+        });
+
+        testWidgets("don't reuse placeholder", (WidgetTester tester) async {
+          final e1 = await explain(
+            tester,
+            html,
+            inlineBuildOp: BuildOp.inline(
+              alignment: PlaceholderAlignment.top,
+              debugLabel: 'inlineBuildOp',
+              onRenderInlineBlock: (tree, child) {
+                return ColoredBox(
+                  color: Colors.green,
+                  child: child,
+                );
+              },
+            ),
+          );
+          expect(
+            e1,
+            equals(
+              '[RichText:(:Hello [ColoredBox:child=[RichText:(:foo)]]@top)]',
+            ),
+          );
+
+          final e2 = await helper.explainWithoutPumping(useExplainer: false);
+          expect(e2, contains('WidgetPlaceholder(inlineBuildOp)'));
+          expect(e2, isNot(contains('WidgetPlaceholder(inline-block)')));
+        });
       });
     });
   });
