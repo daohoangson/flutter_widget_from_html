@@ -8,6 +8,15 @@ extension StyleDisplayInlineBlock on WidgetFactory {
       );
 
   static BuildTree _onParsed(BuildTree tree) {
+    final bits = [...tree.bits];
+    if (bits.length == 1) {
+      final bit = bits.first;
+      if (bit is WidgetBit && bit.isInline == true) {
+        // tree has exactly 1 inline bit, nothing to do here
+        return tree;
+      }
+    }
+
     final parent = tree.parent;
     return parent.sub()
       ..append(

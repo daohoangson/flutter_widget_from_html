@@ -185,6 +185,49 @@ void main() {
   });
 
   group('possible conflict', () {
+    testWidgets('display: inline', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: inline; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
+    });
+
+    testWidgets('display: inline-block', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: inline-block; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
+    });
+
+    testWidgets('display: block', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: block; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[RichText:(:Foo)],'
+          '[Align:alignment=topLeft,widthFactor=1.0,child='
+          '[CssBlock:child=[RichText:(:bar)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders with A tag', (WidgetTester tester) async {
+      const html = '<sup><a href="http://domain.com/foo">foo</a></sup>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Align:alignment=topCenter,widthFactor=1.0,child='
+          '[Padding:(0,0,3,0),child=[RichText:(#FF123456+u@8.3+onTap:foo)]]'
+          ']',
+        ),
+      );
+    });
+
     group('image', () {
       const imgSrc = 'http://domain.com/image.png';
       const imgRendered =
@@ -213,19 +256,6 @@ void main() {
           ),
         );
       });
-    });
-
-    testWidgets('renders with A tag', (WidgetTester tester) async {
-      const html = '<sup><a href="http://domain.com/foo">foo</a></sup>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Align:alignment=topCenter,widthFactor=1.0,child='
-          '[Padding:(0,0,3,0),child=[RichText:(#FF123456+u@8.3+onTap:foo)]]'
-          ']',
-        ),
-      );
     });
   });
 
