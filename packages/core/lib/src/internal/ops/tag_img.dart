@@ -79,6 +79,7 @@ class TagImg {
       return;
     }
 
-    tree.append(WidgetBit.inline(tree, built));
+    const middle = PlaceholderAlignment.middle;
+    tree.append(WidgetBit.inline(tree, built, alignment: middle));
   }
 }

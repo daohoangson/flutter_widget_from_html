@@ -142,7 +142,7 @@ Future<void> main() async {
           '1\n'
           '[CssSizing:$imgSizingConstraints,child='
           '[Image:image=NetworkImage("$src", scale: 1.0)]'
-          '])]',
+          ']@middle)]',
         ),
       );
     });
@@ -999,7 +999,7 @@ Future<void> main() async {
               '[RichText:(:Foo '
               '[CssSizing:$imgSizingConstraints,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]'
-              '])]',
+              ']@middle)]',
             ),
           );
         }),

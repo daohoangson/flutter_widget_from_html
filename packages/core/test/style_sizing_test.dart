@@ -486,7 +486,7 @@ Future<void> main() async {
           '[RichText:(:Foo '
           '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child='
           '[Image:image=NetworkImage("$src", scale: 1.0)]'
-          '])]',
+          ']@middle)]',
         ),
       );
     });
