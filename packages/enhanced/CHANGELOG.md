@@ -10,10 +10,12 @@
 - Fix padding is ignored on empty P tag (#906)
 - Fix `border-radius` error if border is not uniform (#910)
 - Fix inline `white-space: nowrap` (#944)
+- Fix `TR` background color doesn't fill the whole row by #1049
 - MIGRATE: Replace `WidgetPlaceholder.generator` with `.debugLabel` (#619)
 - MIGRATE: Replace `WidgetFactory.gestureTapCallback` with `.buildGestureRecognizer` (#732)
 - MIGRATE: Replace `RebuildTriggers` with `List`
 - MIGRATE: Replace `BuildBit.detach`, `.insertAfter` and `.insertBefore` with returning a new tree in `BuildOp.onParsed` (#732)
+- BREAKING: Remove `HtmlWidget.webViewXxx` properties #615
 - BREAKING: Remove support for `box-sizing` (#903)
 - BREAKING: Remove `WidgetPlaceholder.autoUnwrap` (#906)
 - BREAKING: `.getDependency<MediaQueryData>()` no longer works (#911)
