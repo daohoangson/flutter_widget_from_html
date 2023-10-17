@@ -167,13 +167,17 @@ void main() {
       expect(_data(text2), equals('1'));
     });
 
-    test('WidgetBit.block returns same parent', () {
+    test('WidgetBit.block keeps fields', () {
       final text = _text();
       final child = WidgetPlaceholder();
       final bit = WidgetBit.block(text, child);
 
       final copied = bit.copyWith();
       expect(copied.parent, equals(text));
+
+      final bit2 = copied as WidgetBit;
+      expect(bit2.alignment, isNull);
+      expect(bit2.baseline, isNull);
     });
 
     test('WidgetBit.block returns', () {
@@ -187,13 +191,22 @@ void main() {
       expect(text2.build(), equals(child));
     });
 
-    test('WidgetBit.inline returns same parent', () {
+    test('WidgetBit.inline keeps fields', () {
       final text = _text();
       final child = WidgetPlaceholder();
-      final bit = WidgetBit.inline(text, child);
+      final bit = WidgetBit.inline(
+        text,
+        child,
+        alignment: PlaceholderAlignment.top,
+        baseline: TextBaseline.ideographic,
+      );
 
       final copied = bit.copyWith();
       expect(copied.parent, equals(text));
+
+      final bit2 = copied as WidgetBit;
+      expect(bit2.alignment, PlaceholderAlignment.top);
+      expect(bit2.baseline, TextBaseline.ideographic);
     });
 
     test('BuildTree returns', () {
