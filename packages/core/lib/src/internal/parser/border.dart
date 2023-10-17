@@ -11,16 +11,14 @@ const kCssBorderRadiusBottomRight = 'border-bottom-right-radius';
 const kCssBorderRadiusTopLeft = 'border-top-left-radius';
 const kCssBorderRadiusTopRight = 'border-top-right-radius';
 
-final _elementBorder = Expando<CssBorder>();
-
-CssBorder tryParseBorder(BuildMetadata meta) {
-  final existing = _elementBorder[meta.element];
+CssBorder tryParseBorder(BuildTree tree) {
+  final existing = tree.getNonInherited<CssBorder>();
   if (existing != null) {
     return existing;
   }
 
   var border = const CssBorder();
-  for (final style in meta.styles) {
+  for (final style in tree.styles) {
     final key = style.property;
     if (!key.startsWith(kCssBorder)) {
       continue;
@@ -33,7 +31,9 @@ CssBorder tryParseBorder(BuildMetadata meta) {
     }
   }
 
-  return _elementBorder[meta.element] = border;
+  tree.setNonInherited<CssBorder>(border);
+
+  return border;
 }
 
 CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {

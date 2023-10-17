@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -84,38 +87,39 @@ mixin WebViewFactory on WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case kTagIframe:
-        final op = _tagIframe ??= BuildOp(
-          onWidgets: (meta, widgets) {
-            if (defaultTargetPlatform != TargetPlatform.android &&
-                defaultTargetPlatform != TargetPlatform.iOS &&
-                !kIsWeb) {
-              // Android & iOS are the webview_flutter's supported platforms
-              // Flutter web support is implemented by this package
-              // https://pub.dev/packages/webview_flutter/versions/2.0.12
-              return widgets;
-            }
+        meta.register(
+          _tagIframe ??= BuildOp(
+            // TODO: set debugLabel when our minimum core version >= 1.0
+            onWidgets: (meta, widgets) {
+              if (defaultTargetPlatform != TargetPlatform.android &&
+                  defaultTargetPlatform != TargetPlatform.iOS &&
+                  !kIsWeb) {
+                // Android & iOS are the webview_flutter's supported platforms
+                // Flutter web support is implemented by this package
+                // https://pub.dev/packages/webview_flutter/versions/2.0.12
+                return widgets;
+              }
 
-            final attrs = meta.element.attributes;
-            final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
-            if (src == null) {
-              return widgets;
-            }
+              final a = meta.element.attributes;
+              final src = urlFull(a[kAttributeIframeSrc] ?? '');
+              if (src == null) {
+                return widgets;
+              }
 
-            return listOrNull(
-                  buildWebView(
-                    meta,
-                    src,
-                    height:
-                        tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
-                    sandbox:
-                        attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
-                    width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
-                  ),
-                ) ??
-                widgets;
-          },
+              final height = tryParseDoubleFromMap(a, kAttributeIframeHeight);
+              final width = tryParseDoubleFromMap(a, kAttributeIframeWidth);
+              final sandbox = a[kAttributeIframeSandbox]?.split(RegExp(r'\s+'));
+              final built = buildWebView(
+                meta,
+                src,
+                height: height,
+                sandbox: sandbox,
+                width: width,
+              );
+              return listOrNull(built) ?? widgets;
+            },
+          ),
         );
-        meta.register(op);
         break;
     }
     return super.parse(meta);

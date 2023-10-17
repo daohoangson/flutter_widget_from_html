@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -29,7 +32,7 @@ mixin JustAudioFactory on WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case kTagAudio:
-        _tagAudio ??= TagAudio(this).op;
+        _tagAudio ??= TagAudio(this).buildOp;
         meta.register(_tagAudio!);
         break;
     }

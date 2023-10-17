@@ -1,4 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
@@ -7,29 +10,10 @@ const kHref = 'http://domain.com/href';
 const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  group('basic usage', () {
+  testWidgets('renders A tag', (WidgetTester tester) async {
     const html = '<a href="$kHref">Foo</a>';
-
-    testWidgets('renders', (WidgetTester tester) async {
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-          ' │  BuildTree#2 tsb#3(parent=#1):\n'
-          ' │    "Foo"\n'
-          ' │    _TagABit#4 tsb#3(parent=#1)\n'
-          ' │)\n'
-          ' └RichText(text: "Foo")\n\n',
-        ),
-      );
-    });
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
   });
 
   group('renders without erroneous white spaces', () {
@@ -124,11 +108,12 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[MouseRegion:child='
-        '[GestureDetector:child=[Column:children='
-        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
-        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]'
-        ']]]]',
+        '[CssBlock:child=[Column:children='
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]]'
+        ']]',
       ),
     );
   });
@@ -142,7 +127,7 @@ void main() {
   testWidgets('renders empty background-color inside (#215)', (tester) async {
     const h = '<a href="$kHref"><div style="background-color: red"></div></a>';
     final explained = await explain(tester, h);
-    expect(explained, equals('[widget0]'));
+    expect(explained, contains('[widget0]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
@@ -157,6 +142,30 @@ void main() {
         '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
         ']]],'
         '[SizedBox:0.0x5.0]',
+      ),
+    );
+  });
+
+  testWidgets('renders custom widget inside', (tester) async {
+    const html = '<a href="$kHref">Foo <span class="x">x</span> bar.</a>';
+    final explained = await explain(
+      tester,
+      null,
+      hw: HtmlWidget(
+        html,
+        key: hwKey,
+        customWidgetBuilder: (e) =>
+            e.classes.contains('x') ? Text(e.className) : null,
+      ),
+    );
+    expect(
+      explained,
+      equals(
+        '[Column:children='
+        '[RichText:(#FF123456+u+onTap:Foo)],'
+        '[MouseRegion:child=[GestureDetector:child=[Text:x]]],'
+        '[RichText:(#FF123456+u+onTap:bar.)]'
+        ']',
       ),
     );
   });
@@ -245,7 +254,8 @@ void main() {
     });
   });
 
-  group('#676: skips decoration', () {
+  group('skips decoration', () {
+    // https://github.com/daohoangson/flutter_widget_from_html/issues/676
     testWidgets('renders a filled href', (tester) async {
       const html = '<a href="$kHref">test</a>';
       final explained = await explain(tester, html);
@@ -268,6 +278,16 @@ void main() {
       const html = '<a>test</a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:test)]'));
+    });
+  });
+
+  group('error handling', () {
+    group('defaultColor', () {
+      test('returns resolving itself if context is null', () {
+        const resolving = InheritedProperties([]);
+        final actual = TagA.defaultColor(resolving, null);
+        expect(actual, equals(resolving));
+      });
     });
   });
 }

@@ -9,7 +9,9 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   group('height', () {
     testWidgets('renders em', (WidgetTester tester) async {
       const html = '<div style="height: 2em">Foo</div>';
@@ -425,14 +427,14 @@ void main() {
     expect(
       explained,
       equals(
-        '[DecoratedBox:bg=#FFFF0000,child='
+        '[Container:bg=#FFFF0000,child='
         '[Padding:(20,20,20,20),child='
         '[Column:children=[SizedBox:0.0x15.0],'
         '[CssBlock:child='
-        '[DecoratedBox:bg=#FF008000,child='
+        '[Container:bg=#FF008000,child='
         '[CssBlock:child='
         '[Padding:(0,15,0,15),child='
-        '[DecoratedBox:bg=#FF0000FF,child='
+        '[Container:bg=#FF0000FF,child='
         '[Padding:(5,5,5,5),child='
         '[CssSizing:height=100.0,width=100.0,child='
         '[RichText:(#FFFFFFFF:Foo)]'
@@ -563,6 +565,134 @@ void main() {
       );
     });
 
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        CssSizing(
+          key: key,
+          child: const SizedBox(width: 50, height: 50),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 50)),
+      );
+    });
+
+    testWidgets('computeDryLayout without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(CssSizing(key: key));
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
+      );
+    });
+
+    group('_guessChildSize with 2 dimensions', () {
+      testWidgets('respect wide child', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 2),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(100, 50)));
+      });
+
+      testWidgets('respect wide child (vertical)', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 2),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(200, 100)));
+      });
+
+      testWidgets('child too wide', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 20),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(800, 40)));
+      });
+
+      testWidgets('respect tall child', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .5),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(100, 200)));
+      });
+
+      testWidgets('respect tall child (vertical)', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .5),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(50, 100)));
+      });
+
+      testWidgets('child too tall', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .05),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(30, 600)));
+      });
+    });
+
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
@@ -589,6 +719,14 @@ void main() {
                   '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
               childHeightGtMaxHeight:
                   '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
+              'sized_inline_block': '''
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/799 -->
+<p>
+  <span style="display: inline-block; width: 18px; height: 22px; line-height: 22px; float: left; font-size: 15px; background: 0px 0px; margin-right: 4px; color: #FF6600; letter-spacing: -1px; opacity: 1;">1</span>
+  <a target="_blank" href="http://domain.com" style="color: rgb(36, 64, 179); text-decoration-line: none; max-width: 260px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; vertical-align: middle; display: inline-block; -webkit-line-clamp: 1; font-variant-numeric: normal; font-variant-east-asian: normal; font-stretch: normal; font-size: 14px; line-height: 22px;">Foo</a>
+  <span style="display: inline-block; padding: 0px 2px; text-align: center; vertical-align: middle; font-size: 12px; line-height: 16px; color: #FFFFFF; overflow: hidden; margin-left: 6px; height: 16px; border-radius: 4px; background-color: #FF6600;">bar</span>
+</p>
+''',
             };
 
             for (final testCase in testCases.entries) {

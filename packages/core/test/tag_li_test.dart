@@ -25,7 +25,7 @@ String item(String markerText, String contents, {String? child}) {
 
 String marker(String text) => text.startsWith('[HtmlListMarker.')
     ? text
-    : '[RichText:maxLines=1,(:$text)]';
+    : '[RichText:maxLines=1,softWrap=false,(:$text)]';
 
 Future<void> main() async {
   await loadAppFonts();
@@ -277,7 +277,7 @@ Future<void> main() async {
   <li type="1">decimal</li>
   <li type="i">lower-roman</li>
   <li>lower-alpha</li>
-<ol>
+</ol>
 ''';
       final explained = await explain(tester, html);
       expect(
@@ -334,7 +334,7 @@ Future<void> main() async {
   <li style="list-style-type: none"">none</li>
   <li style="list-style-type: square">square</li>
   <li>circle</li>
-<ul>
+</ul>
 ''';
         final explained = await explain(tester, html);
         expect(
@@ -691,7 +691,8 @@ Future<void> main() async {
       );
     });
 
-    testWidgets('#112: LI has empty A', (WidgetTester tester) async {
+    testWidgets('LI has empty A', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/112
       const html = '''
 <ol>
   <li>One</li>
@@ -746,11 +747,11 @@ Future<void> main() async {
         equals(
           '[Padding:(0,40,0,0),child=[CssBlock:child=[Column:dir=rtl,children='
           '[HtmlListItem:children=[RichText:dir=rtl,(:One)],'
-          '[RichText:maxLines=1,dir=rtl,(:1.)]],'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:1.)]],'
           '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],'
-          '[RichText:maxLines=1,dir=rtl,(:2.)]],'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:2.)]],'
           '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],'
-          '[RichText:maxLines=1,dir=rtl,(:3.)]]'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:3.)]]'
           ']]]',
         ),
       );
@@ -787,49 +788,112 @@ Future<void> main() async {
       expect(rtl, contains('HtmlListItem(textDirection: rtl)'));
     });
 
-    testWidgets('computeIntrinsic', (tester) async {
-      final child = GlobalKey();
-      final listItem = GlobalKey();
+    testWidgets('computeDryLayout with text marker', (tester) async {
+      final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlListItem(
-          key: listItem,
-          marker: widget0,
-          textDirection: TextDirection.ltr,
-          child: SizedBox(key: child, width: 50, height: 5),
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlListItem(
+              key: key,
+              marker: const Text('marker'),
+              textDirection: TextDirection.ltr,
+              child: const SizedBox(width: 50, height: 5),
+            ),
+          ),
         ),
       );
       await tester.pumpAndSettle();
 
-      final childRenderBox =
-          child.currentContext!.findRenderObject() as RenderBox?;
-      final listItemRenderBox =
-          listItem.currentContext!.findRenderObject() as RenderBox?;
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
+      );
+    });
 
-      if (childRenderBox == null) {
-        expect(childRenderBox, isNotNull);
-        return;
-      }
-      if (listItemRenderBox == null) {
-        expect(listItemRenderBox, isNotNull);
-        return;
-      }
+    testWidgets('computeDryLayout with no op marker', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          marker: widget0,
+          textDirection: TextDirection.ltr,
+          child: const SizedBox(width: 50, height: 5),
+        ),
+      );
+      await tester.pumpAndSettle();
 
       expect(
-        listItemRenderBox.getMaxIntrinsicHeight(100),
-        equals(childRenderBox.getMaxIntrinsicHeight(100)),
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
       );
+    });
+
+    testWidgets('computeDryLayout without marker', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+          child: const SizedBox(width: 50, height: 5),
+        ),
+      );
+      await tester.pumpAndSettle();
+
       expect(
-        listItemRenderBox.getMaxIntrinsicWidth(100),
-        equals(childRenderBox.getMaxIntrinsicWidth(100)),
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
       );
+    });
+
+    testWidgets('computeDryLayout without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      await tester.pumpAndSettle();
+
       expect(
-        listItemRenderBox.getMinIntrinsicHeight(100),
-        equals(childRenderBox.getMinIntrinsicHeight(100)),
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
       );
-      expect(
-        listItemRenderBox.getMinIntrinsicWidth(100),
-        equals(childRenderBox.getMinIntrinsicWidth(100)),
+    });
+
+    testWidgets('computeIntrinsic', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+          child: const SizedBox(width: 50, height: 5),
+        ),
       );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(5));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(50));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(5));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(50));
+    });
+
+    testWidgets('computeIntrinsic without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(0));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(0));
     });
 
     testWidgets('performs hit test', (tester) async {
@@ -905,30 +969,6 @@ Future<void> main() async {
             }
           },
           skip: goldenSkip,
-        );
-
-        testGoldens(
-          'computeDryLayout',
-          (tester) async {
-            await tester.pumpWidgetBuilder(
-              const Scaffold(
-                body: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: HtmlWidget(
-                    '<div style="background: black; color: white; '
-                    'width: 200px; height: 200px">'
-                    '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
-                    '<div>',
-                  ),
-                ),
-              ),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(600, 400),
-            );
-
-            await screenMatchesGolden(tester, 'computeDryLayout');
-          },
-          skip: goldenSkip != null,
         );
       },
       config: GoldenToolkitConfiguration(
@@ -1008,8 +1048,8 @@ class _Golden extends StatelessWidget {
 class _NullListMarkerWidgetFactory extends WidgetFactory {
   @override
   Widget? buildListMarker(
-    BuildMetadata meta,
-    TextStyleHtml tsh,
+    BuildTree tree,
+    InheritedProperties resolved,
     String listStyleType,
     int index,
   ) {

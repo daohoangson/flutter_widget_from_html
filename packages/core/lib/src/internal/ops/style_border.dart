@@ -1,12 +1,6 @@
 part of '../core_ops.dart';
 
-const kCssBoxSizing = 'box-sizing';
-const kCssBoxSizingContentBox = 'content-box';
-const kCssBoxSizingBorderBox = 'border-box';
-
 class StyleBorder {
-  static const kPriorityBoxModel7k = 7000;
-
   final WidgetFactory wf;
 
   static final _skipBuilding = Expando<bool>();
@@ -14,77 +8,70 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          if (_skipBuilding[meta] == true) {
-            return;
+        alwaysRenderBlock: false,
+        debugLabel: kCssBorder,
+        onParsed: (tree) {
+          final parent = tree.parent;
+          if (tree.isInline != true) {
+            return tree;
           }
 
-          final border = tryParseBorder(meta);
+          final border = tryParseBorder(tree);
           if (border.isNoOp) {
-            return;
+            return tree;
           }
 
-          _skipBuilding[meta] = true;
-          final copied = tree.copyWith() as BuildTree;
-          final built =
-              wf.buildColumnPlaceholder(meta, copied.build())?.wrapWith(
-                    (context, child) =>
-                        _buildBorder(meta, context, child, border),
-                  );
-          if (built == null) {
-            return;
-          }
-
-          WidgetBit.inline(
-            tree.parent!,
-            built,
-            alignment: PlaceholderAlignment.baseline,
-          ).insertBefore(tree);
-          tree.detach();
+          skip(tree);
+          return parent.sub()
+            ..append(
+              WidgetBit.inline(
+                tree,
+                WidgetPlaceholder(
+                  builder: (context, child) {
+                    final built = _buildBorder(tree, context, child, border);
+                    return built ?? child;
+                  },
+                  debugLabel: '${tree.element.localName}--$kCssBorder',
+                  child: tree.build(),
+                ),
+              ),
+            );
         },
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
+        onRenderBlock: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return placeholder;
           }
 
-          final border = tryParseBorder(meta);
+          final border = tryParseBorder(tree);
           if (border.isNoOp) {
-            return widgets;
+            return placeholder;
           }
 
-          return [
-            WidgetPlaceholder(
-              border,
-              child: wf.buildColumnPlaceholder(meta, widgets),
-            ).wrapWith(
-              (context, child) => _buildBorder(meta, context, child, border),
-            ),
-          ];
+          skip(tree);
+          return WidgetPlaceholder(
+            builder: (ctx, _) => _buildBorder(tree, ctx, placeholder, border),
+            debugLabel: '${tree.element.localName}--$kCssBorder',
+          );
         },
-        onWidgetsIsOptional: true,
-        priority: kPriorityBoxModel7k,
+        priority: BoxModel.border,
       );
 
   Widget? _buildBorder(
-    BuildMetadata meta,
+    BuildTree tree,
     BuildContext context,
     Widget child,
     CssBorder cssBorder,
   ) {
-    final tsh = meta.tsb.build(context);
-    final border = cssBorder.getBorder(tsh);
-    final borderRadius = cssBorder.getBorderRadius(tsh);
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final border = cssBorder.getBorder(resolved);
+    final borderRadius = cssBorder.getBorderRadius(resolved);
     return wf.buildDecoration(
-      meta,
+      tree,
       child,
       border: border,
       borderRadius: borderRadius,
-      isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }
 
-  static void skip(BuildMetadata meta) {
-    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
-    _skipBuilding[meta] = true;
-  }
+  static void skip(BuildTree tree) => _skipBuilding[tree] = true;
 }

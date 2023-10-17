@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.10.6
+  flutter_widget_from_html: ^0.14.2
 ```
 
 ### Platform specific configuration
@@ -60,7 +60,6 @@ HtmlWidget(
     A paragraph with <strong>strong</strong>, <em>emphasized</em>
     and <span style="color: red">colored</span> text.
   </p>
-  <!-- anything goes here -->
   ''',
 
   // all other parameters are optional, a few notable params:
@@ -75,20 +74,21 @@ HtmlWidget(
     return null;
   },
 
-  // render a custom widget
   customWidgetBuilder: (element) {
     if (element.attributes['foo'] == 'bar') {
+      // render a custom block widget that takes the full width
       return FooBarWidget();
+    }
+
+    if (element.attributes['fizz'] == 'buzz') {
+      // render a custom widget inline with surrounding text
+      return InlineCustomWidget(
+        child: FizzBuzzWidget(),
+      )
     }
 
     return null;
   },
-
-  // these callbacks are called when a complicated element is loading
-  // or failed to render allowing the app to render progress indicator
-  // and fallback widget
-  onErrorBuilder: (context, element, error) => Text('$element error: $error'),
-  onLoadingBuilder: (context, element, loadingProgress) => CircularProgressIndicator(),
 
   // this callback will be triggered when user taps a link
   onTapUrl: (url) => print('tapped $url'),
@@ -100,9 +100,6 @@ HtmlWidget(
 
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
-
-  // turn on `webView` if you need IFRAME support (it's disabled by default)
-  webView: true,
 ),
 ```
 
@@ -158,7 +155,6 @@ These tags and their contents will be ignored:
   - border-top-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
-- box-sizing: border-box/content-box
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
@@ -182,13 +178,15 @@ These tags and their contents will be ignored:
   - text-decoration-style: dotted/dashed/double/solid
   - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- white-space: normal/pre
+- white-space: pre/normal/nowrap
 - Sizing: `auto` or values in `em`, `%`, `pt` and `px`
   - width, max-width, min-width
   - height, max-height, min-height
 
 ## Extensibility
 
-See [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core#extensibility) for details.
+The [core](https://pub.dev/packages/flutter_widget_from_html_core) package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize.
+
+See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/v0.14.2/docs/extensibility.md) for detailed information.
 
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

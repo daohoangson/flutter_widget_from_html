@@ -1,59 +1,55 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData, Tooltip;
+    show
+        // we want to limit Material usages to be as generic as possible
+        CircularProgressIndicator,
+        Divider,
+        Tooltip;
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:logging/logging.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
-import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
+import 'internal/text_ops.dart' as text_ops;
+
+final _logger = Logger('fwfh.WidgetFactory');
 
 /// A factory to build widgets.
-class WidgetFactory {
+class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Setting this property to true replaces the default with a static [Text].
   /// This property is most useful for testing purposes.
   ///
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  final _flatteners = <Flattener>[];
+  final _recognizersNeedDisposing = <GestureRecognizer>[];
 
-  late AnchorRegistry _anchorRegistry;
-
-  BuildOp? _styleBgColor;
+  BuildOp? _styleBackground;
   BuildOp? _styleBorder;
-  BuildOp? _styleDisplayInlineBlock;
-  BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
-  TextStyleHtml Function(TextStyleHtml, void)? _tagAColor;
-  BuildOp? _tagBr;
-  BuildOp? _tagFont;
+  BuildOp? _tagDetails;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
+  BuildOp? _tagLi;
   BuildOp? _tagPre;
-  BuildOp? _tagQ;
-  TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
+  TagTable? _tagTable;
   HtmlWidget? _widget;
-
-  /// Gets the current anchor registry.
-  ///
-  /// This is an impl detail and may be changed without a major version bump.
-  @protected
-  AnchorRegistry get anchorRegistry => _anchorRegistry;
 
   /// Builds [Align].
   Widget? buildAlign(
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child,
     AlignmentGeometry alignment, {
     double? heightFactor,
@@ -68,7 +64,7 @@ class WidgetFactory {
 
   /// Builds [AspectRatio].
   Widget? buildAspectRatio(
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child,
     double aspectRatio,
   ) =>
@@ -109,7 +105,7 @@ class WidgetFactory {
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
-    BuildMetadata meta,
+    BuildTree tree,
     Iterable<WidgetPlaceholder> children,
   ) {
     if (children.isEmpty) {
@@ -121,7 +117,7 @@ class WidgetFactory {
 
     return ColumnPlaceholder(
       children: children,
-      meta: meta,
+      tree: tree,
       wf: this,
     );
   }
@@ -130,6 +126,7 @@ class WidgetFactory {
   Widget buildColumnWidget(
     BuildContext context,
     List<Widget> children, {
+    CrossAxisAlignment? crossAxisAlignment,
     TextDirection? dir,
   }) {
     if (children.length == 1) {
@@ -137,7 +134,7 @@ class WidgetFactory {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: dir,
       children: children,
@@ -145,104 +142,123 @@ class WidgetFactory {
   }
 
   /// Builds [Decoration].
-  ///
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-  /// for more information regarding `content-box` (the default)
-  /// and `border-box` (set [isBorderBox] to use).
   Widget? buildDecoration(
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child, {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
-    bool isBorderBox = true,
   }) {
     if (border == null && borderRadius == null && color == null) {
       return child;
     }
 
     final container = child is Container ? child : null;
-    final decoratedBox = child is DecoratedBox ? child : null;
-    final grandChild = container?.child ?? decoratedBox?.child;
-    final prevDeco = container?.decoration ?? decoratedBox?.decoration;
+    final grandChild = container?.child;
+    final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
-    final decoration = baseDeco.copyWith(
-      border: border,
-      borderRadius: borderRadius,
-      color: color,
-    );
+    var decoration = baseDeco.copyWith(border: border, color: color);
 
-    if (!isBorderBox || container != null) {
-      // we are using Container intentionally because it handles border differently
-      // ignore: use_decorated_box
-      return Container(
-        decoration: decoration,
-        child: grandChild ?? child,
-      );
-    } else {
-      return DecoratedBox(
-        decoration: decoration,
-        child: decoratedBox?.child ?? child,
-      );
+    var clipBehavior = Clip.none;
+    if (borderRadius != null) {
+      final borderIsUniform = decoration.border?.isUniform ?? true;
+      if (borderIsUniform) {
+        // TODO: require uniform color & style when our minimum Flutter version >= 3.10
+        // support for non-uniform border has been improved since this commit
+        // https://github.com/flutter/flutter/commit/5054b6e514a7af91db9859b4eb55d71177d19cfa
+        decoration = decoration.copyWith(borderRadius: borderRadius);
+        clipBehavior = Clip.hardEdge;
+      }
     }
+
+    return Container(
+      decoration: decoration,
+      clipBehavior: clipBehavior,
+      child: grandChild ?? child,
+    );
   }
 
-  /// Builds 1-pixel-height divider.
-  Widget? buildDivider(BuildMetadata meta) => const DecoratedBox(
-        decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
-        child: SizedBox(height: 1),
-      );
+  /// Builds [Divider].
+  Widget? buildDivider(BuildTree tree) => const Divider();
 
   /// Builds [GestureDetector].
+  ///
+  /// Only [TapGestureRecognizer] is supported for now.
   Widget? buildGestureDetector(
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child,
-    GestureTapCallback onTap,
-  ) =>
-      MouseRegion(
+    GestureRecognizer recognizer,
+  ) {
+    var built = child;
+
+    if (recognizer is TapGestureRecognizer) {
+      built = MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(onTap: onTap, child: child),
-      );
-
-  /// Builds horizontal scroll view.
-  Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
-      SingleChildScrollView(scrollDirection: Axis.horizontal, child: child);
-
-  /// Builds image widget from an [ImageMetadata].
-  Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
-    final src = data.sources.isNotEmpty ? data.sources.first : null;
-    if (src == null) {
-      return null;
-    }
-
-    var built = buildImageWidget(meta, src);
-
-    final title = data.title;
-    if (built != null && title != null) {
-      built = buildTooltip(meta, built, title);
-    }
-
-    if (built != null &&
-        src.height?.isNegative == false &&
-        src.width?.isNegative == false &&
-        src.height != 0) {
-      built = buildAspectRatio(meta, built, src.width! / src.height!);
-    }
-
-    if (_widget?.onTapImage != null && built != null) {
-      built = buildGestureDetector(
-        meta,
-        built,
-        () => _widget?.onTapImage?.call(data),
+        child: GestureDetector(onTap: recognizer.onTap, child: child),
       );
     }
 
     return built;
   }
 
+  /// Builds [GestureRecognizer].
+  ///
+  /// Only [TapGestureRecognizer.onTap] is supported for now.
+  GestureRecognizer? buildGestureRecognizer(
+    BuildTree tree, {
+    GestureTapCallback? onTap,
+  }) {
+    final recognizer =
+        onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
+    if (recognizer != null) {
+      _recognizersNeedDisposing.add(recognizer);
+    }
+    return recognizer;
+  }
+
+  /// Builds horizontal scroll view.
+  Widget? buildHorizontalScrollView(BuildTree tree, Widget child) =>
+      SingleChildScrollView(scrollDirection: Axis.horizontal, child: child);
+
+  /// Builds image widget from an [ImageMetadata].
+  Widget? buildImage(BuildTree tree, ImageMetadata data) {
+    final src = data.sources.isNotEmpty ? data.sources.first : null;
+    if (src == null) {
+      return null;
+    }
+
+    var built = buildImageWidget(tree, src);
+
+    final title = data.title;
+    if (built != null && title != null) {
+      built = buildTooltip(tree, built, title);
+    }
+
+    if (built != null) {
+      final height = src.height;
+      final width = src.width;
+      if (height != null && height > 0 && width != null && width > 0) {
+        built = buildAspectRatio(tree, built, width / height);
+      }
+    }
+
+    final onTapImage = _widget?.onTapImage;
+    if (onTapImage != null && built != null) {
+      final recognizer = buildGestureRecognizer(
+        tree,
+        onTap: () => onTapImage(data),
+      );
+      if (recognizer != null) {
+        built = buildGestureDetector(tree, built, recognizer);
+      }
+    }
+
+    return built;
+  }
+
   /// Builds [Image].
-  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
 
     ImageProvider? provider;
@@ -263,21 +279,17 @@ class WidgetFactory {
     final semanticLabel = image?.alt ?? image?.title;
     return Image(
       errorBuilder: (context, error, _) =>
-          onErrorBuilder(context, meta, error, src) ?? widget0,
-      loadingBuilder: (context, child, loadingProgress) =>
-          loadingProgress == null
-              ? child
-              : onLoadingBuilder(
-                    context,
-                    meta,
-                    loadingProgress.expectedTotalBytes != null &&
-                            loadingProgress.expectedTotalBytes! > 0
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    src,
-                  ) ??
-                  child,
+          onErrorBuilder(context, tree, error, src) ?? widget0,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+
+        final t = loadingProgress.expectedTotalBytes;
+        final loaded = loadingProgress.cumulativeBytesLoaded;
+        final v = t != null && t > 0 ? loaded / t : null;
+        return onLoadingBuilder(context, tree, v, src) ?? child;
+      },
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -287,38 +299,33 @@ class WidgetFactory {
 
   /// Builds marker widget for a list item.
   Widget? buildListMarker(
-    BuildMetadata meta,
-    TextStyleHtml tsh,
+    BuildTree tree,
+    InheritedProperties resolved,
     String listStyleType,
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final style = tsh.style;
+    final textStyle = resolved.style;
     if (text.isNotEmpty) {
-      return RichText(
-        maxLines: 1,
-        softWrap: false,
-        text: TextSpan(style: style, text: text),
-        textDirection: tsh.textDirection,
-      );
+      return buildText(tree, resolved, TextSpan(style: textStyle, text: text));
     }
 
     switch (listStyleType) {
       case kCssListStyleTypeCircle:
-        return HtmlListMarker.circle(style);
+        return HtmlListMarker.circle(textStyle);
       case kCssListStyleTypeNone:
         return null;
       case kCssListStyleTypeSquare:
-        return HtmlListMarker.square(style);
+        return HtmlListMarker.square(textStyle);
       case kCssListStyleTypeDisc:
       default:
-        return HtmlListMarker.disc(style);
+        return HtmlListMarker.disc(textStyle);
     }
   }
 
   /// Builds [Padding].
   Widget? buildPadding(
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child,
     EdgeInsetsGeometry padding,
   ) =>
@@ -327,17 +334,32 @@ class WidgetFactory {
           : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
-      RichText(
-        maxLines: meta.maxLines > 0 ? meta.maxLines : null,
-        overflow: meta.overflow,
-        selectionRegistrar: tsh.getDependency(),
-        selectionColor:
-            tsh.getDependency<DefaultSelectionStyle>().selectionColor,
-        text: text,
-        textAlign: tsh.textAlign ?? TextAlign.start,
-        textDirection: tsh.textDirection,
-      );
+  Widget? buildText(
+    BuildTree tree,
+    InheritedProperties resolved,
+    InlineSpan text,
+  ) {
+    const selectionColorDefault = DefaultSelectionStyle.defaultColor;
+    final selectionRegistrar = resolved.get<SelectionRegistrar>();
+    final selectionStyle = resolved.get<DefaultSelectionStyle>();
+
+    Widget built = RichText(
+      maxLines: tree.maxLines > 0 ? tree.maxLines : null,
+      overflow: tree.overflow,
+      selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
+      selectionRegistrar: selectionRegistrar,
+      softWrap: resolved.get<CssWhitespace>() != CssWhitespace.nowrap,
+      text: text,
+      textAlign: resolved.get() ?? TextAlign.start,
+      textDirection: resolved.get(),
+    );
+
+    if (selectionRegistrar != null) {
+      built = MouseRegion(cursor: SystemMouseCursors.text, child: built);
+    }
+
+    return built;
+  }
 
   /// Builds [TextSpan].
   InlineSpan? buildTextSpan({
@@ -347,11 +369,11 @@ class WidgetFactory {
     String? text,
   }) {
     if (text?.isEmpty == true) {
-      if (children?.isEmpty == true) {
+      if (children == null) {
         return null;
       }
-      if (children?.length == 1) {
-        return children!.first;
+      if (children.length == 1) {
+        return children.first;
       }
     }
 
@@ -365,109 +387,55 @@ class WidgetFactory {
   }
 
   /// Builds [Tooltip].
-  Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
+  Widget? buildTooltip(BuildTree tree, Widget child, String message) =>
       Tooltip(message: message, child: child);
 
-  /// Called when the [HtmlWidget]'s state is disposed.
-  @mustCallSuper
+  StylesMap? customStylesBuilder(dom.Element element) =>
+      _widget?.customStylesBuilder?.call(element);
+
+  Widget? customWidgetBuilder(dom.Element element) =>
+      _widget?.customWidgetBuilder?.call(element);
+
+  @override
   void dispose() {
+    super.dispose();
     _dispose();
   }
 
   void _dispose() {
-    for (final f in _flatteners) {
-      f.dispose();
+    for (final r in _recognizersNeedDisposing) {
+      r.dispose();
     }
-    _flatteners.clear();
+    _recognizersNeedDisposing.clear();
   }
-
-  /// Flattens a [BuildTree] into widgets.
-  Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
-    final widgets = <WidgetPlaceholder>[];
-    final instance = Flattener(this);
-    _flatteners.add(instance);
-
-    for (final flattened in instance.flatten(tree)) {
-      if (flattened.widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
-        continue;
-      }
-
-      if (flattened.widgetBuilder != null) {
-        widgets.add(
-          WidgetPlaceholder<BuildTree>(tree)
-              .wrapWith((context, _) => flattened.widgetBuilder!(context)),
-        );
-        continue;
-      }
-
-      if (flattened.spanBuilder == null) {
-        continue;
-      }
-      widgets.add(
-        WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
-          final tsh = tree.tsb.build(context);
-          final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null) {
-            return widget0;
-          }
-
-          final textAlign = tsh.textAlign ?? TextAlign.start;
-
-          if (span is WidgetSpan && textAlign == TextAlign.start) {
-            return span.child;
-          }
-
-          return buildText(meta, tsh, span);
-        }),
-      );
-    }
-
-    return widgets;
-  }
-
-  /// Prepares [GestureTapCallback].
-  GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
 
   /// Returns [context]-based dependencies.
   ///
-  /// Includes these by default:
-  ///
-  /// - [MediaQueryData] via [MediaQuery.of]
-  /// - [TextDirection] via [Directionality.of]
-  /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [ThemeData] via [Theme.of]
-  ///
-  /// Use [TextStyleHtml.getDependency] to get value by type.
-  ///
-  /// ```dart
-  /// // in normal widget building:
-  /// final scale = MediaQuery.of(context).textScaleFactor;
-  /// final color = Theme.of(context).accentColor;
-  ///
-  /// // in build ops:
-  /// final scale = tsh.getDependency<MediaQueryData>().textScaleFactor;
-  /// final color = tsh.getDependency<ThemeData>().accentColor;
-  /// ```
-  ///
-  /// It's recommended to use values from [TextStyleHtml] instead of
-  /// obtaining from [BuildContext] for performance reason.
+  /// It's recommended to use [InheritedProperties.get] instead of
+  /// obtaining dependencies from [BuildContext] for performance reason.
   ///
   /// ```dart
   /// // avoid doing this:
-  /// final widgetValue = Directionality.of(context);
+  /// final direction = Directionality.of(context);
   ///
   /// // do this:
-  /// final buildOpValue = tsh.textDirection;
+  /// final direction = resolved.get<TextDirection>();
   /// ```
-  Iterable<dynamic> getDependencies(BuildContext context) => [
-        MediaQuery.of(context),
-        Directionality.of(context),
-        DefaultSelectionStyle.of(context),
-        DefaultTextStyle.of(context).style,
-        SelectionContainer.maybeOf(context),
-        Theme.of(context),
-      ];
+  Iterable<dynamic> getDependencies(BuildContext context) {
+    final selectionRegistrar = SelectionContainer.maybeOf(context);
+    return [
+      CssWhitespace.normal,
+      Directionality.maybeOf(context) ?? TextDirection.ltr,
+      DefaultSelectionStyle.of(context),
+      DefaultTextStyle.of(context).style,
+      if (selectionRegistrar != null) selectionRegistrar,
+
+      // performance critical
+      // avoid adding broad dependencies like MediaQuery.of(context)
+      // because it may invalidate our root properties too often
+      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
+    ];
+  }
 
   /// Returns marker text for the specified list style [type] at index [i].
   String getListMarkerText(String type, int i) {
@@ -564,13 +532,15 @@ class WidgetFactory {
   /// See [OnErrorBuilder].
   Widget? onErrorBuilder(
     BuildContext context,
-    BuildMetadata meta, [
+    BuildTree tree, [
     dynamic error,
     dynamic data,
   ]) {
+    _logger.warning('Could not render data=$data', error);
+
     final callback = _widget?.onErrorBuilder;
     if (callback != null) {
-      final result = callback(context, meta.element, error);
+      final result = callback(context, tree.element, error);
       if (result != null) {
         return result;
       }
@@ -587,13 +557,13 @@ class WidgetFactory {
   /// See [OnLoadingBuilder].
   Widget? onLoadingBuilder(
     BuildContext context,
-    BuildMetadata meta, [
+    BuildTree tree, [
     double? loadingProgress,
     dynamic data,
   ]) {
     final callback = _widget?.onLoadingBuilder;
     if (callback != null) {
-      final result = callback(context, meta.element, loadingProgress);
+      final result = callback(context, tree.element, loadingProgress);
       if (result != null) {
         return result;
       }
@@ -608,15 +578,6 @@ class WidgetFactory {
       ),
     );
   }
-
-  /// Prepares the root [TextStyleBuilder].
-  void onRoot(TextStyleBuilder rootTsb) {}
-
-  /// Ensures anchor is visible.
-  ///
-  /// Returns `true` if anchor has been found and
-  /// [ScrollPosition.ensureVisible] completes successfully.
-  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) => scrollTo(id);
 
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
@@ -633,10 +594,10 @@ class WidgetFactory {
       return true;
     }
 
-    if (url.startsWith('#')) {
-      final id = url.substring(1);
-      final handledViaAnchor =
-          await onTapAnchor(id, _anchorRegistry.ensureVisible);
+    final idPrefix = '${_widget?.baseUrl ?? ''}#';
+    if (url.startsWith(idPrefix)) {
+      final id = url.substring(idPrefix.length);
+      final handledViaAnchor = await onTapAnchorWrapper(id);
       if (handledViaAnchor) {
         return true;
       }
@@ -645,82 +606,100 @@ class WidgetFactory {
     return false;
   }
 
-  /// Parses [meta] for build ops and text styles.
-  void parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+  /// Parses [tree] for build ops and text styles.
+  void parse(BuildTree tree) {
+    final attrs = tree.element.attributes;
+    final localName = tree.element.localName;
 
-    switch (meta.element.localName) {
+    switch (localName) {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
-          final tagA = _tagA ??= TagA(this).buildOp;
-          meta.register(tagA);
-
-          final tagAColor = _tagAColor ??= (tsh, _) => tsh.copyWith(
-                style: tsh.style.copyWith(
-                  color: tsh.getDependency<ThemeData>().colorScheme.primary,
-                ),
-              );
-
-          meta.tsb.enqueue(tagAColor);
+          tree
+            ..inherit<BuildContext?>(TagA.defaultColor)
+            ..register(_tagA ??= TagA(this).buildOp);
         }
 
         final name = attrs[kAttributeAName];
         if (name != null) {
-          meta.register(_anchorOp(name));
+          tree.register(Anchor(this, name).buildOp);
         }
         break;
 
       case 'abbr':
-      case 'acronym':
-        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
-        meta[kCssTextDecorationStyle] = kCssTextDecorationStyleDotted;
+      case kTagAcronym:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagAcronym,
+            defaultStyles: _tagAcronym,
+            priority: Early.tagAcronym,
+          ),
+        );
         break;
 
-      case 'address':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
+      case kTagAddress:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagAddress,
+            defaultStyles: _tagAddress,
+            priority: Early.tagAddress,
+          ),
+        );
         break;
 
       case 'article':
       case 'aside':
-      case 'div':
+      case 'dl':
       case 'figcaption':
       case 'footer':
       case 'header':
       case 'main':
       case 'nav':
       case 'section':
-        meta[kCssDisplay] = kCssDisplayBlock;
+      case kTagDiv:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagDiv,
+            defaultStyles: _cssDisplayBlock,
+            priority: Early.tagDiv,
+          ),
+        );
         break;
 
       case 'blockquote':
-      case 'figure':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 40px';
+      case kTagFigure:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagFigure,
+            defaultStyles: _tagFigure,
+            priority: Early.tagFigure,
+          ),
+        );
         break;
 
       case 'b':
       case 'strong':
-        meta.tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.inherit(text_ops.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        tree.inherit(text_ops.fontSizeTerm, kCssFontSizeLarger);
         break;
       case 'small':
-        meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+        tree.inherit(text_ops.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagBr:
-        meta.register(_tagBr ??= TagBr(this).buildOp);
+        tree.register(tagBr);
         break;
 
       case kTagCenter:
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssTextAlign] = kCssTextAlignWebkitCenter;
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagCenter,
+            defaultStyles: _tagCenter,
+            priority: Early.tagCenter,
+          ),
+        );
         break;
 
       case 'cite':
@@ -728,269 +707,328 @@ class WidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        meta.tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
+        tree.inherit(text_ops.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        meta.tsb.enqueue(
-          TextStyleOps.fontFamily,
+        tree.inherit(
+          text_ops.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
         break;
       case kTagPre:
-        _tagPre ??= BuildOp(
-          onWidgets: (meta, widgets) => listOrNull(
-            buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w)),
-          ),
-        );
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssWhitespace] = kCssWhitespacePre
-          ..tsb.enqueue(
-            TextStyleOps.fontFamily,
-            const [kTagCodeFont1, kTagCodeFont2],
-          )
-          ..register(_tagPre!);
+        tree.register(_tagPre ??= TagPre(this).buildOp);
         break;
 
       case kTagDetails:
-        meta.register(TagDetails(this, meta).op);
+        tree.register(_tagDetails ??= TagDetails(this).buildOp);
         break;
 
-      case 'dd':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0 0 1em 40px';
+      case kTagDd:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagDd,
+            defaultStyles: _tagDd,
+            priority: Early.tagDd,
+          ),
+        );
         break;
-      case 'dl':
-        meta[kCssDisplay] = kCssDisplayBlock;
-        break;
-      case 'dt':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagDt:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagDt,
+            defaultStyles: _tagDt,
+            priority: Early.tagDt,
+          ),
+        );
         break;
 
       case 'del':
       case 's':
-      case 'strike':
-        meta[kCssTextDecorationLine] = kCssTextDecorationLineThrough;
+      case kTagStrike:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagStrike,
+            defaultStyles: _cssTextDecorationLineThrough,
+            priority: Early.tagStrike,
+          ),
+        );
         break;
 
       case kTagFont:
-        _tagFont ??= BuildOp(
-          defaultStyles: (element) {
-            final attrs = element.attributes;
-            final color = attrs[kAttributeFontColor];
-            final fontFace = attrs[kAttributeFontFace];
-            final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];
-            return {
-              if (color != null) kCssColor: color,
-              if (fontFace != null) kCssFontFamily: fontFace,
-              if (fontSize != null) kCssFontSize: fontSize,
-            };
-          },
-        );
-        meta.register(_tagFont!);
+        tree.register(tagFont);
         break;
 
       case 'hr':
-        _tagHr ??=
-            BuildOp(onWidgets: (meta, _) => listOrNull(buildDivider(meta)));
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin + kSuffixBottom] = '1em'
-          ..register(_tagHr!);
+        tree.register(
+          _tagHr ??= BuildOp(
+            debugLabel: localName,
+            defaultStyles: (_) => {
+              kCssDisplay: kCssDisplayBlock,
+              kCssMargin + kSuffixBottom: '1em',
+            },
+            onRenderBlock: (tree, _) => buildDivider(tree) ?? _,
+            priority: Priority.tagHr,
+          ),
+        );
         break;
 
-      case 'h1':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0.67em 0'
-          ..tsb.enqueue(TextStyleOps.fontSizeEm, 2.0)
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH1:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH1,
+            defaultStyles: _tagH1,
+            priority: Early.tagH1,
+          ),
+        );
         break;
-      case 'h2':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0.83em 0'
-          ..tsb.enqueue(TextStyleOps.fontSizeEm, 1.5)
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH2:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH2,
+            defaultStyles: _tagH2,
+            priority: Early.tagH2,
+          ),
+        );
         break;
-      case 'h3':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 0'
-          ..tsb.enqueue(TextStyleOps.fontSizeEm, 1.17)
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH3:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH3,
+            defaultStyles: _tagH3,
+            priority: Early.tagH3,
+          ),
+        );
         break;
-      case 'h4':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1.33em 0'
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH4:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH4,
+            defaultStyles: _tagH4,
+            priority: Early.tagH4,
+          ),
+        );
         break;
-      case 'h5':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1.67em 0'
-          ..tsb.enqueue(TextStyleOps.fontSizeEm, .83)
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH5:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH5,
+            defaultStyles: _tagH5,
+            priority: Early.tagH5,
+          ),
+        );
         break;
-      case 'h6':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '2.33em 0'
-          ..tsb.enqueue(TextStyleOps.fontSizeEm, .67)
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH6:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagH6,
+            defaultStyles: _tagH6,
+            priority: Early.tagH6,
+          ),
+        );
         break;
 
       case kTagImg:
-        _tagImg ??= TagImg(this).buildOp;
-        meta.register(_tagImg!);
-        break;
-
-      case 'ins':
-      case 'u':
-        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
+        tree.register(_tagImg ??= TagImg(this).buildOp);
         break;
 
       case kTagOrderedList:
       case kTagUnorderedList:
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..register(TagLi(this, meta).op);
+        tree.register(_tagLi ??= TagLi(this).buildOp);
         break;
 
-      case 'mark':
-        meta
-          ..[kCssBackgroundColor] = '#ff0'
-          ..[kCssColor] = '#000';
+      case kTagMark:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagMark,
+            defaultStyles: _tagMark,
+            priority: Early.tagMark,
+          ),
+        );
         break;
 
-      case 'p':
-        meta
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 0';
+      case kTagP:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagP,
+            defaultStyles: _tagP,
+            priority: Early.tagP,
+          ),
+        );
         break;
 
       case kTagQ:
-        _tagQ ??= TagQ(this).buildOp;
-        meta.register(_tagQ!);
+        tree.register(tagQ);
         break;
 
       case kTagRuby:
-        meta.register(TagRuby(this, meta).op);
+        tree.register(tagRuby);
         break;
 
-      case 'script':
       case 'style':
-        meta[kCssDisplay] = kCssDisplayNone;
+      case kTagScript:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagScript,
+            defaultStyles: _cssDisplayNone,
+            priority: Early.tagScript,
+          ),
+        );
         break;
 
-      case 'sub':
-        meta
-          ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+      case kTagSub:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagSub,
+            defaultStyles: _tagSub,
+            priority: Early.tagSub,
+          ),
+        );
         break;
-      case 'sup':
-        meta
-          ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+      case kTagSup:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagSup,
+            defaultStyles: _tagSup,
+            priority: Early.tagSup,
+          ),
+        );
         break;
 
       case kTagTable:
-        meta
-          ..[kCssDisplay] = kCssDisplayTable
+        final tagTable = _tagTable ??= TagTable(this);
+        tree
           ..register(
-            TagTable.borderOp(
-              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
-              tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+            const BuildOp.v2(
+              debugLabel: kTagTable,
+              defaultStyles: _cssDisplayTable,
+              priority: Early.tagTableDisplayTable,
             ),
           )
-          ..register(
-            TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
-            ),
-          );
+          ..register(tagTable.borderOp)
+          ..register(tagTable.cellPaddingOp);
         break;
       case kTagTableCell:
-        meta[kCssVerticalAlign] = kCssVerticalAlignMiddle;
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagTableCell,
+            defaultStyles: _cssVerticalAlignMiddle,
+            priority: Early.tagTableCellValignDefault,
+          ),
+        );
         break;
       case kTagTableHeaderCell:
-        meta
-          ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
-          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagTableHeaderCell,
+            defaultStyles: _tagTableHeaderCell,
+            priority: Early.tagTableHeaderCellDefaultStyles,
+          ),
+        );
         break;
       case kTagTableCaption:
-        meta[kCssTextAlign] = kCssTextAlignCenter;
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagTableCaption,
+            defaultStyles: _cssTextAlignCenter,
+            priority: Early.tagTableCaptionTextAlignCenter,
+          ),
+        );
+        break;
+
+      case 'u':
+      case kTagIns:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagIns,
+            defaultStyles: _cssTextDecorationUnderline,
+            priority: Early.tagIns,
+          ),
+        );
         break;
     }
 
     for (final attribute in attrs.entries) {
       switch (attribute.key) {
         case kAttributeAlign:
-          meta[kCssTextAlign] = attribute.value;
+          tree.register(
+            const BuildOp.v2(
+              debugLabel: kAttributeAlign,
+              defaultStyles: _cssTextAlignFromAttribute,
+              priority: Early.attributeAlign,
+            ),
+          );
           break;
         case kAttributeDir:
-          meta[kCssDirection] = attribute.value;
+          tree.register(
+            const BuildOp.v2(
+              debugLabel: kAttributeDir,
+              defaultStyles: _cssDirectionFromAttribute,
+              priority: Early.attributeDir,
+            ),
+          );
           break;
         case kAttributeId:
-          meta.register(_anchorOp(attribute.value));
+          tree.register(Anchor(this, attribute.value).buildOp);
           break;
       }
     }
   }
 
-  /// Parses inline style [key] and [value] pair.
-  void parseStyle(BuildMetadata meta, css.Declaration style) {
+  /// Parses inline style [css.Declaration] one by one.
+  /// This also handles styling from [BuildOp]s and [HtmlWidget.customStylesBuilder].
+  void parseStyle(BuildTree tree, css.Declaration style) {
     final key = style.property;
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
-        _styleBgColor ??= StyleBgColor(this).buildOp;
-        meta.register(_styleBgColor!);
+        tree.register(_styleBackground ??= StyleBackground(this).buildOp);
         break;
 
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
-          meta.tsb.enqueue(TextStyleOps.color, color);
+          tree.inherit(text_ops.color, color);
         }
         break;
 
       case kCssDirection:
-        meta.tsb.enqueue(TextStyleOps.textDirection, style.term);
+        final term = style.term;
+        if (term != null) {
+          tree.inherit(text_ops.textDirection, term);
+        }
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(style.values);
-        meta.tsb.enqueue(TextStyleOps.fontFamily, list);
+        final list = text_ops.fontFamilyTryParse(style.values);
+        tree.inherit(text_ops.fontFamily, list);
         break;
 
       case kCssFontSize:
-        meta.tsb.enqueue(TextStyleOps.fontSize, style.value);
+        final value = style.value;
+        if (value != null) {
+          tree.inherit(text_ops.fontSize, value);
+        }
         break;
 
       case kCssFontStyle:
         final term = style.term;
         final fontStyle =
-            term != null ? TextStyleOps.fontStyleTryParse(term) : null;
+            term != null ? text_ops.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
-          meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
+          tree.inherit(text_ops.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
         final value = style.value;
         final fontWeight =
-            value != null ? TextStyleOps.fontWeightTryParse(value) : null;
+            value != null ? text_ops.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
-          meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
+          tree.inherit(text_ops.fontWeight, fontWeight);
         }
         break;
 
@@ -1000,27 +1038,26 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        StyleSizing.registerSizing(this, meta);
+        StyleSizing.registerSizingOp(this, tree);
         break;
 
       case kCssLineHeight:
-        _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb.enqueue(_tsbLineHeight!, style.value);
+        final value = style.value;
+        if (value != null) {
+          tree.inherit(text_ops.lineHeight, value);
+        }
         break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
         final maxLines = tryParseMaxLines(style.value);
         if (maxLines != null) {
-          meta.maxLines = maxLines;
+          tree.maxLines = maxLines;
         }
         break;
 
       case kCssTextAlign:
-        final term = style.term;
-        if (term != null) {
-          meta.register(StyleTextAlign(this, term).op);
-        }
+        tree.register(styleTextAlign);
         break;
 
       case kCssTextDecoration:
@@ -1029,92 +1066,68 @@ class WidgetFactory {
       case kCssTextDecorationStyle:
       case kCssTextDecorationThickness:
       case kCssTextDecorationWidth:
-        _styleTextDecoration ??= StyleTextDecoration(this).op;
-        meta.register(_styleTextDecoration!);
+        textDecorationApply(tree, style);
         break;
 
       case kCssTextOverflow:
         final textOverflow = tryParseTextOverflow(style.value);
         if (textOverflow != null) {
-          meta.overflow = textOverflow;
+          tree.overflow = textOverflow;
         }
         break;
 
       case kCssVerticalAlign:
-        _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
-        meta.register(_styleVerticalAlign!);
+        tree.register(_styleVerticalAlign ??= StyleVerticalAlign(this).buildOp);
         break;
 
       case kCssWhitespace:
         final term = style.term;
         final whitespace =
-            term != null ? TextStyleOps.whitespaceTryParse(term) : null;
+            term != null ? text_ops.whitespaceTryParse(term) : null;
         if (whitespace != null) {
-          meta.tsb.enqueue(TextStyleOps.whitespace, whitespace);
+          tree.inherit(text_ops.whitespace, whitespace);
         }
         break;
     }
 
     if (key.startsWith(kCssBorder)) {
-      _styleBorder ??= StyleBorder(this).buildOp;
-      meta.register(_styleBorder!);
+      tree.register(_styleBorder ??= StyleBorder(this).buildOp);
     }
 
     if (key.startsWith(kCssMargin)) {
-      _styleMargin ??= StyleMargin(this).buildOp;
-      meta.register(_styleMargin!);
+      tree.register(_styleMargin ??= StyleMargin(this).buildOp);
     }
 
     if (key.startsWith(kCssPadding)) {
-      _stylePadding ??= StylePadding(this).buildOp;
-      meta.register(_stylePadding!);
+      tree.register(_stylePadding ??= StylePadding(this).buildOp);
     }
   }
 
   /// Parses display inline style.
-  void parseStyleDisplay(BuildMetadata meta, String? value) {
-    StyleSizing.registerChild(this, meta);
+  void parseStyleDisplay(BuildTree tree, String? value) {
+    StyleSizing.maybeRegisterChildOp(this, tree);
 
     switch (value) {
       case kCssDisplayBlock:
-        StyleSizing.registerBlock(this, meta);
+        StyleSizing.registerBlockOp(this, tree);
         break;
       case kCssDisplayInlineBlock:
-        final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
-          onTree: (meta, tree) {
-            final built = buildColumnPlaceholder(meta, tree.build());
-            if (built != null) {
-              WidgetBit.inline(
-                tree.parent!,
-                built,
-                alignment: PlaceholderAlignment.baseline,
-              ).insertBefore(tree);
-            }
-            tree.detach();
-          },
-          priority: BuildOp.kPriorityMax,
-        );
-        meta.register(displayInlineBlock);
+        tree.register(displayInlineBlock);
         break;
       case kCssDisplayNone:
-        final displayNone = _styleDisplayNone ??= BuildOp(
-          onTree: (_, tree) => tree.detach(),
-          priority: BuildOp.kPriorityMax,
-        );
-        meta.register(displayNone);
+        tree.register(displayNone);
         break;
       case kCssDisplayTable:
-        meta.register(TagTable(this, meta).op);
+        final tagTable = _tagTable ??= TagTable(this);
+        tree.register(tagTable.tableOp);
         break;
     }
   }
 
-  /// Resets for a new build.
-  @mustCallSuper
+  @override
   void reset(State state) {
+    super.reset(state);
     _dispose();
-
-    _anchorRegistry = AnchorRegistry(state.context);
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1150,50 +1163,143 @@ class WidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  BuildOp _anchorOp(String id) {
-    final anchor = GlobalKey(debugLabel: id);
-
-    return BuildOp(
-      onTree: (meta, tree) {
-        _anchorRegistry.register(id, anchor);
-        tree.registerAnchor(anchor);
-      },
-      onTreeFlattening: (meta, tree) {
-        final widget = WidgetPlaceholder('#$id').wrapWith(
-          (context, _) => SizedBox(
-            height: meta.tsb.build(context).style.fontSize,
-            key: anchor,
-          ),
-        );
-
-        final bit = tree.first;
-        if (bit == null) {
-          // most likely an A[name]
-          tree.add(
-            WidgetBit.inline(
-              tree,
-              widget,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
-        } else {
-          // most likely a SPAN[id]
-          WidgetBit.inline(
-            bit.parent!,
-            widget,
-            alignment: PlaceholderAlignment.baseline,
-          ).insertBefore(bit);
-        }
-      },
-      onWidgets: (meta, widgets) {
-        return listOrNull(
-          buildColumnPlaceholder(meta, widgets)?.wrapWith(
-            (context, child) => SizedBox(key: anchor, child: child),
-          ),
-        );
-      },
-      onWidgetsIsOptional: true,
-      priority: BuildOp.kPriorityMax,
-    );
+  // TODO: switch to use constant function literal when available
+  // https://github.com/dart-lang/language/issues/1048
+  static StylesMap _cssDirectionFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeDir];
+    return value != null ? {kCssDirection: value} : const {};
   }
+
+  static StylesMap _cssDisplayBlock(dom.Element _) =>
+      {kCssDisplay: kCssDisplayBlock};
+
+  static StylesMap _cssDisplayNone(dom.Element _) =>
+      {kCssDisplay: kCssDisplayNone};
+
+  static StylesMap _cssDisplayTable(dom.Element _) =>
+      {kCssDisplay: kCssDisplayTable};
+
+  static StylesMap _cssTextAlignCenter(dom.Element _) =>
+      {kCssTextAlign: kCssTextAlignCenter};
+
+  static StylesMap _cssTextAlignFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeAlign];
+    return value != null ? {kCssTextAlign: value} : const {};
+  }
+
+  static StylesMap _cssTextDecorationLineThrough(dom.Element _) =>
+      {kCssTextDecorationLine: kCssTextDecorationLineThrough};
+
+  static StylesMap _cssTextDecorationUnderline(dom.Element _) =>
+      {kCssTextDecorationLine: kCssTextDecorationUnderline};
+
+  static StylesMap _cssVerticalAlignMiddle(dom.Element _) =>
+      {kCssVerticalAlign: kCssVerticalAlignMiddle};
+
+  static StylesMap _tagAcronym(dom.Element _) => {
+        kCssTextDecorationLine: kCssTextDecorationUnderline,
+        kCssTextDecorationStyle: kCssTextDecorationStyleDotted,
+      };
+
+  static StylesMap _tagAddress(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontStyle: kCssFontStyleItalic,
+      };
+
+  static StylesMap _tagCenter(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssTextAlign: kCssTextAlignWebkitCenter,
+      };
+
+  static StylesMap _tagDd(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '0 0 1em 40px',
+      };
+
+  static StylesMap _tagDt(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+      };
+
+  static StylesMap _tagFigure(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 40px',
+      };
+
+  static StylesMap _tagH1(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '2em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.67em 0',
+      };
+
+  static StylesMap _tagH2(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.5em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.83em 0',
+      };
+
+  static StylesMap _tagH3(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.17em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1em 0',
+      };
+
+  static StylesMap _tagH4(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.33em 0',
+      };
+
+  static StylesMap _tagH5(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.83em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.67em 0',
+      };
+
+  static StylesMap _tagH6(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.67em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '2.33em 0',
+      };
+
+  static StylesMap _tagMark(dom.Element _) => {
+        kCssBackgroundColor: '#ff0',
+        kCssColor: '#000',
+      };
+
+  static StylesMap _tagP(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 0',
+      };
+
+  static StylesMap _tagSub(dom.Element _) => {
+        kCssVerticalAlign: kCssVerticalAlignSub,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
+
+  static StylesMap _tagSup(dom.Element _) => {
+        kCssVerticalAlign: kCssVerticalAlignSuper,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
+
+  static StylesMap _tagTableHeaderCell(dom.Element _) => {
+        kCssFontWeight: kCssFontWeightBold,
+        kCssVerticalAlign: kCssVerticalAlignMiddle,
+      };
+}
+
+/// A factory to build widgets.
+class WidgetFactoryResetter {
+  /// Called when the [HtmlWidget]'s state is disposed.
+  @mustCallSuper
+  void dispose() {}
+
+  /// Resets for a new build.
+  @mustCallSuper
+  void reset(State state) {}
 }

@@ -9,7 +9,7 @@ import '_.dart';
 
 String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='
-    '[Align:alignment=centerLeft,child='
+    '[Align:alignment=centerLeft,widthFactor=1.0,child='
     '$child]]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
@@ -32,8 +32,7 @@ Future<void> main() async {
         explained,
         equals(
           '[HtmlTable:children='
-          '[HtmlTableCaption:child=[CssBlock:child='
-          '[RichText:align=center,(:Caption)]]],'
+          '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
@@ -51,7 +50,7 @@ Future<void> main() async {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerRight,child='));
+      expect(explained, contains('[Align:alignment=centerRight,'));
       expect(explained, contains('[RichText:dir=rtl,(:Foo)]'));
       expect(explained, contains('[RichText:dir=rtl,(:Bar)]'));
     });
@@ -367,27 +366,27 @@ Future<void> main() async {
     testWidgets('renders without align', (WidgetTester tester) async {
       const html = '<table><tr><td>Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerLeft,child='));
+      expect(explained, contains('[Align:alignment=centerLeft,'));
     });
 
     testWidgets('renders align=bottom', (WidgetTester tester) async {
       const html = '<table><tr><td valign="bottom">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, isNot(contains('[Align:alignment=centerLeft,child=')));
-      expect(explained, contains('[Align:alignment=bottomLeft,child='));
+      expect(explained, isNot(contains('[Align:alignment=centerLeft,')));
+      expect(explained, contains('[Align:alignment=bottomLeft,'));
     });
 
     testWidgets('renders align=middle', (WidgetTester tester) async {
       const html = '<table><tr><td valign="middle">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerLeft,child='));
+      expect(explained, contains('[Align:alignment=centerLeft,'));
     });
 
     testWidgets('renders align=top', (WidgetTester tester) async {
       const html = '<table><tr><td valign="top">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, isNot(contains('[Align:alignment=centerLeft,child=')));
-      expect(explained, contains('[Align:alignment=topLeft,child='));
+      expect(explained, isNot(contains('[Align:alignment=centerLeft,')));
+      expect(explained, contains('[Align:alignment=topLeft,'));
     });
   });
 
@@ -550,8 +549,11 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
+  });
 
-    testWidgets('#171: background-color', (WidgetTester tester) async {
+  group('background', () {
+    testWidgets('cell color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/171
       const html = '<table><tr>'
           '<td style="background-color: #f00">Foo</td>'
           '</tr></table>';
@@ -561,11 +563,64 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '[HtmlTableCell:child='
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
           ']]]]]',
+        ),
+      );
+    });
+
+    testWidgets('row color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td>Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('overwrites row color', (WidgetTester tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td style="background-color: #0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child='
+          '[Container:bg=#FFFF0000,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]'
+          ']]]],'
+          '[HtmlTableCell:child='
+          '[Container:bg=#FF00FF00,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Bar)]'
+          ']]]]'
+          ']',
         ),
       );
     });
@@ -589,12 +644,29 @@ Future<void> main() async {
       explained,
       equals(
         '[HtmlTable:children='
-        '[HtmlTableCaption:child=[CssBlock:child='
-        '[RichText:align=center,(:Caption)]]],'
+        '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
         '[HtmlTableCell:child=[RichText:(:Value 2)]]'
+        ']',
+      ),
+    );
+  });
+
+  testWidgets('renders display: table-cell without row', (tester) async {
+    const html = '''
+<div style="display: table">
+  <div style="display: table-cell">Foo</div>
+  <div style="display: table-cell">Bar</div>
+</div>''';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[HtmlTable:children='
+        '[HtmlTableCell:child=[RichText:(:Foo)]],'
+        '[HtmlTableCell:child=[RichText:(:Bar)]]'
         ']',
       ),
     );
@@ -666,29 +738,133 @@ Future<void> main() async {
       });
     });
 
-    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
-      await explain(
-        tester,
-        '<table style="border-collapse: separate">'
-        '<tr><td>Foo</td>'
-        '<td valign="baseline">Bar</td></tr>'
-        '</table>',
-        useExplainer: false,
+    testWidgets('computeDistanceToActualBaseline', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [
+                    HtmlTableCell(
+                      columnStart: 0,
+                      rowStart: 0,
+                      child: Text('Foo'),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Bar'),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
-      final finder = find.byType(ValignBaseline);
-      final before = tester.firstRenderObject(finder);
-      expect(before.toStringShort(), endsWith('(index: 0)'));
+      await tester.pumpAndSettle();
+    });
 
-      await explain(
-        tester,
-        '<table style="border-collapse: separate">'
-        '<tr><td>Foo</td></tr>'
-        '<tr><td valign="baseline">Bar</td></tr>'
-        '</table>',
-        useExplainer: false,
+    testWidgets('computeDistanceToActualBaseline with 2 cells', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [
+                    HtmlTableCell(
+                      columnStart: 0,
+                      rowStart: 0,
+                      child: Text('One'),
+                    ),
+                    HtmlTableCell(
+                      columnStart: 1,
+                      rowStart: 0,
+                      child: Text('Two'),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
-      final after = tester.firstRenderObject(finder);
-      expect(after.toStringShort(), endsWith('(index: 1)'));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDistanceToActualBaseline without cell', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [
+            HtmlTableCell(
+              columnStart: 0,
+              rowStart: 0,
+              child: SizedBox(width: 100, height: 50),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(
+          const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          ),
+        ),
+        equals(const Size(100, 50)),
+      );
+    });
+
+    testWidgets('computeDryLayout without cell', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
+      );
     });
 
     testWidgets('performs hit test', (tester) async {
@@ -807,16 +983,30 @@ Future<void> main() async {
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
-              // TODO: doesn't match browser output
-              'valign_baseline_computeDryLayout': '''
-<div style="width: 100px; height: 100px;">
-  <table border="1">
-    <tr>
-      <td valign="baseline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</td>
-      <td valign="baseline"><div style="margin: 10px">Foo</div></td>
-    </tr>
-  </table>
-</div>''',
+              'row_color': '''
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/1028 -->
+<table style="border-collapse: collapse;">
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Points</th>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Jill</td>
+    <td>Smith</td>
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td>
+    <td>94</td>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Adam</td>
+    <td>Johnson</td>
+    <td>67</td>
+  </tr>
+</table>''',
               'rtl': '''
 <table dir="rtl">
   <tr>
@@ -964,6 +1154,121 @@ Future<void> main() async {
         fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
       ),
     );
+  });
+
+  group('ValignBaseline', () {
+    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
+      await explain(
+        tester,
+        '<table style="border-collapse: separate">'
+        '<tr><td>Foo</td>'
+        '<td valign="baseline">Bar</td></tr>'
+        '</table>',
+        useExplainer: false,
+      );
+      final finder = find.byType(ValignBaseline);
+      final before = tester.firstRenderObject(finder);
+      expect(before.toStringShort(), endsWith('(index: 0)'));
+
+      await explain(
+        tester,
+        '<table style="border-collapse: separate">'
+        '<tr><td>Foo</td></tr>'
+        '<tr><td valign="baseline">Bar</td></tr>'
+        '</table>',
+        useExplainer: false,
+      );
+      final after = tester.firstRenderObject(finder);
+      expect(after.toStringShort(), endsWith('(index: 1)'));
+    });
+
+    testWidgets("renders first text by second's baseline", (tester) async {
+      final foo = GlobalKey();
+      final bar = GlobalKey();
+      const padding = EdgeInsets.all(12);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ValignBaselineContainer(
+              child: Row(
+                children: [
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Foo', key: foo),
+                  ),
+                  ValignBaseline(
+                    index: 0,
+                    child: Padding(
+                      padding: padding,
+                      child: Text('Bar', key: bar),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
+      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      expect(fooTop, equals(padding.top));
+      expect(barTop, equals(fooTop));
+    });
+
+    testWidgets("renders second text by first's baseline", (tester) async {
+      final foo = GlobalKey();
+      final bar = GlobalKey();
+      const padding = EdgeInsets.all(21);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ValignBaselineContainer(
+              child: Row(
+                children: [
+                  ValignBaseline(
+                    index: 0,
+                    child: Padding(
+                      padding: padding,
+                      child: Text('Foo', key: foo),
+                    ),
+                  ),
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Bar', key: bar),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
+      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      expect(fooTop, equals(padding.top));
+      expect(barTop, equals(fooTop));
+    });
+
+    testWidgets('renders without container', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ValignBaseline(
+              index: 0,
+              child: Text('Foo'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Foo'), findsOneWidget);
+    });
   });
 }
 

@@ -10,6 +10,13 @@ set -e
 )
 
 (
+  cd ./packages/fwfh_just_audio &&
+    flutter analyze &&
+    flutter test "$@" &&
+    echo 'packages/fwfh_just_audio OK'
+)
+
+(
   cd ./packages/fwfh_svg &&
     flutter analyze &&
     flutter test "$@" &&
@@ -29,13 +36,6 @@ if [ -z "$UPDATE_GOLDENS" ]; then
       flutter analyze &&
       flutter test "$@" &&
       echo 'packages/fwfh_chewie OK'
-  )
-
-  (
-    cd ./packages/fwfh_just_audio &&
-      flutter analyze &&
-      flutter test "$@" &&
-      echo 'packages/fwfh_just_audio OK'
   )
 
   (

@@ -100,23 +100,14 @@ class HtmlSummary extends StatelessWidget {
           htmlDetails.setIsOpen(!htmlDetails.isOpen);
         }
       },
-      child: child ?? _buildDefault(context),
+      child: child,
     );
   }
+}
 
-  Widget _buildDefault(BuildContext context) {
-    // TODO: i18n
-    const text = 'Details';
-
-    return RichText(
-      text: TextSpan(
-        children: [
-          WidgetSpan(child: HtmlDetailsMarker(style: style)),
-          TextSpan(text: text, style: style),
-        ],
-      ),
-    );
-  }
+extension on BuildContext {
+  _HtmlDetailsInherited? get htmlDetails =>
+      dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>();
 }
 
 class _HtmlDetailsInherited extends InheritedWidget {
@@ -132,9 +123,4 @@ class _HtmlDetailsInherited extends InheritedWidget {
   @override
   bool updateShouldNotify(_HtmlDetailsInherited oldWidget) =>
       isOpen != oldWidget.isOpen;
-}
-
-extension _BuildContext on BuildContext {
-  _HtmlDetailsInherited? get htmlDetails =>
-      dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>();
 }

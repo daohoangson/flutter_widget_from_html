@@ -762,35 +762,18 @@ void main() {
         ),
       );
     });
-  });
 
-  group('box-sizing', () {
-    testWidgets('renders without box-sizing', (tester) async {
-      const html = '<span style="border: solid">Foo</span>';
-      final explained = await explain(tester, html);
+    testWidgets('ignore radius if border is not uniform', (t) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/909
+      const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
+          'border-bottom-right-radius: 0px;">Foo</section>';
+      final explained = await explain(t, html);
       expect(
         explained,
-        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
-      );
-    });
-
-    testWidgets('parses content-box', (tester) async {
-      const html =
-          '<span style="border: solid; box-sizing: content-box">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
-      );
-    });
-
-    testWidgets('parses border-box', (tester) async {
-      const html =
-          '<span style="border: solid; box-sizing: border-box">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[DecoratedBox:border=$_border1,child=[RichText:(:Foo)]]'),
+        equals(
+          '[Container:border=(none,none,1.0@solid#FF3E3E3E,none),child='
+          '[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
       );
     });
   });
@@ -1189,34 +1172,6 @@ void main() {
         ),
       );
     });
-
-    testWidgets('renders border-box with background', (tester) async {
-      const html =
-          '<div style="background: red; border: solid red; box-sizing: border-box">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[DecoratedBox:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
-          '[CssBlock:child='
-          '[RichText:(:Foo)]]]',
-        ),
-      );
-    });
-
-    testWidgets('renders content-box with background', (tester) async {
-      const html =
-          '<div style="background: red; border: solid red; box-sizing: content-box">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
-          '[CssBlock:child='
-          '[RichText:(:Foo)]]]',
-        ),
-      );
-    });
   });
 
   group('error handling', () {
@@ -1238,7 +1193,8 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('#1044: border zero', (WidgetTester tester) async {
+    testWidgets('border zero', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1044
       const html = '<span style="border: 0 solid red">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));

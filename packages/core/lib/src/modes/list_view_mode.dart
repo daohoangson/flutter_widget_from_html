@@ -72,9 +72,7 @@ class ListViewMode extends RenderMode {
     BuildContext context,
     List<Widget> children,
   ) {
-    // ignore: invalid_use_of_protected_member
-    final anchorRegistry = wf.anchorRegistry;
-    anchorRegistry.prepareIndexByAnchor(children);
+    wf.prepareAnchorIndexByAnchor(children);
 
     return ListView.builder(
       addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -83,7 +81,7 @@ class ListViewMode extends RenderMode {
       clipBehavior: clipBehavior,
       controller: controller,
       dragStartBehavior: dragStartBehavior,
-      itemBuilder: (c, i) => anchorRegistry.buildBodyItem(c, i, children[i]),
+      itemBuilder: (c, i) => wf.buildAnchorBodyItem(c, i, children[i]),
       itemCount: children.length,
       keyboardDismissBehavior: keyboardDismissBehavior,
       padding: padding,

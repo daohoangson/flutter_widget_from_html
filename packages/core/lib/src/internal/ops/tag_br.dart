@@ -2,27 +2,30 @@ part of '../core_ops.dart';
 
 const kTagBr = 'br';
 
-class TagBr {
-  final WidgetFactory wf;
+extension TagBr on WidgetFactory {
+  BuildOp get tagBr => const BuildOp.v2(
+        debugLabel: kTagBr,
+        onParsed: _onParsed,
+        priority: Priority.tagBr,
+      );
 
-  TagBr(this.wf);
-
-  BuildOp get buildOp => BuildOp(onTree: (_, tree) => tree.add(TagBrBit(tree)));
+  static BuildTree _onParsed(BuildTree tree) => tree..append(TagBrBit(tree));
 }
 
-class TagBrBit extends BuildBit<void, String> {
-  TagBrBit(BuildTree parent, {TextStyleBuilder? tsb})
-      : super(parent, tsb ?? parent.tsb);
+class TagBrBit extends BuildBit {
+  @override
+  final BuildTree parent;
+
+  const TagBrBit(this.parent);
 
   @override
-  bool get swallowWhitespace => true;
+  bool? get swallowWhitespace => true;
 
   @override
-  String buildBit(void _) => '\n';
+  BuildBit copyWith({BuildTree? parent}) => TagBrBit(parent ?? this.parent);
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      TagBrBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
+  void flatten(Flattened f) => f.write(text: '\n');
 
   @override
   String toString() => '<BR />';

@@ -11,69 +11,35 @@ const kTagImg = 'img';
 class TagImg {
   final WidgetFactory wf;
 
-  static final _placeholders = Expando<WidgetPlaceholder<ImageMetadata>>();
+  static final _builts = Expando<Widget>();
 
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (element) {
-          final attrs = element.attributes;
-          final styles = {
-            kCssHeight: 'auto',
-            kCssMinWidth: '0px',
-            kCssMinHeight: '0px',
-            kCssWidth: 'auto',
-          };
-
-          if (attrs.containsKey(kAttributeImgHeight)) {
-            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
-          }
-          if (attrs.containsKey(kAttributeImgWidth)) {
-            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
-          }
-
-          return styles;
-        },
-        onTree: (meta, tree) {
-          final data = _parse(meta);
-          final built = wf.buildImage(meta, data);
+        alwaysRenderBlock: false,
+        debugLabel: kTagImg,
+        defaultStyles: _defaultStyles,
+        onParsed: (tree) {
+          final data = _parse(tree);
+          final built = wf.buildImage(tree, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
             if (imgText.isNotEmpty) {
               tree.addText(imgText);
             }
-            return;
+            return tree;
           }
 
-          _placeholders[meta] = WidgetPlaceholder(data, child: built);
+          _builts[tree] = built;
+          return tree;
         },
-        onTreeFlattening: (meta, tree) {
-          final placeholder = _placeholders[meta];
-          if (placeholder == null) {
-            return;
-          }
-
-          tree.add(
-            WidgetBit.inline(
-              tree,
-              placeholder,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
-        },
-        onWidgets: (meta, widgets) {
-          final placeholder = _placeholders[meta];
-          if (placeholder == null) {
-            return widgets;
-          }
-
-          return [placeholder];
-        },
-        onWidgetsIsOptional: true,
+        onRenderBlock: _onRenderBlock,
+        onRenderInline: _onRenderInline,
+        priority: Priority.tagImg,
       );
 
-  ImageMetadata _parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+  ImageMetadata _parse(BuildTree tree) {
+    final attrs = tree.element.attributes;
     final url = wf.urlFull(attrs[kAttributeImgSrc] ?? '');
     return ImageMetadata(
       alt: attrs[kAttributeImgAlt],
@@ -88,5 +54,31 @@ class TagImg {
           : const [],
       title: attrs[kAttributeImgTitle],
     );
+  }
+
+  static StylesMap _defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
+    final height = attrs[kAttributeImgHeight];
+    final width = attrs[kAttributeImgWidth];
+    return {
+      kCssHeight: 'auto',
+      kCssMinWidth: '0px',
+      kCssMinHeight: '0px',
+      kCssWidth: 'auto',
+      if (height != null) kCssHeight: '${height}px',
+      if (width != null) kCssWidth: '${width}px',
+    };
+  }
+
+  static Widget _onRenderBlock(BuildTree tree, WidgetPlaceholder _) =>
+      _builts[tree] ?? _;
+
+  static void _onRenderInline(BuildTree tree) {
+    final built = _builts[tree];
+    if (built == null) {
+      return;
+    }
+
+    tree.append(WidgetBit.inline(tree, built));
   }
 }

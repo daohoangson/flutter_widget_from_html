@@ -2,30 +2,40 @@ part of '../core_ops.dart';
 
 final _isBody = Expando<bool>();
 
-class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
+class ColumnPlaceholder extends WidgetPlaceholder {
   final Iterable<WidgetPlaceholder> children;
-  final BuildMetadata meta;
+  final BuildTree tree;
   final WidgetFactory wf;
 
   ColumnPlaceholder({
     required this.children,
-    Key? key,
-    required this.meta,
+    super.key,
+    required this.tree,
     required this.wf,
-  }) : super(meta, key: key);
+  }) : super(debugLabel: '${tree.element.localName}--column');
 
   bool get isBody => _isBody[this] == true;
 
   @override
+  bool get isEmpty => children.isEmpty;
+
+  @override
   Widget build(BuildContext context) {
-    final tsh = meta.tsb.build(context);
-    final widgets = _buildWidgets(context);
-    final built = wf.buildColumnWidget(
-      context,
-      widgets,
-      dir: tsh.textDirection,
-    );
-    return isBody ? wf.buildBodyWidget(context, built) : built;
+    context.skipBuildHeightPlaceholder = true;
+
+    try {
+      final resolved = tree.inheritanceResolvers.resolve(context);
+      final widgets = _buildWidgets(context);
+      final built = wf.buildColumnWidget(
+        context,
+        widgets,
+        crossAxisAlignment: resolved.columnCrossAxisAlignment,
+        dir: resolved.directionOrLtr,
+      );
+      return isBody ? wf.buildBodyWidget(context, built) : built;
+    } finally {
+      context.skipBuildHeightPlaceholder = false;
+    }
   }
 
   @override
@@ -84,9 +94,14 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
       }
     }
 
-    final tsh = meta.tsb.build(context);
+    final resolved = tree.inheritanceResolvers.resolve(context);
     final column = contents.isNotEmpty
-        ? wf.buildColumnWidget(context, contents, dir: tsh.textDirection)
+        ? wf.buildColumnWidget(
+            context,
+            contents,
+            crossAxisAlignment: resolved.columnCrossAxisAlignment,
+            dir: resolved.directionOrLtr,
+          )
         : null;
 
     return [
@@ -106,6 +121,27 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
       }
 
       yield child;
+    }
+  }
+}
+
+extension on InheritedProperties {
+  CrossAxisAlignment get columnCrossAxisAlignment {
+    final isRtl = get<TextDirection>() == TextDirection.rtl;
+    final textAlign = get<TextAlign>() ?? TextAlign.start;
+    switch (textAlign) {
+      case TextAlign.center:
+        return CrossAxisAlignment.center;
+      case TextAlign.end:
+        return CrossAxisAlignment.end;
+      case TextAlign.justify:
+        return CrossAxisAlignment.stretch;
+      case TextAlign.left:
+        return isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+      case TextAlign.right:
+        return isRtl ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+      case TextAlign.start:
+        return CrossAxisAlignment.start;
     }
   }
 }

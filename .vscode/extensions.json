@@ -1,7 +1,9 @@
 {
   "recommendations": [
+    "bierner.markdown-mermaid",
     "dart-code.flutter",
     "darkriszty.markdown-table-prettify",
-    "foxundermoon.shell-format"
+    "foxundermoon.shell-format",
+    "tomoyukim.vscode-mermaid-editor"
   ]
 }

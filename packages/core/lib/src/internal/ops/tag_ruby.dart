@@ -4,98 +4,96 @@ const kTagRuby = 'ruby';
 const kTagRp = 'rp';
 const kTagRt = 'rt';
 
-class TagRuby {
-  late final BuildOp op;
-  final BuildMetadata rubyMeta;
-  final WidgetFactory wf;
+extension TagRuby on WidgetFactory {
+  BuildOp get tagRuby => const BuildOp.v2(
+        debugLabel: kTagRuby,
+        onParsed: _onParsed,
+        onVisitChild: _onVisitChild,
+        priority: Priority.tagRuby,
+      );
 
-  late final BuildOp _rtOp;
+  static StylesMap _cssDisplayNone(dom.Element _) =>
+      {kCssDisplay: kCssDisplayNone};
 
-  TagRuby(this.wf, this.rubyMeta) {
-    op = BuildOp(onChild: onChild, onTree: onTree);
-    _rtOp = BuildOp(
-      onTree: (rtMeta, rtTree) {
-        if (rtTree.isEmpty) {
-          return;
-        }
-        rtTree.isRtBit = true;
-      },
-    );
-  }
-
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.parent != rubyMeta.element) {
-      return;
-    }
-
-    switch (e.localName) {
-      case kTagRp:
-        childMeta[kCssDisplay] = kCssDisplayNone;
-        break;
-      case kTagRt:
-        childMeta
-          ..[kCssFontSize] = '0.5em'
-          ..register(_rtOp);
-        break;
-    }
-  }
-
-  void onTree(BuildMetadata _, BuildTree tree) {
+  static BuildTree _onParsed(BuildTree tree) {
+    final replacement = tree.parent.sub();
     final rubyBits = <BuildBit>[];
-
-    for (final bit in tree.directChildren.toList(growable: false)) {
-      if (!bit.isRtBit || rubyBits.isEmpty) {
+    for (final bit in tree.children) {
+      if (!bit.isRtTree || rubyBits.isEmpty) {
         if (rubyBits.isEmpty && bit is WhitespaceBit) {
           // ruby contents should not start with a whitespace
-          bit.copyWith(parent: tree.parent).insertBefore(tree);
-          bit.detach();
+          replacement.append(bit);
         } else {
           rubyBits.add(bit);
         }
         continue;
       }
 
-      final rtBit = bit;
-      final rtTree = rtBit as BuildTree;
       final rubyTree = tree.sub();
-      final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
-        ..wrapWith((context, __) {
-          final tsh = rubyTree.tsb.build(context);
-
-          final ruby = wf.buildColumnWidget(
-            context,
-            rubyTree.build().toList(growable: false),
-            dir: tsh.getDependency(),
-          );
-          final rt = wf.buildColumnWidget(
-            context,
-            rtTree.build().toList(growable: false),
-            dir: tsh.getDependency(),
-          );
-
-          return HtmlRuby(ruby, rt);
-        });
-
-      WidgetBit.inline(
-        tree.parent!,
-        placeholder,
-        alignment: PlaceholderAlignment.baseline,
-      ).insertBefore(tree);
-
       for (final rubyBit in rubyBits) {
-        rubyTree.add(rubyBit.copyWith(parent: rubyTree));
-        rubyBit.detach();
+        rubyTree.append(rubyBit);
       }
       rubyBits.clear();
-      rtBit.detach();
+
+      final rtTree = bit as BuildTree;
+
+      replacement.append(
+        WidgetBit.inline(
+          replacement,
+          WidgetPlaceholder(
+            builder: (_, __) => HtmlRuby(
+              rt: rtTree.build(),
+              ruby: rubyTree.build(),
+            ),
+            debugLabel: kTagRuby,
+          ),
+        ),
+      );
+    }
+
+    for (final rubyBit in rubyBits) {
+      // preserve orphan bits if any
+      replacement.append(rubyBit);
+    }
+
+    return replacement;
+  }
+
+  static void _onVisitChild(BuildTree tree, BuildTree subTree) {
+    final e = subTree.element;
+    if (e.parent != tree.element) {
+      return;
+    }
+
+    switch (e.localName) {
+      case kTagRp:
+        subTree.register(
+          const BuildOp.v2(
+            debugLabel: kTagRp,
+            defaultStyles: _cssDisplayNone,
+            priority: Early.tagRp,
+          ),
+        );
+        break;
+      case kTagRt:
+        subTree.inherit(text_ops.fontSizeEm, .5);
+        break;
     }
   }
 }
 
-extension _RtBit on BuildBit {
-  static final _rtBits = Expando<bool>();
+extension on BuildBit {
+  bool get isRtTree {
+    final thiz = this;
 
-  bool get isRtBit => _rtBits[this] == true;
-  set isRtBit(bool v) => _rtBits[this] = v;
+    if (thiz is! BuildTree) {
+      return false;
+    }
+
+    if (thiz.isEmpty) {
+      return false;
+    }
+
+    return thiz.element.localName == kTagRt;
+  }
 }
