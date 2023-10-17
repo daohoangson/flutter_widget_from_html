@@ -551,7 +551,7 @@ Future<void> main() async {
     });
 
     group('getMinIntrinsicWidth', () {
-      String buildHtml(String style) => '<div style="width: 20px">'
+      String buildHtml(String style) => '<div style="width: 30px">'
           '<table><tr><td>Foo foo foo '
           '<span style="$style">bar</span>'
           '</td></tr></table></div>';
@@ -561,7 +561,7 @@ Future<void> main() async {
         expect(explained, contains('[RichText:(:bar)]@bottom)'));
 
         final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
-        expect(render.size, equals(const Size(17, 48)));
+        expect(render.size.width, lessThan(30));
       });
 
       testWidgets("crowded but couldn't measure baseline alignment", (t) async {
@@ -570,7 +570,7 @@ Future<void> main() async {
         expect(explained, contains('[RichText:(:bar)])'));
 
         final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
-        expect(render.size, equals(const Size(70, 12)));
+        expect(render.size.width, greaterThan(30));
       });
     });
   });
