@@ -206,7 +206,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[RichText:(:$imgRendered@middle'
+            '[RichText:(:$imgRendered'
             '[Align:alignment=topCenter,widthFactor=1.0,child='
             '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
             ']@bottom)]',

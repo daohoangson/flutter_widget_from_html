@@ -86,10 +86,10 @@ void main() {
         equals(
           '[RichText:(:'
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0)]]@middle'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: )'
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0)]]@middle'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           ')]',
         ),
       );
@@ -130,7 +130,7 @@ void main() {
           '[RichText:(:'
           'Before text. '
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0)]]@middle'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: After text.)'
           ')]',
         ),

@@ -200,7 +200,7 @@ void main() {
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
           '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
-          ']]]@middle)]',
+          ']]])]',
         ),
       );
     });
@@ -215,7 +215,7 @@ void main() {
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
           '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
-          ']]]@middle)]',
+          ']]])]',
         ),
       );
     });
@@ -230,7 +230,7 @@ void main() {
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
           '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
-          ']]]@middle'
+          ']]]'
           '(#FF123456+u+onTap: foo)'
           ')]',
         ),
@@ -247,7 +247,7 @@ void main() {
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
           '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
-          ']]]@middle'
+          ']]]'
           '(: foo))]',
         ),
       );
