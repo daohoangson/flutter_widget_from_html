@@ -5,6 +5,8 @@ const kAttributeDetailsOpen = 'open';
 const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
+// use middle alignment as an early optimization
+// baseline alignment may cause issue with getDrySize, getMinIntrinsicWidth, etc.
 const _markerMarkerAlignment = PlaceholderAlignment.middle;
 
 class TagDetails {
