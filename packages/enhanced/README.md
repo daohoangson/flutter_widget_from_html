@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.14.1-0
+  flutter_widget_from_html: ^0.14.2
 ```
 
 ### Platform specific configuration
@@ -187,6 +187,6 @@ These tags and their contents will be ignored:
 
 The [core](https://pub.dev/packages/flutter_widget_from_html_core) package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize.
 
-See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
+See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/v0.14.2/docs/extensibility.md) for detailed information.
 
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

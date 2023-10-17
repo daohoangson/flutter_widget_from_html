@@ -1,84 +1,24 @@
-## 0.14.1-alpha.1
+## 0.14.2
 
+- Add support for `display: table-cell` without row (#905)
+- Add supporf for `BuildTree.getNonInherited` and `.setNonInherited` (#948)
 - Add support for `InlineCustomWidget` via `customWidgetBuilder` to render simple widget inline (#1056)
 - Add support for `BuildOp.inline` to render complicated widget inline (#1056)
-- BREAKING: Append `defaultStyles` instead of prepend (#1055)
-- BREAKING: Change default alignment of inline widget from `bottom` to `baseline` (#1056)
-
-## 0.14.0-alpha.1
-
-- Refactor build tree properties (#948)
-
-## 0.13.1-alpha.2
-
-- Improve legacy support (#1051)
-
-## 0.13.1-alpha.1
-
-- Remove `BuildTree.apply` (#1027)
-- Restore optional second param for `HtmlStyleBuilder.enqueue` (#1027)
-
-## 0.13.0-alpha.5
-
-- Expose core legacy in enhanced package (#1027)
-- Fix border 0 is still being rendered (#1045)
-
-## 0.13.0-alpha.2
-
-- Fix inline `white-space: nowrap`. (#944)
-- Remove package `fwfh_text_style` (#935)
-- Remove guess dry sizes logic from `HtmlTable` (#972)
-
-## 0.13.0-alpha.1
-
-- Implement `BuildOp.v1` constructor (#930)
-
-## 0.12.0-alpha.2
-
-- Add support for BuildOp.onRenderedBlock (#923)
-
-## 0.12.0-alpha.1
-
-Breaking changes since #917:
-
-- Remove operator `BuildTree.[]=`
-- Replace operator `BuildTree.[String]` with `.getStyle`
-- Remove `BuildTree.replaceWith`
-- Renamed `BuildOp.onBuilt` -> `.onRenderBlock`, now disallows returning `null`
-- Renamed `BuildOp.onFlattening` -> `.onRenderInline`
-- Renamed `BuildOp.onTree` -> `.onParsed`, now allows returning a different build tree
-
-## 0.11.0-alpha.2
-
-- Wrap `RichText` in `MouseRegion` with text cursor (#902)
+- Fix incorrect cursor inside a `SelectionArea` (#902)
 - Fix border radius does not clip contents (#903)
 - Fix anchor doesn't work with `baseUrl` specified (#904)
-- Add support for `display: table-cell` without row (#905)
 - Fix padding is ignored on empty P tag (#906)
-- Ignore `border-radius` if border is not uniform (#910)
-- Refactor: safer typing (#911)
-- Improve observability with better logging (#912)
-- Skip rendering `CssBlock` for text align (#915)
-
-Breaking changes:
-
-- Remove support for `box-sizing` (#903)
-- Remove `WidgetPlaceholder.autoUnwrap` (#906)
-- `.getDependency<MediaQueryData>()` no longer works (#911)
-
-## 0.11.0-alpha.1
-
-- Replace `RebuildTriggers` with `listEquals`
-- Refactor `WidgetPlaceholder` to be simpler (#619)
-- Refactor `Flattener` to be simpler (#627)
-- Refactor `BuildMetadata` into `BuildTree` (#649)
-
-Major breaking changes if you have custom rendering:
-
-- BuildOp: renamed onTreeFlattening, onWidgets
-- Added: HtmlStyle, HtmlStyleBuilder
-- Removed: BuildMetadata, RebuildTriggers
-- Changed: BuildBit, WidgetPlaceholder
+- Fix `border-radius` error if border is not uniform (#910)
+- Fix inline `white-space: nowrap` (#944)
+- MIGRATE: Replace `WidgetPlaceholder.generator` with `.debugLabel` (#619)
+- MIGRATE: Replace `WidgetFactory.gestureTapCallback` with `.buildGestureRecognizer` (#732)
+- MIGRATE: Replace `RebuildTriggers` with `List`
+- MIGRATE: Replace `BuildBit.detach`, `.insertAfter` and `.insertBefore` with returning a new tree in `BuildOp.onParsed` (#732)
+- BREAKING: Remove support for `box-sizing` (#903)
+- BREAKING: Remove `WidgetPlaceholder.autoUnwrap` (#906)
+- BREAKING: `.getDependency<MediaQueryData>()` no longer works (#911)
+- BREAKING: Append `defaultStyles` instead of prepend (#1055)
+- BREAKING: Change default alignment of inline widget from `bottom` to `baseline` (#1056)
 
 ## 0.10.6
 

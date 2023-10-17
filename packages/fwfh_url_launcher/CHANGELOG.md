@@ -1,18 +1,6 @@
-## 0.14.0-alpha.1
+## 0.9.0+4
 
 - Add support for flutter_widget_from_html_core@0.14.0 (#948)
-
-## 0.13.0-alpha.1
-
-- Add support for flutter_widget_from_html_core@0.13.0 (#930)
-
-## 0.12.0-alpha.1
-
-- Add support for flutter_widget_from_html_core@0.12.0 (#922)
-
-## 0.11.0-alpha.1
-
-- Add support for flutter_widget_from_html_core@0.11.0 (#899)
 
 ## 0.9.0+3
 
