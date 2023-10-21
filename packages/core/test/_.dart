@@ -561,6 +561,19 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is LayoutBuilder) {
+      return _widget(
+        widget.builder(
+          context,
+          BoxConstraints.loose(
+            // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+            // ignore: deprecated_member_use
+            TestWidgetsFlutterBinding.instance.window.physicalSize,
+          ),
+        ),
+      );
+    }
+
     if (widget is HtmlDetails) {
       return '[HtmlDetails:open=${widget.open},child=${_widget(widget.child)}]';
     }

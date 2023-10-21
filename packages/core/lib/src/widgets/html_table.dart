@@ -23,6 +23,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: `0.0`.
   final double borderSpacing;
 
+  /// If non-null, overwrites the incoming [BoxConstraints.maxWidth].
+  final double? maxWidth;
+
   /// Determines the order to lay children out horizontally.
   ///
   /// Default: [TextDirection.ltr].
@@ -40,6 +43,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
     required super.children,
+    this.maxWidth,
     this.textDirection = TextDirection.ltr,
     super.key,
   });
@@ -47,9 +51,10 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   @override
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
         border,
-        borderSpacing,
         textDirection,
         borderCollapse: borderCollapse,
+        borderSpacing: borderSpacing,
+        maxWidth: maxWidth,
       );
 
   @override
@@ -81,6 +86,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       ..setBorder(border)
       ..setBorderCollapse(borderCollapse)
       ..setBorderSpacing(borderSpacing)
+      ..setMaxWidth(maxWidth)
       ..setTextDirection(textDirection);
   }
 }
@@ -342,11 +348,12 @@ class _TableRenderLayouter {
     // calculate the available width if possible
     // this may be null if table is inside a horizontal scroll view
     double? availableWidth;
-    if (constraints.hasBoundedWidth) {
+    final maxWidth = tro._maxWidth ?? constraints.maxWidth;
+    if (maxWidth.isFinite && maxWidth > 0) {
       final columnGapsSum = (columnCount + 1) * tro.columnGap;
       final gapsAndPaddings =
           tro.paddingLeft + columnGapsSum + tro.paddingRight;
-      availableWidth = constraints.maxWidth - gapsAndPaddings;
+      availableWidth = maxWidth - gapsAndPaddings;
     }
 
     return _TableDataStep1(
@@ -354,6 +361,7 @@ class _TableRenderLayouter {
       cells: cells,
       children: children,
       columnCount: columnCount,
+      maxWidth: maxWidth,
       rowCount: rowCount,
     );
   }
@@ -363,7 +371,7 @@ class _TableRenderLayouter {
     final cellWidths = cells.map((cell) {
       // use width from cell attribute if it is some sensible value
       // otherwise, ignore and measure via layouter for real
-      final cellWidth = cell.width?.clamp(0, constraints.maxWidth);
+      final cellWidth = cell.width?.clamp(0, step1.maxWidth);
       return cellWidth?.isFinite == true ? cellWidth : null;
     }).toList(growable: false);
 
@@ -508,7 +516,6 @@ class _TableRenderLayouter {
       // get min width to avoid breaking line in the middle of a word
       return child.getMinIntrinsicWidth(double.infinity);
     } catch (error, stackTrace) {
-      // TODO: render horizontal scroll view
       const message = "Could not measure child's min intrinsic width";
       _logger.warning(message, error, stackTrace);
       return double.nan;
@@ -681,6 +688,7 @@ class _TableDataStep1 {
   final List<_TableCellData> cells;
   final List<RenderBox> children;
   final int columnCount;
+  final double maxWidth;
   final int rowCount;
 
   const _TableDataStep1({
@@ -688,6 +696,7 @@ class _TableDataStep1 {
     required this.cells,
     required this.children,
     required this.columnCount,
+    required this.maxWidth,
     required this.rowCount,
   });
 }
@@ -740,10 +749,13 @@ class _TableRenderObject extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
   _TableRenderObject(
     this._border,
-    this._borderSpacing,
     this._textDirection, {
+    required double borderSpacing,
     required bool borderCollapse,
-  }) : _borderCollapse = borderCollapse;
+    required double? maxWidth,
+  })  : _borderCollapse = borderCollapse,
+        _borderSpacing = borderSpacing,
+        _maxWidth = maxWidth;
 
   Border? _border;
   void setBorder(Border? v) {
@@ -771,6 +783,14 @@ class _TableRenderObject extends RenderBox
   }
 
   var _layout = _TableRenderLayout.zero;
+
+  double? _maxWidth;
+  void setMaxWidth(double? v) {
+    if (v != _maxWidth) {
+      _maxWidth = v;
+      markNeedsLayout();
+    }
+  }
 
   TextDirection _textDirection;
   void setTextDirection(TextDirection v) {
