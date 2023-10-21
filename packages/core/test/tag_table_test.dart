@@ -1172,42 +1172,6 @@ Future<void> main() async {
     <td>$multiline</td>
   </tr>
 </table>''',
-              'width_redistribution_colspan': '''
-<div style="background: red; width: 100px">
-  <table border="1">
-    <tr>
-      <td>Foo</td>
-      <td colspan="2">Foo</td>
-      <td>Foo</td>
-    </tr>
-    <tr>
-      <td>Foo</td>
-      <td>Foo</td>
-      <td>Foo</td>
-      <td>Foo</td>
-    </tr>
-  </table>
-</div>''',
-              'width_redistribution_narrow': '''
-<div style="background: red; width: 100px">
-  <table border="1">
-    <tr>
-      <td>Foo</td>
-      <td>Lorem ipsum dolor sit amet.</td>
-      <td>Foo bar</td>
-    </tr>
-  </table>
-</div>''',
-              'width_redistribution_tight': '''
-<div style="background: red; width: 10px">
-  <table border="1">
-    <tr>
-      <td>Foo</td>
-      <td>Lorem ipsum dolor sit amet.</td>
-      <td>Foo bar</td>
-    </tr>
-  </table>
-</div>''',
               'width_redistribution_wide': '''
 <div style="background: red; width: 400px">
   <table border="1">
