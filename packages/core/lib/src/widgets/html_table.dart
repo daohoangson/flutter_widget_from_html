@@ -71,6 +71,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
+    properties.add(DoubleProperty('maxWidth', maxWidth));
     properties.add(
       DiagnosticsProperty(
         'textDirection',
