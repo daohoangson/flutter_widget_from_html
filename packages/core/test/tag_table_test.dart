@@ -150,28 +150,28 @@ Future<void> main() async {
     testWidgets('renders border=0', (WidgetTester tester) async {
       const html =
           '<table border="0"><tbody><tr><td>Foo</td></tr></tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      await explain(tester, html);
+      final table = tester.table;
+      expect(table.border, isNull);
+      expect(tester.table.borderSpacing, equals(2.0));
     });
 
     testWidgets('renders border=1', (WidgetTester tester) async {
       const html =
           '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
-      );
+      await explain(tester, html);
+      final table = tester.table;
+      expect(table.border, isNotNull);
+      expect(tester.table.borderSpacing, equals(2.0));
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
       const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
-      );
+      await explain(tester, html);
+      final table = tester.table;
+      expect(table.border, isNotNull);
+      expect(tester.table.borderSpacing, equals(2.0));
     });
   });
 
@@ -238,6 +238,7 @@ Future<void> main() async {
           '</tbody></table>';
       await explain(tester, html);
       final table = tester.table;
+      expect(table.border, isNull);
       expect(table.borderCollapse, isTrue);
       expect(table.borderSpacing, equals(2.0));
     });
