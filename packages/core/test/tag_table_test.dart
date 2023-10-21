@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:logging/logging.dart';
 
 import '_.dart';
 
@@ -16,6 +17,18 @@ String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 Future<void> main() async {
   await loadAppFonts();
+
+  Logger.root.level = Level.FINE;
+  Logger.root.onRecord.listen((LogRecord record) {
+    final prefix = '${record.time.toIso8601String().substring(11)} '
+        '${record.loggerName}@${record.level.name} ';
+    debugPrint('$prefix${record.message}');
+
+    final error = record.error;
+    if (error != null) {
+      debugPrint('$prefix$error');
+    }
+  });
 
   group('basic usage', () {
     const html = '<table>'

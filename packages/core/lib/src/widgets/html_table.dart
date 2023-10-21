@@ -235,15 +235,21 @@ extension on List<double> {
     double calculatedWidth,
   ) {
     final columnWidth = calculatedWidth.isNaN
-        ? .0
+        ? double.nan
         : ((calculatedWidth - tro._calculateColumnGaps(data)) /
             data.columnSpan);
     for (var c = 0; c < data.columnSpan; c++) {
       final column = data.columnStart + c;
 
-      // make sure each column has enough width for the child
-      // oversimplified: the colspan splits its columns evenly
-      this[column] = max(this[column], columnWidth);
+      if (columnWidth.isNaN) {
+        if (this[column].isZero) {
+          this[column] = columnWidth;
+        }
+      } else {
+        // make sure each column has enough width for the child
+        // oversimplified: the colspan splits its columns evenly
+        this[column] = max(this[column], columnWidth);
+      }
     }
   }
 
@@ -406,7 +412,7 @@ class _TableRenderLayouter {
     while (shouldLoop) {
       shouldLoop = false;
 
-      if (columnWidths.zeros.isEmpty && availableWidth != null) {
+      if (availableWidth != null) {
         columnWidths = redistributeValues(
           available: availableWidth,
           maxValues: maxColumnWidths,
@@ -431,7 +437,6 @@ class _TableRenderLayouter {
           final layoutSize = layouter(child, const BoxConstraints());
           cellSizes[i] = layoutSize;
           childWidth = layoutSize.width;
-          columnWidths.setMaxColumnWidths(tro, data, childWidth);
           maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
           _logger.fine('Got child#$i size without contraints: $layoutSize');
         }
@@ -636,7 +641,7 @@ class _TableRenderLayouter {
     final fair = available / minValues.length;
     final result = minValues
         // minimum may be zero if there were an error during measurement
-        .map((minValue) => minValue.isZero ? fair : minValue)
+        .map((minValue) => minValue.isNaN ? fair : minValue)
         .toList(growable: false);
     final remaining = max(.0, available - result.sum);
     if (remaining.isZero) {
