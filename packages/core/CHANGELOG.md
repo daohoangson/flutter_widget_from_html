@@ -1,3 +1,7 @@
+## 0.14.4
+
+- Improve table support for wide columns (#1073)
+
 ## 0.14.3
 
 - Write migration docs from v0.10 to v0.14 (#1065)
