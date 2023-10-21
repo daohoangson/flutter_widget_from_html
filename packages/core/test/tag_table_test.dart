@@ -1303,6 +1303,26 @@ Future<void> main() async {
     );
   });
 
+  group('HtmlTableCell', () {
+    group('debugTypicalAncestorWidgetClass', () {
+      testWidgets('throws error if parent is not HtmlTable', (tester) async {
+        await tester.pumpWidget(
+          const HtmlTableCell(columnStart: 0, rowStart: 0, child: widget0),
+        );
+        expect(
+          tester.takeException(),
+          isAssertionError.having(
+            (_) => _.message,
+            'message',
+            contains(
+              'Typically, HtmlTableCell widgets are placed directly inside HtmlTable widgets.',
+            ),
+          ),
+        );
+      });
+    });
+  });
+
   group('ValignBaseline', () {
     testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
       await explain(
