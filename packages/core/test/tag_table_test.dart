@@ -1271,6 +1271,31 @@ Future<void> main() async {
                 skip: goldenSkip != null,
               );
             }
+
+            testGoldens(
+              'horizontal_scroll_view',
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  const _Golden('''
+<table border="1">
+  <tr>
+    <td>Foofoofoofoofoofoofoofoofoofoo</td>
+    <td>Bar</td>
+  </tr>
+</table>
+'''),
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(100, 100),
+                );
+
+                await screenMatchesGolden(tester, 'horizontal_scroll_view/foo');
+
+                final bar = findText('Bar').evaluate().single;
+                await Scrollable.ensureVisible(bar);
+                await screenMatchesGolden(tester, 'horizontal_scroll_view/bar');
+              },
+              skip: goldenSkip != null,
+            );
           },
           skip: goldenSkip,
         );
