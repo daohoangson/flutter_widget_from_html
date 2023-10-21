@@ -647,10 +647,14 @@ class _TableRenderLayouter {
     required List<double> minValues,
   }) {
     final fair = available / minValues.length;
-    final result = minValues
+    final result = minValues.asMap().entries.map(
+      (entry) {
+        final i = entry.key;
+        final minValue = entry.value;
         // minimum may be NaN if there were an error during measurement
-        .map((minValue) => minValue.isNaN ? fair : minValue)
-        .toList(growable: false);
+        return minValue.isNaN ? min(fair, maxValues[i]) : minValue;
+      },
+    ).toList(growable: false);
     final remaining = max(.0, available - result.sum);
     if (remaining.isZero) {
       // nothing left to redistribute
