@@ -1144,12 +1144,16 @@ Future<void> main() async {
   </tr>
 </table>
 ''',
+              // TODO: doesn't match browser output
+              // `LayoutBuilder` prevents baseline alignment from working properly since #1073
               'table_in_list': '''
 <ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>
   </li>
 </ul>''',
+              // TODO: doesn't match browser output
+              // `LayoutBuilder` prevents baseline alignment from working properly since #1073
               'table_with_2_cells_in_list': '''
 <ul>
   <li>
