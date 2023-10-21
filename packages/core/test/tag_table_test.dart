@@ -212,45 +212,45 @@ Future<void> main() async {
   group('cellspacing', () {
     testWidgets('renders without cellspacing', (WidgetTester tester) async {
       const html = '<table><tbody><tr><td>Foo</td></tr></tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      await explain(tester, html);
+      expect(tester.table.borderSpacing, equals(2.0));
     });
 
     testWidgets('renders cellspacing=1', (WidgetTester tester) async {
       const html = '<table cellspacing="1"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 1.0)'));
+      await explain(tester, html);
+      expect(tester.table.borderSpacing, equals(1.0));
     });
 
     testWidgets('renders border-spacing', (WidgetTester tester) async {
       const html = '<table style="border-spacing: 1px"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 1.0)'));
+      await explain(tester, html);
+      expect(tester.table.borderSpacing, equals(1.0));
     });
 
     testWidgets('renders border-collapse without border', (tester) async {
       const html = '<table style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(borderCollapse: true, borderSpacing: 2.0)'));
+      await explain(tester, html);
+      final table = tester.table;
+      expect(table.borderCollapse, isTrue);
+      expect(table.borderSpacing, equals(2.0));
     });
 
     testWidgets('renders border-collapse with border=1', (tester) async {
       const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        contains(
-          'HtmlTable(border: all(BorderSide), borderCollapse: true, borderSpacing: 2.0)',
-        ),
-      );
+      await explain(tester, html);
+      final table = tester.table;
+      expect(table.border, isNotNull);
+      expect(table.borderCollapse, isTrue);
+      expect(table.borderSpacing, equals(2.0));
     });
   });
 
@@ -697,49 +697,39 @@ Future<void> main() async {
 
   group('HtmlTable', () {
     group('_TableRenderObject setters', () {
-      testWidgets('updates border', (WidgetTester t) async {
-        await explain(t, '<table border="1"><tr><td>Foo</td></tr></table>');
-        final element = find.byType(HtmlTable).evaluate().single;
-        final before = element.widget as HtmlTable;
+      testWidgets('updates border', (WidgetTester tester) async {
+        await explain(tester, '<table border="1"><tr><td>1</td></tr></table>');
+        final before = tester.table;
         expect(before.border!.bottom.width, equals(1.0));
 
-        await explain(t, '<table border="2"><tr><td>Foo</td></tr></table>');
-        final after = element.widget as HtmlTable;
+        await explain(tester, '<table border="2"><tr><td>2</td></tr></table>');
+        final after = tester.table;
         expect(after.border!.bottom.width, equals(2.0));
       });
 
       testWidgets('updates borderCollapse', (WidgetTester tester) async {
         await explain(
           tester,
-          '<table style="border-collapse: separate"><tr><td>Foo</td></tr></table>',
+          '<table style="border-collapse: separate"><tr><td>1</td></tr></table>',
         );
-        final element = find.byType(HtmlTable).evaluate().single;
-        final before = element.widget as HtmlTable;
+        final before = tester.table;
         expect(before.borderCollapse, isFalse);
 
         await explain(
           tester,
-          '<table style="border-collapse: collapse"><tr><td>Foo</td></tr></table>',
+          '<table style="border-collapse: collapse"><tr><td>2</td></tr></table>',
         );
-        final after = element.widget as HtmlTable;
+        final after = tester.table;
         expect(after.borderCollapse, isTrue);
       });
 
-      testWidgets('updates borderSpacing', (WidgetTester tester) async {
-        await explain(
-          tester,
-          '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
-        );
-        final element = find.byType(HtmlTable).evaluate().single;
-        final before = element.widget as HtmlTable;
+      testWidgets('updates borderSpacing', (WidgetTester t) async {
+        await explain(t, '<table cellspacing="10"><tr><td>1</td></tr></table>');
+        final before = t.table;
         expect(before.borderSpacing, equals(10.0));
 
-        await explain(
-          tester,
-          '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
-          useExplainer: false,
-        );
-        final after = element.widget as HtmlTable;
+        await explain(t, '<table cellspacing="20"><tr><td>2</td></tr></table>');
+        final after = t.table;
         expect(after.borderSpacing, equals(20.0));
       });
 
@@ -748,26 +738,24 @@ Future<void> main() async {
           tester,
           '<div style="max-width: 100px"><table><tr><td>Foo</td></tr></table></div>',
         );
-        final element = find.byType(HtmlTable).evaluate().single;
-        final before = element.widget as HtmlTable;
+        final before = tester.table;
         expect(before.maxWidth, equals(100.0));
 
         await explain(
           tester,
           '<div style="max-width: 200px"><table><tr><td>Foo</td></tr></table></div>',
         );
-        final after = element.widget as HtmlTable;
+        final after = tester.table;
         expect(after.maxWidth, equals(200.0));
       });
 
       testWidgets('updates textDirection', (WidgetTester tester) async {
         await explain(tester, '<table><tr><td>Foo</td></tr></table>');
-        final element = find.byType(HtmlTable).evaluate().single;
-        final before = element.widget as HtmlTable;
+        final before = tester.table;
         expect(before.textDirection, equals(TextDirection.ltr));
 
         await explain(tester, '<table dir="rtl"><tr><td>Foo</td></tr></table>');
-        final after = element.widget as HtmlTable;
+        final after = tester.table;
         expect(after.textDirection, equals(TextDirection.rtl));
       });
     });
@@ -1399,6 +1387,10 @@ Future<void> main() async {
       expect(find.text('Foo'), findsOneWidget);
     });
   });
+}
+
+extension on WidgetTester {
+  HtmlTable get table => widget(find.byType(HtmlTable));
 }
 
 class _Golden extends StatelessWidget {
