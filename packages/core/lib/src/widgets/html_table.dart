@@ -394,10 +394,11 @@ class _TableRenderLayouter {
 
     final childMinWidths = List<double?>.filled(children.length, null);
     final cellSizes = List<Size?>.filled(children.length, null);
-    var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
-    final maxColumnWidths = [...columnWidths];
+    final maxColumnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
+    // prioritize naive value, then layouter value as column width
+    var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
