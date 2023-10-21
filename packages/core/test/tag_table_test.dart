@@ -56,6 +56,35 @@ Future<void> main() async {
     });
   });
 
+  group('horizontal scroll view', () {
+    final hw = HtmlWidget(
+      '<table><tr><td>Foo</td></tr></table>',
+      key: hwKey,
+    );
+
+    testWidgets('renders in constrainted width', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: hw,
+        useExplainer: false,
+      );
+      expect(explained, contains('SingleChildScrollView'));
+    });
+
+    testWidgets('skips in unconstrainted width', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: SingleChildScrollView(scrollDirection: Axis.horizontal, child: hw),
+        useExplainer: false,
+      );
+      // because the entire `HtmlWidget` is already inside a scroll view
+      // `HtmlTable` should not be put inside another one
+      expect(explained, isNot(contains('SingleChildScrollView')));
+    });
+  });
+
   group('rtl', () {
     const html = '<table dir="rtl">'
         '<tbody><tr><td>Foo</td><td>Bar</td></tr></tbody>'

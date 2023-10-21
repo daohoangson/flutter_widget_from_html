@@ -88,7 +88,7 @@ class TagTable {
         final maxWidth = bc.maxWidth;
 
         final resolved = tableTree.inheritanceResolvers.resolve(context);
-        final built = ValignBaselineContainer(
+        Widget built = ValignBaselineContainer(
           child: HtmlTable(
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
@@ -96,13 +96,19 @@ class TagTable {
             maxWidth: maxWidth,
             textDirection: resolved.directionOrLtr,
             children: List.from(
-              data.builders.map((f) => f(context)).where((e) => e != null),
+              data.builders
+                  .map((builder) => builder(context))
+                  .where(_htmlTableCellIsNotNull),
               growable: false,
             ),
           ),
         );
 
-        return wf.buildHorizontalScrollView(tableTree, built) ?? built;
+        if (maxWidth.isFinite) {
+          built = wf.buildHorizontalScrollView(tableTree, built) ?? built;
+        }
+
+        return built;
       },
     );
 
@@ -248,6 +254,8 @@ class TagTable {
 
     return null;
   }
+
+  static bool _htmlTableCellIsNotNull(HtmlTableCell? cell) => cell != null;
 
   static void _onBorderChild(BuildTree tableTree, BuildTree subTree) {
     if (tableTree.element.attributeBorder > 0) {
