@@ -972,7 +972,7 @@ Future<void> main() async {
               HtmlTableCell(
                 columnStart: 0,
                 rowStart: 0,
-                child: Text('Foo foo', key: left),
+                child: Text('Foo foo foo foo', key: left),
               ),
               const HtmlTableCell(
                 columnStart: 1,
@@ -1000,7 +1000,7 @@ Future<void> main() async {
                       WidgetSpan(
                         alignment: PlaceholderAlignment.baseline,
                         baseline: TextBaseline.alphabetic,
-                        child: Text('Foo foo'),
+                        child: Text('Foo foo foo foo'),
                       ),
                     ],
                   ),

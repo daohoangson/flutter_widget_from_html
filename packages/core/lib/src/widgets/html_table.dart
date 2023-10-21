@@ -646,13 +646,16 @@ class _TableRenderLayouter {
     required List<double> maxValues,
     required List<double> minValues,
   }) {
-    final fair = available / minValues.length;
+    final fairValue = available / minValues.length;
     final result = minValues.asMap().entries.map(
       (entry) {
         final i = entry.key;
         final minValue = entry.value;
+        final maxValue = maxValues[i];
         // minimum may be NaN if there were an error during measurement
-        return minValue.isNaN ? min(fair, maxValues[i]) : minValue;
+        final minOrFair = minValue.isNaN ? fairValue : minValue;
+        // cap to max value if it is non-zero
+        return maxValue.isZero ? minOrFair : min(minOrFair, maxValue);
       },
     ).toList(growable: false);
     final remaining = max(.0, available - result.sum);
