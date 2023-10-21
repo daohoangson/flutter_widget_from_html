@@ -641,7 +641,7 @@ class _TableRenderLayouter {
   }) {
     final fair = available / minValues.length;
     final result = minValues
-        // minimum may be zero if there were an error during measurement
+        // minimum may be NaN if there were an error during measurement
         .map((minValue) => minValue.isNaN ? fair : minValue)
         .toList(growable: false);
     final remaining = max(.0, available - result.sum);
