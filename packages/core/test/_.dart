@@ -799,6 +799,10 @@ class HitTestApp extends StatelessWidget {
 
 extension RenderBoxGetter on GlobalKey {
   RenderBox get renderBox => currentContext!.findRenderObject()! as RenderBox;
+
+  Size get size => renderBox.size;
+
+  double get width => size.width;
 }
 
 class _TextFinder extends MatchFinder {

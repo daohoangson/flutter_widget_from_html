@@ -549,30 +549,6 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
-
-    group('getMinIntrinsicWidth', () {
-      String buildHtml(String style) => '<div style="width: 30px">'
-          '<table><tr><td>Foo foo foo '
-          '<span style="$style">bar</span>'
-          '</td></tr></table></div>';
-
-      testWidgets('measure when crowded', (t) async {
-        final explained = await explain(t, buildHtml('vertical-align: bottom'));
-        expect(explained, contains('[RichText:(:bar)]@bottom)'));
-
-        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
-        expect(render.size.width, lessThan(30));
-      });
-
-      testWidgets("crowded but couldn't measure baseline alignment", (t) async {
-        // https://github.com/daohoangson/flutter_widget_from_html/issues/1066
-        final explained = await explain(t, buildHtml('display: inline-block'));
-        expect(explained, contains('[RichText:(:bar)])'));
-
-        final render = t.firstRenderObject<RenderBox>(find.byType(RichText));
-        expect(render.size.width, greaterThan(30));
-      });
-    });
   });
 
   group('background', () {
@@ -907,16 +883,118 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
-    testWidgets('handles dry layout / intrinsic errors', (tester) async {
-      final explained = await explain(
-        tester,
-        '<table>'
-        '<tr><td>Hello <ruby>foo<rt>bar</rt></ruby></td></tr>'
-        '</table>',
-        useExplainer: false,
-      );
-      expect(explained, contains('RichText(text: "foo")'));
-      expect(explained, contains('RichText(text: "bar")'));
+    group('getMinIntrinsicWidth', () {
+      final left = GlobalKey(debugLabel: 'left');
+      final right = GlobalKey(debugLabel: 'right');
+      final table = GlobalKey(debugLabel: 'table');
+
+      Future<void> pumpColumn(WidgetTester tester, List<Widget> children) {
+        // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+        // ignore: deprecated_member_use
+        tester.binding.window.physicalSizeTestValue = const Size(100, 200);
+        // ignore: deprecated_member_use
+        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+        // ignore: deprecated_member_use
+        tester.binding.window.devicePixelRatioTestValue = 1.0;
+        // ignore: deprecated_member_use
+        addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+
+        return tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            ),
+          ),
+        );
+      }
+
+      testWidgets("uses cell's natural width by default", (tester) async {
+        final natural = GlobalKey(debugLabel: 'natural');
+
+        await pumpColumn(tester, [
+          Text('Foo foo', key: natural),
+          HtmlTable(
+            key: table,
+            children: [
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text('Foo foo', key: left),
+              ),
+              HtmlTableCell(
+                columnStart: 1,
+                rowStart: 0,
+                child: Text('Foo foo', key: right),
+              ),
+            ],
+          ),
+        ]);
+
+        expect(left.width, equals(natural.width));
+        expect(right.width, equals(natural.width));
+        expect(left.width + right.width, lessThanOrEqualTo(table.width));
+      });
+
+      testWidgets("uses cell's min width if too crowded", (tester) async {
+        final min = GlobalKey(debugLabel: 'min');
+
+        await pumpColumn(tester, [
+          Text('Foo', key: min),
+          HtmlTable(
+            key: table,
+            children: [
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text('Foo foo', key: left),
+              ),
+              const HtmlTableCell(
+                columnStart: 1,
+                rowStart: 0,
+                child: Text('super' 'wide' 'without' 'space'),
+              ),
+            ],
+          ),
+        ]);
+
+        expect(left.width, equals(min.width));
+      });
+
+      testWidgets("uses fair width if crowded but couldn't measure", (t) async {
+        await pumpColumn(t, [
+          HtmlTable(
+            key: table,
+            children: [
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text.rich(
+                  const TextSpan(
+                    children: [
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: Text('Foo foo'),
+                      ),
+                    ],
+                  ),
+                  key: left,
+                ),
+              ),
+              const HtmlTableCell(
+                columnStart: 1,
+                rowStart: 0,
+                child: Text('super' 'wide' 'without' 'space'),
+              ),
+            ],
+          ),
+        ]);
+
+        expect(left.width, equals(table.width / 2));
+      });
     });
 
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
