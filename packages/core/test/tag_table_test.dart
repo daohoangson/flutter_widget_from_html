@@ -44,13 +44,13 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[HtmlTable:children='
+          '[SingleChildScrollView:child=[HtmlTable:children='
           '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
           '${_richtext('Value 2')}'
-          ']',
+          ']]',
         ),
       );
     });
@@ -77,8 +77,8 @@ Future<void> main() async {
       explained,
       equals(
         '[Column:children='
-        '[HtmlTable:children=${_richtext('Foo')}],'
-        '[HtmlTable:children=${_richtext('Bar')}]'
+        '[SingleChildScrollView:child=[HtmlTable:children=${_richtext('Foo')}]],'
+        '[SingleChildScrollView:child=[HtmlTable:children=${_richtext('Bar')}]]'
         ']',
       ),
     );
@@ -95,14 +95,14 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlTable:children='
+        '[SingleChildScrollView:child=[HtmlTable:children='
         '${_padding('[RichText:(+b:Header 1)]')},'
         '${_padding('[RichText:(+b:Header 2)]')},'
         '${_richtext('Value 1')},'
         '${_richtext('Value 2')},'
         '${_richtext('Footer 1')},'
         '${_richtext('Footer 2')}'
-        ']',
+        ']]',
       ),
     );
   });
@@ -520,7 +520,12 @@ Future<void> main() async {
       const html = '<table><tr style="display: none"><td>Foo</td></tr>'
           '<tr><td>Bar</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children=${_richtext('Bar')}]]',
+        ),
+      );
     });
 
     testWidgets('empty TD (#494)', (WidgetTester tester) async {
@@ -536,7 +541,12 @@ Future<void> main() async {
       const html = '<table><tr><td style="display: none">Foo</td>'
           '<td>Bar</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children=${_richtext('Bar')}]]',
+        ),
+      );
     });
 
     testWidgets('empty CAPTION', (WidgetTester tester) async {
@@ -574,13 +584,13 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[HtmlTable:children='
+          '[SingleChildScrollView:child=[HtmlTable:children='
           '[HtmlTableCell:child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
           '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
-          ']]]]]',
+          ']]]]]]',
         ),
       );
     });
@@ -594,7 +604,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[HtmlTable:children='
+          '[SingleChildScrollView:child=[HtmlTable:children='
           '[HtmlTableCell:child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
@@ -607,7 +617,7 @@ Future<void> main() async {
           '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Bar)]'
           ']]]]'
-          ']',
+          ']]',
         ),
       );
     });
@@ -620,7 +630,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[HtmlTable:children='
+          '[SingleChildScrollView:child=[HtmlTable:children='
           '[HtmlTableCell:child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
@@ -633,7 +643,7 @@ Future<void> main() async {
           '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Bar)]'
           ']]]]'
-          ']',
+          ']]',
         ),
       );
     });
@@ -656,13 +666,13 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlTable:children='
+        '[SingleChildScrollView:child=[HtmlTable:children='
         '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
         '[HtmlTableCell:child=[RichText:(:Value 2)]]'
-        ']',
+        ']]',
       ),
     );
   });
@@ -677,10 +687,10 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlTable:children='
+        '[SingleChildScrollView:child=[HtmlTable:children='
         '[HtmlTableCell:child=[RichText:(:Foo)]],'
         '[HtmlTableCell:child=[RichText:(:Bar)]]'
-        ']',
+        ']]',
       ),
     );
   });
