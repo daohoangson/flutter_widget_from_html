@@ -33,6 +33,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   // https://github.com/flutter/flutter/commit/6a5405925dffb5b4121e1fba898d3d2068dac77c
 
   /// Creates a TABLE widget.
+  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
   // ignore: prefer_const_constructors_in_immutables
   HtmlTable({
     this.border,
@@ -233,8 +234,10 @@ extension on List<double> {
     _TableCellData data,
     double calculatedWidth,
   ) {
-    final columnWidth =
-        (calculatedWidth - tro._calculateColumnGaps(data)) / data.columnSpan;
+    final columnWidth = calculatedWidth.isNaN
+        ? .0
+        : ((calculatedWidth - tro._calculateColumnGaps(data)) /
+            data.columnSpan);
     for (var c = 0; c < data.columnSpan; c++) {
       final column = data.columnStart + c;
 
@@ -497,13 +500,12 @@ class _TableRenderLayouter {
     try {
       // table is too crowded
       // get min width to avoid breaking line in the middle of a word
-      final w = child.getMinIntrinsicWidth(double.infinity);
-      return w;
+      return child.getMinIntrinsicWidth(double.infinity);
     } catch (error, stackTrace) {
       // TODO: render horizontal scroll view
       const message = "Could not measure child's min intrinsic width";
       _logger.warning(message, error, stackTrace);
-      return null;
+      return double.nan;
     }
   }
 
@@ -631,7 +633,11 @@ class _TableRenderLayouter {
     required List<double> maxValues,
     required List<double> minValues,
   }) {
-    final result = [...minValues];
+    final fair = available / minValues.length;
+    final result = minValues
+        // minimum may be zero if there were an error during measurement
+        .map((minValue) => minValue.isZero ? fair : minValue)
+        .toList(growable: false);
     final remaining = max(.0, available - result.sum);
     if (remaining.isZero) {
       // nothing left to redistribute
