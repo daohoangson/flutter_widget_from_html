@@ -6,29 +6,11 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:logging/logging.dart';
 
-import '_.dart';
-
-String _padding(String child) => '[HtmlTableCell:child='
-    '[Padding:(1,1,1,1),child='
-    '[Align:alignment=centerLeft,widthFactor=1.0,child='
-    '$child]]]';
-
-String _richtext(String text) => _padding('[RichText:(:$text)]');
+import '_.dart' as helper;
 
 Future<void> main() async {
+  _loggerSetup();
   await loadAppFonts();
-
-  Logger.root.level = Level.FINE;
-  Logger.root.onRecord.listen((LogRecord record) {
-    final prefix = '${record.time.toIso8601String().substring(11)} '
-        '${record.loggerName}@${record.level.name} ';
-    debugPrint('$prefix${record.message}');
-
-    final error = record.error;
-    if (error != null) {
-      debugPrint('$prefix$error');
-    }
-  });
 
   group('basic usage', () {
     const html = '<table>'
@@ -59,7 +41,7 @@ Future<void> main() async {
   group('horizontal scroll view', () {
     final hw = HtmlWidget(
       '<table><tr><td>Foo</td></tr></table>',
-      key: hwKey,
+      key: helper.hwKey,
     );
 
     testWidgets('renders in constrainted width', (WidgetTester tester) async {
@@ -924,12 +906,12 @@ Future<void> main() async {
       final urls = <String>[];
 
       await tester.pumpWidget(
-        HitTestApp(
+        helper.HitTestApp(
           html: '<table><tr><td><a href="$href">Tap me</a></td></tr></table>',
           list: urls,
         ),
       );
-      expect(await tapText(tester, 'Tap me'), equals(1));
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       await tester.pumpAndSettle();
       expect(urls, equals(const [href]));
@@ -1046,6 +1028,40 @@ Future<void> main() async {
         ]);
 
         expect(left.width, equals(table.width / 2));
+      });
+
+      testWidgets("skips narrow cell in the same column", (tester) async {
+        _loggerMessages.clear();
+        final first = GlobalKey(debugLabel: 'first');
+        final second = GlobalKey(debugLabel: 'second');
+
+        await pumpColumn(tester, [
+          HtmlTable(
+            key: table,
+            children: [
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text('Foofoofoofoo', key: first),
+              ),
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 1,
+                child: Text('Foo', key: second),
+              ),
+            ],
+          ),
+        ]);
+
+        expect(
+          _loggerMessages,
+          contains(matches(RegExp('^Got child#0 min width:'))),
+        );
+        expect(
+          _loggerMessages,
+          isNot(contains(matches(RegExp('^Got child#1 min width:')))),
+        );
+        expect(second.width, equals(first.width));
       });
     });
 
@@ -1287,7 +1303,7 @@ Future<void> main() async {
 
                 await screenMatchesGolden(tester, 'horizontal_scroll_view/foo');
 
-                final bar = findText('Bar').evaluate().single;
+                final bar = helper.findText('Bar').evaluate().single;
                 await Scrollable.ensureVisible(bar);
                 await screenMatchesGolden(tester, 'horizontal_scroll_view/bar');
               },
@@ -1298,7 +1314,7 @@ Future<void> main() async {
         );
       },
       config: GoldenToolkitConfiguration(
-        fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
+        fileNameFactory: (n) => '${helper.kGoldenFilePrefix}/table/$n.png',
       ),
     );
   });
@@ -1438,6 +1454,46 @@ Future<void> main() async {
     });
   });
 }
+
+Future<String> explain(
+  WidgetTester tester,
+  String? html, {
+  Widget? hw,
+  bool useExplainer = true,
+}) {
+  _loggerMessages.clear();
+  return helper.explain(tester, html, hw: hw, useExplainer: useExplainer);
+}
+
+String _padding(String child) => '[HtmlTableCell:child='
+    '[Padding:(1,1,1,1),child='
+    '[Align:alignment=centerLeft,widthFactor=1.0,child='
+    '$child]]]';
+
+final _loggerIsGitHubAction = Platform.environment['GITHUB_ACTIONS'] == 'true';
+final _loggerMessages = [];
+
+void _loggerSetup() {
+  Logger.root.level = Level.FINE;
+  Logger.root.onRecord.listen((LogRecord record) {
+    _loggerMessages.add(record.message);
+    if (_loggerIsGitHubAction) {
+      // skip printing if we are in GitHub Actions, it's too noisy
+      return;
+    }
+
+    final prefix = '${record.time.toIso8601String().substring(11)} '
+        '${record.loggerName}@${record.level.name} ';
+    debugPrint('$prefix${record.message}');
+
+    final error = record.error;
+    if (error != null) {
+      debugPrint('$prefix$error');
+    }
+  });
+}
+
+String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 extension on WidgetTester {
   HtmlTable get table => widget(find.byType(HtmlTable));

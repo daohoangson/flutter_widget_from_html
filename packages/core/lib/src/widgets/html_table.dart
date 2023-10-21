@@ -449,6 +449,7 @@ class _TableRenderLayouter {
           childWidth = layoutSize.width;
           maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
           _logger.fine('Got child#$i size without contraints: $layoutSize');
+          shouldLoop = true;
         }
 
         final childMinWidth = step3GetMinIntrinsicWidth(
@@ -462,18 +463,19 @@ class _TableRenderLayouter {
           childMinWidths[i] = childMinWidth;
           minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
           _logger.info('Got child#$i min width: $childMinWidth');
-
-          // the loop should run at least one more time with new min-width
           shouldLoop = true;
+        }
+
+        if (shouldLoop) {
+          // break the inner `for` and continue with the outer `while`
+          break;
         }
       }
 
       loopCount++;
-      if (loopCount > step1.columnCount) {
-        // using column count to stop early, not a typo
-        // we don't want to waste too much time in this loop
-        // in case the table is extra long with many many rows
-        _logger.info('Finished measuring children x$loopCount');
+      if (shouldLoop && loopCount > children.length) {
+        // stop early to avoid dead loop
+        _logger.info('Stopped measuring children after $loopCount loops');
         break;
       }
     }
@@ -498,7 +500,7 @@ class _TableRenderLayouter {
     final widthSum = columnWidths.sumRange(data);
     final maxWidthSum = maxColumnWidths.sumRange(data);
     if (widthSum >= maxWidthSum) {
-      // cell has more than requested width
+      // cell has been allocated more than its requested value
       // skip measuring if not absolutely needed because it's expensive
 
       if (availableWidth == null) {
