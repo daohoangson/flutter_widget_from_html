@@ -1081,9 +1081,9 @@ Future<void> main() async {
         final _ = _loggerMessages;
         expect(_, contains(contains('Got child#0 min width:')));
         expect(_, contains(contains('Got child#1 min width:')));
-        expect(_, contains(contains('Got child#2 max width:')));
+        expect(_, contains(contains('Got child#2 size without contraints:')));
         expect(_, isNot(contains(contains('Got child#2 min width:'))));
-        expect(_, contains(contains('Got child#3 max width:')));
+        expect(_, contains(contains('Got child#3 size without contraints:')));
         expect(_, isNot(contains(contains('Got child#3 min width:'))));
       });
     });

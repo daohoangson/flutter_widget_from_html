@@ -400,13 +400,13 @@ class _TableRenderLayouter {
     final cells = step1.cells;
     final children = step1.children;
 
-    final childMaxWidths = List<double?>.filled(children.length, null);
+    final cellSizes = List<Size?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
     final maxColumnWidths =
         step2.naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
-    // the current algorithm prioritizes naive value, then max value as column width
+    // the current algorithm prioritizes naive value, then layouter value as column width
     // it only considers min value when the columns don't fit
     var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
@@ -426,23 +426,17 @@ class _TableRenderLayouter {
         final child = children[i];
         final data = cells[i];
 
-        if (step2.cellWidths[i] == null && childMaxWidths[i] == null) {
-          var childMaxWidth = double.nan;
-          try {
-            // no config -> measure max width as the initial value
-            childMaxWidth = child.getMaxIntrinsicWidth(double.infinity);
-            _logger.finer('Got child#$i max width: $childMaxWidth');
-          } catch (error, stackTrace) {
-            final message = "Could not measure child#$i max intrinsic width";
-            _logger.warning(message, error, stackTrace);
-          }
-          childMaxWidths[i] = childMaxWidth;
-          maxColumnWidths.setMaxColumnWidths(tro, data, childMaxWidth);
-          if (!childMaxWidth.isNaN) {
-            shouldLoop = true;
-            // break the inner `for` and continue with the outer `while`
-            break;
-          }
+        if (step2.cellWidths[i] == null && cellSizes[i] == null) {
+          // side effect
+          // no pre-configured width to use
+          // have to layout cells without constraints for the initial width
+          final layoutSize = layouter(child, const BoxConstraints());
+          cellSizes[i] = layoutSize;
+          maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
+          _logger.fine('Got child#$i size without contraints: $layoutSize');
+          shouldLoop = true;
+          // break the inner `for` and continue with the outer `while`
+          break;
         }
 
         if (childMinWidths[i] == null) {
