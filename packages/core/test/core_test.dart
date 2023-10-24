@@ -269,27 +269,6 @@ Future<void> main() async {
     );
   });
 
-  testWidgets('renders HR tag', (WidgetTester tester) async {
-    const html = '<hr/>';
-    final explained = await explainMargin(tester, html);
-    expect(
-      explained,
-      equals(
-        '[SizedBox:0.0x5.0],'
-        '[Container:border=(1.0@solid#FF001234,none,none,none),child=[CssBlock:child=[Container]]],'
-        '[SizedBox:0.0x5.0]',
-      ),
-    );
-
-    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-    final block = tester.getSize(find.byType(CssBlock));
-    // ignore: deprecated_member_use
-    final deviceWidth = tester.binding.window.physicalSize.width /
-        // ignore: deprecated_member_use
-        tester.binding.window.devicePixelRatio;
-    expect(block.width, equals(deviceWidth));
-  });
-
   group('block elements', () {
     const blockOutput = '[Column:children='
         '[CssBlock:child=[RichText:(:First.)]],'
@@ -583,6 +562,42 @@ Future<void> main() async {
           '[SizedBox:0.0x15.6],'
           '[CssBlock:child=[RichText:(@6.7+b:X)]],'
           '[SizedBox:0.0x15.6]',
+        ),
+      );
+    });
+  });
+
+  group('HR', () {
+    testWidgets('renders a horizontal line', (WidgetTester tester) async {
+      final explained = await explainMargin(tester, '<hr/>');
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(1.0@solid#FF001234,none,none,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
+        ),
+      );
+
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      final block = tester.getSize(find.byType(CssBlock));
+      // ignore: deprecated_member_use
+      final deviceWidth = tester.binding.window.physicalSize.width /
+          // ignore: deprecated_member_use
+          tester.binding.window.devicePixelRatio;
+      expect(block.width, equals(deviceWidth));
+    });
+
+    testWidgets('renders custom color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const html = '<hr style="border:none;border-bottom:1px solid #e34a3a">';
+      final explained = await explainMargin(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(none,none,1.0@solid#FFE34A3A,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
         ),
       );
     });
