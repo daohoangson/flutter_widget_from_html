@@ -59,6 +59,7 @@ const kTagH3 = 'h3';
 const kTagH4 = 'h4';
 const kTagH5 = 'h5';
 const kTagH6 = 'h6';
+const kTagHr = 'hr';
 const kTagIns = 'ins';
 const kTagKbd = 'kbd';
 const kTagMark = 'mark';

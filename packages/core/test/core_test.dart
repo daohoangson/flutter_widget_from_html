@@ -272,7 +272,22 @@ Future<void> main() async {
   testWidgets('renders HR tag', (WidgetTester tester) async {
     const html = '<hr/>';
     final explained = await explainMargin(tester, html);
-    expect(explained, equals('[CssBlock:child=[Divider]],[SizedBox:0.0x10.0]'));
+    expect(
+      explained,
+      equals(
+        '[SizedBox:0.0x5.0],'
+        '[Container:border=(1.0@solid#FF001234,none,none,none),child=[CssBlock:child=[Container]]],'
+        '[SizedBox:0.0x5.0]',
+      ),
+    );
+
+    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+    final block = tester.getSize(find.byType(CssBlock));
+    // ignore: deprecated_member_use
+    final deviceWidth = tester.binding.window.physicalSize.width /
+        // ignore: deprecated_member_use
+        tester.binding.window.devicePixelRatio;
+    expect(block.width, equals(deviceWidth));
   });
 
   group('block elements', () {
