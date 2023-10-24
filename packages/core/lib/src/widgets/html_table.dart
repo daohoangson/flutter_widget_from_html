@@ -412,7 +412,6 @@ class _TableRenderLayouter {
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
-        cellSizes: cellSizes,
         columnWidths: columnWidths,
       );
     }
@@ -482,7 +481,6 @@ class _TableRenderLayouter {
 
     return _TableDataStep3(
       step2,
-      cellSizes: cellSizes,
       columnWidths: columnWidths,
     );
   }
@@ -528,31 +526,22 @@ class _TableRenderLayouter {
   _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
     final step2 = step3.step2;
     final step1 = step2.step1;
-    final cellSizes = step3.cellSizes;
     final cells = step1.cells;
     final children = step1.children;
 
-    final childSizes = List.generate(
-      cellSizes.length,
-      (i) => cellSizes[i] ?? Size.zero,
-    );
+    final childSizes = List.filled(children.length, Size.zero);
     final rowHeights = List.filled(step1.rowCount, .0);
 
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      final cellSize = cellSizes[i];
 
       final childWidth = data.calculateWidth(tro, step3.columnWidths);
-      Size childSize;
-      if (cellSize != null && cellSize.width == childWidth) {
-        childSize = cellSize;
-      } else {
-        // side effect
-        // layout with tight constraints to get the expected width
-        childSize = layouter(child, BoxConstraints.tightFor(width: childWidth));
-        _logger.fine('Got child#$i size with width=$childWidth: $childSize');
-      }
+      // layout with tight constraints to get the expected width
+      final cc1 = BoxConstraints.tightFor(width: childWidth);
+      // side effect
+      final childSize = layouter(child, cc1);
+      _logger.fine('Got child#$i size with width=$childWidth: $childSize');
       childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
@@ -729,12 +718,10 @@ class _TableDataStep2 {
 class _TableDataStep3 {
   final _TableDataStep2 step2;
 
-  final List<Size?> cellSizes;
   final List<double> columnWidths;
 
   const _TableDataStep3(
     this.step2, {
-    required this.cellSizes,
     required this.columnWidths,
   });
 }

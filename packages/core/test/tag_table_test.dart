@@ -466,6 +466,19 @@ Future<void> main() async {
     });
   });
 
+  group('combos', () {
+    testWidgets('renders HR tag', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const html = '<table><tr><td>Foo<hr /></td></tr></table>';
+      await explain(tester, html, useExplainer: false);
+      final foo = tester.getSize(find.byType(RichText));
+      final divider = tester.getSize(find.byType(Divider));
+      expect(foo.width, greaterThan(.0));
+      expect(divider.width, equals(foo.width));
+      expect(divider.height, greaterThan(.0));
+    });
+  });
+
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
       const html = '<table><tbody>'
