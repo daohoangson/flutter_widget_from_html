@@ -423,11 +423,6 @@ class _TableRenderLayouter {
       shouldLoop = false;
 
       for (var i = 0; i < children.length; i++) {
-        if (childMinWidths[i] != null) {
-          // this child has been measured already
-          continue;
-        }
-
         final child = children[i];
         final data = cells[i];
 
@@ -443,27 +438,38 @@ class _TableRenderLayouter {
           }
           childMaxWidths[i] = childMaxWidth;
           maxColumnWidths.setMaxColumnWidths(tro, data, childMaxWidth);
-          shouldLoop = true;
+          if (!childMaxWidth.isNaN) {
+            shouldLoop = true;
+            // break the inner `for` and continue with the outer `while`
+            break;
+          }
         }
 
-        final childMinWidth = step3GetMinIntrinsicWidth(
-          step2,
-          child: child,
-          data: data,
-          columnWidths: columnWidths,
-          maxColumnWidths: maxColumnWidths,
-          minColumnWidths: minColumnWidths,
-        );
-        if (childMinWidth != null) {
-          childMinWidths[i] = childMinWidth;
-          minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
-          _logger.finer('Got child#$i min width: $childMinWidth');
-          shouldLoop = true;
-        }
-
-        if (shouldLoop) {
-          // break the inner `for` and continue with the outer `while`
-          break;
+        if (childMinWidths[i] == null) {
+          double? childMinWidth = double.nan;
+          try {
+            childMinWidth = step3GetMinIntrinsicWidthIfNeeded(
+              step2,
+              child: child,
+              data: data,
+              columnWidths: columnWidths,
+              maxColumnWidths: maxColumnWidths,
+              minColumnWidths: minColumnWidths,
+            );
+            if (childMinWidth != null) {
+              _logger.finer('Got child#$i min width: $childMinWidth');
+            }
+          } catch (error, stackTrace) {
+            final message = "Could not measure child#$i min intrinsic width";
+            _logger.warning(message, error, stackTrace);
+          }
+          if (childMinWidth != null) {
+            childMinWidths[i] = childMinWidth;
+            minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
+            shouldLoop = true;
+            // break the inner `for` and continue with the outer `while`
+            break;
+          }
         }
       }
 
@@ -490,7 +496,7 @@ class _TableRenderLayouter {
     );
   }
 
-  double? step3GetMinIntrinsicWidth(
+  double? step3GetMinIntrinsicWidthIfNeeded(
     _TableDataStep2 step2, {
     required RenderBox child,
     required _TableCellData data,
@@ -523,15 +529,9 @@ class _TableRenderLayouter {
       }
     }
 
-    try {
-      // table is too crowded
-      // get min width to avoid breaking line in the middle of a word
-      return child.getMinIntrinsicWidth(double.infinity);
-    } catch (error, stackTrace) {
-      const message = "Could not measure child's min intrinsic width";
-      _logger.warning(message, error, stackTrace);
-      return double.nan;
-    }
+    // table is too crowded
+    // get min width to avoid breaking line in the middle of a word
+    return child.getMinIntrinsicWidth(double.infinity);
   }
 
   _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
