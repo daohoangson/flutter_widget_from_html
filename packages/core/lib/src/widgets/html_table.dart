@@ -399,14 +399,15 @@ class _TableRenderLayouter {
     final availableWidth = step1.availableWidth;
     final cells = step1.cells;
     final children = step1.children;
-    final naiveColumnWidths = step2.naiveColumnWidths;
 
+    final childMaxWidths = List<double?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
-    final cellSizes = List<Size?>.filled(children.length, null);
-    final maxColumnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
+    final maxColumnWidths =
+        step2.naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
-    // prioritize naive value, then layouter value as column width
+    // the current algorithm prioritizes naive value, then max value as column width
+    // it only considers min value when the columns don't fit
     var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
@@ -421,14 +422,6 @@ class _TableRenderLayouter {
     while (shouldLoop) {
       shouldLoop = false;
 
-      if (availableWidth != null) {
-        columnWidths = redistributeValues(
-          available: availableWidth,
-          maxValues: maxColumnWidths,
-          minValues: minColumnWidths,
-        );
-      }
-
       for (var i = 0; i < children.length; i++) {
         if (childMinWidths[i] != null) {
           // this child has been measured already
@@ -438,16 +431,18 @@ class _TableRenderLayouter {
         final child = children[i];
         final data = cells[i];
 
-        var childWidth = step2.cellWidths[i] ?? cellSizes[i]?.width;
-        if (childWidth == null) {
-          // side effect
-          // no pre-configured width to use
-          // have to layout cells without constraints for the initial width
-          final layoutSize = layouter(child, const BoxConstraints());
-          cellSizes[i] = layoutSize;
-          childWidth = layoutSize.width;
-          maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
-          _logger.fine('Got child#$i size without contraints: $layoutSize');
+        if (step2.cellWidths[i] == null && childMaxWidths[i] == null) {
+          var childMaxWidth = double.nan;
+          try {
+            // no config -> measure max width as the initial value
+            childMaxWidth = child.getMaxIntrinsicWidth(double.infinity);
+            _logger.finer('Got child#$i max width: $childMaxWidth');
+          } catch (error, stackTrace) {
+            final message = "Could not measure child#$i max intrinsic width";
+            _logger.warning(message, error, stackTrace);
+          }
+          childMaxWidths[i] = childMaxWidth;
+          maxColumnWidths.setMaxColumnWidths(tro, data, childMaxWidth);
           shouldLoop = true;
         }
 
@@ -457,11 +452,12 @@ class _TableRenderLayouter {
           data: data,
           columnWidths: columnWidths,
           maxColumnWidths: maxColumnWidths,
+          minColumnWidths: minColumnWidths,
         );
         if (childMinWidth != null) {
           childMinWidths[i] = childMinWidth;
           minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
-          _logger.info('Got child#$i min width: $childMinWidth');
+          _logger.finer('Got child#$i min width: $childMinWidth');
           shouldLoop = true;
         }
 
@@ -471,9 +467,18 @@ class _TableRenderLayouter {
         }
       }
 
+      if (availableWidth != null) {
+        columnWidths = redistributeValues(
+          available: availableWidth,
+          maxValues: maxColumnWidths,
+          minValues: minColumnWidths,
+        );
+      }
+
       loopCount++;
-      if (shouldLoop && loopCount > children.length) {
+      if (shouldLoop && loopCount > 2 * children.length) {
         // stop early to avoid dead loop
+        // each child may need at maximum 1 loop to get max and 1 to get min
         _logger.info('Stopped measuring children after $loopCount loops');
         break;
       }
@@ -491,6 +496,7 @@ class _TableRenderLayouter {
     required _TableCellData data,
     required List<double> columnWidths,
     required List<double> maxColumnWidths,
+    required List<double> minColumnWidths,
   }) {
     final step1 = step2.step1;
     final availableWidth = step1.availableWidth;
@@ -508,6 +514,11 @@ class _TableRenderLayouter {
 
       if (columnWidths.sum <= availableWidth) {
         // current widths are good enough
+        return null;
+      }
+
+      if (maxWidthSum >= minColumnWidths.sumRange(data)) {
+        // another cell in the same column needs wider minimum width already
         return null;
       }
     }
@@ -639,15 +650,16 @@ class _TableRenderLayouter {
     required List<double> minValues,
   }) {
     final fairValue = available / minValues.length;
+    final maxOrFairValues = maxValues
+        .map((v) => v.isNaN || v.isZero ? fairValue : v)
+        .toList(growable: false);
     final result = minValues.asMap().entries.map(
       (entry) {
         final i = entry.key;
         final minValue = entry.value;
-        final maxValue = maxValues[i];
         // minimum may be NaN if there were an error during measurement
-        final minOrFair = minValue.isNaN ? fairValue : minValue;
-        // cap to max value if it is non-zero
-        return maxValue.isZero ? minOrFair : min(minOrFair, maxValue);
+        final minOrFairValue = minValue.isNaN ? fairValue : minValue;
+        return min(minOrFairValue, maxOrFairValues[i]);
       },
     ).toList(growable: false);
     final remaining = max(.0, available - result.sum);
@@ -658,7 +670,7 @@ class _TableRenderLayouter {
 
     final dirties = List.filled(result.length, .0);
     for (var i = 0; i < result.length; i++) {
-      dirties[i] = max(.0, maxValues[i] - result[i]);
+      dirties[i] = max(.0, maxOrFairValues[i] - result[i]);
     }
     final dirtySum = dirties.sum;
     if (dirtySum.isZero) {
@@ -674,7 +686,7 @@ class _TableRenderLayouter {
       // calculate delta using weighted distribution
       // e.g. if a value has larger difference, it will grow more
       final delta = dirties[i] / dirtySum * remaining;
-      result[i] = min(maxValues[i], result[i] + delta);
+      result[i] = min(maxOrFairValues[i], result[i] + delta);
     }
 
     return result;

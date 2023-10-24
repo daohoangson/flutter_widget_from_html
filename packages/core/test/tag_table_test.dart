@@ -1057,24 +1057,34 @@ Future<void> main() async {
                 rowStart: 0,
                 child: Text('Foofoofoofoo', key: first),
               ),
+              const HtmlTableCell(
+                columnStart: 1,
+                rowStart: 0,
+                child: Text('super' 'wide' 'without' 'space'),
+              ),
               HtmlTableCell(
                 columnStart: 0,
                 rowStart: 1,
                 child: Text('Foo', key: second),
               ),
+              const HtmlTableCell(
+                columnStart: 1,
+                rowStart: 1,
+                child: Text('Bar'),
+              ),
             ],
           ),
         ]);
 
-        expect(
-          _loggerMessages,
-          contains(matches(RegExp('^Got child#0 min width:'))),
-        );
-        expect(
-          _loggerMessages,
-          isNot(contains(matches(RegExp('^Got child#1 min width:')))),
-        );
         expect(second.width, equals(first.width));
+
+        final _ = _loggerMessages;
+        expect(_, contains(contains('Got child#0 min width:')));
+        expect(_, contains(contains('Got child#1 min width:')));
+        expect(_, contains(contains('Got child#2 max width:')));
+        expect(_, isNot(contains(contains('Got child#2 min width:'))));
+        expect(_, contains(contains('Got child#3 max width:')));
+        expect(_, isNot(contains(contains('Got child#3 min width:'))));
       });
     });
 
@@ -1487,7 +1497,7 @@ final _loggerIsGitHubAction = Platform.environment['GITHUB_ACTIONS'] == 'true';
 final _loggerMessages = [];
 
 void _loggerSetup() {
-  Logger.root.level = Level.FINE;
+  Logger.root.level = Level.FINER;
   Logger.root.onRecord.listen((LogRecord record) {
     _loggerMessages.add(record.message);
     if (_loggerIsGitHubAction) {
