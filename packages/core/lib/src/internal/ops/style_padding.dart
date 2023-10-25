@@ -4,17 +4,21 @@ const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(BuildTree tree, CssLengthBox box) =>
     WidgetPlaceholder(
-      builder: (context, _) => _paddingInlineSizedBox(
-        box.getValueRight(tree.inheritanceResolvers.resolve(context)),
-      ),
+      builder: (context, _) {
+        final resolved = tree.inheritanceResolvers.resolve(context);
+        final right = box.getRight(resolved);
+        return _paddingInlineSizedBox(right?.getValue(resolved));
+      },
       debugLabel: '${tree.element.localName}--paddingInlineAfter',
     );
 
 WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox box) =>
     WidgetPlaceholder(
-      builder: (context, _) => _paddingInlineSizedBox(
-        box.getValueLeft(tree.inheritanceResolvers.resolve(context)),
-      ),
+      builder: (context, _) {
+        final resolved = tree.inheritanceResolvers.resolve(context);
+        final left = box.getLeft(resolved);
+        return _paddingInlineSizedBox(left?.getValue(resolved));
+      },
       debugLabel: '${tree.element.localName}--paddingInlineBefore',
     );
 
@@ -72,9 +76,9 @@ class StylePadding {
       tree,
       child,
       EdgeInsets.fromLTRB(
-        max(padding.getValueLeft(resolved) ?? 0.0, 0.0),
+        max(padding.getLeft(resolved)?.getValue(resolved) ?? 0.0, 0.0),
         max(padding.top?.getValue(resolved) ?? 0.0, 0.0),
-        max(padding.getValueRight(resolved) ?? 0.0, 0.0),
+        max(padding.getRight(resolved)?.getValue(resolved) ?? 0.0, 0.0),
         max(padding.bottom?.getValue(resolved) ?? 0.0, 0.0),
       ),
     );

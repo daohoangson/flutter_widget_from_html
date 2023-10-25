@@ -6,14 +6,18 @@ Widget _marginHorizontalBuilder(
   Widget widget,
   CssLengthBox box,
   InheritedProperties resolved,
-) =>
-    Padding(
-      padding: EdgeInsets.only(
-        left: max(box.getValueLeft(resolved) ?? 0.0, 0.0),
-        right: max(box.getValueRight(resolved) ?? 0.0, 0.0),
-      ),
-      child: widget,
-    );
+) {
+  final left = box.getLeft(resolved);
+  final leftValue = max(left?.getValue(resolved) ?? 0.0, 0.0);
+  final right = box.getRight(resolved);
+  final rightValue = max(right?.getValue(resolved) ?? 0.0, 0.0);
+
+  return HorizontalMargin(
+    left: left?.unit == CssLengthUnit.auto ? double.infinity : leftValue,
+    right: right?.unit == CssLengthUnit.auto ? double.infinity : rightValue,
+    child: widget,
+  );
+}
 
 class StyleMargin {
   final WidgetFactory wf;

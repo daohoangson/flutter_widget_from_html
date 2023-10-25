@@ -19,7 +19,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,2,0,4),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=4,right=2,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -32,7 +32,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,4,0,2),child='
+          '[HorizontalMargin:left=2,right=4,child='
           '[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'
           '],'
           '[SizedBox:0.0x3.0]',
@@ -59,7 +59,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,2,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=2,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -70,7 +70,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,2),child=[CssBlock:child='
+            '[HorizontalMargin:left=2,right=0,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -96,7 +96,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,4),child=[CssBlock:child='
+            '[HorizontalMargin:left=4,right=0,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -107,7 +107,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,4,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=4,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -123,7 +123,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x5.0],'
-          '[Padding:(0,10,0,10),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x5.0]',
         ),
       );
@@ -148,7 +148,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,10,0,10),child=[CssBlock:child='
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -163,7 +163,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x20.0],'
-          '[Padding:(0,20,0,20),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=20,right=20,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x20.0]',
         ),
       );
@@ -176,7 +176,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x13.3],'
-          '[Padding:(0,13,0,13),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=13,right=13,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x13.3]',
         ),
       );
@@ -189,7 +189,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x10.0],'
-          '[Padding:(0,10,0,10),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x10.0]',
         ),
       );
@@ -204,8 +204,8 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x2.0],'
-        '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Padding:(0,2,0,2),child='
+        '[HorizontalMargin:left=1,right=1,child='
+        '[CssBlock:child=[HorizontalMargin:left=2,right=2,child='
         '[CssBlock:child=[RichText:(:Foo)]]'
         ']]],'
         '[SizedBox:0.0x2.0]',
@@ -222,11 +222,11 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:1)]]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:2)]]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:3)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:3)]]],'
         '[SizedBox:0.0x3.0]',
       ),
     );
@@ -240,12 +240,12 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[Column:children='
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:1a)]],'
         '[CssBlock:child=[RichText:(:1b)]]'
         ']]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[Column:children='
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:2a)]],'
         '[CssBlock:child=[RichText:(:2b)]]'
         ']]],'
@@ -283,7 +283,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,3,0,0),child=[CssBlock:child='
+          '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -297,7 +297,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,3,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -308,7 +308,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,3),child=[CssBlock:child='
+            '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -343,7 +343,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,0,0,3),child=[CssBlock:child='
+          '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -357,7 +357,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,3),child=[CssBlock:child='
+            '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -368,7 +368,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,3,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -382,7 +382,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x5.0],'
-          '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -395,7 +395,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x3.0],'
-          '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:Foo)]]]',
+          '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:Foo)]]]',
         ),
       );
     });
