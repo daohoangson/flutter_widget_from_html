@@ -1176,6 +1176,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   static StylesMap _cssTextAlignFromAttribute(dom.Element element) {
     final value = element.attributes[kAttributeAlign];
+
+    if (value == kCssTextAlignCenter) {
+      // `align=center` works more like `CENTER` tag, not `text-align: center`
+      return const {kCssTextAlign: kCssTextAlignWebkitCenter};
+    }
+
     return value != null ? {kCssTextAlign: value} : const {};
   }
 
