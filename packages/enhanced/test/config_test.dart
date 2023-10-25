@@ -245,17 +245,15 @@ void main() {
 
     group('resets FIGURE margin', () {
       const html = '<figure class="name">Foo</figure>';
+      // TODO: remove padding check when our minimum core version >= 0.14.5
+      const padding = '[Padding:(0,40,0,40),child=';
+      const horizontalMargin = '[HorizontalMargin:left=40,right=40,child=';
 
       testWidgets('renders without value', (WidgetTester tester) async {
         final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-        expect(
-          e,
-          equals(
-            '[HorizontalMargin:left=40,right=40,child='
-            '[CssBlock:child=[RichText:(:Foo)]]'
-            ']',
-          ),
-        );
+        expect(e, contains('[CssBlock:child=[RichText:(:Foo)]]'));
+        final hasMargin = e.contains(padding) || e.contains(horizontalMargin);
+        expect(hasMargin, isTrue);
       });
 
       testWidgets('renders with value', (WidgetTester tester) async {
