@@ -432,7 +432,7 @@ Future<void> main() async {
         '[CssBlock:child='
         '[Container:bg=#FF008000,child='
         '[CssBlock:child='
-        '[Padding:(0,15,0,15),child='
+        '[HorizontalMargin:left=15,right=15,child='
         '[Container:bg=#FF0000FF,child='
         '[Padding:(5,5,5,5),child='
         '[CssSizing:height=100.0,width=100.0,child='

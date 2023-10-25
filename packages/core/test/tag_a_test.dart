@@ -138,7 +138,7 @@ void main() {
       equals(
         '[SizedBox:0.0x5.0],'
         '[MouseRegion:child=[GestureDetector:child='
-        '[Padding:(0,5,0,5),child='
+        '[HorizontalMargin:left=5,right=5,child='
         '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
         ']]],'
         '[SizedBox:0.0x5.0]',
