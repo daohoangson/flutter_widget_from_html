@@ -1,6 +1,8 @@
-## 0.14.4
+## 0.14.4+1
 
 - Improve table support for wide columns (#1073)
+- BREAKING: remove `WidgetFactory.buildDivider` (#1075)
+- Make `align=center` work like `CENTER` tag (#1076)
 
 ## 0.14.3
 
