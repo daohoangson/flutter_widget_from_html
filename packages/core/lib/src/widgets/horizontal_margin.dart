@@ -59,7 +59,10 @@ class _HorizontalMarginRenderObject extends RenderProxyBox {
       final fullWidth = size.width;
       final childWidth = child?.size.width ?? .0;
       final margins = max(.0, fullWidth - childWidth);
-      super.paint(context, offset.translate(min(_left, margins / 2), 0));
+      final leftFinite = _left.isInfinite ? fullWidth : _left;
+      final rightFinite = _right.isInfinite ? fullWidth : _right;
+      final leftMax = margins / (leftFinite + rightFinite) * leftFinite;
+      super.paint(context, offset.translate(min(_left, leftMax), 0));
     }
   }
 
