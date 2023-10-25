@@ -472,10 +472,17 @@ Future<void> main() async {
       const html = '<table><tr><td>Foo<hr /></td></tr></table>';
       await explain(tester, html, useExplainer: false);
       final foo = tester.getSize(find.byType(RichText));
-      final divider = tester.getSize(find.byType(Divider));
       expect(foo.width, greaterThan(.0));
-      expect(divider.width, equals(foo.width));
-      expect(divider.height, greaterThan(.0));
+
+      final containerFinder = find.byType(Container);
+      expect(
+        containerFinder,
+        findsNWidgets(2),
+        reason: 'Implementation details: HR renders two `Container` widgets.',
+      );
+      final box = tester.firstRenderObject(containerFinder) as RenderBox;
+      expect(box.size.width, equals(foo.width));
+      expect(box.size.height, greaterThan(.0));
     });
   });
 
