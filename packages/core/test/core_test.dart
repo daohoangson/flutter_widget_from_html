@@ -269,12 +269,6 @@ Future<void> main() async {
     );
   });
 
-  testWidgets('renders HR tag', (WidgetTester tester) async {
-    const html = '<hr/>';
-    final explained = await explainMargin(tester, html);
-    expect(explained, equals('[CssBlock:child=[Divider]],[SizedBox:0.0x10.0]'));
-  });
-
   group('block elements', () {
     const blockOutput = '[Column:children='
         '[CssBlock:child=[RichText:(:First.)]],'
@@ -568,6 +562,37 @@ Future<void> main() async {
           '[SizedBox:0.0x15.6],'
           '[CssBlock:child=[RichText:(@6.7+b:X)]],'
           '[SizedBox:0.0x15.6]',
+        ),
+      );
+    });
+  });
+
+  group('HR', () {
+    testWidgets('renders a horizontal line', (WidgetTester tester) async {
+      final explained = await explainMargin(tester, '<hr/>');
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(1.0@solid#FF001234,none,none,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
+        ),
+      );
+
+      final block = tester.getSize(find.byType(CssBlock));
+      expect(block.width, equals(tester.windowWidth));
+    });
+
+    testWidgets('renders custom color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const html = '<hr style="border:none;border-bottom:1px solid #e34a3a">';
+      final explained = await explainMargin(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(none,none,1.0@solid#FFE34A3A,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
         ),
       );
     });

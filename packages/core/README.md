@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.14.3
+  flutter_widget_from_html_core: ^0.14.4
 ```
 
 ## Usage
@@ -98,6 +98,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - TABLE attributes `border`, `cellpadding`, `cellspacing`
   - TD/TH attributes `colspan`, `rowspan`, `valign`
+  - Table is scrollable if columns are too wide
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,

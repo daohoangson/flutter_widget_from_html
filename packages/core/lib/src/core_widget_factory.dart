@@ -4,7 +4,6 @@ import 'package:flutter/material.dart'
     show
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
-        Divider,
         Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -40,7 +39,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
   BuildOp? _tagDetails;
-  BuildOp? _tagHr;
   BuildOp? _tagImg;
   BuildOp? _tagLi;
   BuildOp? _tagPre;
@@ -178,9 +176,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       child: grandChild ?? child,
     );
   }
-
-  /// Builds [Divider].
-  Widget? buildDivider(BuildTree tree) => const Divider();
 
   /// Builds [GestureDetector].
   ///
@@ -762,20 +757,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         tree.register(tagFont);
         break;
 
-      case 'hr':
-        tree.register(
-          _tagHr ??= BuildOp(
-            debugLabel: localName,
-            defaultStyles: (_) => {
-              kCssDisplay: kCssDisplayBlock,
-              kCssMargin + kSuffixBottom: '1em',
-            },
-            onRenderBlock: (tree, _) => buildDivider(tree) ?? _,
-            priority: Priority.tagHr,
-          ),
-        );
-        break;
-
       case kTagH1:
         tree.register(
           const BuildOp.v2(
@@ -827,6 +808,17 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             debugLabel: kTagH6,
             defaultStyles: _tagH6,
             priority: Early.tagH6,
+          ),
+        );
+        break;
+
+      case kTagHr:
+        tree.register(
+          const BuildOp.v2(
+            debugLabel: kTagHr,
+            defaultStyles: _tagHrDefaultStyles,
+            onRenderBlock: _tagHrOnRenderBlock,
+            priority: Priority.tagHr,
           ),
         );
         break;
@@ -1184,6 +1176,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   static StylesMap _cssTextAlignFromAttribute(dom.Element element) {
     final value = element.attributes[kAttributeAlign];
+
+    if (value == kCssTextAlignCenter) {
+      // `align=center` works more like `CENTER` tag, not `text-align: center`
+      return _tagCenter(element);
+    }
+
     return value != null ? {kCssTextAlign: value} : const {};
   }
 
@@ -1209,6 +1207,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   static StylesMap _tagCenter(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssTextAlign: kCssTextAlignWebkitCenter,
+        kCssWidth: '100%',
       };
 
   static StylesMap _tagDd(dom.Element _) => {
@@ -1266,6 +1265,18 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         kCssFontWeight: kCssFontWeightBold,
         kCssMargin: '2.33em 0',
       };
+
+  static StylesMap _tagHrDefaultStyles(dom.Element _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '0.5em 0',
+        kCssBorder + kSuffixTop: '1px solid',
+      };
+
+  static WidgetPlaceholder _tagHrOnRenderBlock(
+    BuildTree _,
+    WidgetPlaceholder placeholder,
+  ) =>
+      placeholder.wrapWith((_, __) => Container());
 
   static StylesMap _tagMark(dom.Element _) => {
         kCssBackgroundColor: '#ff0',
