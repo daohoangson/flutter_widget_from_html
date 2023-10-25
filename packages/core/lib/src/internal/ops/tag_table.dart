@@ -80,25 +80,39 @@ class TagTable {
         ? tryParseCssLength(borderSpacingExpression)
         : null;
 
-    return WidgetPlaceholder(
-      builder: (context, _) {
-        final resolved = tableTree.inheritanceResolvers.resolve(context);
+    final layoutBuilder = LayoutBuilder(
+      builder: (context, bc) {
+        // wrap the table in a builder to obtain the layout constraints early
+        // in order to calculate a conservative width
+        // the whole thing becomes scrollable when columns are too wide
+        final maxWidth = bc.maxWidth;
 
-        return ValignBaselineContainer(
+        final resolved = tableTree.inheritanceResolvers.resolve(context);
+        Widget built = ValignBaselineContainer(
           child: HtmlTable(
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
+            maxWidth: maxWidth,
             textDirection: resolved.directionOrLtr,
             children: List.from(
-              data.builders.map((f) => f(context)).where((e) => e != null),
+              data.builders
+                  .map((builder) => builder(context))
+                  .where(_htmlTableCellIsNotNull),
               growable: false,
             ),
           ),
         );
+
+        if (maxWidth.isFinite) {
+          built = wf.buildHorizontalScrollView(tableTree, built) ?? built;
+        }
+
+        return built;
       },
-      debugLabel: kTagTable,
     );
+
+    return WidgetPlaceholder(debugLabel: kTagTable, child: layoutBuilder);
   }
 
   void _prepareHtmlTableCaptionBuilders(_TagTableData data) {
@@ -240,6 +254,8 @@ class TagTable {
 
     return null;
   }
+
+  static bool _htmlTableCellIsNotNull(HtmlTableCell? cell) => cell != null;
 
   static void _onBorderChild(BuildTree tableTree, BuildTree subTree) {
     if (tableTree.element.attributeBorder > 0) {

@@ -1179,7 +1179,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     if (value == kCssTextAlignCenter) {
       // `align=center` works more like `CENTER` tag, not `text-align: center`
-      return const {kCssTextAlign: kCssTextAlignWebkitCenter};
+      return _tagCenter(element);
     }
 
     return value != null ? {kCssTextAlign: value} : const {};
@@ -1207,6 +1207,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   static StylesMap _tagCenter(dom.Element _) => {
         kCssDisplay: kCssDisplayBlock,
         kCssTextAlign: kCssTextAlignWebkitCenter,
+        kCssWidth: '100%',
       };
 
   static StylesMap _tagDd(dom.Element _) => {
