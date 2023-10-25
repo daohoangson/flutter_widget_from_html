@@ -22,7 +22,8 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[RichText:align=center,(:_X_)]]',
+          '[CssBlock:child=[Center:heightFactor=1.0,child='
+          '[RichText:align=center,(:_X_)]]]',
         ),
       );
     });
