@@ -818,6 +818,37 @@ extension RenderBoxGetter on GlobalKey {
   double get width => size.width;
 }
 
+extension WindowTester on WidgetTester {
+  double get windowWidth =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.width /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
+  void setTextScaleFactor(double value) {
+    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+    // ignore: deprecated_member_use
+    binding.window.platformDispatcher.textScaleFactorTestValue = value;
+    addTearDown(
+      // ignore: deprecated_member_use
+      binding.window.platformDispatcher.clearTextScaleFactorTestValue,
+    );
+  }
+
+  void setWindowSize(Size size) {
+    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+    // ignore: deprecated_member_use
+    binding.window.physicalSizeTestValue = size;
+    // ignore: deprecated_member_use
+    addTearDown(binding.window.clearPhysicalSizeTestValue);
+    // ignore: deprecated_member_use
+    binding.window.devicePixelRatioTestValue = 1.0;
+    // ignore: deprecated_member_use
+    addTearDown(binding.window.clearDevicePixelRatioTestValue);
+  }
+}
+
 class _TextFinder extends MatchFinder {
   final String data;
 

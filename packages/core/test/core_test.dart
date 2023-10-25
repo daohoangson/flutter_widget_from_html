@@ -579,13 +579,8 @@ Future<void> main() async {
         ),
       );
 
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
       final block = tester.getSize(find.byType(CssBlock));
-      // ignore: deprecated_member_use
-      final deviceWidth = tester.binding.window.physicalSize.width /
-          // ignore: deprecated_member_use
-          tester.binding.window.devicePixelRatio;
-      expect(block.width, equals(deviceWidth));
+      expect(block.width, equals(tester.windowWidth));
     });
 
     testWidgets('renders custom color', (WidgetTester tester) async {

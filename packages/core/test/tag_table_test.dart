@@ -467,10 +467,27 @@ Future<void> main() async {
   });
 
   group('combos', () {
+    testWidgets('renders align=center', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const windowSize = 100.0;
+      tester.setWindowSize(const Size(windowSize, windowSize));
+
+      const html = '<table><tr><td align="center">'
+          '<table><tr><td>Foo</td></tr></table>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final foo = tester.getRect(find.byType(RichText));
+      final width = foo.right - foo.left;
+      final margin = (windowSize - width) / 2;
+      expect(foo.left, equals(margin));
+      expect(foo.right, equals(windowSize - margin));
+    });
+
     testWidgets('renders HR tag', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
       const html = '<table><tr><td>Foo<hr /></td></tr></table>';
-      await explain(tester, html, useExplainer: false);
+      await explain(tester, html);
       final foo = tester.getSize(find.byType(RichText));
       expect(foo.width, greaterThan(.0));
 
@@ -943,15 +960,7 @@ Future<void> main() async {
       final table = GlobalKey(debugLabel: 'table');
 
       Future<void> pumpColumn(WidgetTester tester, List<Widget> children) {
-        // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-        // ignore: deprecated_member_use
-        tester.binding.window.physicalSizeTestValue = const Size(100, 200);
-        // ignore: deprecated_member_use
-        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-        // ignore: deprecated_member_use
-        tester.binding.window.devicePixelRatioTestValue = 1.0;
-        // ignore: deprecated_member_use
-        addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+        tester.setWindowSize(const Size(100, 200));
 
         return tester.pumpWidget(
           MaterialApp(
