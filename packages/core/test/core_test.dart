@@ -699,12 +699,13 @@ Future<void> main() async {
       const html =
           '<div style="background-image: url(asset:$assetName)">Foo</div>';
       final explained = await explain(tester, html);
+
       expect(
         explained,
         equals(
           '[Container:bgimage='
-          '[DecorationImage:image='
-          '[AssetImage:assetName=test/images/logo.png]],child='
+          'DecorationImage('
+          'AssetImage(bundle: null, name: "test/images/logo.png"), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
           '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
@@ -717,13 +718,11 @@ Future<void> main() async {
 
       expect(
         explained,
-        equals(
-          '[Container:bgimage='
-          '[DecorationImage:image='
-          '[MemoryImage:size=42]],child='
-          '[CssBlock:child='
-          '[RichText:(:Foo)]]]',
-        ),
+        matches(
+            r'^\[Container:bgimage=DecorationImage\(MemoryImage\(Uint8List#[0-9a-fA-F]+, scale: 1\.0\), '
+            r'Alignment\.center, scale 1\.0, opacity 1\.0, FilterQuality\.low\),child='
+            r'\[CssBlock:child='
+            r'\[RichText:\(:Foo\)\]\]\]$'),
       );
     });
 
@@ -737,8 +736,8 @@ Future<void> main() async {
         explained,
         equals(
           '[Container:bgimage='
-          '[DecorationImage:image='
-          '[FileImage:file=/test/images/logo.png]],child='
+          'DecorationImage('
+          'FileImage("/test/images/logo.png", scale: 1.0), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
           '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
