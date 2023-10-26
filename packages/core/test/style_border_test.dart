@@ -169,7 +169,7 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x1.0],'
-        '[Padding:(0,1,0,1),child='
+        '[HorizontalMargin:left=1,right=1,child='
         '[Container:border=$_border1,child='
         '[CssBlock:child='
         '[RichText:(:Foo)]]]'
@@ -189,7 +189,7 @@ void main() {
         '[Container:border=$_border1,child='
         '[Column:children='
         '[SizedBox:0.0x1.0],'
-        '[CssBlock:child=[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]]],'
+        '[CssBlock:child=[HorizontalMargin:left=1,right=1,child=[CssBlock:child=[RichText:(:Foo)]]]],'
         '[SizedBox:0.0x1.0]'
         ']]',
       ),

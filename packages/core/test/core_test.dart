@@ -262,7 +262,7 @@ Future<void> main() async {
       equals(
         '[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(+b:Foo)]],'
-        '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Bar)]]]'
+        '[HorizontalMargin:left=40,right=0,child=[CssBlock:child=[RichText:(:Bar)]]]'
         ']],'
         '[SizedBox:0.0x10.0]',
       ),
@@ -294,7 +294,7 @@ Future<void> main() async {
         explained,
         equals(
           '[SizedBox:0.0x10.0],'
-          '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=40,right=40,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x10.0]',
         ),
       );
@@ -321,7 +321,7 @@ Future<void> main() async {
           explained,
           equals(
             '[SizedBox:0.0x10.0],'
-            '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
+            '[HorizontalMargin:left=40,right=40,child=[CssBlock:child=[Column:children='
             '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
             '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
             ']]],'
@@ -626,7 +626,7 @@ Future<void> main() async {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,1,0,1),child='
+          '[HorizontalMargin:left=1,right=1,child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(2,2,2,2),child='
           '[CssBlock:child='

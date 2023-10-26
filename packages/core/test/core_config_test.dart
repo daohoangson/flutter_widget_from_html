@@ -262,7 +262,7 @@ void main() {
         expect(
           e,
           equals(
-            '[Padding:(0,40,0,40),child='
+            '[HorizontalMargin:left=40,right=40,child='
             '[CssBlock:child=[RichText:(:Foo)]]'
             ']',
           ),

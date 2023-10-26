@@ -13,6 +13,7 @@ export 'external/csslib.dart';
 export 'external/text_scale_factor.dart';
 export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
+export 'widgets/horizontal_margin.dart';
 export 'widgets/html_details.dart';
 export 'widgets/html_list_item.dart';
 export 'widgets/html_list_marker.dart';

@@ -1,8 +1,14 @@
+## 0.14.5
+
+- Add support for auto margins (#1077)
+- BREAKING: Replace `CssLengthBox.getValueLeft` with `.getLeft`
+- BREAKING: Replace `CssLengthBox.getValueRight` with `.getRight`
+
 ## 0.14.4+1
 
 - Improve table support for wide columns (#1073)
-- BREAKING: remove `WidgetFactory.buildDivider` (#1075)
 - Make `align=center` work like `CENTER` tag (#1076)
+- BREAKING: remove `WidgetFactory.buildDivider` (#1075)
 
 ## 0.14.3
 

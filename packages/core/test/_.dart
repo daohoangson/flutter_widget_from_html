@@ -730,6 +730,23 @@ class Explainer {
       );
     }
 
+    if (widget is SingleChildRenderObjectWidget) {
+      final dynamicWidget = widget as dynamic;
+      switch (widget.runtimeType.toString()) {
+        case 'HorizontalMargin':
+          // TODO: remove ignore when our minimum core version >= 1.0
+          // ignore: avoid_dynamic_calls
+          final left = dynamicWidget.left as double;
+          // ignore: avoid_dynamic_calls
+          final right = dynamicWidget.right as double;
+          attr.add(
+            'left=${left.isInfinite ? '∞' : left.truncate()},'
+            'right=${right.isInfinite ? '∞' : right.truncate()}',
+          );
+          break;
+      }
+    }
+
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }

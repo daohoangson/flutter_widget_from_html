@@ -361,15 +361,13 @@ class CssLengthBox {
       _inlineStart?.isPositive == true ||
       _right?.isPositive == true;
 
-  /// Calculates the left value taking text direction into account.
-  double? getValueLeft(InheritedProperties resolved) =>
-      (_left ?? (resolved.isRtl ? _inlineEnd : _inlineStart))
-          ?.getValue(resolved);
+  /// Calculates the left length taking text direction into account.
+  CssLength? getLeft(InheritedProperties resolved) =>
+      _left ?? (resolved.isRtl ? _inlineEnd : _inlineStart);
 
-  /// Calculates the right value taking text direction into account.
-  double? getValueRight(InheritedProperties resolved) =>
-      (_right ?? (resolved.isRtl ? _inlineStart : _inlineEnd))
-          ?.getValue(resolved);
+  /// Calculates the right length taking text direction into account.
+  CssLength? getRight(InheritedProperties resolved) =>
+      _right ?? (resolved.isRtl ? _inlineStart : _inlineEnd);
 
   @override
   String toString() {
