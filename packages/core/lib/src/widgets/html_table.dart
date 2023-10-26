@@ -418,7 +418,6 @@ class _TableRenderLayouter {
     }
 
     var shouldLoop = true;
-    var loopCount = 0;
     while (shouldLoop) {
       shouldLoop = false;
 
@@ -435,11 +434,11 @@ class _TableRenderLayouter {
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
           logger.fine('Got child#$i size without contraints: $layoutSize');
           shouldLoop = true;
-          // break the inner `for` and continue with the outer `while`
-          break;
         }
 
-        if (childMinWidths[i] == null) {
+        if (!shouldLoop && childMinWidths[i] == null) {
+          // do not re-consider min width if we measured it already
+          // or if max width has just been made available
           double? childMinWidth = double.nan;
           try {
             childMinWidth = step3GetMinIntrinsicWidthIfNeeded(
@@ -461,8 +460,6 @@ class _TableRenderLayouter {
             childMinWidths[i] = childMinWidth;
             minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
             shouldLoop = true;
-            // break the inner `for` and continue with the outer `while`
-            break;
           }
         }
       }
@@ -473,14 +470,6 @@ class _TableRenderLayouter {
           maxValues: maxColumnWidths,
           minValues: minColumnWidths,
         );
-      }
-
-      loopCount++;
-      if (shouldLoop && loopCount > 2 * children.length) {
-        // stop early to avoid dead loop
-        // each child may need at maximum 1 loop to get max and 1 to get min
-        logger.info('Stopped measuring children after $loopCount loops');
-        break;
       }
     }
 
