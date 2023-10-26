@@ -10,11 +10,18 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
 
   /// Creates a list item widget.
   HtmlListItem({
-    required Widget child,
+    Widget? child,
     super.key,
-    required Widget marker,
+    Widget? marker,
     required this.textDirection,
-  }) : super(children: [child, marker]);
+  }) : super(
+          children: child != null
+              ? [
+                  child,
+                  if (marker != null) marker,
+                ]
+              : const [],
+        );
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
@@ -57,39 +64,28 @@ class _ListItemRenderObject extends RenderBox
       defaultComputeDistanceToFirstActualBaseline(baseline);
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _compute(firstChild, constraints, ChildLayoutHelper.dryLayoutChild);
+
+  @override
   double computeMaxIntrinsicHeight(double width) =>
-      firstChild!.computeMaxIntrinsicHeight(width);
+      firstChild?.computeMaxIntrinsicHeight(width) ??
+      super.computeMaxIntrinsicHeight(width);
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      firstChild!.computeMaxIntrinsicWidth(height);
+      firstChild?.computeMaxIntrinsicWidth(height) ??
+      super.computeMaxIntrinsicWidth(height);
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      firstChild!.computeMinIntrinsicHeight(width);
+      firstChild?.computeMinIntrinsicHeight(width) ??
+      super.computeMinIntrinsicHeight(width);
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      firstChild!.getMinIntrinsicWidth(height);
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final child = firstChild!;
-    final childConstraints = constraints;
-    final childData = child.parentData! as _ListItemData;
-    final childSize = child.getDryLayout(childConstraints);
-
-    final marker = childData.nextSibling!;
-    final markerConstraints = childConstraints.loosen();
-    final markerSize = marker.getDryLayout(markerConstraints);
-
-    return constraints.constrain(
-      Size(
-        childSize.width,
-        childSize.height > 0 ? childSize.height : markerSize.height,
-      ),
-    );
-  }
+      firstChild?.getMinIntrinsicWidth(height) ??
+      super.computeMinIntrinsicWidth(height);
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
@@ -100,45 +96,46 @@ class _ListItemRenderObject extends RenderBox
       defaultPaint(context, offset);
 
   @override
-  void performLayout() {
-    final child = firstChild!;
-    final childConstraints = constraints;
-    final childData = child.parentData! as _ListItemData;
-    child.layout(childConstraints, parentUsesSize: true);
-    final childSize = child.size;
-
-    final marker = childData.nextSibling!;
-    final markerConstraints = childConstraints.loosen();
-    final markerData = marker.parentData! as _ListItemData;
-    marker.layout(markerConstraints, parentUsesSize: true);
-    final markerSize = marker.size;
-
-    size = constraints.constrain(
-      Size(
-        childSize.width,
-        childSize.height > 0 ? childSize.height : markerSize.height,
-      ),
-    );
-
-    const baseline = TextBaseline.alphabetic;
-    final markerDistance =
-        marker.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerSize.height;
-    final childDistance =
-        child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
-
-    markerData.offset = Offset(
-      textDirection == TextDirection.ltr
-          ? -markerSize.width - _kGapVsMarker
-          : childSize.width + _kGapVsMarker,
-      childDistance - markerDistance,
-    );
-  }
+  void performLayout() =>
+      size = _compute(firstChild, constraints, ChildLayoutHelper.layoutChild);
 
   @override
   void setupParentData(RenderBox child) {
     if (child.parentData is! _ListItemData) {
       child.parentData = _ListItemData();
     }
+  }
+
+  Size _compute(RenderBox? child, BoxConstraints bc, ChildLayouter fn) {
+    if (child == null) {
+      return bc.smallest;
+    }
+
+    final childData = child.parentData! as _ListItemData;
+    final childSize = fn(child, bc);
+    final marker = childData.nextSibling;
+    final markerSize = marker != null ? fn(marker, bc.loosen()) : Size.zero;
+    final height = childSize.height > 0 ? childSize.height : markerSize.height;
+    final size = bc.constrain(Size(childSize.width, height));
+
+    if (identical(fn, ChildLayoutHelper.layoutChild) && marker != null) {
+      const baseline = TextBaseline.alphabetic;
+      final markerDistance =
+          marker.getDistanceToBaseline(baseline, onlyReal: true) ??
+              markerSize.height;
+      final childDistance =
+          child.getDistanceToBaseline(baseline, onlyReal: true) ??
+              markerDistance;
+
+      final markerData = marker.parentData! as _ListItemData;
+      markerData.offset = Offset(
+        textDirection == TextDirection.ltr
+            ? -markerSize.width - _kGapVsMarker
+            : childSize.width + _kGapVsMarker,
+        childDistance - markerDistance,
+      );
+    }
+
+    return size;
   }
 }

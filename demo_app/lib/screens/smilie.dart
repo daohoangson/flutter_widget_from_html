@@ -28,22 +28,23 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onTree: (meta, tree) {
-      final alt = meta.element.attributes['alt'];
-      tree.addText(kSmilies[alt] ?? alt ?? '');
+    debugLabel: 'smilie',
+    onParsed: (tree) {
+      final alt = tree.element.attributes['alt'];
+      return tree..addText(kSmilies[alt] ?? alt ?? '');
     },
   );
 
   @override
-  void parse(BuildMetadata meta) {
-    final e = meta.element;
+  void parse(BuildTree tree) {
+    final e = tree.element;
     if (e.localName == 'img' &&
         e.classes.contains('smilie') &&
         e.attributes.containsKey('alt')) {
-      meta.register(smilieOp);
+      tree.register(smilieOp);
       return;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }

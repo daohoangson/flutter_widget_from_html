@@ -1,3 +1,41 @@
+## 0.14.4+1
+
+- Improve table support for wide columns (#1073)
+- BREAKING: remove `WidgetFactory.buildDivider` (#1075)
+- Make `align=center` work like `CENTER` tag (#1076)
+
+## 0.14.3
+
+- Write migration docs from v0.10 to v0.14 (#1065)
+- Fix Flutter badge SVG urls (#1065)
+- Fix broken table (#1067)
+
+## 0.14.2
+
+- Add support for `display: table-cell` without row (#905)
+- Add supporf for `BuildTree.getNonInherited` and `.setNonInherited` (#948)
+- Add support for `InlineCustomWidget` via `customWidgetBuilder` to render simple widget inline (#1056)
+- Add support for `BuildOp.inline` to render complicated widget inline (#1056)
+- Fix incorrect cursor inside a `SelectionArea` (#902)
+- Fix border radius does not clip contents (#903)
+- Fix anchor doesn't work with `baseUrl` specified (#904)
+- Fix padding is ignored on empty P tag (#906)
+- Fix `border-radius` error if border is not uniform (#910)
+- Fix inline `white-space: nowrap` (#944)
+- Fix `TR` background color doesn't fill the whole row by #1049
+- MIGRATE: Replace `WidgetPlaceholder.generator` with `.debugLabel` (#619)
+- MIGRATE: Replace `WidgetFactory.gestureTapCallback` with `.buildGestureRecognizer` (#732)
+- MIGRATE: Replace `RebuildTriggers` with `List`
+- MIGRATE: Replace `BuildBit.detach`, `.insertAfter` and `.insertBefore` with returning a new tree in `BuildOp.onParsed` (#732)
+- BREAKING: Remove `HtmlWidget.webViewXxx` properties #615
+- BREAKING: Remove support for `box-sizing` (#903)
+- BREAKING: Remove `WidgetPlaceholder.autoUnwrap` (#906)
+- BREAKING: `.getDependency<MediaQueryData>()` no longer works (#911)
+- BREAKING: Append `defaultStyles` instead of prepend (#1055)
+- BREAKING: Change default alignment of inline widget from `bottom` to `baseline` (#1056)
+
+See migration document: https://github.com/daohoangson/flutter_widget_from_html/blob/master/docs/migration.md
+
 ## 0.10.6
 
 - Fix border 0 is still being rendered (#1045)

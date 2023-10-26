@@ -1,3 +1,9 @@
+## 0.14.2
+
+- Requires Flutter 3.7 (#899)
+- Refactor: safer typing (#911)
+- Add support for flutter_widget_from_html_core@0.14.0 (#948)
+
 ## 0.9.0+3
 
 - Add screenshots, funding and topics to pubspec files (#1010)

@@ -1,159 +1,158 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 import '../core_data.dart';
+import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
 import 'margin_vertical.dart';
 
-@immutable
-class Flattened {
-  final SpanBuilder? spanBuilder;
-  final Widget? widget;
-  final WidgetBuilder? widgetBuilder;
+final _logger = Logger('fwfh.Flattener');
 
-  const Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
-}
-
-typedef SpanBuilder = InlineSpan? Function(
-  BuildContext,
-  CssWhitespace whitespace, {
-  bool? isLast,
-});
-
-class Flattener {
+class Flattener implements Flattened {
+  final BuildTree tree;
   final WidgetFactory wf;
+  final _widgets = <WidgetPlaceholder>[];
 
-  final _flattened = <Flattened>[];
-  final _recognizers = <GestureRecognizer>[];
+  List<InlineSpan? Function(BuildContext, {bool? isLast})>? _childrenBuilder;
+  late InheritanceResolvers _firstInheritanceResolvers;
+  late List<_String> _firstStrings;
 
-  late _Recognizer _recognizer;
-  late _Recognizer _prevRecognizer;
-  List<SpanBuilder>? _spans;
-  late List<_String> _strings;
-  late List<_String> _prevStrings;
+  late BuildBit _bit;
+  late InheritanceResolvers _inheritanceResolvers;
   var _swallowWhitespace = false;
-  late TextStyleBuilder _tsb;
-  late TextStyleBuilder _prevTsb;
+  late List<_String> _strings;
 
-  Flattener(this.wf);
+  Flattener(this.wf, this.tree) {
+    _loopSubTree(tree, flatten: false);
 
-  @mustCallSuper
-  void dispose() {
-    for (final r in _recognizers) {
-      r.dispose();
-    }
-    _recognizers.clear();
-  }
-
-  List<Flattened> flatten(BuildTree tree) {
-    _resetLoop(tree.tsb);
-
-    final bits = tree.bits.toList(growable: false);
-
-    var min = 0;
-    var max = bits.length - 1;
-    for (; min <= max; min++) {
-      if (bits[min] is! WhitespaceBit) {
-        break;
-      }
-    }
-    for (; max >= min; max--) {
-      if (bits[max] is! WhitespaceBit) {
-        break;
-      }
-    }
-
-    for (var i = 0; i <= bits.length - 1; i++) {
-      _loop(
-        bits[i],
-        shouldBeTrimmed: i < min || i > max,
-      );
+    _resetLoop(tree.inheritanceResolvers);
+    for (final bit in tree.bits) {
+      _loop(bit);
     }
     _completeLoop();
-
-    return _flattened;
   }
 
-  void _resetLoop(TextStyleBuilder tsb) {
-    _recognizer = _Recognizer();
-    _spans = [];
-    _strings = [];
-    _tsb = tsb;
+  Iterable<WidgetPlaceholder> get widgets => _widgets;
 
-    _prevRecognizer = _recognizer;
-    _prevStrings = _strings;
-    _prevTsb = _tsb;
-  }
-
-  void _loop(
-    BuildBit bit, {
-    required bool shouldBeTrimmed,
+  @override
+  void inlineWidget({
+    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
+    TextBaseline baseline = TextBaseline.alphabetic,
+    required Widget child,
   }) {
-    final thisTsb = _getBitTsb(bit);
-    if (_spans == null) {
-      _resetLoop(thisTsb);
-    }
-    if (!thisTsb.hasSameStyleWith(_prevTsb)) {
-      _saveSpan();
+    _saveSpan();
+
+    final scopedTree = _bit.parent;
+    final scopedInheritanceResolvers = _inheritanceResolvers;
+    final placeholder = WidgetPlaceholder.lazy(
+      child,
+      debugLabel: '${scopedTree.element.localName}--Flattener.inlineWidget',
+    );
+
+    placeholder.wrapWith((context, widget) {
+      final resolved = scopedInheritanceResolvers.resolve(context);
+      final recognizer = resolved.gestureRecognizer;
+      if (recognizer != null && _needsInlineRecognizer(context, resolved)) {
+        return wf.buildGestureDetector(scopedTree, widget, recognizer);
+      }
+
+      return widget;
+    });
+
+    _childrenBuilder?.add(
+      (_, {bool? isLast}) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: placeholder,
+      ),
+    );
+  }
+
+  @override
+  void widget(Widget value) {
+    _completeLoop();
+
+    final placeholder = WidgetPlaceholder.lazy(
+      value,
+      debugLabel: '${_bit.parent.element.localName}--Flattener.widget',
+    );
+    final scopedInheritanceResolvers = _inheritanceResolvers;
+    placeholder.wrapWith((context, child) {
+      final resolved = scopedInheritanceResolvers.resolve(context);
+      final recognizer = resolved.gestureRecognizer;
+      final detector = recognizer != null
+          ? wf.buildGestureDetector(tree, child, recognizer)
+          : null;
+      return detector ?? child;
+    });
+
+    _widgets.add(placeholder);
+    _logger.finest('Added ${placeholder.debugLabel} widget');
+  }
+
+  @override
+  void write({String? text, String? whitespace}) {
+    if (text != null) {
+      _strings.add(_String(text));
     }
 
-    dynamic built;
-    if (bit is BuildBit<BuildContext, Widget>) {
-      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
-      built = widgetBuilder;
-    } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
-      built = bit.buildBit(_prevRecognizer.value);
-    } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      // ignore: prefer_function_declarations_over_variables
-      final SpanBuilder spanBuilder =
-          (context, _, {bool? isLast}) => bit.buildBit(thisTsb.build(context));
-      built = spanBuilder;
-    } else {
-      built = bit.buildBit(null);
-    }
-
-    if (built is GestureRecognizer) {
-      _prevRecognizer.value = built;
-    } else if (built is InlineSpan) {
-      _saveSpan();
-
-      final inlineSpan = built;
-      _spans!.add((_, __, {bool? isLast}) => inlineSpan);
-    } else if (built is SpanBuilder) {
-      _saveSpan();
-      _spans!.add(built);
-    } else if (built is String) {
-      _prevStrings.add(
+    if (whitespace != null) {
+      _strings.add(
         _String(
-          bit,
-          built,
-          shouldBeSwallowed: _shouldSwallow(bit),
-          shouldBeTrimmed: shouldBeTrimmed,
+          whitespace,
+          isWhitespace: true,
+          shouldBeSwallowed: _shouldSwallow(_bit),
         ),
       );
-    } else if (built is Widget) {
-      _completeLoop();
-      _flattened.add(Flattened._(widget: built));
-    } else if (built is WidgetBuilder) {
-      _completeLoop();
-      _flattened.add(Flattened._(widgetBuilder: built));
+    }
+  }
+
+  void _resetLoop(InheritanceResolvers inheritanceResolvers) {
+    _childrenBuilder = [];
+    _firstInheritanceResolvers = inheritanceResolvers;
+    _firstStrings = [];
+
+    _inheritanceResolvers = _firstInheritanceResolvers;
+    _strings = _firstStrings;
+  }
+
+  void _loopSubTree(BuildTree someTree, {required bool flatten}) {
+    for (final child in someTree.children) {
+      if (child is BuildTree) {
+        _loopSubTree(child, flatten: true);
+      }
     }
 
-    _prevTsb = thisTsb;
+    if (flatten) {
+      someTree.flatten(this);
+    }
+  }
+
+  void _loop(BuildBit bit) {
+    _bit = bit;
+    final thisInheritanceResolvers =
+        bit.effectiveInheritanceResolvers ?? _inheritanceResolvers;
+    if (_childrenBuilder == null) {
+      _resetLoop(thisInheritanceResolvers);
+    }
+    if (!thisInheritanceResolvers.isIdenticalWith(_inheritanceResolvers)) {
+      _saveSpan();
+    }
+    _inheritanceResolvers = thisInheritanceResolvers;
+
+    bit.flatten(this);
+
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
 
   bool _shouldSwallow(BuildBit bit) {
-    if (bit is! WhitespaceBit) {
-      return false;
-    }
     if (_swallowWhitespace) {
       return true;
     }
 
-    final next = nextNonWhitespace(bit);
-    if (next != null && !next.isInline) {
+    final next = bit.nextNonWhitespace;
+    if (next != null && next.isInline == false) {
       // skip whitespace before a new block
       return true;
     }
@@ -162,135 +161,165 @@ class Flattener {
   }
 
   void _saveSpan() {
-    if (_prevStrings != _strings && _prevStrings.isNotEmpty) {
-      final scopedRecognizer = _prevRecognizer.value;
-      final scopedTsb = _prevTsb;
-      final scopedStrings = _prevStrings;
+    if (_strings != _firstStrings && _strings.isNotEmpty) {
+      final scopedInheritanceResolvers = _inheritanceResolvers;
+      final scopedStrings = _strings;
 
-      if (scopedRecognizer != null) {
-        _recognizers.add(scopedRecognizer);
-      }
-
-      _spans!.add(
-        (context, whitespace, {bool? isLast}) {
+      _childrenBuilder?.add(
+        (context, {bool? isLast}) {
+          final resolved = scopedInheritanceResolvers.resolve(context);
           final text = scopedStrings.toText(
-            whitespace,
-            dropNewLine: isLast != false,
+            resolved.whitespaceOrNormal,
+            isFirst: false,
+            isLast: isLast != false,
           );
           if (text.isEmpty) {
             return null;
           }
 
           return wf.buildTextSpan(
-            recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).style,
+            recognizer: _needsInlineRecognizer(context, resolved)
+                ? resolved.gestureRecognizer
+                : null,
+            style: resolved.style,
             text: text,
           );
         },
       );
     }
 
-    _prevStrings = [];
-    _prevRecognizer = _Recognizer();
+    _strings = [];
   }
 
   void _completeLoop() {
     _saveSpan();
 
-    final scopedSpans = _spans;
-    if (scopedSpans == null) {
+    final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
+    if (reversedBuilders == null) {
       return;
     }
 
-    _spans = null;
-    if (scopedSpans.isEmpty && _strings.isEmpty) {
+    _childrenBuilder = null;
+    if (reversedBuilders.isEmpty && _firstStrings.isEmpty) {
       return;
     }
-    final scopedRecognizer = _recognizer.value;
-    final scopedTsb = _tsb;
-    final scopedStrings = _strings;
+    final scopedStrings = _firstStrings;
+    final scopedInheritanceResolvers = _firstInheritanceResolvers;
 
-    if (scopedRecognizer != null) {
-      _recognizers.add(scopedRecognizer);
-    }
+    final placeholder = WidgetPlaceholder(
+      builder: (context, _) {
+        final resolved = scopedInheritanceResolvers.resolve(context);
+        final children = <InlineSpan>[];
 
-    _flattened.add(
-      Flattened._(
-        spanBuilder: (context, whitespace, {bool? isLast}) {
-          final spanBuilders = scopedSpans.reversed.toList(growable: false);
-          final children = <InlineSpan>[];
-
-          var isLast_ = isLast != false;
-          for (final spanBuilder in spanBuilders) {
-            final child = spanBuilder(context, whitespace, isLast: isLast_);
-            if (child != null) {
-              isLast_ = false;
-              children.insert(0, child);
-            }
+        var isLast_ = true;
+        for (final builder in reversedBuilders) {
+          final child = builder(context, isLast: isLast_);
+          if (child != null) {
+            isLast_ = false;
+            children.insert(0, child);
           }
+        }
 
-          final text = scopedStrings.toText(whitespace, dropNewLine: isLast_);
-          if (text.isEmpty && children.isEmpty) {
-            final nonWhitespaceStrings = scopedStrings
-                .where((str) => str.bit is! WhitespaceBit)
-                .toList(growable: false);
-            if (nonWhitespaceStrings.length == 1 &&
-                nonWhitespaceStrings[0].bit is TagBrBit) {
-              // special handling for paragraph with <BR /> only
-              const oneEm = CssLength(1, CssLengthUnit.em);
-              return WidgetSpan(child: HeightPlaceholder(oneEm, scopedTsb));
-            }
-
-            return null;
+        final text = scopedStrings.toText(
+          resolved.whitespaceOrNormal,
+          isFirst: true,
+          isLast: isLast_,
+        );
+        InlineSpan? span;
+        if (text.isEmpty && children.isEmpty) {
+          final nonWhitespaceStrings = scopedStrings
+              .where((str) => !str.isWhitespace)
+              .toList(growable: false);
+          if (nonWhitespaceStrings.length == 1 &&
+              nonWhitespaceStrings[0].data == '\n') {
+            // special handling for paragraph with <BR /> only
+            const oneEm = CssLength(1, CssLengthUnit.em);
+            span = WidgetSpan(
+              child: HeightPlaceholder(
+                oneEm,
+                scopedInheritanceResolvers,
+                debugLabel: '${tree.element.localName}--$oneEm',
+              ),
+            );
           }
-
-          return wf.buildTextSpan(
+        } else {
+          span = wf.buildTextSpan(
             children: children,
-            recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).style,
+            recognizer: _needsInlineRecognizer(context, resolved)
+                ? resolved.gestureRecognizer
+                : null,
+            style: resolved.style,
             text: text,
           );
-        },
-      ),
+        }
+
+        if (span == null) {
+          return widget0;
+        }
+
+        final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
+        if (span is WidgetSpan && textAlign == TextAlign.start) {
+          return span.child;
+        }
+
+        return wf.buildText(tree, resolved, span);
+      },
+      debugLabel: '${tree.element.localName}--text',
     );
+
+    _widgets.add(placeholder);
+    _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
-  TextStyleBuilder _getBitTsb(BuildBit bit) {
-    if (bit is! WhitespaceBit) {
-      return bit.tsb;
-    }
+  bool _needsInlineRecognizer(
+    BuildContext context,
+    InheritedProperties resolved,
+  ) {
+    final rootProperties = tree.inheritanceResolvers.resolve(context);
+    return resolved.gestureRecognizer != null &&
+        !identical(
+          resolved.gestureRecognizer,
+          rootProperties.gestureRecognizer,
+        );
+  }
+}
 
-    // the below code will find the best style for this whitespace bit
+extension on BuildBit {
+  InheritanceResolvers? get effectiveInheritanceResolvers {
+    // the below code will find the best resolvers for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
-    final parent = bit.parent;
-    if (parent == null || bit == parent.first) {
-      return _prevTsb;
+    final parent = this.parent;
+    if (this is! WhitespaceBit) {
+      return parent.inheritanceResolvers;
+    }
+    if (this == parent.first) {
+      return null;
     }
 
     // complicated: whitespace at the end of a tag, try to merge with the next
-    // unless it has unrelated style (e.g. next bit is a sibling)
-    if (bit == parent.last) {
-      final next = nextNonWhitespace(bit);
+    // unless it has unrelated styling (e.g. next bit is a sibling)
+    if (this == parent.last) {
+      final next = nextNonWhitespace;
       if (next != null) {
         var tree = parent;
-        while (tree.parent?.last == bit) {
-          tree = tree.parent!;
+        while (tree.parent.last == this) {
+          tree = tree.parent;
         }
 
         if (tree.parent == next.parent) {
-          return next.tsb;
+          return next.parent.inheritanceResolvers;
         } else {
-          return _prevTsb;
+          return null;
         }
       }
     }
 
-    // fallback to default (style from parent)
-    return parent.tsb;
+    // fallback to parent's
+    return parent.inheritanceResolvers;
   }
 
-  static BuildBit? nextNonWhitespace(BuildBit bit) {
-    var next = bit.next;
+  BuildBit? get nextNonWhitespace {
+    var next = this.next;
     while (next != null && next is WhitespaceBit) {
       next = next.next;
     }
@@ -299,32 +328,28 @@ class Flattener {
   }
 }
 
-/// A mutable recognizer.
-///
-/// This class is needed because [GestureRecognizer] is rebuilt
-/// but we have to keep track of prev / current recognizer for spans
-class _Recognizer {
-  GestureRecognizer? value;
+extension on InheritedProperties {
+  CssWhitespace get whitespaceOrNormal => get() ?? CssWhitespace.normal;
 }
 
+@immutable
 class _String {
-  final BuildBit bit;
   final String data;
+  final bool isWhitespace;
   final bool shouldBeSwallowed;
-  final bool shouldBeTrimmed;
 
-  _String(
-    this.bit,
+  const _String(
     this.data, {
+    this.isWhitespace = false,
     this.shouldBeSwallowed = false,
-    this.shouldBeTrimmed = false,
   });
 }
 
-extension _StringListToText on List<_String> {
+extension on List<_String> {
   String toText(
     CssWhitespace whitespace, {
-    required bool dropNewLine,
+    required bool isFirst,
+    required bool isLast,
   }) {
     if (isEmpty) {
       return '';
@@ -335,14 +360,18 @@ extension _StringListToText on List<_String> {
     var min = 0;
     var max = length - 1;
     if (whitespace != CssWhitespace.pre) {
-      for (; min <= max; min++) {
-        if (!this[min].shouldBeTrimmed) {
-          break;
+      if (isFirst) {
+        for (; min <= max; min++) {
+          if (!this[min].isWhitespace) {
+            break;
+          }
         }
       }
-      for (; max >= min; max--) {
-        if (!this[max].shouldBeTrimmed) {
-          break;
+      if (isLast) {
+        for (; max >= min; max--) {
+          if (!this[max].isWhitespace) {
+            break;
+          }
         }
       }
     }
@@ -353,14 +382,30 @@ extension _StringListToText on List<_String> {
         continue;
       }
 
-      if (str.bit is WhitespaceBit) {
-        if (whitespace == CssWhitespace.pre) {
-          buffer.write(str.data);
-        } else {
-          buffer.write(' ');
+      if (str.isWhitespace) {
+        switch (whitespace) {
+          case CssWhitespace.normal:
+            buffer.write(' ');
+            break;
+          case CssWhitespace.nowrap:
+            buffer.write('\u00A0');
+            break;
+          case CssWhitespace.pre:
+            buffer.write(str.data);
+            break;
         }
       } else {
-        buffer.write(str.data);
+        switch (whitespace) {
+          case CssWhitespace.normal:
+            buffer.write(str.data);
+            break;
+          case CssWhitespace.nowrap:
+            buffer.write(str.data.replaceAll(' ', '\u00A0'));
+            break;
+          case CssWhitespace.pre:
+            buffer.write(str.data);
+            break;
+        }
       }
     }
 
@@ -370,7 +415,7 @@ extension _StringListToText on List<_String> {
       return result;
     }
 
-    if (dropNewLine) {
+    if (isLast) {
       return result.replaceFirst(RegExp(r'\n$'), '');
     }
 

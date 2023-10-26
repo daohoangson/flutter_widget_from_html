@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -17,7 +20,8 @@ class TagAudio {
 
   TagAudio(this.wf);
 
-  BuildOp get op => BuildOp(
+  BuildOp get buildOp => BuildOp(
+        // TODO: set debugLabel when our minimum core version >= 1.0
         onWidgets: (meta, widgets) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
@@ -34,19 +38,17 @@ class TagAudio {
             return widgets;
           }
 
-          return listOrNull(
-                wf.buildAudioPlayer(
-                  meta,
-                  url,
-                  autoplay: attrs.containsKey(kAttributeAudioAutoplay),
-                  loop: attrs.containsKey(kAttributeAudioLoop),
-                  muted: attrs.containsKey(kAttributeAudioMuted),
-                  preload: attrs.containsKey(kAttributeAudioPreload) &&
-                      attrs[kAttributeAudioPreload] !=
-                          kAttributeAudioPreloadNone,
-                ),
-              ) ??
-              widgets;
+          final built = wf.buildAudioPlayer(
+            meta,
+            url,
+            autoplay: attrs.containsKey(kAttributeAudioAutoplay),
+            loop: attrs.containsKey(kAttributeAudioLoop),
+            muted: attrs.containsKey(kAttributeAudioMuted),
+            preload: attrs.containsKey(kAttributeAudioPreload) &&
+                attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
+          );
+
+          return listOrNull(built) ?? widgets;
         },
       );
 }

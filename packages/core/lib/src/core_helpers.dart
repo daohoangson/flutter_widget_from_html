@@ -4,10 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_data.dart';
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
+import 'widgets/inline_custom_widget.dart';
 
 export 'external/csslib.dart';
+export 'external/text_scale_factor.dart';
 export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_details.dart';
@@ -15,6 +18,7 @@ export 'widgets/html_list_item.dart';
 export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
+export 'widgets/inline_custom_widget.dart';
 export 'widgets/valign_baseline.dart';
 
 /// The default character threshold to build widget tree asynchronously.
@@ -25,6 +29,7 @@ const kShouldBuildAsync = 10000;
 /// A no op widget.
 const widget0 = SizedBox.shrink();
 
+/// {@template flutter_widget_from_html.customStylesBuilder}
 /// A callback to specify custom styling.
 ///
 /// The returned `Map` will be applied as inline styles.
@@ -38,16 +43,20 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String>? Function(
-  dom.Element element,
-);
+/// {@endtemplate}
+typedef CustomStylesBuilder = StylesMap? Function(dom.Element element);
 
+/// {@template flutter_widget_from_html.customWidgetBuilder}
 /// A callback to render custom widget for a DOM element.
 ///
 /// This is suitable for fairly simple widget. Please note that
 /// you have to handle the DOM element and its children manually,
 /// if the children have HTML styling etc., they won't be processed at all.
 /// For those needs, a custom [WidgetFactory] is the way to go.
+///
+/// By default, the widget will be rendered as a block element.
+/// Wrap custom widget in a [InlineCustomWidget] to make it inline.
+/// {@endtemplate}
 typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
 /// A callback to scroll the anchor identified by [id] into the viewport.
@@ -90,105 +99,37 @@ typedef OnLoadingBuilder = Widget? Function(
   double? loadingProgress,
 );
 
-/// A set of values that should trigger rebuild.
-class RebuildTriggers {
-  final List _values;
+/// A widget builder that can be extended with callbacks.
+class WidgetPlaceholder extends StatelessWidget {
+  /// A human-readable description of this placeholder.
+  final String? debugLabel;
 
-  /// Creates a set.
-  ///
-  /// The values should have sane equality check to avoid excessive rebuilds.
-  RebuildTriggers(this._values);
-
-  @override
-  int get hashCode => _values.length;
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (other is RebuildTriggers) {
-      final otherValues = other._values;
-      if (otherValues.length != _values.length) {
-        return false;
-      }
-
-      for (var i = 0; i < _values.length; i++) {
-        if (otherValues[i] != _values[i]) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-}
-
-/// An extension on [Widget] to keep track of anchors.
-extension WidgetAnchors on Widget {
-  static final _anchors = Expando<Iterable<Key>>();
-
-  /// Anchor keys of this widget and its children.
-  Iterable<Key>? get anchors => _anchors[this];
-
-  /// Set anchor keys.
-  bool setAnchorsIfUnset(Iterable<Key>? anchors) {
-    if (anchors == null) {
-      return false;
-    }
-
-    final existing = _anchors[this];
-    if (existing != null) {
-      return false;
-    }
-
-    _anchors[this] = anchors;
-    return true;
-  }
-}
-
-/// A widget builder that supports builder callbacks.
-class WidgetPlaceholder<T> extends StatelessWidget {
-  /// The origin of this widget.
-  final T generator;
-
-  final bool _autoUnwrap;
-  final List<Widget? Function(BuildContext, Widget)> _builders = [];
+  final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
-  /// Creates a widget builder.
-  WidgetPlaceholder(
-    this.generator, {
-    bool autoUnwrap = true,
+  /// Creates a placeholder.
+  WidgetPlaceholder({
+    WidgetPlaceholderBuilder? builder,
     Widget? child,
+    this.debugLabel,
     super.key,
-  })  : _autoUnwrap = autoUnwrap,
+  })  : _builders = builder != null ? [builder] : [],
         _firstChild = child;
 
-  @visibleForTesting
+  /// Whether this placeholder renders anything.
+  bool get isEmpty => _firstChild == null && _builders.isEmpty;
+
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
+  @protected
   Widget callBuilders(BuildContext context, Widget? child) {
     var built = unwrap(context, child ?? widget0);
-    if (child != null && built == widget0) {
-      // child has been unwrapped into no op, stop processing further right now
-      return widget0;
-    }
 
     for (final builder in _builders) {
       built = unwrap(context, builder(context, built) ?? widget0);
-      if (built == widget0) {
-        // builder returns no op, cancel subsequent callbacks
-        return widget0;
-      }
     }
-
-    built.setAnchorsIfUnset(anchors);
 
     return built;
   }
@@ -196,44 +137,39 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty('generator', generator, showName: false));
+
+    if (debugLabel != null) {
+      properties.add(
+        DiagnosticsProperty('debugLabel', debugLabel, showName: false),
+      );
+    }
   }
 
   /// Enqueues [builder] to be built later.
-  WidgetPlaceholder<T> wrapWith(
-    Widget? Function(BuildContext context, Widget child) builder,
-  ) {
+  WidgetPlaceholder wrapWith(WidgetPlaceholderBuilder builder) {
     _builders.add(builder);
     return this;
   }
 
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      generator != null
-          ? 'WidgetPlaceholder($generator)'
-          : objectRuntimeType(this, 'WidgetPlaceholder');
-
   /// Creates a placeholder lazily.
   ///
   /// Returns [child] if it is already a placeholder.
-  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
-      ? child
-      : WidgetPlaceholder<Widget>(child, child: child);
+  // ignore: prefer_constructors_over_static_methods
+  static WidgetPlaceholder lazy(Widget child, {String? debugLabel}) =>
+      child is WidgetPlaceholder
+          ? child
+          : WidgetPlaceholder(debugLabel: debugLabel, child: child);
 
-  /// Unwraps a placeholder if `autoUnwrap` has been set.
-  static Widget unwrap(BuildContext context, Widget widget) {
-    if (widget is WidgetPlaceholder) {
-      if (widget._autoUnwrap) {
-        return widget.build(context);
-      } else {
-        return widget;
-      }
-    } else {
-      return widget;
-    }
-  }
+  /// Builds widget if it is a placeholder.
+  static Widget unwrap(BuildContext context, Widget widget) =>
+      widget is WidgetPlaceholder ? widget.build(context) : widget;
 }
+
+/// A callback for [WidgetPlaceholder].
+typedef WidgetPlaceholderBuilder = Widget? Function(
+  BuildContext context,
+  Widget child,
+);
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 
@@ -260,9 +196,6 @@ Uint8List? bytesFromDataUri(String dataUri) {
 
   return bytes?.isNotEmpty == true ? bytes : null;
 }
-
-/// Returns [List<T>] if [x] is provided or `null` otherwise.
-Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
 double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) {

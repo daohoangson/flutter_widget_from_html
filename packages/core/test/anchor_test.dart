@@ -81,6 +81,48 @@ void main() {
   });
 
   group('tap test', () {
+    testWidgets('hits id', (WidgetTester tester) async {
+      await pumpWidget(
+        tester,
+        const _ColumnTestApp(
+          html: '<div id="foo">Foo</div><a href="#foo">Tap me</a>',
+        ),
+      );
+
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+      expect(_onTapAnchorResults, equals({'foo': true}));
+    });
+
+    testWidgets('hits id with baseUrl specified', (WidgetTester tester) async {
+      await pumpWidget(
+        tester,
+        _ColumnTestApp(
+          baseUrl: Uri.https('domain.com', 'path'),
+          html: '<div id="foo">Foo</div><a href="#foo">Tap me</a>',
+        ),
+      );
+
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+      expect(_onTapAnchorResults, equals({'foo': true}));
+    });
+
+    testWidgets('hits baseUrl#id', (WidgetTester tester) async {
+      await pumpWidget(
+        tester,
+        _ColumnTestApp(
+          baseUrl: Uri.https('domain.com', 'path'),
+          html: '<div id="fragment">Foo</div>'
+              '<a href="https://domain.com/path#fragment">Tap me</a>',
+        ),
+      );
+
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+      expect(_onTapAnchorResults, equals({'fragment': true}));
+    });
+
     testWidgets('skips unknown id', (WidgetTester tester) async {
       await pumpWidget(
         tester,
@@ -367,31 +409,23 @@ ${htmlDesc * 3}
 final globalKey = GlobalKey<HtmlWidgetState>();
 
 Future<void> pumpWidget(WidgetTester tester, Widget child) async {
-  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-  // ignore: deprecated_member_use
-  tester.binding.window.physicalSizeTestValue = const Size(200, 200);
-  // ignore: deprecated_member_use
-  addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-  // ignore: deprecated_member_use
-  tester.binding.window.devicePixelRatioTestValue = 1.0;
-  // ignore: deprecated_member_use
-  addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
-  // ignore: deprecated_member_use
-  tester.binding.window.platformDispatcher.textScaleFactorTestValue = 1.0;
-  addTearDown(
-    // ignore: deprecated_member_use
-    tester.binding.window.platformDispatcher.clearTextScaleFactorTestValue,
-  );
+  tester.setWindowSize(const Size(200, 200));
+  tester.setTextScaleFactor(1);
 
   await tester.pumpWidget(MaterialApp(home: child));
   await tester.pump();
 }
 
 class _ColumnTestApp extends StatelessWidget {
+  final Uri? baseUrl;
   final String? html;
   final Key? keyBottom;
 
-  const _ColumnTestApp({this.html, this.keyBottom});
+  const _ColumnTestApp({
+    this.baseUrl,
+    this.html,
+    this.keyBottom,
+  });
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -400,6 +434,7 @@ class _ColumnTestApp extends StatelessWidget {
             children: [
               HtmlWidget(
                 html ?? htmlDefault,
+                baseUrl: baseUrl,
                 factoryBuilder: () => _WidgetFactory(),
                 key: globalKey,
               ),

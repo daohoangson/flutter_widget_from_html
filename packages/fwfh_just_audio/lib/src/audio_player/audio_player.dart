@@ -89,8 +89,9 @@ class _AudioPlayerState extends State<AudioPlayer> {
         builder: (_, bc) {
           final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
           final theme = Theme.of(context);
-          final iconSize = DefaultTextStyle.of(context).style.fontSize! *
-              MediaQuery.of(context).textScaleFactor;
+          final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
+          final tsf = MediaQuery.textScaleFactorOf(context);
+          final iconSize = fontSize * tsf;
 
           return DecoratedBox(
             decoration: BoxDecoration(

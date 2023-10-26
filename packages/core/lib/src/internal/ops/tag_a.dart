@@ -10,67 +10,55 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_) => const {
-          kCssTextDecoration: kCssTextDecorationUnderline,
-        },
-        onTreeFlattening: (meta, tree) {
-          final onTap = _gestureTapCallback(meta);
-          if (onTap == null) {
-            return;
+        debugLabel: 'a[href]',
+        defaultStyles: _defaultStyles,
+        onParsed: (tree) {
+          final href = tree.element.attributes[kAttributeAHref];
+          if (href == null) {
+            return tree;
           }
 
-          for (final bit in tree.bits.toList(growable: false)) {
-            if (bit is WidgetBit) {
-              bit.child.wrapWith(
-                (_, child) => wf.buildGestureDetector(meta, child, onTap),
-              );
-            } else if (bit is! WhitespaceBit) {
-              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
-            }
-          }
-        },
-        onWidgets: (meta, widgets) {
-          final onTap = _gestureTapCallback(meta);
-          if (onTap == null) {
-            return widgets;
-          }
-
-          return listOrNull(
-            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildGestureDetector(meta, child, onTap),
-                ),
+          final url = wf.urlFull(href) ?? href;
+          final recognizer = wf.buildGestureRecognizer(
+            tree,
+            onTap: () => wf.onTapUrl(url),
           );
+          if (recognizer == null) {
+            return tree;
+          }
+
+          return tree..inherit(_builder, recognizer);
         },
-        onWidgetsIsOptional: true,
+        priority: Priority.tagA,
       );
 
-  GestureTapCallback? _gestureTapCallback(BuildMetadata meta) {
-    final href = meta.element.attributes[kAttributeAHref];
-    return href != null
-        ? wf.gestureTapCallback(wf.urlFull(href) ?? href)
-        : null;
+  static InheritedProperties defaultColor(
+    InheritedProperties resolving,
+    BuildContext? context,
+  ) =>
+      context == null
+          ? resolving
+          : resolving.copyWith(
+              style: resolving.style.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                debugLabel: 'fwfh: a[href] default color',
+              ),
+            );
+
+  static StylesMap _defaultStyles(dom.Element _) {
+    return const {
+      kCssTextDecoration: kCssTextDecorationUnderline,
+    };
   }
+
+  static InheritedProperties _builder(
+    InheritedProperties resolving,
+    GestureRecognizer value,
+  ) =>
+      resolving.copyWith<GestureRecognizer>(value: value);
 }
 
-class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer> {
-  final GestureTapCallback onTap;
-
-  const _TagABit(super.parent, super.tsb, this.onTap);
-
-  @override
-  bool? get swallowWhitespace => null;
-
-  @override
-  GestureRecognizer buildBit(GestureRecognizer? recognizer) {
-    if (recognizer is TapGestureRecognizer) {
-      recognizer.onTap = onTap;
-      return recognizer;
-    }
-
-    return TapGestureRecognizer()..onTap = onTap;
-  }
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagABit(parent ?? this.parent, tsb ?? this.tsb, onTap);
+extension GestureRecognizerGetter on InheritedProperties {
+  /// The [GestureRecognizer] for inline spans.
+  GestureRecognizer? get gestureRecognizer => get();
 }

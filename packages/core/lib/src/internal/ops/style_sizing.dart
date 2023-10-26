@@ -7,186 +7,154 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
-extension CssLengthToSizing on CssLength {
-  CssSizingValue? getSizing(TextStyleHtml tsh) {
-    final value = getValue(tsh);
-    if (value != null) {
-      return CssSizingValue.value(value);
-    }
-
-    switch (unit) {
-      case CssLengthUnit.auto:
-        return const CssSizingValue.auto();
-      case CssLengthUnit.percentage:
-        return CssSizingValue.percentage(number);
-      default:
-        return null;
-    }
-  }
-}
-
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
-  static const kPriorityBoxModel3k = 3000;
 
-  late final BuildOp opBlock;
-  late final BuildOp opChild;
-  late final BuildOp opSizing;
-  final WidgetFactory wf;
+  final BuildOp blockOp;
+  final BuildOp childOp;
+  final BuildOp sizingOp;
 
-  static final _instances = Expando<StyleSizing>();
-  static final _elementMeta = Expando<BuildMetadata>();
-  static final _metaIsBlock = Expando<bool>();
+  static final _elementTree = Expando<BuildTree>();
+  static final _treeIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
-  static void registerBlock(WidgetFactory wf, BuildMetadata meta) {
-    _elementMeta[meta.element] = meta;
-    _metaIsBlock[meta] = true;
-
-    final instance = StyleSizing._factory(wf);
-    meta
-      ..register(instance.opBlock)
-      ..register(instance.opSizing);
-  }
-
-  static void registerChild(WidgetFactory wf, BuildMetadata meta) {
-    final parentElement = meta.element.parent;
-    if (parentElement == null || _elementMeta[parentElement] == null) {
+  static void maybeRegisterChildOp(WidgetFactory wf, BuildTree tree) {
+    final parentElement = tree.element.parent;
+    if (parentElement == null || _elementTree[parentElement] == null) {
       return;
     }
 
-    meta.register(StyleSizing._factory(wf).opChild);
+    tree.register(StyleSizing().childOp);
   }
 
-  static void registerSizing(WidgetFactory wf, BuildMetadata meta) {
-    _elementMeta[meta.element] = meta;
-    meta.register(StyleSizing._factory(wf).opSizing);
+  static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
+    _elementTree[tree.element] = tree;
+    _treeIsBlock[tree] = true;
+
+    final instance = StyleSizing();
+    tree
+      ..register(instance.blockOp)
+      ..register(instance.sizingOp);
   }
 
-  factory StyleSizing._factory(WidgetFactory wf) {
-    final existingInstance = _instances[wf];
-    if (existingInstance != null) {
-      return existingInstance;
-    }
-    return _instances[wf] = StyleSizing._(wf);
+  static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
+    _elementTree[tree.element] = tree;
+    tree.register(StyleSizing().sizingOp);
   }
 
-  StyleSizing._(this.wf) {
-    opBlock = const BuildOp(onWidgets: bypass);
+  factory StyleSizing() => const StyleSizing._(
+        blockOp: BuildOp.v2(
+          alwaysRenderBlock: true,
+          debugLabel: 'display: block',
+        ),
+        childOp: BuildOp.v2(
+          alwaysRenderBlock: false,
+          debugLabel: 'sizing (min-width=0)',
+          onRenderBlock: _childZero,
+          priority: BoxModel.sizingMinWidthZero,
+        ),
+        sizingOp: BuildOp.v2(
+          alwaysRenderBlock: false,
+          debugLabel: 'sizing',
+          onRenderBlock: _sizingBlock,
+          onRenderInline: _sizingInline,
+          priority: BoxModel.sizing,
+        ),
+      );
 
-    opChild = BuildOp(
-      onWidgets: buildMinWidthZero,
-      onWidgetsIsOptional: true,
-      // min-width resetter should wrap all other box model widgets
-      priority: StyleMargin.kPriorityBoxModel9k + 1,
-    );
+  const StyleSizing._({
+    required this.blockOp,
+    required this.childOp,
+    required this.sizingOp,
+  });
 
-    opSizing = BuildOp(
-      onTreeFlattening: handleInlineSizing,
-      onWidgets: buildCssSizing,
-      onWidgetsIsOptional: true,
-      priority: StyleSizing.kPriorityBoxModel3k,
-    );
-  }
-
-  Iterable<Widget>? buildCssSizing(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_skipBuilding[meta] == true || widgets.isEmpty) {
-      return widgets;
-    }
-
-    final input = _StyleSizingInput.tryParse(meta);
-    if (input == null) {
-      return widgets;
-    }
-
-    return listOrNull(
-      wf
-          .buildColumnPlaceholder(meta, widgets)
-          ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
-    );
-  }
-
-  Iterable<Widget>? buildMinWidthZero(
-    BuildMetadata childMeta,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_StyleSizingInput.tryParse(childMeta)?.preferredWidth == k100percent) {
-      return widgets;
+  static Widget _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
+    if (subTree.sizingInput?.preferredWidth == k100percent) {
+      return placeholder;
     }
 
-    final parentElement = childMeta.element.parent;
+    final parentElement = subTree.element.parent;
     if (parentElement == null) {
-      return widgets;
+      return placeholder;
     }
 
-    final parentMeta = _elementMeta[parentElement];
-    if (parentMeta == null) {
-      return widgets;
+    final parentTree = _elementTree[parentElement];
+    if (parentTree == null) {
+      return placeholder;
     }
 
-    final parentInput = _StyleSizingInput.tryParse(parentMeta);
+    final parentInput = parentTree.sizingInput;
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return widgets;
+      return placeholder;
     }
 
-    return listOrNull(
-      wf.buildColumnPlaceholder(childMeta, widgets)?.wrapWith(
-        (context, child) {
-          final textDirection = childMeta.tsb.build(context).textDirection;
-          return _MinWidthZero(
-            textDirection: textDirection,
-            child: child,
-          );
-        },
-      ),
+    return placeholder.wrapWith((context, child) {
+      final dir = subTree.inheritanceResolvers.resolve(context).directionOrLtr;
+      return _MinWidthZero(
+        textDirection: dir,
+        child: child,
+      );
+    });
+  }
+
+  static Widget _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
+    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+      return placeholder;
+    }
+
+    final input = tree.sizingInput;
+    if (input == null) {
+      return placeholder;
+    }
+
+    return placeholder.wrapWith(
+      (context, child) =>
+          _build(context, child, input, tree.inheritanceResolvers),
     );
   }
 
-  static Iterable<Widget>? bypass(
-    BuildMetadata _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) =>
-      widgets;
-
-  static void handleInlineSizing(BuildMetadata meta, BuildTree tree) {
-    if (_skipBuilding[meta] == true) {
+  static void _sizingInline(BuildTree tree) {
+    if (_skipBuilding[tree] == true) {
       return;
     }
 
-    final input = _StyleSizingInput.tryParse(meta);
+    final input = tree.sizingInput;
     if (input == null) {
       return;
     }
 
-    WidgetPlaceholder? widget;
+    WidgetPlaceholder? placeholder;
     for (final b in tree.bits) {
       if (b is WidgetBit) {
-        if (widget != null) {
+        if (placeholder != null) {
+          // TODO: handle multiple inline widgets in the same tree
           return;
         }
-        widget = b.child;
+        placeholder = b.child;
       } else {
         return;
       }
     }
 
-    widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
+    if (placeholder == null || placeholder.isEmpty) {
+      return;
+    }
+
+    placeholder
+        .wrapWith((c, w) => _build(c, w, input, tree.inheritanceResolvers));
   }
 
-  static void skip(BuildMetadata meta) {
-    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
-    _skipBuilding[meta] = true;
+  static void skip(BuildTree tree) {
+    assert(_skipBuilding[tree] != true, 'Built ${tree.element} already');
+    _skipBuilding[tree] = true;
   }
 
   static Widget _build(
     BuildContext context,
     Widget child,
     _StyleSizingInput input,
-    TextStyleBuilder tsb,
+    InheritanceResolvers inheritanceResolvers,
   ) {
     if (input.maxHeight == null &&
         input.maxWidth == null &&
@@ -202,17 +170,117 @@ class StyleSizing {
       return CssBlock(child: child);
     }
 
-    final tsh = tsb.build(context);
+    final resolved = inheritanceResolvers.resolve(context);
     return CssSizing(
-      maxHeight: input.maxHeight?.getSizing(tsh),
-      maxWidth: input.maxWidth?.getSizing(tsh),
-      minHeight: input.minHeight?.getSizing(tsh),
-      minWidth: input.minWidth?.getSizing(tsh),
+      maxHeight: input.maxHeight?.getSizing(resolved),
+      maxWidth: input.maxWidth?.getSizing(resolved),
+      minHeight: input.minHeight?.getSizing(resolved),
+      minWidth: input.minWidth?.getSizing(resolved),
       preferredAxis: input.preferredAxis,
-      preferredHeight: input.preferredHeight?.getSizing(tsh),
-      preferredWidth: input.preferredWidth?.getSizing(tsh),
+      preferredHeight: input.preferredHeight?.getSizing(resolved),
+      preferredWidth: input.preferredWidth?.getSizing(resolved),
       child: child,
     );
+  }
+}
+
+extension on BuildTree {
+  _StyleSizingInput? get sizingInput {
+    final input = getNonInherited<_StyleSizingInput>() ??
+        setNonInherited<_StyleSizingInput>(_parse());
+
+    if (input.maxHeight == null &&
+        input.maxWidth == null &&
+        input.minHeight == null &&
+        input.minWidth == null &&
+        input.preferredHeight == null &&
+        input.preferredWidth == null) {
+      return null;
+    }
+
+    return input;
+  }
+
+  _StyleSizingInput _parse() {
+    CssLength? maxHeight;
+    CssLength? maxWidth;
+    CssLength? minHeight;
+    CssLength? minWidth;
+    Axis? preferredAxis;
+    CssLength? preferredHeight;
+    CssLength? preferredWidth;
+
+    for (final style in styles) {
+      final value = style.value;
+      if (value == null) {
+        continue;
+      }
+
+      switch (style.property) {
+        case kCssHeight:
+          final parsedHeight = tryParseCssLength(value);
+          if (parsedHeight != null) {
+            preferredAxis = Axis.vertical;
+            preferredHeight = parsedHeight;
+          }
+          break;
+        case kCssMaxHeight:
+          maxHeight = tryParseCssLength(value) ?? maxHeight;
+          break;
+        case kCssMaxWidth:
+          maxWidth = tryParseCssLength(value) ?? maxWidth;
+          break;
+        case kCssMinHeight:
+          minHeight = tryParseCssLength(value) ?? minHeight;
+          break;
+        case kCssMinWidth:
+          minWidth = tryParseCssLength(value) ?? minWidth;
+          break;
+        case kCssWidth:
+          final parsedWidth = tryParseCssLength(value);
+          if (parsedWidth != null) {
+            preferredAxis = Axis.horizontal;
+            preferredWidth = parsedWidth;
+          }
+          break;
+      }
+    }
+
+    if (preferredWidth == null && StyleSizing._treeIsBlock[this] == true) {
+      // `display: block` implies a 100% width
+      // but it MUST NOT reset width value if specified
+      // we need to keep track of block width to calculate contraints correctly
+      preferredWidth = StyleSizing.k100percent;
+      preferredAxis ??= Axis.horizontal;
+    }
+
+    return _StyleSizingInput(
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+      preferredAxis: preferredAxis,
+      preferredHeight: preferredHeight,
+      preferredWidth: preferredWidth,
+    );
+  }
+}
+
+extension on CssLength {
+  CssSizingValue? getSizing(InheritedProperties resolved) {
+    final value = getValue(resolved);
+    if (value != null) {
+      return CssSizingValue.value(value);
+    }
+
+    switch (unit) {
+      case CssLengthUnit.auto:
+        return const CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(number);
+      default:
+        return null;
+    }
   }
 }
 
@@ -250,88 +318,4 @@ class _StyleSizingInput {
     this.preferredHeight,
     this.preferredWidth,
   });
-
-  factory _StyleSizingInput.fromMeta(BuildMetadata meta) {
-    CssLength? maxHeight;
-    CssLength? maxWidth;
-    CssLength? minHeight;
-    CssLength? minWidth;
-    Axis? preferredAxis;
-    CssLength? preferredHeight;
-    CssLength? preferredWidth;
-
-    for (final style in meta.styles) {
-      final value = style.value;
-      if (value == null) {
-        continue;
-      }
-
-      switch (style.property) {
-        case kCssHeight:
-          final parsedHeight = tryParseCssLength(value);
-          if (parsedHeight != null) {
-            preferredAxis = Axis.vertical;
-            preferredHeight = parsedHeight;
-          }
-          break;
-        case kCssMaxHeight:
-          maxHeight = tryParseCssLength(value) ?? maxHeight;
-          break;
-        case kCssMaxWidth:
-          maxWidth = tryParseCssLength(value) ?? maxWidth;
-          break;
-        case kCssMinHeight:
-          minHeight = tryParseCssLength(value) ?? minHeight;
-          break;
-        case kCssMinWidth:
-          minWidth = tryParseCssLength(value) ?? minWidth;
-          break;
-        case kCssWidth:
-          final parsedWidth = tryParseCssLength(value);
-          if (parsedWidth != null) {
-            preferredAxis = Axis.horizontal;
-            preferredWidth = parsedWidth;
-          }
-          break;
-      }
-    }
-
-    if (preferredWidth == null && StyleSizing._metaIsBlock[meta] == true) {
-      // `display: block` implies a 100% width
-      // but it MUST NOT reset width value if specified
-      // we need to keep track of block width to calculate contraints correctly
-      preferredWidth = StyleSizing.k100percent;
-      preferredAxis ??= Axis.horizontal;
-    }
-
-    return _StyleSizingInput(
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      minHeight: minHeight,
-      minWidth: minWidth,
-      preferredAxis: preferredAxis,
-      preferredHeight: preferredHeight,
-      preferredWidth: preferredWidth,
-    );
-  }
-
-  static final _metaInput = Expando<_StyleSizingInput>();
-
-  static _StyleSizingInput? tryParse(BuildMetadata meta) {
-    var input = _metaInput[meta];
-    if (input == null) {
-      _metaInput[meta] = input = _StyleSizingInput.fromMeta(meta);
-    }
-
-    if (input.maxHeight == null &&
-        input.maxWidth == null &&
-        input.minHeight == null &&
-        input.minWidth == null &&
-        input.preferredHeight == null &&
-        input.preferredWidth == null) {
-      return null;
-    }
-
-    return input;
-  }
 }

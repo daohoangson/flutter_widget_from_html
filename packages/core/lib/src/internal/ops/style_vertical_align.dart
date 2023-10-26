@@ -9,8 +9,6 @@ const kCssVerticalAlignSub = 'sub';
 const kCssVerticalAlignSuper = 'super';
 
 class StyleVerticalAlign {
-  static const kPriority4k3 = 4300;
-
   final WidgetFactory wf;
 
   static final _skipBuilding = Expando<bool>();
@@ -18,99 +16,89 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          final v = meta[kCssVerticalAlign]?.term;
+        alwaysRenderBlock: false,
+        debugLabel: kCssVerticalAlign,
+        onParsed: (tree) {
+          final parent = tree.parent;
+          if (tree.isInline != true) {
+            return tree;
+          }
+
+          final v = tree.getStyle(kCssVerticalAlign)?.term;
           if (v == null || v == kCssVerticalAlignBaseline) {
-            return;
+            return tree;
           }
 
           final alignment = _tryParsePlaceholderAlignment(v);
           if (alignment == null) {
-            return;
+            return tree;
           }
 
-          _skipBuilding[meta] = true;
-          final built = _buildTree(meta, tree);
-          if (built == null) {
-            return;
-          }
+          _skipBuilding[tree] = true;
+          final placeholder = WidgetPlaceholder(
+            debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
+            child: tree.build(),
+          );
 
           if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
-            built.wrapWith(
-              (context, child) => _buildPaddedAlign(
-                context,
-                meta,
-                child,
-                EdgeInsets.only(
+            placeholder.wrapWith(
+              (context, child) {
+                final padding = EdgeInsets.only(
                   bottom: v == kCssVerticalAlignSuper ? .4 : 0,
                   top: v == kCssVerticalAlignSub ? .4 : 0,
-                ),
-              ),
+                );
+                return _buildPaddedAlign(context, tree, child, padding);
+              },
             );
           }
 
-          WidgetBit.inline(tree.parent!, built, alignment: alignment)
-              .insertBefore(tree);
-          tree.detach();
+          return parent.sub()
+            ..append(
+              WidgetBit.inline(
+                tree,
+                placeholder,
+                alignment: alignment,
+              ),
+            );
         },
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
+        onRenderBlock: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return placeholder;
           }
 
-          final v = meta[kCssVerticalAlign]?.term;
-          if (v == null) {
-            return widgets;
+          final value = tree.getStyle(kCssVerticalAlign)?.term;
+          if (value == null) {
+            return placeholder;
           }
 
-          return listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((context, child) {
-              final tsh = meta.tsb.build(context);
-              final alignment =
-                  _tryParseAlignmentGeometry(tsh.textDirection, v);
-              if (alignment == null) {
-                return child;
-              }
+          return placeholder.wrapWith((context, child) {
+            final resolved = tree.inheritanceResolvers.resolve(context);
+            final alignment =
+                _tryParseAlignmentGeometry(resolved.directionOrLtr, value);
+            if (alignment == null) {
+              return child;
+            }
 
-              return wf.buildAlign(meta, child, alignment, widthFactor: 1.0);
-            }),
-          );
+            return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
+          });
         },
-        onWidgetsIsOptional: true,
-        priority: kPriority4k3,
+        priority: BoxModel.verticalAlign,
       );
-
-  WidgetPlaceholder? _buildTree(BuildMetadata meta, BuildTree tree) {
-    final bits = tree.bits.toList(growable: false);
-    if (bits.length == 1) {
-      final firstBit = bits.first;
-      if (firstBit is WidgetBit) {
-        // use the first widget if possible
-        // and avoid creating a redundant `RichText`
-        return firstBit.child;
-      }
-    }
-
-    final copied = tree.copyWith() as BuildTree;
-    return wf.buildColumnPlaceholder(meta, copied.build());
-  }
 
   Widget? _buildPaddedAlign(
     BuildContext context,
-    BuildMetadata meta,
+    BuildTree tree,
     Widget child,
     EdgeInsets padding,
   ) {
-    final tsh = meta.tsb.build(context);
-    final fontSize = tsh.style.fontSize;
+    final resolved = tree.inheritanceResolvers.resolve(context);
+    final fontSize = resolved.style.fontSize;
     if (fontSize == null) {
       return child;
     }
 
     final withPadding = wf.buildPadding(
-      meta,
+      tree,
       child,
       EdgeInsets.only(
         bottom: fontSize * padding.bottom,
@@ -121,12 +109,9 @@ class StyleVerticalAlign {
       return child;
     }
 
-    return wf.buildAlign(
-      meta,
-      withPadding,
-      padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter,
-      widthFactor: 1.0,
-    );
+    final alignment =
+        padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter;
+    return wf.buildAlign(tree, withPadding, alignment, widthFactor: 1.0);
   }
 }
 

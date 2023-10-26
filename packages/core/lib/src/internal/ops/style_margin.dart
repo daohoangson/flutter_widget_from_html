@@ -2,66 +2,78 @@ part of '../core_ops.dart';
 
 const kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
+Widget _marginHorizontalBuilder(
+  Widget widget,
+  CssLengthBox box,
+  InheritedProperties resolved,
+) =>
     Padding(
       padding: EdgeInsets.only(
-        left: max(b.getValueLeft(tsh) ?? 0.0, 0.0),
-        right: max(b.getValueRight(tsh) ?? 0.0, 0.0),
+        left: max(box.getValueLeft(resolved) ?? 0.0, 0.0),
+        right: max(box.getValueRight(resolved) ?? 0.0, 0.0),
       ),
-      child: w,
+      child: widget,
     );
 
 class StyleMargin {
-  static const kPriorityBoxModel9k = 9000;
-
   final WidgetFactory wf;
 
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) {
+        alwaysRenderBlock: false,
+        debugLabel: kCssMargin,
+        onRenderBlock: (tree, placeholder) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
+            return placeholder;
+          }
+
+          final marginTop = margin.top;
+          final marginBottom = margin.bottom;
+          final inheritanceResolvers = tree.inheritanceResolvers;
+          final column = wf.buildColumnPlaceholder(tree, [
+            if (marginTop != null && marginTop.isPositive)
+              HeightPlaceholder(
+                marginTop,
+                inheritanceResolvers,
+                debugLabel: '${tree.element.localName}--marginTop',
+              ),
+            if (margin.mayHaveLeft || margin.mayHaveRight)
+              placeholder.wrapWith(
+                (context, child) {
+                  final resolved = inheritanceResolvers.resolve(context);
+                  return _marginHorizontalBuilder(child, margin, resolved);
+                },
+              )
+            else
+              placeholder,
+            if (marginBottom != null && marginBottom.isPositive)
+              HeightPlaceholder(
+                marginBottom,
+                inheritanceResolvers,
+                debugLabel: '${tree.element.localName}--marginBottom',
+              ),
+          ]);
+          return column ?? placeholder;
+        },
+        onRenderInline: (tree) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
             return;
           }
 
-          final mayHaveLeft = m.mayHaveLeft;
-          final mayHaveRight = m.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) {
-            return;
+          const bottom = PlaceholderAlignment.bottom;
+          if (margin.mayHaveLeft) {
+            final before = _paddingInlineBefore(tree, margin);
+            tree.prepend(WidgetBit.inline(tree, before, alignment: bottom));
           }
 
-          return wrapTree(
-            tree,
-            append: mayHaveRight
-                ? (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m))
-                : null,
-            prepend: mayHaveLeft
-                ? (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m))
-                : null,
-          );
-        },
-        onWidgets: (meta, widgets) {
-          final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) {
-            return widgets;
+          if (margin.mayHaveRight) {
+            final after = _paddingInlineAfter(tree, margin);
+            tree.append(WidgetBit.inline(tree, after, alignment: bottom));
           }
-
-          final tsb = meta.tsb;
-          return [
-            if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
-            for (final widget in widgets)
-              if (m.mayHaveLeft || m.mayHaveRight)
-                widget.wrapWith(
-                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)),
-                )
-              else
-                widget,
-            if (m.bottom?.isPositive ?? false)
-              HeightPlaceholder(m.bottom!, tsb),
-          ];
         },
-        onWidgetsIsOptional: true,
-        priority: kPriorityBoxModel9k,
+        priority: BoxModel.margin,
       );
 }

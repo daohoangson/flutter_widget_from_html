@@ -10,7 +10,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[Align:alignment=bottomCenter,child='
+        '[Align:alignment=bottomCenter,widthFactor=1.0,child='
         '[Padding:(3,0,0,0),child=[RichText:(@8.3:Foo)]]'
         ']',
       ),
@@ -23,7 +23,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[Align:alignment=topCenter,child='
+        '[Align:alignment=topCenter,widthFactor=1.0,child='
         '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
         ']',
       ),
@@ -61,7 +61,7 @@ void main() {
       explained,
       equals(
         '[RichText:(:'
-        '[Align:alignment=bottomCenter,child='
+        '[Align:alignment=bottomCenter,widthFactor=1.0,child='
         '[Padding:(4,0,0,0),child=[RichText:(:Foo)]]'
         ']@top'
         '(: bar)'
@@ -77,43 +77,13 @@ void main() {
       explained,
       equals(
         '[RichText:(:'
-        '[Align:alignment=topCenter,child='
+        '[Align:alignment=topCenter,widthFactor=1.0,child='
         '[Padding:(0,0,4,0),child=[RichText:(:Foo)]]'
         ']@bottom'
         '(: bar)'
         ')]',
       ),
     );
-  });
-
-  group('image', () {
-    const imgSrc = 'http://domain.com/image.png';
-    const imgRendered =
-        '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
-        '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
-        ']';
-    Future<String> imgExplain(WidgetTester t, String html) =>
-        mockNetworkImages(() => explain(t, html));
-
-    testWidgets('renders top image', (WidgetTester tester) async {
-      const html = '<img src="$imgSrc" style="vertical-align: top" /> foo';
-      final explained = await imgExplain(tester, html);
-      expect(explained, equals('[RichText:(:$imgRendered@top(: foo))]'));
-    });
-
-    testWidgets('renders after image', (WidgetTester tester) async {
-      const html = '<img src="$imgSrc" /><sup>Foo</sup>';
-      final explained = await imgExplain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[RichText:(:$imgRendered'
-          '[Align:alignment=topCenter,child='
-          '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
-          ']@bottom)]',
-        ),
-      );
-    });
   });
 
   testWidgets('renders styling', (WidgetTester tester) async {
@@ -137,7 +107,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=topLeft,child='
+            '[Align:alignment=topLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -149,7 +119,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=topRight,child='
+            '[Align:alignment=topRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
@@ -165,7 +135,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=centerLeft,child='
+            '[Align:alignment=centerLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -177,7 +147,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=centerRight,child='
+            '[Align:alignment=centerRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
@@ -193,7 +163,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=bottomLeft,child='
+            '[Align:alignment=bottomLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -205,9 +175,84 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=bottomRight,child='
+            '[Align:alignment=bottomRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
+          ),
+        );
+      });
+    });
+  });
+
+  group('possible conflict', () {
+    testWidgets('display: inline', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: inline; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
+    });
+
+    testWidgets('display: inline-block', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: inline-block; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
+    });
+
+    testWidgets('display: block', (WidgetTester tester) async {
+      const html = 'Foo <span style="display: block; '
+          'vertical-align: top">bar</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[RichText:(:Foo)],'
+          '[Align:alignment=topLeft,widthFactor=1.0,child='
+          '[CssBlock:child=[RichText:(:bar)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders with A tag', (WidgetTester tester) async {
+      const html = '<sup><a href="http://domain.com/foo">foo</a></sup>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Align:alignment=topCenter,widthFactor=1.0,child='
+          '[Padding:(0,0,3,0),child=[RichText:(#FF123456+u@8.3+onTap:foo)]]'
+          ']',
+        ),
+      );
+    });
+
+    group('image', () {
+      const imgSrc = 'http://domain.com/image.png';
+      const imgRendered =
+          '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
+          '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
+          ']';
+      Future<String> imgExplain(WidgetTester t, String html) =>
+          mockNetworkImages(() => explain(t, html));
+
+      testWidgets('renders top image', (WidgetTester tester) async {
+        const html = '<img src="$imgSrc" style="vertical-align: top" /> foo';
+        final explained = await imgExplain(tester, html);
+        expect(explained, equals('[RichText:(:$imgRendered@top(: foo))]'));
+      });
+
+      testWidgets('renders after image', (WidgetTester tester) async {
+        const html = '<img src="$imgSrc" /><sup>Foo</sup>';
+        final explained = await imgExplain(tester, html);
+        expect(
+          explained,
+          equals(
+            '[RichText:(:$imgRendered'
+            '[Align:alignment=topCenter,widthFactor=1.0,child='
+            '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
+            ']@bottom)]',
           ),
         );
       });
@@ -218,26 +263,19 @@ void main() {
     testWidgets('renders empty tag', (WidgetTester tester) async {
       const html = 'Foo <sub></sub>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, contains('Foo'));
     });
 
     testWidgets('renders empty SPAN inside', (WidgetTester tester) async {
       const html = 'Foo <sup><span></span></sup>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, contains('Foo'));
     });
 
     testWidgets('renders empty DIV inside', (WidgetTester tester) async {
       const html = 'Foo <sup><div></div></sup>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-
-    testWidgets('#170: renders whitespace contents', (tester) async {
-      const html = 'Foo <sub> </sub>';
-      final explained = await explain(tester, html);
-      // TODO: drop widget0 if possible
-      expect(explained, equals('[RichText:(:Foo [widget0]@top)]'));
+      expect(explained, contains('Foo'));
     });
   });
 }

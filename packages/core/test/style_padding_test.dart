@@ -252,6 +252,20 @@ void main() {
     );
   });
 
+  testWidgets('renders padding around empty string', (tester) async {
+    // https://github.com/daohoangson/flutter_widget_from_html/issues/812
+    const html = '<p style="padding: 260px 0px 260px 0px;"></p>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[SizedBox:0.0x10.0],'
+        '[Padding:(260,0,260,0),child=[widget0]],'
+        '[SizedBox:0.0x10.0]',
+      ),
+    );
+  });
+
   group('padding-xxx', () {
     testWidgets('parses padding-top', (WidgetTester tester) async {
       const html = '<div style="padding-top: 3px">Foo</div>';
@@ -597,7 +611,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[Padding:(5,5,5,5),child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
