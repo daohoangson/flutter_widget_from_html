@@ -645,7 +645,7 @@ class _TableRenderLayouter {
   }) {
     final fairValue = available / minValues.length;
     final maxOrFairValues = maxValues
-        .map((v) => v.isNaN || v.isZero ? fairValue : v)
+        .map((value) => value.isNaN ? fairValue : value)
         .toList(growable: false);
     final result = minValues.asMap().entries.map(
       (entry) {

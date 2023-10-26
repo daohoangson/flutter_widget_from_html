@@ -467,6 +467,25 @@ Future<void> main() async {
   });
 
   group('combos', () {
+    testWidgets('renders nested table', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const html = '<p>Foo bar bar</p>'
+          '<table cellpadding="0"><tr><td>'
+          '<table cellpadding="0"><tr>'
+          '<td>Foo bar</td>'
+          '<td></td>'
+          '</tr></table>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final fooBarBar = tester.getSize(helper.findText('Foo bar bar'));
+      final fooBar = tester.getSize(helper.findText('Foo bar'));
+
+      // previous version has a bug that makes text in nested table to break line
+      // this test makes sure that bug is fixed
+      expect(fooBar.height, equals(fooBarBar.height));
+    });
+
     testWidgets('renders align=center', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
       const windowSize = 100.0;
