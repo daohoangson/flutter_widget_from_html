@@ -17,7 +17,7 @@ class HorizontalMargin extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _HorizontalMarginRenderObject(left, right);
+    return _HorizontalMarginRenderObject(left: left, right: right);
   }
 
   @override
@@ -28,8 +28,14 @@ class HorizontalMargin extends SingleChildRenderObjectWidget {
   }
 }
 
-class _HorizontalMarginRenderObject extends RenderProxyBox {
-  _HorizontalMarginRenderObject(this._left, this._right);
+class _HorizontalMarginRenderObject extends RenderShiftedBox {
+  _HorizontalMarginRenderObject({
+    RenderBox? child,
+    required double left,
+    required double right,
+  })  : _left = left,
+        _right = right,
+        super(child);
 
   double _left;
   void setLeft(double value) {
@@ -47,52 +53,66 @@ class _HorizontalMarginRenderObject extends RenderProxyBox {
     }
   }
 
+  double get marginsOrZero => _left.or(0) + _right.or(0);
+
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _compute(child, constraints, ChildLayoutHelper.dryLayoutChild);
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-    if (_left == .0) {
-      super.paint(context, offset);
-    } else {
-      final fullWidth = size.width;
-      final childWidth = child?.size.width ?? .0;
-      final margins = max(.0, fullWidth - childWidth);
-      final leftFinite = _left.isInfinite ? fullWidth : _left;
-      final rightFinite = _right.isInfinite ? fullWidth : _right;
-      final leftMax = margins / (leftFinite + rightFinite) * leftFinite;
-      super.paint(context, offset.translate(min(_left, leftMax), 0));
+  double computeMaxIntrinsicWidth(double height) {
+    final scopedChild = child;
+    if (scopedChild == null) {
+      return marginsOrZero;
     }
+
+    return scopedChild.getMaxIntrinsicWidth(height) + marginsOrZero;
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    final scopedChild = child;
+    if (scopedChild == null) {
+      return marginsOrZero;
+    }
+
+    return scopedChild.getMinIntrinsicWidth(height) + marginsOrZero;
   }
 
   @override
   void performLayout() =>
       size = _compute(child, constraints, ChildLayoutHelper.layoutChild);
 
-  Size _compute(RenderBox? child, BoxConstraints bc, ChildLayouter fn) {
-    final padLeft = _left.isInfinite ? .0 : _left;
-    final padRight = _right.isInfinite ? .0 : _right;
-    if (child != null) {
-      final scopedConstraints = constraints;
-      final minWidth = max(.0, scopedConstraints.minWidth - padLeft - padRight);
-      final cc = scopedConstraints.copyWith(
-        minWidth: minWidth,
-        maxWidth: max(
-          minWidth,
-          scopedConstraints.maxWidth - padLeft - padRight,
-        ),
-      );
-      final childSize = fn(child, cc);
-      final paddedSize = Size(
-        (constraints.hasBoundedWidth && (_left.isInfinite || _right.isInfinite))
-            ? constraints.maxWidth
-            : childSize.width + padLeft + padRight,
-        childSize.height,
-      );
-      return constraints.constrain(paddedSize);
-    } else {
-      return computeSizeForNoChild(constraints);
+  Size _compute(RenderBox? scopedChild, BoxConstraints bc, ChildLayouter fn) {
+    if (scopedChild == null) {
+      return bc.constrain(Size(marginsOrZero, 0));
     }
+
+    final edges = EdgeInsets.only(left: _left.or(0), right: _right.or(0));
+    final cc = bc.deflate(edges);
+    final childSize = fn(scopedChild, cc);
+    final width = bc.maxWidth.orChildWithMargins(childSize, _left, _right);
+    final fullSize = bc.constrain(Size(width, childSize.height));
+
+    if (identical(fn, ChildLayoutHelper.layoutChild)) {
+      final delta = max(.0, fullSize.width - childSize.width);
+      final leftWeight = _left.or(fullSize.width);
+      final totalWeight = leftWeight + _right.or(fullSize.width);
+      final leftMax = totalWeight == .0 ? .0 : delta / totalWeight * leftWeight;
+
+      final data = scopedChild.parentData! as BoxParentData;
+      data.offset = Offset(min(_left, leftMax), 0);
+    }
+
+    return fullSize;
   }
+}
+
+extension on double {
+  double orChildWithMargins(Size child, double left, double right) =>
+      (isFinite && (left.isInfinite || right.isInfinite))
+          ? this
+          : child.width + left.or(0) + right.or(0);
+
+  double or(double value) => isInfinite ? value : this;
 }

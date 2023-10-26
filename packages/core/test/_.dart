@@ -734,12 +734,14 @@ class Explainer {
       final dynamicWidget = widget as dynamic;
       switch (widget.runtimeType.toString()) {
         case 'HorizontalMargin':
-          // TODO: remove ignore for file when our minimum core version >= 1.0
+          // TODO: remove ignore when our minimum core version >= 1.0
+          // ignore: avoid_dynamic_calls
+          final left = dynamicWidget.left as double;
+          // ignore: avoid_dynamic_calls
+          final right = dynamicWidget.right as double;
           attr.add(
-            // ignore: avoid_dynamic_calls
-            'left=${dynamicWidget.left.truncate()},'
-            // ignore: avoid_dynamic_calls
-            'right=${dynamicWidget.right.truncate()}',
+            'left=${left.isInfinite ? '∞' : left.truncate()},'
+            'right=${right.isInfinite ? '∞' : right.truncate()}',
           );
           break;
       }
