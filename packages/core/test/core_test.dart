@@ -702,7 +702,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bgimage='
+          '[Container:bgimage='
           '[DecorationImage:image='
           '[AssetImage:assetName=test/images/logo.png]],child='
           '[CssBlock:child='
@@ -718,7 +718,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bgimage='
+          '[Container:bgimage='
           '[DecorationImage:image='
           '[MemoryImage:size=42]],child='
           '[CssBlock:child='
@@ -736,7 +736,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bgimage='
+          '[Container:bgimage='
           '[DecorationImage:image='
           '[FileImage:file=/test/images/logo.png]],child='
           '[CssBlock:child='

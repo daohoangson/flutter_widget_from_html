@@ -160,7 +160,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
-    var decoration = baseDeco.copyWith(border: border, color: color, image: buildDecorationImage(bgImageUrl), );
+    var decoration = baseDeco.copyWith(
+      border: border,
+      color: color,
+      image: buildDecorationImage(bgImageUrl),
+    );
 
     var clipBehavior = Clip.none;
     if (borderRadius != null) {
