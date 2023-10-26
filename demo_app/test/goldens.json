@@ -148,7 +148,7 @@
   "inline/margin/1_value": "----<div style=\"margin: 30px\">Foo</div>----",
   "inline/margin/2_values": "----\n<div style=\"margin: 10px 20px\">both</div>\n----\n<div style=\"margin: 10px 0\">vertical only</div>\n----\n<div style=\"margin: 0 20px\">horizontal only</div>\n----\n",
   "inline/margin/4_values": "----\n<div style=\"margin: 10px 20px 30px 40px\">all</div>\n----\n<div style=\"margin: 10px 0 0 0\">top only</div>\n----\n<div style=\"margin: 0 20px 0 0; text-align: right\">right only</div>\n----\n<div style=\"margin: 0 0 30px 0\">bottom only</div>\n----\n<div style=\"margin: 0 0 0 40px\">left only</div>\n---\n",
-  "inline/margin/auto": "<table border=\"1\" style=\"margin: 0 auto\">\n  <tbody>\n    <tr>\n      <td style=\"width: 100px\">1</td>\n      <td style=\"width: 100px\">2</td>\n    </tr>\n    <tr>\n      <td>3</td>\n      <td>4</td>\n    </tr>\n  </tbody>\n</table>\n<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/1071 -->",
+  "inline/margin/auto": "<table border=\"1\" style=\"margin: 0 auto\">\n  <tbody>\n    <tr>\n      <td style=\"width: 100px\">1</td>\n      <td style=\"width: 100px\">2</td>\n    </tr>\n    <tr>\n      <td>3</td>\n      <td>4</td>\n    </tr>\n  </tbody>\n</table>",
   "inline/margin/margin-bottom": "----<div style=\"margin-bottom: 30px\">Foo</div>----",
   "inline/margin/margin-left": "----<div style=\"margin-left: 30px\">Foo</div>----",
   "inline/margin/margin-right": "----<div style=\"margin-right: 30px; text-align: right\">Foo</div>----",
