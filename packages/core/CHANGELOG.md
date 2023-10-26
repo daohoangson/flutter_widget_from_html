@@ -1,3 +1,7 @@
+## 0.14.5+1
+
+- Fix `TABLE` bug that force text to break line (#1078)
+
 ## 0.14.5
 
 - Add support for auto margins (#1077)
