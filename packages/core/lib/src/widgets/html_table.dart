@@ -6,8 +6,6 @@ import 'package:logging/logging.dart';
 
 import 'css_sizing.dart';
 
-final _logger = Logger('fwfh.HtmlTable');
-
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -317,6 +315,8 @@ class _TableRenderLayouter {
   _TableRenderLayouter.dry(this.tro, this.constraints)
       : layouter = ChildLayoutHelper.dryLayoutChild;
 
+  Logger get logger => tro.logger;
+
   _TableRenderLayout compute(RenderBox? firstChild) {
     if (firstChild == null) {
       return _TableRenderLayout(Rect.zero, constraints.smallest);
@@ -433,7 +433,7 @@ class _TableRenderLayouter {
           final layoutSize = layouter(child, const BoxConstraints());
           cellSizes[i] = layoutSize;
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
-          _logger.fine('Got child#$i size without contraints: $layoutSize');
+          logger.fine('Got child#$i size without contraints: $layoutSize');
           shouldLoop = true;
           // break the inner `for` and continue with the outer `while`
           break;
@@ -451,11 +451,11 @@ class _TableRenderLayouter {
               minColumnWidths: minColumnWidths,
             );
             if (childMinWidth != null) {
-              _logger.finer('Got child#$i min width: $childMinWidth');
+              logger.finer('Got child#$i min width: $childMinWidth');
             }
           } catch (error, stackTrace) {
             final message = "Could not measure child#$i min intrinsic width";
-            _logger.warning(message, error, stackTrace);
+            logger.warning(message, error, stackTrace);
           }
           if (childMinWidth != null) {
             childMinWidths[i] = childMinWidth;
@@ -479,7 +479,7 @@ class _TableRenderLayouter {
       if (shouldLoop && loopCount > 2 * children.length) {
         // stop early to avoid dead loop
         // each child may need at maximum 1 loop to get max and 1 to get min
-        _logger.info('Stopped measuring children after $loopCount loops');
+        logger.info('Stopped measuring children after $loopCount loops');
         break;
       }
     }
@@ -546,7 +546,7 @@ class _TableRenderLayouter {
       final cc1 = BoxConstraints.tightFor(width: childWidth);
       // side effect
       final childSize = layouter(child, cc1);
-      _logger.fine('Got child#$i size with width=$childWidth: $childSize');
+      logger.fine('Got child#$i size with width=$childWidth: $childSize');
       childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
@@ -602,7 +602,7 @@ class _TableRenderLayouter {
         childSize = layouter(child, cc2);
         childHeight = childSize.height;
         childWidth = childSize.width;
-        _logger.fine('Laid out child#$i at ${childWidth}x$childHeight');
+        logger.fine('Laid out child#$i at ${childWidth}x$childHeight');
       }
 
       final calculatedY = data.calculateY(tro, step4.rowHeights);
@@ -750,13 +750,17 @@ class _TableRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
+  final Logger logger;
+  static int loggers = 0;
+
   _TableRenderObject(
     this._border,
     this._textDirection, {
     required double borderSpacing,
     required bool borderCollapse,
     required double? maxWidth,
-  })  : _borderCollapse = borderCollapse,
+  })  : logger = Logger('fwfh.HtmlTable${loggers++}'),
+        _borderCollapse = borderCollapse,
         _borderSpacing = borderSpacing,
         _maxWidth = maxWidth;
 
