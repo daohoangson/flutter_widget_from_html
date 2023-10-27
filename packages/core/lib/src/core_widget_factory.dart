@@ -674,9 +674,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           ),
         );
         break;
-      case 'div':
-        meta[kCssDisplay] = kCssDisplayBlock;
-        break;
       case 'article':
       case 'aside':
       case 'dl':
@@ -1138,7 +1135,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     switch (value) {
       case kCssDisplayFlex:
-        meta.register(StyleDisplayFlexOps.flexOp(meta));
+        tree.register(StyleDisplayFlexOps.flexOp(tree));
         break;
       case kCssDisplayBlock:
         StyleSizing.registerBlockOp(this, tree);

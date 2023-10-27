@@ -9,9 +9,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -21,9 +23,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -33,9 +37,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -45,9 +51,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=end]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=end,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -57,9 +65,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=stretch]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=stretch,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -70,9 +80,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -82,9 +94,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=center,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=center,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -95,9 +109,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=end,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=end,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -108,9 +124,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=spaceBetween,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=spaceBetween,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -121,9 +139,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=spaceAround,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=spaceAround,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -134,9 +154,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=spaceEvenly,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=spaceEvenly,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 
@@ -146,9 +168,11 @@ void main() {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+        explained,
+        equals(
+          '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children=[widget0]]',
+        ),
+      );
     });
   });
 }

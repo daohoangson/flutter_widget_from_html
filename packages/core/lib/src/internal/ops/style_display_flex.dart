@@ -22,18 +22,18 @@ const kCssAlignItemsStretch = 'stretch';
 // ignore: avoid_classes_with_only_static_members
 class StyleDisplayFlexOps {
   /// Builds custom widget for div elements with display: flex from [meta]
-  static BuildOp flexOp(BuildMetadata meta) {
+  static BuildOp flexOp(BuildTree tree) {
     return BuildOp(
-      onChild: (childMeta) {
-        childMeta.register(_flexItemOp(childMeta));
+      onVisitChild: (tree, subTree) {
+        subTree.register(_flexItemOp(subTree));
       },
-      onWidgets: (meta, widgets) {
-        final String id = meta.element.id;
+      onRenderBlock: (tree, placeholder) {
+        final String id = tree.element.id;
         String flexDirection = kCssFlexDirectionRow;
         String justifyContent = kCssJustifyContentFlexStart;
         String alignItems = kCssAlignItemsFlexStart;
 
-        for (final element in meta.element.styles) {
+        for (final element in tree.element.styles) {
           final String? value = element.term;
 
           if (value != null) {
@@ -51,22 +51,23 @@ class StyleDisplayFlexOps {
           }
         }
 
-        return [
-          Flex(
-              key: Key(id),
-              direction: kCssFlexDirectionRow == flexDirection
-                  ? Axis.horizontal
-                  : Axis.vertical,
-              mainAxisAlignment: _toMainAxisAlignment(justifyContent),
-              crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-              children: widgets.toList())
-        ];
+        return Flex(
+          key: Key(id),
+          direction: kCssFlexDirectionRow == flexDirection
+              ? Axis.horizontal
+              : Axis.vertical,
+          mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+          crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+          children: [
+            placeholder,
+          ],
+        );
       },
     );
   }
 
   /// Build op for child elements of flex containers
-  static BuildOp _flexItemOp(BuildMetadata meta) {
+  static BuildOp _flexItemOp(BuildTree tree) {
     return BuildOp(defaultStyles: (element) {
       return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
     });
