@@ -295,10 +295,7 @@ class CssLength {
 
   @override
   String toString() =>
-      number.toString() +
-      (unit == CssLengthUnit.percentage
-          ? '%'
-          : unit.toString().replaceAll('CssLengthUnit.', ''));
+      number.toString() + (unit == CssLengthUnit.percentage ? '%' : unit.name);
 }
 
 /// A set of length measurements.
