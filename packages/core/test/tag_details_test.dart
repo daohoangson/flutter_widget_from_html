@@ -3,35 +3,36 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  const defaultSummaryText = '￼Details';
+  const summaryDetails = 'Details';
+  const summaryWithPlaceholder = '\u{fffc}Details';
 
   group('renders DETAILS tag', () {
-    const expected = [
-      'HtmlDetails(state: _HtmlDetailsState)',
-      '├HtmlSummary',
-      '└HtmlDetailsMarker()',
-      '└HtmlDetailsContents()',
-      '└RichText(text: "Foo")',
-    ];
-
     testWidgets('initial close', (WidgetTester tester) async {
       const html = '<details>Foo</details>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains(expected[0]));
-      expect(explained, contains(expected[1]));
-      expect(explained, contains(expected[2]));
-      expect(explained, contains(expected[3]));
-      expect(explained, isNot(contains(expected[4])));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlDetails:open=false,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:$summaryDetails))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Foo)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('initial open', (WidgetTester tester) async {
       const html = '<details open>Foo</details>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains(expected[0]));
-      expect(explained, contains(expected[1]));
-      expect(explained, contains(expected[2]));
-      expect(explained, contains(expected[3]));
-      expect(explained, contains(expected[4]));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:$summaryDetails))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Foo)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('open on tap', (WidgetTester tester) async {
@@ -41,7 +42,7 @@ void main() {
       final contentsFinder = findText('Foo');
       expect(contentsFinder, findsNothing);
 
-      expect(await tapText(tester, defaultSummaryText), equals(1));
+      expect(await tapText(tester, summaryWithPlaceholder), equals(1));
       await tester.pumpAndSettle();
 
       expect(contentsFinder, findsOneWidget);
@@ -54,7 +55,7 @@ void main() {
       final contentsFinder = findText('Foo');
       expect(contentsFinder, findsOneWidget);
 
-      expect(await tapText(tester, defaultSummaryText), equals(1));
+      expect(await tapText(tester, summaryWithPlaceholder), equals(1));
       await tester.pumpAndSettle();
 
       expect(contentsFinder, findsNothing);
@@ -62,36 +63,34 @@ void main() {
   });
 
   group('renders SUMMARY tag', () {
-    const summaryText = '￼Foo';
-    const expected = [
-      '└HtmlDetails(state: _HtmlDetailsState)',
-      '├HtmlSummary',
-      '└RichText(text: "$summaryText")',
-      '└HtmlDetailsMarker()',
-      '└HtmlDetailsContents()',
-      '└RichText(text: "Bar")',
-    ];
+    const summaryFoo = '\u{fffc}Foo';
 
     testWidgets('initial close', (WidgetTester tester) async {
       const html = '<details><summary>Foo</summary>Bar</details>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains(expected[0]));
-      expect(explained, contains(expected[1]));
-      expect(explained, contains(expected[2]));
-      expect(explained, contains(expected[3]));
-      expect(explained, contains(expected[4]));
-      expect(explained, isNot(contains(expected[5])));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlDetails:open=false,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Bar)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('initial open', (WidgetTester tester) async {
       const html = '<details open><summary>Foo</summary>Bar</details>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains(expected[0]));
-      expect(explained, contains(expected[1]));
-      expect(explained, contains(expected[2]));
-      expect(explained, contains(expected[3]));
-      expect(explained, contains(expected[4]));
-      expect(explained, contains(expected[5]));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Bar)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('open on tap', (WidgetTester tester) async {
@@ -101,7 +100,7 @@ void main() {
       final contentsFinder = findText('Bar');
       expect(contentsFinder, findsNothing);
 
-      expect(await tapText(tester, summaryText), equals(1));
+      expect(await tapText(tester, summaryFoo), equals(1));
       await tester.pumpAndSettle();
 
       expect(contentsFinder, findsOneWidget);
@@ -114,10 +113,47 @@ void main() {
       final contentsFinder = findText('Bar');
       expect(contentsFinder, findsOneWidget);
 
-      expect(await tapText(tester, summaryText), equals(1));
+      expect(await tapText(tester, summaryFoo), equals(1));
       await tester.pumpAndSettle();
 
       expect(contentsFinder, findsNothing);
+    });
+
+    testWidgets('double DETAILS', (WidgetTester tester) async {
+      const html = '<details open><summary>Foo1</summary>Foo2</details>'
+          '<details open><summary>Bar1</summary>Bar2</details>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Foo1))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Foo2)]]'
+          ']],'
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:Bar1))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Bar2)]]'
+          ']]]',
+        ),
+      );
+    });
+
+    testWidgets('double SUMMARY', (WidgetTester tester) async {
+      const html = '<details><summary>One</summary>'
+          '<summary>Two</summary>Foo</details>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlDetails:open=false,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@middle(:One))]],'
+          '[HtmlDetailsContents:child=[Column:children='
+          '[RichText:(:[HtmlDetailsMarker]@middle(:Two))],'
+          '[RichText:(:Foo)]'
+          ']]]]',
+        ),
+      );
     });
   });
 

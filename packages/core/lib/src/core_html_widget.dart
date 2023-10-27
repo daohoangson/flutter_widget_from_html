@@ -5,12 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
+import 'package:logging/logging.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
-import 'internal/builder.dart' as builder;
-import 'internal/tsh_widget.dart';
+import 'internal/core_build_tree.dart';
+
+final _logger = Logger('fwfh.HtmlWidget');
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -24,10 +26,10 @@ class HtmlWidget extends StatefulWidget {
   /// [html] has at least [kShouldBuildAsync] characters.
   final bool? buildAsync;
 
-  /// The callback to specify custom stylings.
+  /// {@macro flutter_widget_from_html.customStylesBuilder}
   final CustomStylesBuilder? customStylesBuilder;
 
-  /// The callback to render a custom widget.
+  /// {@macro flutter_widget_from_html.customWidgetBuilder}
   final CustomWidgetBuilder? customWidgetBuilder;
 
   /// Controls whether the built widget tree is cached between rebuilds.
@@ -64,20 +66,18 @@ class HtmlWidget extends StatefulWidget {
   /// - [buildAsync]
   /// - [enableCaching]
   /// - [html]
-  ///
-  /// In `flutter_widget_from_html` package, these are also included:
-  ///
-  /// - `unsupportedWebViewWorkaroundForIssue37`
-  /// - `webView`
-  /// - `webViewJs`
-  RebuildTriggers get rebuildTriggers => RebuildTriggers([
-        html,
+  /// - [renderMode]
+  /// - [textStyle]
+  List<dynamic> get rebuildTriggers => [
         baseUrl,
         buildAsync,
         enableCaching,
-        if (_rebuildTriggers != null) _rebuildTriggers,
-      ]);
-  final RebuildTriggers? _rebuildTriggers;
+        html,
+        renderMode,
+        textStyle,
+        ..._rebuildTriggers ?? const [],
+      ];
+  final List<dynamic>? _rebuildTriggers;
 
   /// The render mode.
   ///
@@ -106,7 +106,7 @@ class HtmlWidget extends StatefulWidget {
     this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
-    RebuildTriggers? rebuildTriggers,
+    List<dynamic>? rebuildTriggers,
     this.renderMode = RenderMode.column,
     this.textStyle,
   }) : _rebuildTriggers = rebuildTriggers;
@@ -117,27 +117,30 @@ class HtmlWidget extends StatefulWidget {
 
 /// State for a [HtmlWidget].
 class HtmlWidgetState extends State<HtmlWidget> {
-  late final BuildMetadata _rootMeta;
-  late final _RootTsb _rootTsb;
+  late final InheritanceResolvers _rootResolvers;
   late final WidgetFactory _wf;
 
   Widget? _cache;
   Future<Widget>? _future;
+  InheritedProperties? _rootProperties;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
+  CoreBuildTree get _rootTree => CoreBuildTree.root(
+        inheritanceResolvers: _rootResolvers,
+        wf: _wf,
+      );
+
   @override
   void initState() {
     super.initState();
 
-    _rootTsb = _RootTsb(this);
-    _rootMeta = builder.BuildMetadata(dom.Element.tag('root'), _rootTsb);
+    _rootResolvers = _RootResolvers(this);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
-    _wf.onRoot(_rootTsb);
     _wf.reset(this);
 
     if (buildAsync) {
@@ -155,7 +158,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _rootTsb.reset();
+    // performance critical
+    _rootProperties = null;
   }
 
   @override
@@ -164,13 +168,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
     var needsRebuild = false;
 
-    if (widget.rebuildTriggers != oldWidget.rebuildTriggers) {
+    if (!listEquals(widget.rebuildTriggers, oldWidget.rebuildTriggers)) {
       needsRebuild = true;
     }
 
     if (widget.textStyle != oldWidget.textStyle) {
-      _rootTsb.reset();
-      needsRebuild = true;
+      // performance critical
+      _rootProperties = null;
     }
 
     if (needsRebuild) {
@@ -181,16 +185,17 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_future != null) {
+    final future = _future;
+    if (future != null) {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data!;
+            return snapshot.requireData;
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(
                     context,
-                    _rootMeta,
+                    _rootTree,
                     snapshot.error,
                     snapshot.stackTrace,
                   ) ??
@@ -198,11 +203,11 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _rootMeta) ?? widget0,
+              _wf.onLoadingBuilder(context, _rootTree) ?? widget0,
             );
           }
         },
-        future: _future!.then(_tshWidget),
+        future: future.then(_wrapper),
       );
     }
 
@@ -210,7 +215,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       _cache = _buildSync();
     }
 
-    return _tshWidget(_cache!);
+    return _wrapper(_cache!);
   }
 
   /// Scrolls to make sure the requested anchor is as visible as possible.
@@ -238,7 +243,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       built = _buildBody(this, domNodes);
     } catch (error, stackTrace) {
       built =
-          _wf.onErrorBuilder(context, _rootMeta, error, stackTrace) ?? widget0;
+          _wf.onErrorBuilder(context, _rootTree, error, stackTrace) ?? widget0;
     }
 
     Timeline.finishSync();
@@ -251,54 +256,57 @@ class HtmlWidgetState extends State<HtmlWidget> {
           ? SliverToBoxAdapter(child: child)
           : child;
 
-  Widget _tshWidget(Widget child) =>
-      TshWidget(tsh: _rootTsb._output, child: child);
+  Widget _wrapper(Widget child) =>
+      _RootWidget(resolved: _rootProperties, child: child);
 }
 
-class _RootTsb extends TextStyleBuilder {
-  TextStyleHtml? _output;
+class _RootResolvers extends InheritanceResolvers {
+  final HtmlWidgetState state;
 
-  _RootTsb(HtmlWidgetState state) {
-    enqueue(builder, state);
-  }
+  _RootResolvers(this.state);
 
   @override
-  TextStyleHtml build(BuildContext context) {
-    context.dependOnInheritedWidgetOfExactType<TshWidget>();
-    return super.build(context);
-  }
+  InheritedProperties resolve(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<_RootWidget>();
 
-  TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
-    if (_output != null) {
-      return _output!;
+    final existing = state._rootProperties;
+    if (existing != null) {
+      return existing;
     }
 
-    return _output = TextStyleHtml.root(
+    return state._rootProperties = InheritedProperties.root(
       state._wf.getDependencies(state.context),
       state.widget.textStyle,
     );
   }
+}
 
-  void reset() => _output = null;
+class _RootWidget extends InheritedWidget {
+  final InheritedProperties? resolved;
+
+  const _RootWidget({
+    required super.child,
+    required this.resolved,
+  });
+
+  @override
+  bool updateShouldNotify(_RootWidget oldWidget) =>
+      resolved == null || resolved != oldWidget.resolved;
 }
 
 Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
-  final rootMeta = state._rootMeta;
+  _logger.fine('Building body...');
   final wf = state._wf;
   wf.reset(state);
 
-  final tree = builder.BuildTree(
-    customStylesBuilder: state.widget.customStylesBuilder,
-    customWidgetBuilder: state.widget.customWidgetBuilder,
-    parentMeta: rootMeta,
-    tsb: rootMeta.tsb,
-    wf: wf,
-  )..addBitsFromNodes(domNodes);
+  final rootTree = state._rootTree;
+  rootTree.addBitsFromNodes(domNodes);
 
-  return wf
-          .buildColumnPlaceholder(rootMeta, tree.build())
-          ?.wrapWith(wf.buildBodyWidget) ??
-      widget0;
+  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+
+  _logger.fine('Built body successfuly.');
+
+  return built;
 }
 
 dom.NodeList _parseHtml(String html) =>

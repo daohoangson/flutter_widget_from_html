@@ -1,12 +1,9 @@
-// ignore_for_file: deprecated_member_use_from_same_package
-
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../fwfh_url_launcher/test/mock_url_launcher_platform.dart';
@@ -53,7 +50,7 @@ void main() {
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, startsWith('TshWidget'));
+      expect(explained, startsWith('_RootWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
@@ -70,7 +67,7 @@ void main() {
       Uri? baseUrl,
       bool? buildAsync,
       required bool enableCaching,
-      RebuildTriggers? rebuildTriggers,
+      List<dynamic>? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
         helper.explain(
@@ -88,8 +85,8 @@ void main() {
         );
 
     void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
-      final widget1 = (built1! as TshWidget).child;
-      final widget2 = (built2! as TshWidget).child;
+      final widget1 = (built1! as InheritedWidget).child;
+      final widget2 = (built2! as InheritedWidget).child;
       expect(widget1 == widget2, matcher);
     }
 
@@ -163,7 +160,7 @@ void main() {
         tester,
         html,
         enableCaching: true,
-        rebuildTriggers: RebuildTriggers([1]),
+        rebuildTriggers: [1],
       );
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
@@ -172,7 +169,7 @@ void main() {
         tester,
         html,
         enableCaching: true,
-        rebuildTriggers: RebuildTriggers([2]),
+        rebuildTriggers: [2],
       );
       final built2 = helper.buildCurrentState();
       enableCachingExpect(built1, built2, isFalse);
@@ -224,46 +221,103 @@ void main() {
   });
 
   group('customStylesBuilder', () {
-    const html = 'Hello <span class="name">World</span>!';
+    group('color: red', () {
+      const html = 'Hello <span class="name">World</span>!';
 
-    testWidgets('renders without value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Hello World!)]'));
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Hello World!)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customStylesBuilder: (e) =>
+                e.classes.contains('name') ? {'color': 'red'} : null,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+      });
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(
-          html,
-          customStylesBuilder: (e) =>
-              e.classes.contains('name') ? {'color': 'red'} : null,
-          key: helper.hwKey,
-        ),
-      );
-      expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+    group('resets FIGURE margin', () {
+      const html = '<figure class="name">Foo</figure>';
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(
+          e,
+          equals(
+            '[HorizontalMargin:left=40,right=40,child='
+            '[CssBlock:child=[RichText:(:Foo)]]'
+            ']',
+          ),
+        );
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customStylesBuilder: (e) =>
+                e.classes.contains('name') ? {'margin': '0'} : null,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
     });
   });
 
   group('customWidgetBuilder', () {
-    Widget? customWidgetBuilder(dom.Element element) => const Text('Bar');
-    const html = '<span>Foo</span>';
+    group('block widget', () {
+      Widget? customWidgetBuilder(dom.Element _) => const Text('Bar');
+      const html = 'Foo <span>bar</span>';
 
-    testWidgets('renders without value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Foo)]'));
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Foo bar)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final e = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customWidgetBuilder: customWidgetBuilder,
+            key: helper.hwKey,
+          ),
+        );
+        expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+      });
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(
-          html,
-          customWidgetBuilder: customWidgetBuilder,
-          key: helper.hwKey,
-        ),
-      );
-      expect(explained, equals('[Text:Bar]'));
+    group('inline widget', () {
+      Widget? customWidgetBuilder(dom.Element _) =>
+          const InlineCustomWidget(child: Text('Bar'));
+
+      const html = 'Foo <span>bar</span>';
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Foo bar)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customWidgetBuilder: customWidgetBuilder,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[RichText:(:Foo [Text:Bar])]'));
+      });
     });
   });
 
@@ -586,11 +640,11 @@ void main() {
 
 class _OnErrorBuilderFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.className == 'throw') {
-      throw UnsupportedError(meta.element.outerHtml);
+  void parse(BuildTree tree) {
+    if (tree.element.className == 'throw') {
+      throw UnsupportedError(tree.element.outerHtml);
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }

@@ -111,9 +111,9 @@ class _ListMarkerRenderObject extends RenderBox {
     final center = offset +
         Offset(
           size.width / 2,
-          (m?.descent.isFinite == true && m?.unscaledAscent.isFinite == true)
+          (m != null && m.descent.isFinite && m.unscaledAscent.isFinite)
               ? size.height -
-                  m!.descent -
+                  m.descent -
                   m.unscaledAscent +
                   m.unscaledAscent * .7
               : size.height / 2,

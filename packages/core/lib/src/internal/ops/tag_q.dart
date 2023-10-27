@@ -2,40 +2,26 @@ part of '../core_ops.dart';
 
 const kTagQ = 'q';
 
-class TagQ {
-  final WidgetFactory wf;
-
-  TagQ(this.wf);
-
-  BuildOp get buildOp => BuildOp(
-        onTree: (_, tree) =>
-            wrapTree(tree, append: _TagQBit.closing, prepend: _TagQBit.opening),
+extension TagQ on WidgetFactory {
+  BuildOp get tagQ => const BuildOp.v2(
+        debugLabel: kTagQ,
+        onParsed: _onParsed,
+        priority: Priority.tagQ,
       );
-}
 
-class _TagQBit extends BuildBit<void, String> {
-  final bool isOpening;
+  static BuildTree _onParsed(BuildTree tree) {
+    const opening = '“';
+    const closing = '”';
+    final firstParent = tree.first?.parent;
+    final lastParent = tree.last?.parent;
+    if (firstParent == null || lastParent == null) {
+      return tree
+        ..prepend(TextBit(tree, opening))
+        ..append(TextBit(tree, closing));
+    }
 
-  const _TagQBit(
-    super.parent,
-    super.tsb, {
-    required this.isOpening,
-  });
-
-  @override
-  String buildBit(void _) => isOpening ? '“' : '”';
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening: isOpening);
-
-  @override
-  String toString() =>
-      'QBit.${isOpening ? "opening" : "closing"}#$hashCode $tsb';
-
-  static BuildBit closing(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, isOpening: false);
-
-  static BuildBit opening(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, isOpening: true);
+    firstParent.prepend(TextBit(firstParent, opening));
+    lastParent.append(TextBit(lastParent, closing));
+    return tree;
+  }
 }

@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart' as helper;
 
@@ -19,7 +21,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,2,0,4),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=4,right=2,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -32,7 +34,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,4,0,2),child='
+          '[HorizontalMargin:left=2,right=4,child='
           '[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'
           '],'
           '[SizedBox:0.0x3.0]',
@@ -59,7 +61,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,2,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=2,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -70,7 +72,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,2),child=[CssBlock:child='
+            '[HorizontalMargin:left=2,right=0,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -96,7 +98,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,4),child=[CssBlock:child='
+            '[HorizontalMargin:left=4,right=0,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -107,7 +109,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,4,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=4,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -123,7 +125,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x5.0],'
-          '[Padding:(0,10,0,10),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x5.0]',
         ),
       );
@@ -148,7 +150,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,10,0,10),child=[CssBlock:child='
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -163,7 +165,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x20.0],'
-          '[Padding:(0,20,0,20),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=20,right=20,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x20.0]',
         ),
       );
@@ -176,7 +178,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x13.3],'
-          '[Padding:(0,13,0,13),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=13,right=13,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x13.3]',
         ),
       );
@@ -189,8 +191,47 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x10.0],'
-          '[Padding:(0,10,0,10),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=10,right=10,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x10.0]',
+        ),
+      );
+    });
+  });
+
+  group('auto', () {
+    testWidgets('parses 4 values', (WidgetTester tester) async {
+      const html = '<div style="margin: 1px auto 2px auto">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x1.0],'
+          '[HorizontalMargin:left=∞,right=∞,child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[SizedBox:0.0x2.0]',
+        ),
+      );
+    });
+
+    testWidgets('parses 2 values', (WidgetTester tester) async {
+      const html = '<div style="margin: 0 auto">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HorizontalMargin:left=∞,right=∞,child=[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('parses 1 value', (WidgetTester tester) async {
+      const html = '<div style="margin: auto">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[widget0],'
+          '[HorizontalMargin:left=∞,right=∞,child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[widget0]',
         ),
       );
     });
@@ -204,8 +245,8 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x2.0],'
-        '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Padding:(0,2,0,2),child='
+        '[HorizontalMargin:left=1,right=1,child='
+        '[CssBlock:child=[HorizontalMargin:left=2,right=2,child='
         '[CssBlock:child=[RichText:(:Foo)]]'
         ']]],'
         '[SizedBox:0.0x2.0]',
@@ -222,11 +263,11 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:1)]]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:2)]]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:3)]]],'
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:3)]]],'
         '[SizedBox:0.0x3.0]',
       ),
     );
@@ -240,12 +281,12 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[Column:children='
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:1a)]],'
         '[CssBlock:child=[RichText:(:1b)]]'
         ']]],'
         '[SizedBox:0.0x3.0],'
-        '[Padding:(0,3,0,3),child=[CssBlock:child=[Column:children='
+        '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:2a)]],'
         '[CssBlock:child=[RichText:(:2b)]]'
         ']]],'
@@ -283,7 +324,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,3,0,0),child=[CssBlock:child='
+          '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -297,7 +338,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,3,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -308,7 +349,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,3),child=[CssBlock:child='
+            '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -343,7 +384,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Padding:(0,0,0,3),child=[CssBlock:child='
+          '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -357,7 +398,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,0,0,3),child=[CssBlock:child='
+            '[HorizontalMargin:left=3,right=0,child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -368,7 +409,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Padding:(0,3,0,0),child=[CssBlock:child='
+            '[HorizontalMargin:left=0,right=3,child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -382,7 +423,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x5.0],'
-          '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -395,7 +436,7 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x3.0],'
-          '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:Foo)]]]',
+          '[HorizontalMargin:left=3,right=3,child=[CssBlock:child=[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -678,4 +719,157 @@ void main() {
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
+
+  group('HorizontalMargin', () {
+    group('_HorizontalMarginRenderObject setters', () {
+      testWidgets('updates left', (t) async {
+        await explain(t, '<div style="margin-left: 1px">Foo</div>');
+        final element = find.byType(HorizontalMargin).evaluate().single;
+        final before = element.widget as HorizontalMargin;
+        expect(before.left, equals(1.0));
+
+        await explain(t, '<div style="margin-left: auto">Foo</div>');
+        final after = element.widget as HorizontalMargin;
+        expect(after.left, equals(double.infinity));
+      });
+
+      testWidgets('updates right', (t) async {
+        await explain(t, '<div style="margin-right: 1px">Foo</div>');
+        final element = find.byType(HorizontalMargin).evaluate().single;
+        final before = element.widget as HorizontalMargin;
+        expect(before.right, equals(1.0));
+
+        await explain(t, '<div style="margin-right: auto">Foo</div>');
+        final after = element.widget as HorizontalMargin;
+        expect(after.right, equals(double.infinity));
+      });
+    });
+
+    testWidgets('computeDryLayout', (tester) async {
+      await tester.pumpSizedBox(
+        left: double.infinity,
+        right: double.infinity,
+      );
+
+      final bc = BoxConstraints.loose(const Size(50, 50));
+      final drySize = tester.horizontalMargin.getDryLayout(bc);
+      expect(drySize, equals(const Size(50, 10)));
+    });
+
+    group('computeMaxIntrinsicWidth', () {
+      testWidgets('computes with child', (tester) async {
+        await tester.pumpSizedBox(left: 1, right: 2);
+        final maxWidth = tester.horizontalMargin.getMaxIntrinsicWidth(50);
+        expect(maxWidth, equals(13));
+      });
+
+      testWidgets('computes without child', (tester) async {
+        await tester.pumpSizedBox(isNull: true, left: 1, right: 2);
+        final maxWidth = tester.horizontalMargin.getMaxIntrinsicWidth(50);
+        expect(maxWidth, equals(3));
+      });
+    });
+
+    group('computeMinIntrinsicWidth', () {
+      testWidgets('computes with child', (tester) async {
+        await tester.pumpSizedBox(left: 1, right: 2);
+        final maxWidth = tester.horizontalMargin.getMinIntrinsicWidth(50);
+        expect(maxWidth, equals(13));
+      });
+
+      testWidgets('computes without child', (tester) async {
+        await tester.pumpSizedBox(isNull: true, left: 1, right: 2);
+        final maxWidth = tester.horizontalMargin.getMinIntrinsicWidth(50);
+        expect(maxWidth, equals(3));
+      });
+    });
+
+    group('performLayout', () {
+      testWidgets('aligns left', (tester) async {
+        final key = await tester.pumpSizedBox(right: double.infinity);
+
+        final full = tester.getRect(find.byType(HorizontalMargin));
+        expect(full, equals(const Rect.fromLTWH(0, 0, 100, 10)));
+
+        final child = tester.getRect(find.byKey(key));
+        expect(child, equals(const Rect.fromLTWH(0, 0, 10, 10)));
+      });
+
+      testWidgets('aligns center', (tester) async {
+        final key = await tester.pumpSizedBox(
+          left: double.infinity,
+          right: double.infinity,
+        );
+
+        final full = tester.getRect(find.byType(HorizontalMargin));
+        expect(full, equals(const Rect.fromLTWH(0, 0, 100, 10)));
+
+        final child = tester.getRect(find.byKey(key));
+        expect(child, equals(const Rect.fromLTWH(45, 0, 10, 10)));
+      });
+
+      testWidgets('aligns right', (tester) async {
+        final key = await tester.pumpSizedBox(left: double.infinity);
+
+        final full = tester.getRect(find.byType(HorizontalMargin));
+        expect(full, equals(const Rect.fromLTWH(0, 0, 100, 10)));
+
+        final child = tester.getRect(find.byKey(key));
+        expect(child, equals(const Rect.fromLTWH(90, 0, 10, 10)));
+      });
+
+      testWidgets('aligns values', (tester) async {
+        final key = await tester.pumpSizedBox(left: 20, right: 30);
+
+        final full = tester.getRect(find.byType(HorizontalMargin));
+        expect(full, equals(const Rect.fromLTWH(0, 0, 60, 10)));
+
+        final child = tester.getRect(find.byKey(key));
+        expect(child, equals(const Rect.fromLTWH(20, 0, 10, 10)));
+      });
+
+      testWidgets('aligns big values', (tester) async {
+        final key = await tester.pumpSizedBox(left: 200, right: 300);
+
+        final full = tester.getRect(find.byType(HorizontalMargin));
+        expect(full, equals(const Rect.fromLTWH(0, 0, 100, 10)));
+
+        final child = tester.getSize(find.byKey(key));
+        expect(child, equals(const Size(0, 10)));
+      });
+    });
+  });
+}
+
+extension on WidgetTester {
+  RenderBox get horizontalMargin =>
+      renderObject(find.byType(HorizontalMargin)) as RenderBox;
+
+  Future<GlobalKey> pumpSizedBox({
+    bool isNull = false,
+    double left = .0,
+    double right = .0,
+  }) async {
+    setWindowSize(const Size(100, 100));
+
+    final key = GlobalKey();
+    await pumpWidget(
+      Align(
+        alignment: Alignment.topLeft,
+        child: HorizontalMargin(
+          left: left,
+          right: right,
+          child: isNull
+              ? null
+              : SizedBox(
+                  height: 10,
+                  key: key,
+                  width: 10,
+                ),
+        ),
+      ),
+    );
+
+    return key;
+  }
 }

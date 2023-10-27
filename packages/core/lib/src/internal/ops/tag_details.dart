@@ -5,86 +5,110 @@ const kAttributeDetailsOpen = 'open';
 const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
+// use middle alignment as an early optimization
+// baseline alignment may cause issue with getDrySize, getMinIntrinsicWidth, etc.
+const _markerMarkerAlignment = PlaceholderAlignment.middle;
+
 class TagDetails {
-  final BuildMetadata detailsMeta;
-  late final BuildOp op;
   final WidgetFactory wf;
 
-  late final BuildOp _summaryOp;
-  WidgetPlaceholder? _summary;
+  TagDetails(this.wf);
 
-  TagDetails(this.wf, this.detailsMeta) {
-    op = BuildOp(onChild: onChild, onWidgets: onWidgets);
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagDetails,
+        onRenderBlock: (tree, placeholder) {
+          final attrs = tree.element.attributes;
+          final open = attrs.containsKey(kAttributeDetailsOpen);
 
-    _summaryOp = BuildOp(
-      onTree: (meta, tree) {
-        final children = tree.directChildren;
-        if (children.isEmpty) {
-          return;
-        }
+          return placeholder.wrapWith(
+            (context, child) {
+              final resolved = tree.inheritanceResolvers.resolve(context);
+              final textStyle = resolved.style;
+              final summaries = tree.detailsData.summaries;
+              final summary = summaries.isNotEmpty
+                  ? summaries.first
+                  : wf.buildText(
+                      tree,
+                      resolved,
+                      TextSpan(
+                        children: [
+                          WidgetSpan(
+                            alignment: _markerMarkerAlignment,
+                            child: HtmlDetailsMarker(style: textStyle),
+                          ),
+                          // TODO: i18n
+                          TextSpan(text: 'Details', style: textStyle),
+                        ],
+                      ),
+                    );
 
-        final first = children.first;
-        final marker = WidgetBit.inline(
-          first.parent!,
-          WidgetPlaceholder(meta).wrapWith((context, child) {
-            final tsh = meta.tsb.build(context);
-            return HtmlDetailsMarker(style: tsh.style);
-          }),
-        );
-        marker.insertBefore(first);
-      },
-      onWidgets: (meta, widgets) {
-        if (_summary != null) {
-          return widgets;
-        }
+              return HtmlDetails(
+                open: open,
+                child: wf.buildColumnWidget(
+                  context,
+                  [
+                    HtmlSummary(style: textStyle, child: summary),
+                    HtmlDetailsContents(child: child),
+                  ],
+                  dir: resolved.directionOrLtr,
+                ),
+              );
+            },
+          );
+        },
+        onVisitChild: (detailsTree, subTree) {
+          final e = subTree.element;
+          if (e.parent != detailsTree.element) {
+            return;
+          }
+          if (e.localName != kTagSummary) {
+            return;
+          }
 
-        _summary = wf.buildColumnPlaceholder(meta, widgets);
-        if (_summary == null) {
-          return widgets;
-        }
+          subTree.register(
+            BuildOp(
+              debugLabel: kTagSummary,
+              onParsed: (summaryTree) {
+                if (summaryTree.isEmpty) {
+                  return summaryTree;
+                }
 
-        return const [];
-      },
-      priority: BuildOp.kPriorityMax,
-    );
-  }
+                final marker = WidgetBit.inline(
+                  summaryTree,
+                  WidgetPlaceholder(
+                    builder: (context, _) {
+                      final resolved =
+                          summaryTree.inheritanceResolvers.resolve(context);
+                      return HtmlDetailsMarker(style: resolved.style);
+                    },
+                    debugLabel: '$kTagSummary--inlineMarker',
+                  ),
+                  alignment: _markerMarkerAlignment,
+                );
+                return summaryTree..prepend(marker);
+              },
+              onRenderBlock: (_, placeholder) {
+                final data = detailsTree.detailsData;
+                if (data.summaries.isNotEmpty) {
+                  return placeholder;
+                }
 
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.parent != detailsMeta.element) {
-      return;
-    }
-    if (e.localName != kTagSummary) {
-      return;
-    }
-
-    childMeta.register(_summaryOp);
-  }
-
-  Iterable<Widget>? onWidgets(
-    BuildMetadata _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    final attrs = detailsMeta.element.attributes;
-    final open = attrs.containsKey(kAttributeDetailsOpen);
-    return listOrNull(
-      wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
-        (context, child) {
-          final tsh = detailsMeta.tsb.build(context);
-
-          return HtmlDetails(
-            open: open,
-            child: wf.buildColumnWidget(
-              context,
-              [
-                HtmlSummary(style: tsh.style, child: _summary),
-                HtmlDetailsContents(child: child),
-              ],
-              dir: tsh.getDependency(),
+                data.summaries.add(placeholder);
+                return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
+              },
+              priority: Late.tagSummary,
             ),
           );
         },
-      ),
-    );
-  }
+        priority: Priority.tagDetails,
+      );
+}
+
+extension on BuildTree {
+  _TagDetailsData get detailsData =>
+      getNonInherited<_TagDetailsData>() ?? setNonInherited(_TagDetailsData());
+}
+
+class _TagDetailsData {
+  final summaries = <Widget>[];
 }

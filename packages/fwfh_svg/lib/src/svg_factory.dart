@@ -1,3 +1,6 @@
+// TODO: remove ignore for file when our minimum core version >= 1.0
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -87,13 +90,17 @@ mixin SvgFactory on WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case 'svg':
-        _tagSvg ??= BuildOp(
-          onWidgets: (meta, widgets) {
-            final bytesLoader = SvgStringLoader(meta.element.outerHtml);
-            return [_buildSvgPicture(meta, const ImageSource(''), bytesLoader)];
-          },
+        meta.register(
+          _tagSvg ??= BuildOp(
+            // TODO: set debugLabel when our minimum core version >= 1.0
+            onWidgets: (meta, widgets) {
+              final bytesLoader = SvgStringLoader(meta.element.outerHtml);
+              const src = ImageSource('');
+              final built = _buildSvgPicture(meta, src, bytesLoader);
+              return [built];
+            },
+          ),
         );
-        meta.register(_tagSvg!);
         break;
     }
 

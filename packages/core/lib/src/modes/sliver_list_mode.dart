@@ -30,13 +30,11 @@ class SliverListMode extends RenderMode {
     BuildContext context,
     List<Widget> children,
   ) {
-    // ignore: invalid_use_of_protected_member
-    final anchorRegistry = wf.anchorRegistry;
-    anchorRegistry.prepareIndexByAnchor(children);
+    wf.prepareAnchorIndexByAnchor(children);
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (c, i) => anchorRegistry.buildBodyItem(c, i, children[i]),
+        (c, i) => wf.buildAnchorBodyItem(c, i, children[i]),
         addAutomaticKeepAlives: addAutomaticKeepAlives,
         addRepaintBoundaries: addRepaintBoundaries,
         addSemanticIndexes: addSemanticIndexes,

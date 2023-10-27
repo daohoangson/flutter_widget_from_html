@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 export '_constants.dart';
 
@@ -283,6 +282,11 @@ class Explainer {
       final borderRadius = d.borderRadius;
       if (borderRadius != null && borderRadius is BorderRadius) {
         attr.add('radius=${_borderRadius(borderRadius)}');
+      }
+
+      final image = d.image;
+      if (image != null) {
+        attr.add("bgimage=$image");
       }
     }
 
@@ -575,12 +579,50 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is LayoutBuilder) {
+      return _widget(
+        widget.builder(
+          context,
+          BoxConstraints.loose(
+            // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+            // ignore: deprecated_member_use
+            TestWidgetsFlutterBinding.instance.window.physicalSize,
+          ),
+        ),
+      );
+    }
+
+    if (widget is HtmlDetails) {
+      return '[HtmlDetails:open=${widget.open},child=${_widget(widget.child)}]';
+    }
+
+    if (widget is HtmlDetailsContents) {
+      return '[HtmlDetailsContents:child=${_widget(widget.child)}]';
+    }
+
     if (widget is HtmlListMarker) {
       return _htmlListMarker(widget);
     }
 
-    if (widget is TshWidget) {
-      return _widget(widget.child);
+    if (widget is HtmlSummary) {
+      final child = widget.child;
+      return '[HtmlSummary:child=${child != null ? _widget(child) : null}]';
+    }
+
+    if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'TshWidget') {
+        // v0.5+
+        return _widget(widget.child);
+      }
+      if (widget.runtimeType.toString() == '_RootWidget') {
+        // v0.14+
+        return _widget(widget.child);
+      }
+    }
+
+    if (widget.runtimeType.toString() == 'InlineCustomWidget') {
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
     }
 
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
@@ -592,10 +634,10 @@ class Explainer {
       return _widget(widget.build(context));
     }
 
-    if (widget.runtimeType.toString() == '_MinWidthZero') {
+    if (widget.runtimeType.toString() == '_MinWidthZero' &&
+        widget is ConstraintsTransformBox) {
       // TODO: verify min-width resetter in tests when it's stable
-      // ignore: avoid_dynamic_calls
-      return _widget((widget as dynamic).child as Widget);
+      return _widget(widget.child!);
     }
 
     if (widget is Image) {
@@ -616,6 +658,15 @@ class Explainer {
             : null;
     if (maxLines != null) {
       attr.add('maxLines=$maxLines');
+    }
+
+    final softWrap = widget is RichText
+        ? widget.softWrap
+        : widget is Text
+            ? widget.softWrap
+            : null;
+    if (softWrap == false) {
+      attr.add('softWrap=$softWrap');
     }
 
     attr.add(
@@ -646,12 +697,28 @@ class Explainer {
       ),
     );
 
-    if (widget is Align && widget is! Center) {
-      attr.add(_alignment(widget.alignment));
+    if (widget is Align) {
+      if (widget is! Center) {
+        attr.add(_alignment(widget.alignment));
+      }
+      if (widget.heightFactor != null) {
+        attr.add('heightFactor=${widget.heightFactor}');
+      }
+      if (widget.widthFactor != null) {
+        attr.add('widthFactor=${widget.widthFactor}');
+      }
     }
 
     if (widget is AspectRatio) {
       attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
+    }
+
+    if (widget is Column) {
+      final caa = widget.crossAxisAlignment;
+      if (caa != CrossAxisAlignment.start) {
+        final name = caa.toString().replaceAll('CrossAxisAlignment.', '');
+        attr.add('crossAxisAlignment=$name');
+      }
     }
 
     if (widget is ConstrainedBox) {
@@ -664,10 +731,6 @@ class Explainer {
 
     if (widget is CssSizing) {
       attr.addAll(_cssSizing(widget));
-    }
-
-    if (widget is DecoratedBox) {
-      attr.addAll(_boxDecoration(widget.decoration));
     }
 
     if (widget is LimitedBox) {
@@ -683,6 +746,23 @@ class Explainer {
         '(${widget.top},${widget.right},'
         '${widget.bottom},${widget.left})',
       );
+    }
+
+    if (widget is SingleChildRenderObjectWidget) {
+      final dynamicWidget = widget as dynamic;
+      switch (widget.runtimeType.toString()) {
+        case 'HorizontalMargin':
+          // TODO: remove ignore when our minimum core version >= 1.0
+          // ignore: avoid_dynamic_calls
+          final left = dynamicWidget.left as double;
+          // ignore: avoid_dynamic_calls
+          final right = dynamicWidget.right as double;
+          attr.add(
+            'left=${left.isInfinite ? '∞' : left.truncate()},'
+            'right=${right.isInfinite ? '∞' : right.truncate()}',
+          );
+          break;
+      }
     }
 
     if (widget is Tooltip) {
@@ -767,6 +847,45 @@ class HitTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+extension RenderBoxGetter on GlobalKey {
+  RenderBox get renderBox => currentContext!.findRenderObject()! as RenderBox;
+
+  Size get size => renderBox.size;
+
+  double get width => size.width;
+}
+
+extension WindowTester on WidgetTester {
+  double get windowWidth =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.width /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
+  void setTextScaleFactor(double value) {
+    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+    // ignore: deprecated_member_use
+    binding.window.platformDispatcher.textScaleFactorTestValue = value;
+    addTearDown(
+      // ignore: deprecated_member_use
+      binding.window.platformDispatcher.clearTextScaleFactorTestValue,
+    );
+  }
+
+  void setWindowSize(Size size) {
+    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+    // ignore: deprecated_member_use
+    binding.window.physicalSizeTestValue = size;
+    // ignore: deprecated_member_use
+    addTearDown(binding.window.clearPhysicalSizeTestValue);
+    // ignore: deprecated_member_use
+    binding.window.devicePixelRatioTestValue = 1.0;
+    // ignore: deprecated_member_use
+    addTearDown(binding.window.clearDevicePixelRatioTestValue);
+  }
 }
 
 class _TextFinder extends MatchFinder {

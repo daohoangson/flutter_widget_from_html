@@ -92,8 +92,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
         widget.aspectRatio;
 
     Widget? child;
-    if (_controller != null) {
-      child = lib.Chewie(controller: _controller!);
+    final controller = _controller;
+    if (controller != null) {
+      child = lib.Chewie(controller: controller);
     } else if (_error != null) {
       final errorBuilder = widget.errorBuilder;
       if (errorBuilder != null) {

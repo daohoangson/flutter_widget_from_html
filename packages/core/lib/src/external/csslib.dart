@@ -11,7 +11,7 @@ extension DomElementExtension on dom.Element {
 
   /// Returns CSS declarations from the element's `style` attribute.
   ///
-  /// This is different from [BuildMetadata.styles] as it doesn't include
+  /// This is different from [BuildTree.styles] as it doesn't include
   /// runtime additions from [WidgetFactory] or [BuildOp]s.
   ///
   /// Parsing CSS is a non-trivial task but the result is cached

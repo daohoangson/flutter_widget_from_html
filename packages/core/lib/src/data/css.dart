@@ -103,19 +103,18 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border? getBorder(TextStyleHtml tsh) {
-    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
+  Border? getBorder(InheritedProperties resolved) {
+    final isRtl = resolved.isRtl;
+    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(resolved);
     final left = CssBorderSide._copyWith(
       _all,
-      _left ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd),
-    )?._getValue(tsh);
+      _left ?? (isRtl ? _inlineEnd : _inlineStart),
+    )?._getValue(resolved);
     final right = CssBorderSide._copyWith(
       _all,
-      _right ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart),
-    )?._getValue(tsh);
-    final top = CssBorderSide._copyWith(_all, _top)?._getValue(tsh);
+      _right ?? (isRtl ? _inlineStart : _inlineEnd),
+    )?._getValue(resolved);
+    final top = CssBorderSide._copyWith(_all, _top)?._getValue(resolved);
     if (bottom == null && left == null && right == null && top == null) {
       return null;
     }
@@ -129,11 +128,11 @@ class CssBorder {
   }
 
   /// Calculates [BorderRadius].
-  BorderRadius? getBorderRadius(TextStyleHtml tsh) {
-    final topLeft = radiusTopLeft._getValue(tsh);
-    final topRight = radiusTopRight._getValue(tsh);
-    final bottomLeft = radiusBottomLeft._getValue(tsh);
-    final bottomRight = radiusBottomRight._getValue(tsh);
+  BorderRadius? getBorderRadius(InheritedProperties resolved) {
+    final topLeft = radiusTopLeft._getValue(resolved);
+    final topRight = radiusTopRight._getValue(resolved);
+    final bottomLeft = radiusBottomLeft._getValue(resolved);
+    final bottomRight = radiusBottomRight._getValue(resolved);
     if (topLeft == null &&
         topRight == null &&
         bottomLeft == null &&
@@ -163,11 +162,11 @@ class CssRadius {
   /// A radius with [x] and [y] values set to zero.
   static const zero = CssRadius(CssLength.zero, CssLength.zero);
 
-  Radius? _getValue(TextStyleHtml tsh) => this == zero
+  Radius? _getValue(InheritedProperties resolved) => this == zero
       ? null
       : Radius.elliptical(
-          x.getValue(tsh) ?? 0.0,
-          y.getValue(tsh) ?? 0.0,
+          x.getValue(resolved) ?? 0.0,
+          y.getValue(resolved) ?? 0.0,
         );
 }
 
@@ -194,17 +193,17 @@ class CssBorderSide {
   /// Border will use the default text color so [color] is not required.
   bool get isNoOp => style == null || width?.isPositive != true;
 
-  BorderSide? _getValue(TextStyleHtml tsh) {
+  BorderSide? _getValue(InheritedProperties resolved) {
     if (identical(this, none)) {
       return null;
     }
 
-    final scopedColor = color ?? tsh.style.color;
+    final scopedColor = color ?? resolved.style.color;
     if (scopedColor == null) {
       return null;
     }
 
-    final scopedWidth = width?.getValue(tsh);
+    final scopedWidth = width?.getValue(resolved);
     if (scopedWidth == null) {
       return null;
     }
@@ -256,7 +255,7 @@ class CssLength {
 
   /// Calculates value in logical pixel.
   double? getValue(
-    TextStyleHtml tsh, {
+    InheritedProperties resolved, {
     double? baseValue,
     double? scaleFactor,
   }) {
@@ -267,7 +266,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= tsh.style.fontSize;
+        baseValue ??= resolved.style.fontSize;
         if (baseValue == null) {
           return null;
         }
@@ -362,15 +361,13 @@ class CssLengthBox {
       _inlineStart?.isPositive == true ||
       _right?.isPositive == true;
 
-  /// Calculates the left value taking text direction into account.
-  double? getValueLeft(TextStyleHtml tsh) => (_left ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
-      ?.getValue(tsh);
+  /// Calculates the left length taking text direction into account.
+  CssLength? getLeft(InheritedProperties resolved) =>
+      _left ?? (resolved.isRtl ? _inlineEnd : _inlineStart);
 
-  /// Calculates the right value taking text direction into account.
-  double? getValueRight(TextStyleHtml tsh) => (_right ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
-      ?.getValue(tsh);
+  /// Calculates the right length taking text direction into account.
+  CssLength? getRight(InheritedProperties resolved) =>
+      _right ?? (resolved.isRtl ? _inlineStart : _inlineEnd);
 
   @override
   String toString() {
@@ -436,7 +433,15 @@ enum CssWhitespace {
   /// Lines are broken as necessary to fill line boxes.
   normal,
 
+  /// Collapses white space as for normal,
+  /// but suppresses line breaks (text wrapping) within the source.
+  nowrap,
+
   /// Sequences of white space are preserved.
   /// Lines are only broken at newline characters in the source and at `BR`s.
   pre,
+}
+
+extension on InheritedProperties {
+  bool get isRtl => get<TextDirection>() == TextDirection.rtl;
 }

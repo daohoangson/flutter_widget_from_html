@@ -1,16 +1,12 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-Future<void> main() async {
-  await loadAppFonts();
-
+void main() {
   testWidgets('renders RUBY tag', (WidgetTester tester) async {
     const html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
     final explained = await explain(tester, html);
@@ -161,24 +157,112 @@ Future<void> main() async {
   });
 
   group('HtmlRuby', () {
+    testWidgets('computeDistanceToActualBaseline', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlRuby(
+                  rt: const SizedBox(width: 10, height: 5),
+                  ruby: const SizedBox(width: 50, height: 10),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDistanceToActualBaseline without children',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlRuby(),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlRuby(
+          key: key,
+          rt: const SizedBox(width: 10, height: 5),
+          ruby: const SizedBox(width: 50, height: 10),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 15)),
+      );
+    });
+
+    testWidgets('computeDryLayout without children', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(HtmlRuby(key: key));
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
+      );
+    });
+
+    testWidgets('computeDryLayout without rt', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlRuby(
+          key: key,
+          ruby: const SizedBox(width: 50, height: 10),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 10)),
+      );
+    });
+
     testWidgets('computeIntrinsic', (tester) async {
       final rt = GlobalKey();
       final ruby = GlobalKey();
       final key = GlobalKey();
       await tester.pumpWidget(
         HtmlRuby(
-          SizedBox(key: ruby, width: 50, height: 10),
-          SizedBox(key: rt, width: 10, height: 5),
           key: key,
+          rt: SizedBox(key: rt, width: 10, height: 5),
+          ruby: SizedBox(key: ruby, width: 50, height: 10),
         ),
       );
       await tester.pumpAndSettle();
 
-      final rtRenderBox = rt.currentContext!.findRenderObject()! as RenderBox;
-      final rubyRenderBox =
-          ruby.currentContext!.findRenderObject()! as RenderBox;
-      final htmlRubyRenderBox =
-          key.currentContext!.findRenderObject()! as RenderBox;
+      final rtRenderBox = rt.renderBox;
+      final rubyRenderBox = ruby.renderBox;
+      final htmlRubyRenderBox = key.renderBox;
       expect(
         htmlRubyRenderBox.getMaxIntrinsicHeight(100),
         equals(
@@ -213,6 +297,35 @@ Future<void> main() async {
       );
     });
 
+    testWidgets('computeIntrinsic without children', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(HtmlRuby(key: key));
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(0));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(0));
+    });
+
+    testWidgets('computeIntrinsic without rt', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlRuby(
+          key: key,
+          ruby: const SizedBox(width: 50, height: 10),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(10));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(50));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(10));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(50));
+    });
+
     testWidgets('performs hit test', (tester) async {
       const href = 'href';
       final urls = <String>[];
@@ -228,43 +341,5 @@ Future<void> main() async {
       await tester.pumpAndSettle();
       expect(urls, equals(const [href]));
     });
-
-    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
-    final goldenSkip = goldenSkipEnvVar == null
-        ? Platform.isLinux
-            ? null
-            : 'Linux only'
-        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
-
-    GoldenToolkit.runWithConfiguration(
-      () {
-        testGoldens(
-          'computeDryLayout',
-          (tester) async {
-            await tester.pumpWidgetBuilder(
-              const Scaffold(
-                body: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: HtmlWidget(
-                    '<div style="background: black; color: white; '
-                    'width: 200px; height: 200px">'
-                    '<ruby>Foo <rt>bar</rt></ruby>'
-                    '<div>',
-                  ),
-                ),
-              ),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(600, 400),
-            );
-
-            await screenMatchesGolden(tester, 'computeDryLayout');
-          },
-          skip: goldenSkip != null,
-        );
-      },
-      config: GoldenToolkitConfiguration(
-        fileNameFactory: (name) => '$kGoldenFilePrefix/ruby/$name.png',
-      ),
-    );
   });
 }

@@ -62,7 +62,7 @@ class _State extends State<IframeScreen> {
                   webView: webView,
                   webViewJs: webViewJs,
                 ),
-                rebuildTriggers: RebuildTriggers([webView, webViewJs]),
+                rebuildTriggers: [webView, webViewJs],
               ),
             ),
           ],

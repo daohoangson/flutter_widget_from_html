@@ -34,6 +34,17 @@ Future<void> main() async {
     expect(explained, equals('[RichText:(@20.0+b:Hello world)]'));
   });
 
+  testWidgets('renders MouseRegion', (WidgetTester tester) async {
+    final explained = await explain(
+      tester,
+      null,
+      hw: SelectionArea(
+        child: HtmlWidget('Foo', key: hwKey),
+      ),
+    );
+    expect(explained, equals('[MouseRegion:child=[RichText:(:Foo)]]'));
+  });
+
   testWidgets('renders without erroneous white spaces', (tester) async {
     const html = '''
 <div>
@@ -211,12 +222,12 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          'TshWidget\n'
-          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
+          '_RootWidget\n'
+          '└ColumnPlaceholder(root--column)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'
           '  │└RichText(text: "1")\n'
-          '  ├HeightPlaceholder(1.0em)\n'
+          '  ├HeightPlaceholder(root--1.0em)\n'
           '  │└SizedBox(height: 10.0)\n'
           '  └CssBlock()\n'
           '   └RichText(text: "2")\n\n',
@@ -251,20 +262,8 @@ Future<void> main() async {
       equals(
         '[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(+b:Foo)]],'
-        '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Bar)]]]'
+        '[HorizontalMargin:left=40,right=0,child=[CssBlock:child=[RichText:(:Bar)]]]'
         ']],'
-        '[SizedBox:0.0x10.0]',
-      ),
-    );
-  });
-
-  testWidgets('renders HR tag', (WidgetTester tester) async {
-    const html = '<hr/>';
-    final explained = await explainMargin(tester, html);
-    expect(
-      explained,
-      equals(
-        '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
         '[SizedBox:0.0x10.0]',
       ),
     );
@@ -295,7 +294,7 @@ Future<void> main() async {
         explained,
         equals(
           '[SizedBox:0.0x10.0],'
-          '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[HorizontalMargin:left=40,right=40,child=[CssBlock:child=[RichText:(:Foo)]]],'
           '[SizedBox:0.0x10.0]',
         ),
       );
@@ -322,7 +321,7 @@ Future<void> main() async {
           explained,
           equals(
             '[SizedBox:0.0x10.0],'
-            '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
+            '[HorizontalMargin:left=40,right=40,child=[CssBlock:child=[Column:children='
             '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
             '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
             ']]],'
@@ -568,6 +567,37 @@ Future<void> main() async {
     });
   });
 
+  group('HR', () {
+    testWidgets('renders a horizontal line', (WidgetTester tester) async {
+      final explained = await explainMargin(tester, '<hr/>');
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(1.0@solid#FF001234,none,none,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
+        ),
+      );
+
+      final block = tester.getSize(find.byType(CssBlock));
+      expect(block.width, equals(tester.windowWidth));
+    });
+
+    testWidgets('renders custom color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      const html = '<hr style="border:none;border-bottom:1px solid #e34a3a">';
+      final explained = await explainMargin(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x5.0],'
+          '[Container:border=(none,none,1.0@solid#FFE34A3A,none),child=[CssBlock:child=[Container]]],'
+          '[SizedBox:0.0x5.0]',
+        ),
+      );
+    });
+  });
+
   group('background-color', () {
     testWidgets('renders MARK tag', (WidgetTester tester) async {
       const html = '<mark>Foo</mark>';
@@ -581,7 +611,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
@@ -596,8 +626,8 @@ Future<void> main() async {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,1,0,1),child='
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[HorizontalMargin:left=1,right=1,child='
+          '[Container:bg=#FFFF0000,child='
           '[Padding:(2,2,2,2),child='
           '[CssBlock:child='
           '[RichText:(:Foo)]]]'
@@ -612,7 +642,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[CssBlock:child='
           '[Column:children='
           '[CssBlock:child=[RichText:(:A)]],'
@@ -658,6 +688,58 @@ Future<void> main() async {
         explained,
         equals(
           '[RichText:(:(bg=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]',
+        ),
+      );
+    });
+  });
+
+  group('background-image', () {
+    testWidgets('asset', (WidgetTester tester) async {
+      const assetName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(asset:$assetName)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[Container:bgimage='
+          'DecorationImage('
+          'AssetImage(bundle: null, name: "test/images/logo.png"), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('data uri', (WidgetTester tester) async {
+      const html = '<div style="background-image: url($kDataUri)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        matches(
+            r'^\[Container:bgimage=DecorationImage\(MemoryImage\(Uint8List#[0-9a-fA-F]+, scale: 1\.0\), '
+            r'Alignment\.center, scale 1\.0, opacity 1\.0, FilterQuality\.low\),child='
+            r'\[CssBlock:child='
+            r'\[RichText:\(:Foo\)\]\]\]$'),
+      );
+    });
+
+    testWidgets('file', (WidgetTester tester) async {
+      const fileName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(file:$fileName)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[Container:bgimage='
+          'DecorationImage('
+          'FileImage("/test/images/logo.png", scale: 1.0), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -950,19 +1032,28 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onWidgets inline', (WidgetTester tester) async {
+    testWidgets('renders onRenderBlock inline', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/646
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
         tester,
         null,
         hw: HtmlWidget(
           html,
-          factoryBuilder: () => _InlineBlockOnWidgetsFactory(),
+          factoryBuilder: () => _InlineOnRenderBlockFactory(),
           key: hwKey,
         ),
       );
 
       expect(explained, equals('[Text:Bar]'));
+    });
+
+    testWidgets('inline block with bg, v-align', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/799
+      const html = '<span style="background-color: #FF6600; '
+          'display: inline-block; vertical-align: middle">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:bg=#FFFF6600,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders display: none', (WidgetTester tester) async {
@@ -1580,17 +1671,57 @@ Future<void> main() async {
   });
 
   group('white-space', () {
-    testWidgets('renders normal', (tester) async {
-      const html = '<div style="white-space: normal">Foo\nbar</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo bar)]]'));
-    });
+    const text = '\nFoo bar.\n\tFoo  bar.\n\t\t';
 
     testWidgets('renders pre', (tester) async {
-      const code = '\n  Foo\n  bar  \n';
-      const html = '<div style="white-space: pre">$code</div>';
+      const html = '<div style="white-space: pre">$text</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:$code)]]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:$text)]]'));
+    });
+
+    testWidgets('renders normal', (tester) async {
+      const html = '<div style="white-space: normal">$text</div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:(:Foo bar. Foo bar.)]]'));
+    });
+
+    testWidgets('renders nowrap', (tester) async {
+      const html = '<div style="white-space: nowrap">$text</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:softWrap=false,(:Foo\u00A0bar.\u00A0Foo\u00A0bar.)]]',
+        ),
+      );
+    });
+
+    testWidgets('renders inline nowrap', (tester) async {
+      const html = '<p><span style="white-space: nowrap">$text</span></p>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:(:Foo\u00A0bar.\u00A0Foo\u00A0bar.)]]',
+        ),
+      );
+    });
+
+    testWidgets('#939: renders inline nowrap', (tester) async {
+      const html =
+          '<p style="line-height: 1.2;">For any two real numbers x and y, '
+          'prove that: <span style="white-space:nowrap">|x  +  y|  ≤  |x|  +  |y|.</span></p>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:'
+          '(+height=1.2:For any two real numbers x and y, prove that: '
+          '(+height=1.2:|x\u00A0+\u00A0y|\u00A0≤\u00A0|x|\u00A0+\u00A0|y|.)'
+          ')'
+          ']]',
+        ),
+      );
     });
 
     group('PRE tag', () {
@@ -1658,16 +1789,12 @@ Future<void> main() async {
   });
 }
 
-class _InlineBlockOnWidgetsFactory extends WidgetFactory {
+class _InlineOnRenderBlockFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.localName == 'span') {
-      meta.register(
-        BuildOp(
-          onWidgets: (_, __) => const [Text('Bar')],
-        ),
-      );
+  void parse(BuildTree tree) {
+    if (tree.element.localName == 'span') {
+      tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Bar')));
     }
-    super.parse(meta);
+    super.parse(tree);
   }
 }
