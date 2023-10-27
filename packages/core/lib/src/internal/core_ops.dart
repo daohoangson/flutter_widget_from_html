@@ -80,6 +80,7 @@ const kCssDisplay = 'display';
 const kCssDisplayBlock = 'block';
 const kCssDisplayInline = 'inline';
 const kCssDisplayInlineBlock = 'inline-block';
+const kCssDisplayFlex = 'flex';
 const kCssDisplayNone = 'none';
 
 const kCssLineHeight = 'line-height';

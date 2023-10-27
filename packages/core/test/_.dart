@@ -556,6 +556,22 @@ class Explainer {
     return '+w${FontWeight.values.indexOf(fontWeight)}';
   }
 
+  List<String> _flex(Flex flex) {
+    final List<String> result = [];
+
+    result.add(
+      'direction=${flex.direction.toString().replaceFirst('Axis.', '')}',
+    );
+    result.add(
+      'mainAxisAlignment=${flex.mainAxisAlignment.toString().replaceFirst('MainAxisAlignment.', '')}',
+    );
+    result.add(
+      'crossAxisAlignment=${flex.crossAxisAlignment.toString().replaceFirst('CrossAxisAlignment.', '')}',
+    );
+
+    return result;
+  }
+
   String _widget(Widget widget) {
     final explained = explainer?.call(this, widget);
     if (explained != null) {
@@ -754,6 +770,10 @@ class Explainer {
 
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
+    }
+
+    if (widget is! Column && (widget is Flex)) {
+      attr.addAll(_flex(widget));
     }
 
     // Special cases

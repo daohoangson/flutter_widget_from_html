@@ -16,6 +16,7 @@ import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/margin_vertical.dart';
+import 'internal/ops/style_display_flex.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'internal/text_ops.dart' as text_ops;
@@ -673,7 +674,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           ),
         );
         break;
-
       case 'article':
       case 'aside':
       case 'dl':
@@ -1134,6 +1134,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     StyleSizing.maybeRegisterChildOp(this, tree);
 
     switch (value) {
+      case kCssDisplayFlex:
+        tree.register(StyleDisplayFlexOps.flexOp(tree));
+        break;
       case kCssDisplayBlock:
         StyleSizing.registerBlockOp(this, tree);
         break;
