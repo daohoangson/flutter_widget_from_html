@@ -68,9 +68,11 @@ class StyleDisplayFlexOps {
 
   /// Build op for child elements of flex containers
   static BuildOp _flexItemOp(BuildTree tree) {
-    return BuildOp(defaultStyles: (element) {
-      return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
-    });
+    return BuildOp(
+      defaultStyles: (element) {
+        return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
+      },
+    );
   }
 
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
