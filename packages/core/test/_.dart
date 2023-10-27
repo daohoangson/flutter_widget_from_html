@@ -283,6 +283,11 @@ class Explainer {
       if (borderRadius != null && borderRadius is BorderRadius) {
         attr.add('radius=${_borderRadius(borderRadius)}');
       }
+
+      final image = d.image;
+      if (image != null) {
+        attr.add("bgimage=$image");
+      }
     }
 
     return attr;

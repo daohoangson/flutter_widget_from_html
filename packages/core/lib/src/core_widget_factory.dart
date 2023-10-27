@@ -146,8 +146,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
+    String? bgImageUrl,
   }) {
-    if (border == null && borderRadius == null && color == null) {
+    if (border == null &&
+        borderRadius == null &&
+        color == null &&
+        bgImageUrl == null) {
       return child;
     }
 
@@ -156,7 +160,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
-    var decoration = baseDeco.copyWith(border: border, color: color);
+    var decoration = baseDeco.copyWith(
+      border: border,
+      color: color,
+      image: buildDecorationImage(bgImageUrl),
+    );
 
     var clipBehavior = Clip.none;
     if (borderRadius != null) {
@@ -175,6 +183,31 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       clipBehavior: clipBehavior,
       child: grandChild ?? child,
     );
+  }
+
+  /// Builds decoration image from [url]
+  DecorationImage? buildDecorationImage(String? url) {
+    if (url == null) {
+      return null;
+    }
+
+    ImageProvider? provider;
+
+    if (url.startsWith('asset:')) {
+      provider = imageProviderFromAsset(url);
+    } else if (url.startsWith('data:image/')) {
+      provider = imageProviderFromDataUri(url);
+    } else if (url.startsWith('file:')) {
+      provider = imageProviderFromFileUri(url);
+    } else {
+      provider = imageProviderFromNetwork(url);
+    }
+
+    if (provider == null) {
+      return null;
+    }
+
+    return DecorationImage(image: provider);
   }
 
   /// Builds [GestureDetector].
@@ -977,6 +1010,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
+      case kCssBackgroundImage:
         tree.register(_styleBackground ??= StyleBackground(this).buildOp);
         break;
 

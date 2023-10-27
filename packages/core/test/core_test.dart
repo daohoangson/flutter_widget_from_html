@@ -693,6 +693,58 @@ Future<void> main() async {
     });
   });
 
+  group('background-image', () {
+    testWidgets('asset', (WidgetTester tester) async {
+      const assetName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(asset:$assetName)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[Container:bgimage='
+          'DecorationImage('
+          'AssetImage(bundle: null, name: "test/images/logo.png"), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('data uri', (WidgetTester tester) async {
+      const html = '<div style="background-image: url($kDataUri)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        matches(
+            r'^\[Container:bgimage=DecorationImage\(MemoryImage\(Uint8List#[0-9a-fA-F]+, scale: 1\.0\), '
+            r'Alignment\.center, scale 1\.0, opacity 1\.0, FilterQuality\.low\),child='
+            r'\[CssBlock:child='
+            r'\[RichText:\(:Foo\)\]\]\]$'),
+      );
+    });
+
+    testWidgets('file', (WidgetTester tester) async {
+      const fileName = 'test/images/logo.png';
+      const html =
+          '<div style="background-image: url(file:$fileName)">Foo</div>';
+      final explained = await explain(tester, html);
+
+      expect(
+        explained,
+        equals(
+          '[Container:bgimage='
+          'DecorationImage('
+          'FileImage("/test/images/logo.png", scale: 1.0), Alignment.center, scale 1.0, opacity 1.0, FilterQuality.low),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+  });
+
   group('color (inline style)', () {
     testWidgets('renders hex values', (WidgetTester tester) async {
       const html = '<span style="color: #F00">red</span>'
