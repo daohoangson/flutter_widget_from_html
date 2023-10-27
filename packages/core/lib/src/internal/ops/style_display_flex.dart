@@ -70,7 +70,10 @@ class StyleDisplayFlexOps {
   static BuildOp _flexItemOp(BuildTree tree) {
     return BuildOp(
       defaultStyles: (element) {
-        return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
+        return {
+          kCssWidth: kCssLengthAuto,
+          kCssHeight: kCssLengthAuto,
+        };
       },
     );
   }

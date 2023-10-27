@@ -11,6 +11,8 @@ part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/length.dart';
 
+const kCssLengthAuto = 'auto';
+
 const kCssMaxLines = 'max-lines';
 const kCssMaxLinesNone = 'none';
 const kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';

@@ -24,7 +24,7 @@ CssLength? tryParseCssLength(css.Expression expression) {
     }
 
     switch (expression.valueAsString) {
-      case 'auto':
+      case kCssLengthAuto:
         return const CssLength(1, CssLengthUnit.auto);
     }
   }

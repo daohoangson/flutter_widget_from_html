@@ -61,10 +61,10 @@ class TagImg {
     final height = attrs[kAttributeImgHeight];
     final width = attrs[kAttributeImgWidth];
     return {
-      kCssHeight: 'auto',
+      kCssHeight: kCssLengthAuto,
       kCssMinWidth: '0px',
       kCssMinHeight: '0px',
-      kCssWidth: 'auto',
+      kCssWidth: kCssLengthAuto,
       if (height != null) kCssHeight: '${height}px',
       if (width != null) kCssWidth: '${width}px',
     };
