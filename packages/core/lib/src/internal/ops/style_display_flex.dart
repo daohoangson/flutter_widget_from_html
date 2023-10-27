@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../flutter_widget_from_html_core.dart';
-import '../core_ops.dart';
+part of '../core_ops.dart';
 
 const kCssFlexDirection = 'flex-direction';
 const kCssFlexDirectionRow = 'row';
@@ -19,16 +16,22 @@ const kCssAlignItemsCenter = 'center';
 const kCssAlignItemsBaseline = 'baseline';
 const kCssAlignItemsStretch = 'stretch';
 
-// ignore: avoid_classes_with_only_static_members
-class StyleDisplayFlexOps {
-  /// Builds custom widget for div elements with display: flex from [meta]
-  static BuildOp flexOp(BuildTree tree) {
+class StyleDisplayFlex {
+  final WidgetFactory wf;
+
+  StyleDisplayFlex(this.wf);
+
+  BuildOp get buildOp {
     return BuildOp(
       onVisitChild: (tree, subTree) {
-        subTree.register(_flexItemOp(subTree));
+        if (subTree.element.parent != tree.element) {
+          return;
+        }
+
+        const itemOp = BuildOp.v2(defaultStyles: _itemDefaultStyles);
+        subTree.register(itemOp);
       },
       onRenderBlock: (tree, placeholder) {
-        final String id = tree.element.id;
         String flexDirection = kCssFlexDirectionRow;
         String justifyContent = kCssJustifyContentFlexStart;
         String alignItems = kCssAlignItemsFlexStart;
@@ -51,32 +54,25 @@ class StyleDisplayFlexOps {
           }
         }
 
-        return Flex(
-          key: Key(id),
-          direction: kCssFlexDirectionRow == flexDirection
+        final flex = wf.buildFlex(
+          tree,
+          [placeholder],
+          crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+          direction: flexDirection == kCssFlexDirectionRow
               ? Axis.horizontal
               : Axis.vertical,
           mainAxisAlignment: _toMainAxisAlignment(justifyContent),
-          crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-          children: [
-            placeholder,
-          ],
         );
+
+        return flex ?? placeholder;
       },
     );
   }
 
-  /// Build op for child elements of flex containers
-  static BuildOp _flexItemOp(BuildTree tree) {
-    return BuildOp(
-      defaultStyles: (element) {
-        return {
-          kCssWidth: kCssLengthAuto,
-          kCssHeight: kCssLengthAuto,
-        };
-      },
-    );
-  }
+  static StylesMap _itemDefaultStyles(dom.Element _) => const {
+        kCssWidth: kCssLengthAuto,
+        kCssHeight: kCssLengthAuto,
+      };
 
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
   static MainAxisAlignment _toMainAxisAlignment(String justifyContent) {
