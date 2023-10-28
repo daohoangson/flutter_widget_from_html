@@ -191,7 +191,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BuildTree tree,
     String? url, {
     AlignmentGeometry alignment = Alignment.center,
-    BoxFit? fit,
+    BoxFit fit = BoxFit.scaleDown,
     ImageRepeat repeat = ImageRepeat.noRepeat,
   }) {
     if (url == null) {

@@ -4,6 +4,24 @@ const kCssBackground = 'background';
 const kCssBackgroundColor = 'background-color';
 const kCssBackgroundImage = 'background-image';
 
+const kCssBackgroundPosition = 'background-position';
+const kCssBackgroundPositionBottom = 'bottom';
+const kCssBackgroundPositionCenter = 'center';
+const kCssBackgroundPositionLeft = 'left';
+const kCssBackgroundPositionRight = 'right';
+const kCssBackgroundPositionTop = 'top';
+
+const kCssBackgroundRepeat = 'background-repeat';
+const kCssBackgroundRepeatNo = 'no-repeat';
+const kCssBackgroundRepeatX = 'repeat-x';
+const kCssBackgroundRepeatY = 'repeat-y';
+const kCssBackgroundRepeatYes = 'repeat';
+
+const kCssBackgroundSize = 'background-size';
+const kCssBackgroundSizeAuto = 'auto';
+const kCssBackgroundSizeContain = 'contain';
+const kCssBackgroundSizeCover = 'cover';
+
 class StyleBackground {
   final WidgetFactory wf;
 
@@ -24,6 +42,9 @@ class StyleBackground {
           final image = wf.buildDecorationImage(
             tree,
             imageUrl,
+            alignment: data.alignment,
+            fit: data.size,
+            repeat: data.repeat,
           );
 
           return placeholder.wrapWith(
@@ -71,6 +92,7 @@ extension on BuildTree {
           for (final expression in style.values) {
             data = data.copyWithColor(expression);
             data = data.copyWithImageUrl(expression);
+            data = data.copyWithTerm(expression);
           }
           break;
         case kCssBackgroundColor:
@@ -79,6 +101,10 @@ extension on BuildTree {
         case kCssBackgroundImage:
           data = data.copyWithImageUrl(style.value);
           break;
+        case kCssBackgroundPosition:
+        case kCssBackgroundRepeat:
+        case kCssBackgroundSize:
+          data = data.copyWithTerm(style.value);
       }
     }
 
@@ -88,20 +114,32 @@ extension on BuildTree {
 
 @immutable
 class _StyleBackgroundData {
+  final AlignmentGeometry alignment;
   final Color? color;
   final String? imageUrl;
+  final ImageRepeat repeat;
+  final BoxFit size;
   const _StyleBackgroundData({
+    this.alignment = Alignment.center,
     this.color,
     this.imageUrl,
+    this.repeat = ImageRepeat.noRepeat,
+    this.size = BoxFit.scaleDown,
   });
 
   _StyleBackgroundData copyWith({
+    AlignmentGeometry? alignment,
     Color? color,
     String? imageUrl,
+    ImageRepeat? repeat,
+    BoxFit? size,
   }) =>
       _StyleBackgroundData(
+        alignment: alignment ?? this.alignment,
         color: color ?? this.color,
         imageUrl: imageUrl ?? this.imageUrl,
+        repeat: repeat ?? this.repeat,
+        size: size ?? this.size,
       );
 
   _StyleBackgroundData copyWithColor(css.Expression? expression) {
@@ -118,5 +156,40 @@ class _StyleBackgroundData {
       return this;
     }
     return copyWith(imageUrl: newImageUrl);
+  }
+
+  _StyleBackgroundData copyWithTerm(css.Expression? expression) {
+    if (expression is! css.LiteralTerm) {
+      return this;
+    }
+
+    switch (expression.valueAsString) {
+      case kCssBackgroundPositionBottom:
+        return copyWith(alignment: Alignment.bottomCenter);
+      case kCssBackgroundPositionCenter:
+        return copyWith(alignment: Alignment.center);
+      case kCssBackgroundPositionLeft:
+        return copyWith(alignment: Alignment.centerLeft);
+      case kCssBackgroundPositionRight:
+        return copyWith(alignment: Alignment.centerRight);
+      case kCssBackgroundPositionTop:
+        return copyWith(alignment: Alignment.topCenter);
+      case kCssBackgroundRepeatNo:
+        return copyWith(repeat: ImageRepeat.noRepeat);
+      case kCssBackgroundRepeatX:
+        return copyWith(repeat: ImageRepeat.repeatX);
+      case kCssBackgroundRepeatY:
+        return copyWith(repeat: ImageRepeat.repeatY);
+      case kCssBackgroundRepeatYes:
+        return copyWith(repeat: ImageRepeat.repeat);
+      case kCssBackgroundSizeAuto:
+        return copyWith(size: BoxFit.scaleDown);
+      case kCssBackgroundSizeContain:
+        return copyWith(size: BoxFit.contain);
+      case kCssBackgroundSizeCover:
+        return copyWith(size: BoxFit.cover);
+    }
+
+    return this;
   }
 }
