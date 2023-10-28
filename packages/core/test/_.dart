@@ -285,6 +285,15 @@ class Explainer {
       final image = d.image;
       if (image != null) {
         attr.add("image=${image.image}");
+        if (image.alignment != Alignment.center) {
+          attr.add(_alignment(image.alignment));
+        }
+        if (image.fit != BoxFit.scaleDown) {
+          attr.add('fit=${image.fit?.name}');
+        }
+        if (image.repeat != ImageRepeat.noRepeat) {
+          attr.add('repeat=${image.repeat.name}');
+        }
       }
 
       final borderRadius = d.borderRadius;

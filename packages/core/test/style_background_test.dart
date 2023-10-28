@@ -67,12 +67,6 @@ void main() {
       expect(explained, equals('[RichText:(:Foo (color=#FFFF0000:bar))]'));
     });
 
-    testWidgets('renders background', (WidgetTester tester) async {
-      const html = 'Foo <span style="background: #f00">bar</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo (color=#FFFF0000:bar))]'));
-    });
-
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
         const html = 'Foo<span style="background-color: #f00"> bar</span>';
@@ -87,7 +81,8 @@ void main() {
       });
     });
 
-    testWidgets('resets in continuous SPANs (#155)', (tester) async {
+    testWidgets('resets in continuous SPANs', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/155
       const html =
           '<span style="color: #ff0; background-color:#00f;">Foo</span>'
           '<span style="color: #f00;">bar</span>';
@@ -176,17 +171,86 @@ void main() {
         ),
       );
     });
+  });
 
-    testWidgets('renders background', (WidgetTester tester) async {
-      const assetName = 'test/images/logo.png';
+  group('shorthand', () {
+    const assetName = 'test/images/logo.png';
+    const assetImage = 'AssetImage(bundle: null, name: "$assetName")';
+
+    testWidgets('renders color', (WidgetTester tester) async {
+      const html = 'Foo <span style="background: #f00">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo (color=#FFFF0000:bar))]'));
+    });
+
+    testWidgets('renders image', (WidgetTester tester) async {
       const html = '<div style="background: url(asset:$assetName)">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
-          '[Container:image=AssetImage(bundle: null, name: "$assetName"),child='
+          '[Container:image=$assetImage,child='
           '[CssBlock:child=[RichText:(:Foo)]]'
           ']',
+        ),
+      );
+    });
+
+    testWidgets('renders position', (WidgetTester tester) async {
+      const html =
+          '<div style="background: url(asset:$assetName) right">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:image=$assetImage,alignment=centerRight,child='
+          '[CssBlock:child=[RichText:(:Foo)]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('renders repeat', (WidgetTester tester) async {
+      const html =
+          '<div style="background: url(asset:$assetName) repeat">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:image=$assetImage,repeat=repeat,child='
+          '[CssBlock:child=[RichText:(:Foo)]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('renders size', (WidgetTester tester) async {
+      const html =
+          '<div style="background: url(asset:$assetName) cover">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:image=$assetImage,fit=cover,child='
+          '[CssBlock:child=[RichText:(:Foo)]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('renders everything', (WidgetTester tester) async {
+      const html = '<div style="background: #f00 '
+          'url(asset:$assetName) right repeat cover">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:color=#FFFF0000,'
+          'image=$assetImage,'
+          'alignment=centerRight,'
+          'fit=cover,'
+          'repeat=repeat,'
+          'child=[CssBlock:child=[RichText:(:Foo)]]]',
         ),
       );
     });
