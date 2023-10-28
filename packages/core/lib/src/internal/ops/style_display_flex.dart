@@ -23,6 +23,7 @@ class StyleDisplayFlex {
 
   BuildOp get buildOp {
     return BuildOp(
+      alwaysRenderBlock: true,
       onVisitChild: (tree, subTree) {
         if (subTree.element.parent != tree.element) {
           return;
@@ -31,7 +32,11 @@ class StyleDisplayFlex {
         const itemOp = BuildOp.v2(defaultStyles: _itemDefaultStyles);
         subTree.register(itemOp);
       },
-      onRenderBlock: (tree, placeholder) {
+      onRenderedChildren: (tree, children) {
+        if (children.isEmpty) {
+          return null;
+        }
+
         String flexDirection = kCssFlexDirectionRow;
         String justifyContent = kCssJustifyContentFlexStart;
         String alignItems = kCssAlignItemsFlexStart;
@@ -54,17 +59,18 @@ class StyleDisplayFlex {
           }
         }
 
-        final flex = wf.buildFlex(
-          tree,
-          [placeholder],
-          crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-          direction: flexDirection == kCssFlexDirectionRow
-              ? Axis.horizontal
-              : Axis.vertical,
-          mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+        return WidgetPlaceholder(
+          debugLabel: kCssDisplayFlex,
+          child: wf.buildFlex(
+            tree,
+            children.toList(growable: false),
+            crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+            direction: flexDirection == kCssFlexDirectionRow
+                ? Axis.horizontal
+                : Axis.vertical,
+            mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+          ),
         );
-
-        return flex ?? placeholder;
       },
       priority: Priority.displayFlex,
     );

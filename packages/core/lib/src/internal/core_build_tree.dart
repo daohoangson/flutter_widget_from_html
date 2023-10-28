@@ -77,13 +77,19 @@ class CoreBuildTree extends BuildTree {
   @override
   WidgetPlaceholder? build() {
     final children = Flattener(wf, this).widgets;
-    final column = wf.buildColumnPlaceholder(this, children);
-    if (column == null && _buildOps == null) {
-      return null;
+
+    final Iterable<_CoreBuildOp> ops = _buildOps ?? const [];
+    WidgetPlaceholder? customPlaceholder;
+    for (final op in ops) {
+      customPlaceholder = op.onRenderedChildren(children);
+      if (customPlaceholder != null) {
+        break;
+      }
     }
 
-    var placeholder = column ?? const _WidgetPlaceholderDefault();
-    final Iterable<_CoreBuildOp> ops = _buildOps ?? const [];
+    var placeholder = customPlaceholder ??
+        wf.buildColumnPlaceholder(this, children) ??
+        const _WidgetPlaceholderDefault();
     for (final op in ops) {
       placeholder = WidgetPlaceholder.lazy(
         op.onRenderBlock(placeholder),
@@ -389,6 +395,9 @@ class _CoreBuildOp {
 
   void onRenderedBlock(WidgetPlaceholder placeholder) =>
       op.onRenderedBlock?.call(tree, placeholder);
+
+  WidgetPlaceholder? onRenderedChildren(Iterable<WidgetPlaceholder> children) =>
+      op.onRenderedChildren?.call(tree, children);
 
   void onVisitChild(BuildTree subTree) => op.onVisitChild?.call(tree, subTree);
 
