@@ -66,6 +66,7 @@ class StyleDisplayFlex {
 
         return flex ?? placeholder;
       },
+      priority: Priority.displayFlex,
     );
   }
 
