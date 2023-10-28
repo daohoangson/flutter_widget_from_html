@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -99,19 +102,51 @@ void main() {
   });
 
   group('background-image', () {
-    testWidgets('asset', (WidgetTester tester) async {
-      const assetName = 'test/images/logo.png';
-      const html =
-          '<div style="background-image: url(asset:$assetName)">Foo</div>';
-      final explained = await explain(tester, html);
+    testWidgets('renders network', (WidgetTester tester) async {
+      const src = 'http://domain.com/image.png';
+      const html = '<div style="background-image: url($src)">Foo</div>';
+      final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
         explained,
         equals(
-          '[Container:image=AssetImage(bundle: null, name: "$assetName"),child='
+          '[Container:image=NetworkImage("$src", scale: 1.0),child='
           '[CssBlock:child=[RichText:(:Foo)]]'
           ']',
         ),
       );
+    });
+
+    group('asset', () {
+      const assetName = 'test/images/logo.png';
+
+      testWidgets('renders asset', (WidgetTester tester) async {
+        const html =
+            '<div style="background-image: url(asset:$assetName)">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(
+          explained,
+          equals(
+            '[Container:image=AssetImage(bundle: null, name: "$assetName"),child='
+            '[CssBlock:child=[RichText:(:Foo)]]'
+            ']',
+          ),
+        );
+      });
+
+      testWidgets('renders asset (specified package)', (tester) async {
+        const package = 'flutter_widget_from_html_core';
+        const html =
+            '<div style="background-image: url(asset:$assetName?package=$package)">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(
+          explained,
+          equals(
+            '[Container:image=AssetImage(bundle: null, name: "packages/$package/$assetName"),child='
+            '[CssBlock:child=[RichText:(:Foo)]]'
+            ']',
+          ),
+        );
+      });
     });
 
     testWidgets('data uri', (WidgetTester tester) async {
@@ -127,15 +162,29 @@ void main() {
       );
     });
 
-    testWidgets('file', (WidgetTester tester) async {
-      const fileName = '/test/images/logo.png';
-      const html =
-          '<div style="background-image: url(file:$fileName)">Foo</div>';
+    testWidgets('file uri', (WidgetTester tester) async {
+      final filePath = '${Directory.current.path}/test/images/logo.png';
+      final fileUri = 'file://$filePath';
+      final html = '<div style="background-image: url($fileUri)">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
-          '[Container:image=FileImage("$fileName", scale: 1.0),child='
+          '[Container:image=FileImage("$filePath", scale: 1.0),child='
+          '[CssBlock:child=[RichText:(:Foo)]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('renders background', (WidgetTester tester) async {
+      const assetName = 'test/images/logo.png';
+      const html = '<div style="background: url(asset:$assetName)">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:image=AssetImage(bundle: null, name: "$assetName"),child='
           '[CssBlock:child=[RichText:(:Foo)]]'
           ']',
         ),
