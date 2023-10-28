@@ -41,6 +41,40 @@ void main() {
       expect(explained, contains('[SizedBox#foo'));
     });
 
+    testWidgets('renders in AlertDialog', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1082
+      await explain(
+        tester,
+        null,
+        hw: Builder(
+          builder: (context) {
+            return InkWell(
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: HtmlWidget(
+                      '<p><a name="foo"></a><a name="bar"></a></p>',
+                      key: hwKey,
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('Tap me'),
+            );
+          },
+        ),
+      );
+
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+
+      final explained = await explainWithoutPumping();
+      expect(explained, contains('[SizedBox#foo:0.0x16.0]'));
+      expect(explained, contains('[SizedBox#bar:0.0x16.0]'));
+    });
+
     testWidgets('renders in ListView', (WidgetTester tester) async {
       const html = '<a name="foo"></a>Foo';
       final explained = await explain(
