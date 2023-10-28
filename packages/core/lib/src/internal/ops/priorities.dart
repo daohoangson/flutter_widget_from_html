@@ -8,12 +8,16 @@ part of '../core_ops.dart';
 /// User's build op has a default priority of 10 so they should run
 /// after our early ops and before our normal ops.
 class Priority {
+  static const max = 9007199254740991;
+
+  @visibleForTesting
+  static const step = 1000000000;
+
   static const _baseEarly00 = -3000000000000000;
   static const _baseNormal00 = 1000000000000000;
   static const _baseBoxModel = 5000000000000000;
   static const _baseLate0000 = 9000000000000000;
-  static const _step = 1000000000;
-  static const max = 9007199254740991;
+  static const _step = step;
 
   static const first = _baseNormal00;
   static const tagA = first + _step;
