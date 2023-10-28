@@ -24,14 +24,6 @@ class StyleDisplayFlex {
   BuildOp get buildOp {
     return BuildOp(
       alwaysRenderBlock: true,
-      onVisitChild: (tree, subTree) {
-        if (subTree.element.parent != tree.element) {
-          return;
-        }
-
-        const itemOp = BuildOp.v2(defaultStyles: _itemDefaultStyles);
-        subTree.register(itemOp);
-      },
       onRenderedChildren: (tree, children) {
         if (children.isEmpty) {
           return null;
@@ -75,11 +67,6 @@ class StyleDisplayFlex {
       priority: Priority.displayFlex,
     );
   }
-
-  static StylesMap _itemDefaultStyles(dom.Element _) => const {
-        kCssWidth: kCssLengthAuto,
-        kCssHeight: kCssLengthAuto,
-      };
 
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
   static MainAxisAlignment _toMainAxisAlignment(String justifyContent) {
