@@ -147,12 +147,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
-    String? bgImageUrl,
+    DecorationImage? image,
   }) {
     if (border == null &&
         borderRadius == null &&
         color == null &&
-        bgImageUrl == null) {
+        image == null) {
       return child;
     }
 
@@ -164,7 +164,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     var decoration = baseDeco.copyWith(
       border: border,
       color: color,
-      image: buildDecorationImage(bgImageUrl),
+      image: image,
     );
 
     var clipBehavior = Clip.none;
@@ -187,7 +187,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   }
 
   /// Builds decoration image from [url]
-  DecorationImage? buildDecorationImage(String? url) {
+  DecorationImage? buildDecorationImage(
+    BuildTree tree,
+    String? url, {
+    AlignmentGeometry alignment = Alignment.center,
+    BoxFit? fit,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+  }) {
     if (url == null) {
       return null;
     }
@@ -208,7 +214,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       return null;
     }
 
-    return DecorationImage(image: provider);
+    return DecorationImage(
+      alignment: alignment,
+      fit: fit,
+      image: provider,
+      repeat: repeat,
+    );
   }
 
   /// Builds [Flex].

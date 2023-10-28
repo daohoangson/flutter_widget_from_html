@@ -14,18 +14,23 @@ class StyleBackground {
         debugLabel: kCssBackground,
         onRenderBlock: (tree, placeholder) {
           final color = _parseColor(tree);
-          final bgImageUrl = _parseBackgroundImageUrl(wf, tree);
+          final imageUrl = _parseBackgroundImageUrl(wf, tree);
 
-          if (color == null && bgImageUrl == null) {
+          if (color == null && imageUrl == null) {
             return placeholder;
           }
+
+          final image = wf.buildDecorationImage(
+            tree,
+            imageUrl,
+          );
 
           return placeholder.wrapWith(
             (_, child) => wf.buildDecoration(
               tree,
               child,
               color: color,
-              bgImageUrl: bgImageUrl,
+              image: image,
             ),
           );
         },
