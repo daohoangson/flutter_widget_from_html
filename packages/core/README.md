@@ -138,6 +138,11 @@ These tags and their contents will be ignored:
   - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
+- display: block/flex/inline/inline-block/none
+  - In `flex` mode:
+    - flex-direction: column/row
+    - align-items: flex-start/flex-end/center/baseline/stretch
+    - justify-content: flex-start/flex-end/center/space-between/space-around/space-evenly
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
