@@ -31,6 +31,7 @@ class Priority {
   static const tagTableAttributeCellPadding = tagTableAttributeBorder + _step;
   static const tagTableRow = tagTableAttributeCellPadding + _step;
   static const tagTableRowGroup = tagTableRow + _step;
+  static const displayFlex = tagTableRowGroup + _step;
 }
 
 class Early {

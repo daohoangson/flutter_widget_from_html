@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-
-import '../../../flutter_widget_from_html_core.dart';
-import '../core_ops.dart';
+part of '../core_ops.dart';
 
 const kCssFlexDirection = 'flex-direction';
+const kCssFlexDirectionColumn = 'column';
 const kCssFlexDirectionRow = 'row';
 const kCssJustifyContent = 'justify-content';
 const kCssJustifyContentFlexStart = 'flex-start';
@@ -19,16 +17,19 @@ const kCssAlignItemsCenter = 'center';
 const kCssAlignItemsBaseline = 'baseline';
 const kCssAlignItemsStretch = 'stretch';
 
-// ignore: avoid_classes_with_only_static_members
-class StyleDisplayFlexOps {
-  /// Builds custom widget for div elements with display: flex from [meta]
-  static BuildOp flexOp(BuildTree tree) {
+class StyleDisplayFlex {
+  final WidgetFactory wf;
+
+  StyleDisplayFlex(this.wf);
+
+  BuildOp get buildOp {
     return BuildOp(
-      onVisitChild: (tree, subTree) {
-        subTree.register(_flexItemOp(subTree));
-      },
-      onRenderBlock: (tree, placeholder) {
-        final String id = tree.element.id;
+      alwaysRenderBlock: true,
+      onRenderedChildren: (tree, children) {
+        if (children.isEmpty) {
+          return null;
+        }
+
         String flexDirection = kCssFlexDirectionRow;
         String justifyContent = kCssJustifyContentFlexStart;
         String alignItems = kCssAlignItemsFlexStart;
@@ -51,27 +52,20 @@ class StyleDisplayFlexOps {
           }
         }
 
-        return Flex(
-          key: Key(id),
-          direction: kCssFlexDirectionRow == flexDirection
-              ? Axis.horizontal
-              : Axis.vertical,
-          mainAxisAlignment: _toMainAxisAlignment(justifyContent),
-          crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-          children: [
-            placeholder,
-          ],
+        return WidgetPlaceholder(
+          debugLabel: kCssDisplayFlex,
+          child: wf.buildFlex(
+            tree,
+            children.toList(growable: false),
+            crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+            direction: flexDirection == kCssFlexDirectionRow
+                ? Axis.horizontal
+                : Axis.vertical,
+            mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+          ),
         );
       },
-    );
-  }
-
-  /// Build op for child elements of flex containers
-  static BuildOp _flexItemOp(BuildTree tree) {
-    return BuildOp(
-      defaultStyles: (element) {
-        return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
-      },
+      priority: Priority.displayFlex,
     );
   }
 

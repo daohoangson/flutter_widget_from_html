@@ -16,7 +16,6 @@ import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/margin_vertical.dart';
-import 'internal/ops/style_display_flex.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'internal/text_ops.dart' as text_ops;
@@ -35,6 +34,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   BuildOp? _styleBackground;
   BuildOp? _styleBorder;
+  BuildOp? _styleDisplayFlex;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
   BuildOp? _styleVerticalAlign;
@@ -209,6 +209,24 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     }
 
     return DecorationImage(image: provider);
+  }
+
+  /// Builds [Flex].
+  Widget? buildFlex(
+    BuildTree tree,
+    List<Widget> children, {
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    required Axis direction,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+    TextBaseline textBaseline = TextBaseline.alphabetic,
+  }) {
+    return Flex(
+      crossAxisAlignment: crossAxisAlignment,
+      direction: direction,
+      mainAxisAlignment: mainAxisAlignment,
+      textBaseline: textBaseline,
+      children: children,
+    );
   }
 
   /// Builds [GestureDetector].
@@ -1135,7 +1153,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     switch (value) {
       case kCssDisplayFlex:
-        tree.register(StyleDisplayFlexOps.flexOp(tree));
+        tree.register(_styleDisplayFlex ??= StyleDisplayFlex(this).buildOp);
         break;
       case kCssDisplayBlock:
         StyleSizing.registerBlockOp(this, tree);

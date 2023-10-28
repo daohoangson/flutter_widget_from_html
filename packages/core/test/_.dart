@@ -241,7 +241,7 @@ class Explainer {
 
   String _borderSide(BorderSide s) => s != BorderSide.none
       ? '${s.width}'
-          '@${s.style.toString().replaceFirst('BorderStyle.', '')}'
+          '@${s.style.name}'
           '${_color(s.color)}'
       : 'none';
 
@@ -444,18 +444,18 @@ class Explainer {
 
   String _textAlign(TextAlign? textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
-          ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
+          ? 'align=${textAlign.name}'
           : '';
 
   String _textDirection(TextDirection? textDirection) =>
       (textDirection != null && textDirection != TextDirection.ltr)
-          ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
+          ? 'dir=${textDirection.name}'
           : '';
 
-  String _textOverflow(TextOverflow? textOverflow) => (textOverflow != null &&
-          textOverflow != TextOverflow.clip)
-      ? 'overflow=${textOverflow.toString().replaceAll('TextOverflow.', '')}'
-      : '';
+  String _textOverflow(TextOverflow? textOverflow) =>
+      (textOverflow != null && textOverflow != TextOverflow.clip)
+          ? 'overflow=${textOverflow.name}'
+          : '';
 
   String _textStyle(TextStyle? style, TextStyle parent) {
     var s = '';
@@ -559,15 +559,9 @@ class Explainer {
   List<String> _flex(Flex flex) {
     final List<String> result = [];
 
-    result.add(
-      'direction=${flex.direction.toString().replaceFirst('Axis.', '')}',
-    );
-    result.add(
-      'mainAxisAlignment=${flex.mainAxisAlignment.toString().replaceFirst('MainAxisAlignment.', '')}',
-    );
-    result.add(
-      'crossAxisAlignment=${flex.crossAxisAlignment.toString().replaceFirst('CrossAxisAlignment.', '')}',
-    );
+    result.add('direction=${flex.direction.name}');
+    result.add('mainAxisAlignment=${flex.mainAxisAlignment.name}');
+    result.add('crossAxisAlignment=${flex.crossAxisAlignment.name}');
 
     return result;
   }
@@ -719,8 +713,7 @@ class Explainer {
     if (widget is Column) {
       final caa = widget.crossAxisAlignment;
       if (caa != CrossAxisAlignment.start) {
-        final name = caa.toString().replaceAll('CrossAxisAlignment.', '');
-        attr.add('crossAxisAlignment=$name');
+        attr.add('crossAxisAlignment=${caa.name}');
       }
     }
 

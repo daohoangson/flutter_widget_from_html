@@ -65,6 +65,21 @@ typedef OnRenderInlineBlock = Widget Function(BuildTree tree, Widget child);
 /// {@endtemplate}
 typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 
+/// {@template flutter_widget_from_html.onRenderedChildren}
+/// The callback that will be called after children widgets has been built.
+///
+/// If no return value is provided, the default behavior is to wrap the children
+/// using [WidgetFactory.buildColumnPlaceholder] before continue with
+/// [BuildOp.onRenderBlock] callbacks.
+///
+/// If there are more than one [BuildOp]s with this callback, the first one
+/// returning a non-null value will win.
+/// {@endtemplate}
+typedef OnRenderedChildren = WidgetPlaceholder? Function(
+  BuildTree tree,
+  Iterable<WidgetPlaceholder> children,
+);
+
 /// {@template flutter_widget_from_html.onVisitChild}
 /// The callback that will be called before processing a child element.
 ///
@@ -111,6 +126,9 @@ class BuildOp {
   /// {@macro flutter_widget_from_html.onRenderedBlock}
   final OnRenderedBlock? onRenderedBlock;
 
+  //// {@macro flutter_widget_from_html.onRenderedChildren}
+  final OnRenderedChildren? onRenderedChildren;
+
   /// {@macro flutter_widget_from_html.onVisitChild}
   final OnVisitChild? onVisitChild;
 
@@ -128,6 +146,7 @@ class BuildOp {
     OnRenderBlock? onRenderBlock,
     OnRenderInline? onRenderInline,
     OnRenderedBlock? onRenderedBlock,
+    OnRenderedChildren? onRenderedChildren,
     OnVisitChild? onVisitChild,
     int priority = kPriorityDefault,
 
@@ -183,6 +202,7 @@ class BuildOp {
               ? (tree) => onTreeFlattening(tree, tree)
               : null),
       onRenderedBlock: onRenderedBlock,
+      onRenderedChildren: onRenderedChildren,
       onVisitChild: onVisitChild ??
           (onChild != null ? (_, subTree) => onChild(subTree) : null),
       priority: priority,
@@ -240,6 +260,7 @@ class BuildOp {
     this.onRenderBlock,
     this.onRenderInline,
     this.onRenderedBlock,
+    this.onRenderedChildren,
     this.onVisitChild,
     this.priority = kPriorityDefault,
   });

@@ -105,7 +105,7 @@ flowchart TD
         -->|no| flattener
 
     ifIsBlock
-        --->|yes\n\nonRenderBlock| appendBuiltSubTree[/render block/]
+        --->|yes\n\nonRenderedChildren\nonRenderBlock| appendBuiltSubTree[/render block/]
         ---> bitOK
 ```
 
