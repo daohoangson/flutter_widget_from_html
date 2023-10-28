@@ -129,7 +129,7 @@ class _Golden extends StatelessWidget {
         child: HtmlWidget('''
 <div style="background: lightgray; height: 100px; width: 300px; $inlineStyle">
   <div style="background: red; padding: 5px">$flexDirection</div>
-  <div style="background: green; padding: 5px">$alignItem</div>
+  <div style="background: green; margin-top: 5px; padding: 5px">$alignItem</div><!-- added margin to verify baseline alignment -->
   <div style="background: blue; color: white; padding: 5px">$justifyContent</div>
 </div>'''),
       ),

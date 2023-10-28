@@ -218,11 +218,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
     required Axis direction,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+    TextBaseline textBaseline = TextBaseline.alphabetic,
   }) {
     return Flex(
       crossAxisAlignment: crossAxisAlignment,
       direction: direction,
       mainAxisAlignment: mainAxisAlignment,
+      textBaseline: textBaseline,
       children: children,
     );
   }
