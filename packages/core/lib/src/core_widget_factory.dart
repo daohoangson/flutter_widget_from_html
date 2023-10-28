@@ -1037,12 +1037,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   void parseStyle(BuildTree tree, css.Declaration style) {
     final key = style.property;
     switch (key) {
-      case kCssBackground:
-      case kCssBackgroundColor:
-      case kCssBackgroundImage:
-        tree.register(_styleBackground ??= StyleBackground(this).buildOp);
-        break;
-
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
@@ -1143,6 +1137,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           tree.inherit(text_ops.whitespace, whitespace);
         }
         break;
+    }
+
+    if (key.startsWith(kCssBackground)) {
+      tree.register(_styleBackground ??= StyleBackground(this).buildOp);
     }
 
     if (key.startsWith(kCssBorder)) {

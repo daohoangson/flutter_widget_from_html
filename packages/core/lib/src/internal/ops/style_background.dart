@@ -13,8 +13,9 @@ class StyleBackground {
         alwaysRenderBlock: false,
         debugLabel: kCssBackground,
         onRenderBlock: (tree, placeholder) {
-          final color = _parseColor(tree);
-          final imageUrl = _parseBackgroundImageUrl(wf, tree);
+          final data = tree.backgroundData;
+          final color = data.color;
+          final imageUrl = data.imageUrl;
 
           if (color == null && imageUrl == null) {
             return placeholder;
@@ -35,7 +36,7 @@ class StyleBackground {
           );
         },
         onRenderInline: (tree) {
-          final color = _parseColor(tree);
+          final color = tree.backgroundData.color;
           if (color == null) {
             return;
           }
@@ -55,45 +56,67 @@ class StyleBackground {
           debugLabel: 'fwfh: $kCssBackgroundColor',
         ),
       );
+}
 
-  static Color? _parseColor(BuildTree tree) {
-    Color? color;
-    for (final style in tree.styles) {
+extension on BuildTree {
+  _StyleBackgroundData get backgroundData =>
+      getNonInherited<_StyleBackgroundData>() ??
+      setNonInherited<_StyleBackgroundData>(_parse());
+
+  _StyleBackgroundData _parse() {
+    var data = const _StyleBackgroundData();
+    for (final style in styles) {
       switch (style.property) {
         case kCssBackground:
           for (final expression in style.values) {
-            color = tryParseColor(expression) ?? color;
+            data = data.copyWithColor(expression);
+            data = data.copyWithImageUrl(expression);
           }
           break;
         case kCssBackgroundColor:
-          color = tryParseColor(style.value) ?? color;
+          data = data.copyWithColor(style.value);
+          break;
+        case kCssBackgroundImage:
+          data = data.copyWithImageUrl(style.value);
           break;
       }
     }
 
-    return color;
+    return data;
+  }
+}
+
+@immutable
+class _StyleBackgroundData {
+  final Color? color;
+  final String? imageUrl;
+  const _StyleBackgroundData({
+    this.color,
+    this.imageUrl,
+  });
+
+  _StyleBackgroundData copyWith({
+    Color? color,
+    String? imageUrl,
+  }) =>
+      _StyleBackgroundData(
+        color: color ?? this.color,
+        imageUrl: imageUrl ?? this.imageUrl,
+      );
+
+  _StyleBackgroundData copyWithColor(css.Expression? expression) {
+    final newColor = tryParseColor(expression) ?? color;
+    if (newColor == color) {
+      return this;
+    }
+    return copyWith(color: newColor);
   }
 
-  /// Attempts to parse the background image URL from the [tree] styles.
-  String? _parseBackgroundImageUrl(WidgetFactory wf, BuildTree tree) {
-    for (final style in tree.styles) {
-      final styleValue = style.value;
-      if (styleValue == null) {
-        continue;
-      }
-
-      switch (style.property) {
-        case kCssBackground:
-        case kCssBackgroundImage:
-          for (final expression in style.values) {
-            if (expression is css.UriTerm) {
-              return expression.text;
-            }
-          }
-          break;
-      }
+  _StyleBackgroundData copyWithImageUrl(css.Expression? expression) {
+    final newImageUrl = expression is css.UriTerm ? expression.text : imageUrl;
+    if (newImageUrl == imageUrl) {
+      return this;
     }
-
-    return null;
+    return copyWith(imageUrl: newImageUrl);
   }
 }
