@@ -1,6 +1,7 @@
 part of '../core_ops.dart';
 
 const kCssFlexDirection = 'flex-direction';
+const kCssFlexDirectionColumn = 'column';
 const kCssFlexDirectionRow = 'row';
 const kCssJustifyContent = 'justify-content';
 const kCssJustifyContentFlexStart = 'flex-start';
