@@ -86,29 +86,73 @@ extension on BuildTree {
 
   _StyleBackgroundData _parse() {
     var data = const _StyleBackgroundData();
-    for (final style in styles) {
+    for (final style_ in styles) {
+      final style = _StyleBackgroundDeclaration(style_);
       switch (style.property) {
         case kCssBackground:
-          for (final expression in style.values) {
-            data = data.copyWithColor(expression);
-            data = data.copyWithImageUrl(expression);
-            data = data.copyWithTerm(expression);
+          while (style.hasValue) {
+            final prev = data;
+            data = data.copyWithColor(style);
+            if (style.hasValue) {
+              data = data.copyWithImageUrl(style);
+            }
+            if (style.hasValue) {
+              data = data.copyWithPosition(style);
+            }
+            if (style.hasValue) {
+              data = data.copyWithRepeatOrSize(style);
+            }
+            if (identical(data, prev)) {
+              // unrecognized value, ignore it
+              style.increaseIndex();
+            }
           }
           break;
         case kCssBackgroundColor:
-          data = data.copyWithColor(style.value);
+          data = data.copyWithColor(style);
           break;
         case kCssBackgroundImage:
-          data = data.copyWithImageUrl(style.value);
+          data = data.copyWithImageUrl(style);
           break;
         case kCssBackgroundPosition:
+          while (style.hasValue) {
+            final prev = data;
+            data = data.copyWithPosition(style);
+            if (identical(data, prev)) {
+              // unrecognized value, ignore it
+              style.increaseIndex();
+            }
+          }
+          break;
         case kCssBackgroundRepeat:
         case kCssBackgroundSize:
-          data = data.copyWithTerm(style.value);
+          data = data.copyWithRepeatOrSize(style);
+          break;
       }
     }
 
     return data;
+  }
+}
+
+extension on css.Expression {
+  _StyleBackgroundPosition? get position {
+    final self = this;
+    final term = self is css.LiteralTerm ? self.valueAsString : null;
+    switch (term) {
+      case kCssBackgroundPositionBottom:
+        return _StyleBackgroundPosition.bottom;
+      case kCssBackgroundPositionCenter:
+        return _StyleBackgroundPosition.center;
+      case kCssBackgroundPositionLeft:
+        return _StyleBackgroundPosition.left;
+      case kCssBackgroundPositionRight:
+        return _StyleBackgroundPosition.right;
+      case kCssBackgroundPositionTop:
+        return _StyleBackgroundPosition.top;
+    }
+
+    return null;
   }
 }
 
@@ -120,7 +164,7 @@ class _StyleBackgroundData {
   final ImageRepeat repeat;
   final BoxFit size;
   const _StyleBackgroundData({
-    this.alignment = Alignment.center,
+    this.alignment = Alignment.topLeft,
     this.color,
     this.imageUrl,
     this.repeat = ImageRepeat.noRepeat,
@@ -142,38 +186,130 @@ class _StyleBackgroundData {
         size: size ?? this.size,
       );
 
-  _StyleBackgroundData copyWithColor(css.Expression? expression) {
-    final newColor = tryParseColor(expression) ?? color;
-    if (newColor == color) {
+  _StyleBackgroundData copyWithColor(_StyleBackgroundDeclaration style) {
+    final color = tryParseColor(style.value);
+    if (color == null) {
       return this;
     }
-    return copyWith(color: newColor);
+
+    style.increaseIndex();
+    return copyWith(color: color);
   }
 
-  _StyleBackgroundData copyWithImageUrl(css.Expression? expression) {
-    final newImageUrl = expression is css.UriTerm ? expression.text : imageUrl;
-    if (newImageUrl == imageUrl) {
+  _StyleBackgroundData copyWithImageUrl(_StyleBackgroundDeclaration style) {
+    final value = style.value;
+    final imageUrl = value is css.UriTerm ? value.text : null;
+    if (imageUrl == null) {
       return this;
     }
-    return copyWith(imageUrl: newImageUrl);
+
+    style.increaseIndex();
+    return copyWith(imageUrl: imageUrl);
   }
 
-  _StyleBackgroundData copyWithTerm(css.Expression? expression) {
-    if (expression is! css.LiteralTerm) {
+  _StyleBackgroundData copyWithPosition(_StyleBackgroundDeclaration style) {
+    final value1 = style.value;
+    final position1 = value1?.position;
+    if (position1 == null) {
       return this;
     }
 
-    switch (expression.valueAsString) {
-      case kCssBackgroundPositionBottom:
-        return copyWith(alignment: Alignment.bottomCenter);
-      case kCssBackgroundPositionCenter:
-        return copyWith(alignment: Alignment.center);
-      case kCssBackgroundPositionLeft:
-        return copyWith(alignment: Alignment.centerLeft);
-      case kCssBackgroundPositionRight:
-        return copyWith(alignment: Alignment.centerRight);
-      case kCssBackgroundPositionTop:
-        return copyWith(alignment: Alignment.topCenter);
+    final value2 = style.valuePlus1;
+    final position2 = value2?.position;
+    if (position2 == null) {
+      // single keyword position
+      style.increaseIndex();
+      switch (position1) {
+        case _StyleBackgroundPosition.bottom:
+          return copyWith(alignment: Alignment.bottomCenter);
+        case _StyleBackgroundPosition.center:
+          return copyWith(alignment: Alignment.center);
+        case _StyleBackgroundPosition.left:
+          return copyWith(alignment: Alignment.centerLeft);
+        case _StyleBackgroundPosition.right:
+          return copyWith(alignment: Alignment.centerRight);
+        case _StyleBackgroundPosition.top:
+          return copyWith(alignment: Alignment.topCenter);
+      }
+    } else {
+      // double keywords position
+      style.increaseIndex(2);
+      switch (position1) {
+        case _StyleBackgroundPosition.bottom:
+          switch (position2) {
+            case _StyleBackgroundPosition.left:
+              return copyWith(alignment: Alignment.bottomLeft);
+            case _StyleBackgroundPosition.right:
+              return copyWith(alignment: Alignment.bottomRight);
+            case _StyleBackgroundPosition.bottom:
+            case _StyleBackgroundPosition.center:
+            case _StyleBackgroundPosition.top:
+              return copyWith(alignment: Alignment.bottomCenter);
+          }
+        case _StyleBackgroundPosition.center:
+          switch (position2) {
+            case _StyleBackgroundPosition.bottom:
+              return copyWith(alignment: Alignment.bottomCenter);
+            case _StyleBackgroundPosition.center:
+              return copyWith(alignment: Alignment.center);
+            case _StyleBackgroundPosition.left:
+              return copyWith(alignment: Alignment.centerLeft);
+            case _StyleBackgroundPosition.right:
+              return copyWith(alignment: Alignment.centerRight);
+            case _StyleBackgroundPosition.top:
+              return copyWith(alignment: Alignment.topCenter);
+          }
+        case _StyleBackgroundPosition.left:
+          switch (position2) {
+            case _StyleBackgroundPosition.bottom:
+              return copyWith(alignment: Alignment.bottomLeft);
+            case _StyleBackgroundPosition.top:
+              return copyWith(alignment: Alignment.topLeft);
+            case _StyleBackgroundPosition.center:
+            case _StyleBackgroundPosition.left:
+            case _StyleBackgroundPosition.right:
+              return copyWith(alignment: Alignment.centerLeft);
+          }
+        case _StyleBackgroundPosition.right:
+          switch (position2) {
+            case _StyleBackgroundPosition.bottom:
+              return copyWith(alignment: Alignment.bottomRight);
+            case _StyleBackgroundPosition.top:
+              return copyWith(alignment: Alignment.topRight);
+            case _StyleBackgroundPosition.left:
+            case _StyleBackgroundPosition.right:
+            case _StyleBackgroundPosition.center:
+              return copyWith(alignment: Alignment.centerRight);
+          }
+        case _StyleBackgroundPosition.top:
+          switch (position2) {
+            case _StyleBackgroundPosition.left:
+              return copyWith(alignment: Alignment.topLeft);
+            case _StyleBackgroundPosition.right:
+              return copyWith(alignment: Alignment.topRight);
+            case _StyleBackgroundPosition.bottom:
+            case _StyleBackgroundPosition.center:
+            case _StyleBackgroundPosition.top:
+              return copyWith(alignment: Alignment.topCenter);
+          }
+      }
+    }
+  }
+
+  _StyleBackgroundData copyWithRepeatOrSize(_StyleBackgroundDeclaration style) {
+    final value = style.value;
+    final term = value is css.LiteralTerm ? value.valueAsString : null;
+    final copied = copyWithTerm(term);
+    if (identical(copied, this)) {
+      return this;
+    }
+
+    style.increaseIndex();
+    return copied;
+  }
+
+  _StyleBackgroundData copyWithTerm(String? term) {
+    switch (term) {
       case kCssBackgroundRepeatNo:
         return copyWith(repeat: ImageRepeat.noRepeat);
       case kCssBackgroundRepeatX:
@@ -192,4 +328,32 @@ class _StyleBackgroundData {
 
     return this;
   }
+}
+
+class _StyleBackgroundDeclaration {
+  final String property;
+  final List<css.Expression> values;
+
+  var _i = 0;
+
+  _StyleBackgroundDeclaration(css.Declaration style)
+      : property = style.property,
+        values = style.values;
+
+  bool get hasValue => _i < values.length;
+
+  css.Expression? get value => hasValue ? values[_i] : null;
+
+  css.Expression? get valuePlus1 =>
+      _i + 1 < values.length ? values[_i + 1] : null;
+
+  void increaseIndex([int delta = 1]) => _i += delta;
+}
+
+enum _StyleBackgroundPosition {
+  bottom,
+  center,
+  left,
+  right,
+  top,
 }

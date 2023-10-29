@@ -285,7 +285,7 @@ class Explainer {
       final image = d.image;
       if (image != null) {
         attr.add("image=${image.image}");
-        if (image.alignment != Alignment.center) {
+        if (image.alignment != Alignment.topLeft) {
           attr.add(_alignment(image.alignment));
         }
         if (image.fit != BoxFit.scaleDown) {

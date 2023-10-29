@@ -190,7 +190,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   DecorationImage? buildDecorationImage(
     BuildTree tree,
     String? url, {
-    AlignmentGeometry alignment = Alignment.center,
+    AlignmentGeometry alignment = Alignment.topLeft,
     BoxFit fit = BoxFit.scaleDown,
     ImageRepeat repeat = ImageRepeat.noRepeat,
   }) {
