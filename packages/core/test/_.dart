@@ -155,10 +155,13 @@ Future<String> explainWithoutPumping({
     return 'null';
   }
 
-  return Explainer(
+  var str = Explainer(
     key.currentContext!,
     explainer: explainer,
   ).explain(built);
+
+  str = str.replaceAll(RegExp('String#[^,]+,'), 'String,');
+  return str.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
 }
 
 final _explainMarginRegExp = RegExp(
@@ -269,24 +272,33 @@ class Explainer {
     final attr = <String>[];
 
     if (d is BoxDecoration) {
-      final color = d.color;
-      if (color != null) {
-        attr.add('bg=${_color(color)}');
-      }
-
       final border = d.border;
       if (border != null) {
         attr.add('border=${_boxBorder(border)}');
       }
 
-      final borderRadius = d.borderRadius;
-      if (borderRadius != null && borderRadius is BorderRadius) {
-        attr.add('radius=${_borderRadius(borderRadius)}');
+      final color = d.color;
+      if (color != null) {
+        attr.add('color=${_color(color)}');
       }
 
       final image = d.image;
       if (image != null) {
-        attr.add("bgimage=$image");
+        attr.add("image=${image.image}");
+        if (image.alignment != Alignment.topLeft) {
+          attr.add(_alignment(image.alignment));
+        }
+        if (image.fit != BoxFit.scaleDown) {
+          attr.add('fit=${image.fit?.name}');
+        }
+        if (image.repeat != ImageRepeat.noRepeat) {
+          attr.add('repeat=${image.repeat.name}');
+        }
+      }
+
+      final borderRadius = d.borderRadius;
+      if (borderRadius != null && borderRadius is BorderRadius) {
+        attr.add('radius=${_borderRadius(borderRadius)}');
       }
     }
 
@@ -465,7 +477,7 @@ class Explainer {
 
     final bg = style.background;
     if (bg != null) {
-      s += 'bg=${_color(bg.color)}';
+      s += 'color=${_color(bg.color)}';
     }
 
     final color = style.color;

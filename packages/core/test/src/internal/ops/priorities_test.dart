@@ -12,6 +12,11 @@ void main() {
       expect(BoxModel.first, greaterThan(kPriorityDefault));
     });
 
+    test('background and border should be next to each other', () {
+      // they both uses `WidgetFactory.buildDecoration`
+      expect(BoxModel.background - BoxModel.border, equals(Priority.step));
+    });
+
     test('Late.displayInlineBlock is before inline block default', () {
       expect(Late.displayInlineBlock, lessThan(kPriorityInlineBlockDefault));
     });

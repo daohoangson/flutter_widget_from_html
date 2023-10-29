@@ -215,8 +215,7 @@ void main() {
 
     testWidgets('renders data uri', (WidgetTester tester) async {
       const html = '<img src="${helper.kDataUri}" />';
-      final explained = (await explain(tester, html))
-          .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -253,8 +252,7 @@ void main() {
 
     testWidgets('renders file uri', (WidgetTester tester) async {
       final html = '<img src="$fileUri" />';
-      final explained = (await explain(tester, html))
-          .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
