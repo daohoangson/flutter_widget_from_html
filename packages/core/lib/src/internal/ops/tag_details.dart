@@ -15,32 +15,45 @@ class TagDetails {
   TagDetails(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        alwaysRenderBlock: true,
         debugLabel: kTagDetails,
-        onRenderBlock: (tree, placeholder) {
+        onRenderedChildren: (tree, children) {
+          Widget? summaryOrNull;
+          final rest = <WidgetPlaceholder>[];
+          for (final child in children) {
+            if (summaryOrNull == null && child.isSummary == true) {
+              summaryOrNull = child;
+            } else {
+              rest.add(child);
+            }
+          }
+          final column = wf.buildColumnPlaceholder(tree, rest);
+          if (column == null) {
+            return null;
+          }
+
           final attrs = tree.element.attributes;
           final open = attrs.containsKey(kAttributeDetailsOpen);
 
-          return placeholder.wrapWith(
-            (context, child) {
+          return column
+            ..wrapWith((context, child) {
               final resolved = tree.inheritanceResolvers.resolve(context);
               final textStyle = resolved.style;
-              final summaries = tree.detailsData.summaries;
-              final summary = summaries.isNotEmpty
-                  ? summaries.first
-                  : wf.buildText(
-                      tree,
-                      resolved,
-                      TextSpan(
-                        children: [
-                          WidgetSpan(
-                            alignment: _markerMarkerAlignment,
-                            child: HtmlDetailsMarker(style: textStyle),
-                          ),
-                          // TODO: i18n
-                          TextSpan(text: 'Details', style: textStyle),
-                        ],
-                      ),
-                    );
+              final summary = summaryOrNull ??
+                  wf.buildText(
+                    tree,
+                    resolved,
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          alignment: _markerMarkerAlignment,
+                          child: HtmlDetailsMarker(style: textStyle),
+                        ),
+                        // TODO: i18n
+                        TextSpan(text: 'Details', style: textStyle),
+                      ],
+                    ),
+                  );
 
               return HtmlDetails(
                 open: open,
@@ -53,8 +66,7 @@ class TagDetails {
                   dir: resolved.directionOrLtr,
                 ),
               );
-            },
-          );
+            });
         },
         onVisitChild: (detailsTree, subTree) {
           final e = subTree.element;
@@ -66,49 +78,46 @@ class TagDetails {
           }
 
           subTree.register(
-            BuildOp(
+            const BuildOp.v2(
+              alwaysRenderBlock: true,
               debugLabel: kTagSummary,
-              onParsed: (summaryTree) {
-                if (summaryTree.isEmpty) {
-                  return summaryTree;
-                }
-
-                final marker = WidgetBit.inline(
-                  summaryTree,
-                  WidgetPlaceholder(
-                    builder: (context, _) {
-                      final resolved =
-                          summaryTree.inheritanceResolvers.resolve(context);
-                      return HtmlDetailsMarker(style: resolved.style);
-                    },
-                    debugLabel: '$kTagSummary--inlineMarker',
-                  ),
-                  alignment: _markerMarkerAlignment,
-                );
-                return summaryTree..prepend(marker);
-              },
-              onRenderBlock: (_, placeholder) {
-                final data = detailsTree.detailsData;
-                if (data.summaries.isNotEmpty) {
-                  return placeholder;
-                }
-
-                data.summaries.add(placeholder);
-                return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
-              },
+              onParsed: _onSummaryParsed,
+              onRenderedBlock: _markBlockIsSummary,
               priority: Late.tagSummary,
             ),
           );
         },
         priority: Priority.tagDetails,
       );
+
+  static BuildTree _onSummaryParsed(BuildTree summaryTree) {
+    if (summaryTree.isEmpty) {
+      return summaryTree;
+    }
+
+    final marker = WidgetBit.inline(
+      summaryTree,
+      WidgetPlaceholder(
+        builder: (context, _) {
+          final resolved = summaryTree.inheritanceResolvers.resolve(context);
+          return HtmlDetailsMarker(style: resolved.style);
+        },
+        debugLabel: '$kTagSummary--inlineMarker',
+      ),
+      alignment: _markerMarkerAlignment,
+    );
+
+    return summaryTree..prepend(marker);
+  }
+
+  static void _markBlockIsSummary(BuildTree _, Widget block) =>
+      block.isSummary = true;
 }
 
-extension on BuildTree {
-  _TagDetailsData get detailsData =>
-      getNonInherited<_TagDetailsData>() ?? setNonInherited(_TagDetailsData());
-}
+extension on Widget {
+  static final _isSummary = Expando<bool>();
 
-class _TagDetailsData {
-  final summaries = <Widget>[];
+  bool get isSummary => _isSummary[this] ?? false;
+
+  set isSummary(bool value) => _isSummary[this] = value;
 }
