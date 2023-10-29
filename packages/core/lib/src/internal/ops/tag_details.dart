@@ -18,9 +18,15 @@ class TagDetails {
         alwaysRenderBlock: true,
         debugLabel: kTagDetails,
         onRenderedChildren: (tree, children) {
-          final first = children.isNotEmpty ? children.first : null;
-          final summaryOrNull = first?.isSummary == true ? first : null;
-          final rest = summaryOrNull != null ? children.skip(1) : children;
+          Widget? summaryOrNull;
+          final rest = <WidgetPlaceholder>[];
+          for (final child in children) {
+            if (summaryOrNull == null && child.isSummary == true) {
+              summaryOrNull = child;
+            } else {
+              rest.add(child);
+            }
+          }
           final column = wf.buildColumnPlaceholder(tree, rest);
           if (column == null) {
             return null;
