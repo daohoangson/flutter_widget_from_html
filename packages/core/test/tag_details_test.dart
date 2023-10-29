@@ -157,6 +157,20 @@ void main() {
     });
   });
 
+  group('error handling', () {
+    testWidgets('empty DETAILS tag', (WidgetTester tester) async {
+      const html = '<details></details>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('empty contents', (WidgetTester tester) async {
+      const html = '<details><summary>Foo</summary></details>';
+      final explained = await explain(tester, html);
+      expect(explained, isNot(contains('[HtmlDetails:')));
+    });
+  });
+
   group('HtmlDetails', () {
     testWidgets('verifies updateShouldNotify', (WidgetTester tester) async {
       final contentsFinder = findText('Foo');
