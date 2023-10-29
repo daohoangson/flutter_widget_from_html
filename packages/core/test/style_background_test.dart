@@ -1,11 +1,17 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   group('background-color', () {
     testWidgets('renders MARK tag', (WidgetTester tester) async {
       const html = '<mark>Foo</mark>';
@@ -255,4 +261,93 @@ void main() {
       );
     });
   });
+
+  final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+  final goldenSkip = goldenSkipEnvVar == null
+      ? Platform.isLinux
+          ? null
+          : 'Linux only'
+      : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
+  GoldenToolkit.runWithConfiguration(
+    () {
+      group(
+        'background-image',
+        () {
+          const image44 = 'background-image: url(asset:test/images/44px.png)';
+          const size100x75 = 'width: 100px; height: 75px';
+          const size100x100 = 'width: 100px; height: 100px';
+          const testCases = <String, String>{
+            'position/bottom':
+                '<div style="background-position: bottom; $image44; $size100x100">Foo</div>',
+            'position/center':
+                '<div style="background-position: center; $image44; $size100x100">Foo</div>',
+            'position/left':
+                '<div style="background-position: left; $image44; $size100x100">Foo</div>',
+            'position/right':
+                '<div style="background-position: right; $image44; $size100x100">Foo</div>',
+            'position/top':
+                '<div style="background-position: top; $image44; $size100x100">Foo</div>',
+            'repeat/no':
+                '<div style="background-repeat: no-repeat; $image44; $size100x100">Foo</div>',
+            'repeat/x':
+                '<div style="background-repeat: repeat-x; $image44; $size100x100">Foo</div>',
+            'repeat/y':
+                '<div style="background-repeat: repeat-y; $image44; $size100x100">Foo</div>',
+            'repeat/yes':
+                '<div style="background-repeat: repeat; $image44; $size100x100">Foo</div>',
+            'size/auto':
+                '<div style="background-size: auto; $image44; $size100x75">Foo</div>',
+            'size/contain':
+                '<div style="background-size: contain; $image44; $size100x75">Foo</div>',
+            'size/cover':
+                '<div style="background-size: cover; $image44; $size100x75">Foo</div>',
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(
+              testCase.key,
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  _Golden(testCase.value),
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(116, 116),
+                );
+
+                await screenMatchesGolden(tester, testCase.key);
+              },
+              skip: goldenSkip != null,
+            );
+          }
+        },
+        skip: goldenSkip,
+      );
+    },
+    config: GoldenToolkitConfiguration(
+      fileNameFactory: (name) => '$kGoldenFilePrefix/background/$name.png',
+    ),
+  );
+}
+
+class _Golden extends StatelessWidget {
+  final String html;
+
+  const _Golden(this.html);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            html,
+            customStylesBuilder: (element) {
+              if (element.localName == 'div') {
+                return const {kCssBackgroundColor: 'lightgray'};
+              }
+
+              return null;
+            },
+          ),
+        ),
+      );
 }
