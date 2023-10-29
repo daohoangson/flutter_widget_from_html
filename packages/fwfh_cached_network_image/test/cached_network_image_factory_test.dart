@@ -21,8 +21,7 @@ void main() {
 
   testWidgets('renders Image for data uri', (WidgetTester tester) async {
     const html = '<img src="$kDataUri" />';
-    final explained = (await explain(tester, html))
-        .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+    final explained = await explain(tester, html);
     expect(
       explained,
       equals(

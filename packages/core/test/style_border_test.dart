@@ -1163,7 +1163,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Container:bg=#FFFF0000,border=$_border1,child='
+          '[Container:border=$_border1,color=#FFFF0000,child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
           '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
