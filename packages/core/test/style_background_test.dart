@@ -288,13 +288,13 @@ Future<void> main() async {
                 '<div style="background-position: right; $image44; $size100x100">Foo</div>',
             'position/top':
                 '<div style="background-position: top; $image44; $size100x100">Foo</div>',
-            'repeat/no':
+            'repeat/no-repeat':
                 '<div style="background-repeat: no-repeat; $image44; $size100x100">Foo</div>',
-            'repeat/x':
+            'repeat/repeat-x':
                 '<div style="background-repeat: repeat-x; $image44; $size100x100">Foo</div>',
-            'repeat/y':
+            'repeat/repeat-y':
                 '<div style="background-repeat: repeat-y; $image44; $size100x100">Foo</div>',
-            'repeat/yes':
+            'repeat/repeat':
                 '<div style="background-repeat: repeat; $image44; $size100x100">Foo</div>',
             'size/auto':
                 '<div style="background-size: auto; $image44; $size100x75">Foo</div>',
