@@ -1,3 +1,9 @@
+## 0.14.6
+
+- Add support for `background-image` (#1057, authored by @anttileppa 🎉)
+- Add support for `display: flex` (#1021, also by @anttileppa 🔥🔥🔥🔥)
+- Add support for background position, repeat & size (#1084)
+
 ## 0.14.5+1
 
 - Fix `TABLE` bug that force text to break line (#1078)
