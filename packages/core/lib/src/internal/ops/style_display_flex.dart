@@ -54,15 +54,21 @@ class StyleDisplayFlex {
 
         return WidgetPlaceholder(
           debugLabel: kCssDisplayFlex,
-          child: wf.buildFlex(
-            tree,
-            children.toList(growable: false),
-            crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-            direction: flexDirection == kCssFlexDirectionRow
-                ? Axis.horizontal
-                : Axis.vertical,
-            mainAxisAlignment: _toMainAxisAlignment(justifyContent),
-          ),
+          builder: (context, _) {
+            final unwrapped = children
+                .map((child) => WidgetPlaceholder.unwrap(context, child))
+                .where((child) => child != widget0)
+                .toList(growable: false);
+            return wf.buildFlex(
+              tree,
+              unwrapped,
+              crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+              direction: flexDirection == kCssFlexDirectionRow
+                  ? Axis.horizontal
+                  : Axis.vertical,
+              mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+            );
+          },
         );
       },
       priority: Priority.displayFlex,

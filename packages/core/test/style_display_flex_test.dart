@@ -38,6 +38,21 @@ Future<void> main() async {
     );
   });
 
+  testWidgets('ignores whitesplace', (WidgetTester tester) async {
+    const html =
+        '<div style="display: flex">\n<div>Foo</div>\n<div>Bar</div>\n</div>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[CssBlock:child=[RichText:(:Foo)]],'
+        '[CssBlock:child=[RichText:(:Bar)]]'
+        ']',
+      ),
+    );
+  });
+
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
