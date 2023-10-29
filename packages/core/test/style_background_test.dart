@@ -383,16 +383,24 @@ Future<void> main() async {
           const size100x75 = 'width: 100px; height: 75px';
           const size100x100 = 'width: 100px; height: 100px';
           const testCases = <String, String>{
-            'position/bottom':
-                '<div style="background-position: bottom; $image44; $size100x100">Foo</div>',
             'position/center':
                 '<div style="background-position: center; $image44; $size100x100">Foo</div>',
-            'position/left':
-                '<div style="background-position: left; $image44; $size100x100">Foo</div>',
-            'position/right':
-                '<div style="background-position: right; $image44; $size100x100">Foo</div>',
             'position/top':
                 '<div style="background-position: top; $image44; $size100x100">Foo</div>',
+            'position/top_right':
+                '<div style="background-position: top right; $image44; $size100x100">Foo</div>',
+            'position/right':
+                '<div style="background-position: right; $image44; $size100x100">Foo</div>',
+            'position/bottom_right':
+                '<div style="background-position: bottom right; $image44; $size100x100">Foo</div>',
+            'position/bottom':
+                '<div style="background-position: bottom; $image44; $size100x100">Foo</div>',
+            'position/bottom_left':
+                '<div style="background-position: bottom left; $image44; $size100x100">Foo</div>',
+            'position/left':
+                '<div style="background-position: left; $image44; $size100x100">Foo</div>',
+            'position/top_left':
+                '<div style="background-position: top left; $image44; $size100x100">Foo</div>',
             'repeat/no-repeat':
                 '<div style="background-repeat: no-repeat; $image44; $size100x100">Foo</div>',
             'repeat/repeat-x':
