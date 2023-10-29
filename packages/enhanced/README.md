@@ -146,17 +146,21 @@ These tags and their contents will be ignored:
 ### Inline stylings
 
 - background: 1 value (color)
-  - background-color
+  - background-color: hex values, `rgb()`, `hsl()` or named colors
+  - background-image: `url()` with support for asset (`asset://`), data uri, local file (`file://`) and network image
+  - background-repeat: no-repeat/repeat/repeat-x/repeat-y
+  - background-position: single or double instances of bottom/center/left/right/top (e.g. `top left`)
+  - background-size: auto/contain/cover
 - border: 3 values (width style color), 2 values (width style) or 1 value (width)
   - border-top, border-right, border-bottom, border-left
   - border-block-start, border-block-end
   - border-inline-start, border-inline-end
-- border-radius: 4, 3, 2 or 1 values with slash support (e.g. `10px / 20px`)
+- border-radius: 4, 3, 2 or 1 value with slash support (e.g. `10px / 20px`)
   - border-top-left-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-top-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
-- color: hex values, `rgb()`, `hsl()` or named colors
+- color (similar to `background-color` inline styling)
 - direction (similar to `dir` attribute)
 - display: block/flex/inline/inline-block/none
   - In `flex` mode:
