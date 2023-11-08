@@ -59,7 +59,10 @@ class TagTable {
     );
   }
 
-  Widget _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
+  Widget _onTableRenderBlock(
+    BuildTree tableTree,
+    WidgetPlaceholder placeholder,
+  ) {
     final data = tableTree.tableData;
 
     _prepareHtmlTableCaptionBuilders(data);
@@ -69,7 +72,7 @@ class TagTable {
     }
     _prepareHtmlTableCellBuilders(tableTree, data.footer);
     if (data.builders.isEmpty) {
-      return _;
+      return placeholder;
     }
 
     final border = tryParseBorder(tableTree);

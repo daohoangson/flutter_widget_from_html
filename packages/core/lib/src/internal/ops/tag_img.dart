@@ -70,8 +70,8 @@ class TagImg {
     };
   }
 
-  static Widget _onRenderBlock(BuildTree tree, WidgetPlaceholder _) =>
-      _builts[tree] ?? _;
+  static Widget _onRenderBlock(BuildTree tree, WidgetPlaceholder placeholder) =>
+      _builts[tree] ?? placeholder;
 
   static void _onRenderInline(BuildTree tree) {
     final built = _builts[tree];

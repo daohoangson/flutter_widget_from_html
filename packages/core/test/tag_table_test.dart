@@ -1113,13 +1113,13 @@ Future<void> main() async {
 
         expect(second.width, equals(first.width));
 
-        final _ = _loggerMessages;
-        expect(_, contains(contains('Got child#0 min width:')));
-        expect(_, contains(contains('Got child#1 min width:')));
-        expect(_, contains(contains('Got child#2 size without contraints:')));
-        expect(_, isNot(contains(contains('Got child#2 min width:'))));
-        expect(_, contains(contains('Got child#3 size without contraints:')));
-        expect(_, isNot(contains(contains('Got child#3 min width:'))));
+        final m = _loggerMessages;
+        expect(m, contains(contains('Got child#0 min width:')));
+        expect(m, contains(contains('Got child#1 min width:')));
+        expect(m, contains(contains('Got child#2 size without contraints:')));
+        expect(m, isNot(contains(contains('Got child#2 min width:'))));
+        expect(m, contains(contains('Got child#3 size without contraints:')));
+        expect(m, isNot(contains(contains('Got child#3 min width:'))));
       });
     });
 
@@ -1386,7 +1386,7 @@ Future<void> main() async {
         expect(
           tester.takeException(),
           isAssertionError.having(
-            (_) => _.message,
+            (error) => error.message,
             'message',
             contains(
               'Typically, HtmlTableCell widgets are placed directly inside HtmlTable widgets.',
