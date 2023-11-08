@@ -53,7 +53,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
     _instance = this;
   }
 
-  Iterable<String> get urls => _uris.map((_) => _.toString());
+  Iterable<String> get urls => _uris.map((uri) => uri.toString());
 
   FutureOr<NavigationDecision?> onNavigationRequest({
     required String url,

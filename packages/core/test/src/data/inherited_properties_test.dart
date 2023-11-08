@@ -55,7 +55,7 @@ void main() {
         final parent = InheritanceResolvers();
         final r1 = parent.sub();
         final r2 = parent.sub();
-        r2.enqueue((_, __) => _);
+        r2.enqueue((resolving, __) => resolving);
 
         expect(r1.isIdenticalWith(r2), isFalse);
         expect(r2.isIdenticalWith(r1), isFalse);

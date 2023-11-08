@@ -342,7 +342,7 @@ void main() {
         expect(
           FakeWebViewController.instance?.params,
           isA<WebKitWebViewControllerCreationParams>().having(
-            (_) => _.mediaTypesRequiringUserAction,
+            (params) => params.mediaTypesRequiringUserAction,
             'mediaTypesRequiringUserAction',
             require
                 ? equals([PlaybackMediaTypes.audio, PlaybackMediaTypes.video])
