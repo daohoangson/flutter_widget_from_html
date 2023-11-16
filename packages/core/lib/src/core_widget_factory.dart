@@ -491,6 +491,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       // performance critical
       // avoid adding broad dependencies like MediaQuery.of(context)
       // because it may invalidate our root properties too often
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
       TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
     ];
   }

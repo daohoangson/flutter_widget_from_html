@@ -90,6 +90,9 @@ class _AudioPlayerState extends State<AudioPlayer> {
           final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
           final theme = Theme.of(context);
           final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
+
+          // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+          // ignore: deprecated_member_use
           final tsf = MediaQuery.textScaleFactorOf(context);
           final iconSize = fontSize * tsf;
 
@@ -188,6 +191,9 @@ class _PositionText extends StatelessWidget {
             return Text(
               text,
               style: TextStyle(fontSize: size),
+
+              // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+              // ignore: deprecated_member_use
               textScaleFactor: 1,
             );
           },
