@@ -366,6 +366,21 @@ Future<void> main() async {
   });
 
   group('non renderable elements', () {
+    testWidgets('skips AUDIO tag', (WidgetTester tester) async {
+      const html = '''
+<audio controls src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
+  <code>AUDIO</code> support is not enabled.
+</audio>''';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[RichText:(:(+font=Courier+fonts=monospace:AUDIO)'
+          '(: support is not enabled.))]',
+        ),
+      );
+    });
+
     testWidgets('skips IFRAME tag', (WidgetTester tester) async {
       const html = '''
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="320" height="180">
@@ -393,10 +408,16 @@ Future<void> main() async {
       const html = '''
 <svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-  SVG support is not enabled.
+  <code>SVG</code> support is not enabled.
 </svg>''';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:SVG support is not enabled.)]'));
+      expect(
+        explained,
+        equals(
+          '[RichText:(:(+font=Courier+fonts=monospace:SVG)'
+          '(: support is not enabled.))]',
+        ),
+      );
     });
 
     testWidgets('skips VIDEO tag', (WidgetTester tester) async {

@@ -14,7 +14,7 @@ const kHtml = '''
 <p>
   <a name="top"></a>A paragraph with <strong>&lt;strong&gt;</strong>, <em>&lt;em&gt;phasized</em>
   and <span style="color: red">colored</span> text.
-  With an inline Flutter logo:
+  With an inline logo:
   <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0000998/demo_app/logos/icon.png" style="width: 1em" />.
 </p>
 
@@ -125,7 +125,7 @@ const kHtml = '''
   </g>
   <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
 
-  SVG support is not enabled.
+  <code>SVG</code> support is not enabled.
 </svg>
 
 <h4>&lt;VIDEO&gt;</h4>
