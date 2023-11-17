@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-set -e
+set -euo pipefail
 
 (cd packages/core && pwd && flutter pub outdated || true)
 (cd packages/fwfh_cached_network_image && pwd && flutter pub outdated || true)

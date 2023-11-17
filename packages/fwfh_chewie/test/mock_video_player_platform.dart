@@ -21,13 +21,7 @@ class _FakeVideoPlayerPlatform extends Fake
 
   @override
   Widget buildView(int textureId) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.fromBorderSide(
-          BorderSide(color: Colors.grey),
-        ),
-      ),
-    );
+    return const Placeholder();
   }
 
   @override

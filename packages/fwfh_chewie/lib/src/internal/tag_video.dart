@@ -25,9 +25,10 @@ class TagVideo {
         onRenderBlock: (tree, placeholder) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
+              defaultTargetPlatform != TargetPlatform.macOS &&
               !kIsWeb) {
-            // these are the chewie's supported platforms
-            // https://pub.dev/packages/chewie/versions/1.2.2
+            // these are the player's supported platforms
+            // https://pub.dev/packages/video_player/versions/2.8.1
             return placeholder;
           }
 

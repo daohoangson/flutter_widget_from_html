@@ -44,6 +44,9 @@ void _test(
           textScaleSize: textScaleSize,
         );
 
+        // wait for slow tags like AUDIO, VIDEO, etc.
+        await tester.pumpAndSettle();
+
         await screenMatchesGolden(tester, name, finder: find.byKey(key));
         debugDefaultTargetPlatformOverride = null;
         WidgetFactory.debugDeterministicLoadingWidget = false;

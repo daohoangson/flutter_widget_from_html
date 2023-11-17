@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-set -e
+set -euo pipefail
 
 find . -name 'pubspec.lock' -delete
 
