@@ -33,7 +33,7 @@ Future<void> main() async {
     const html = '''
 <svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-  <code>SVG</code> support is not enabled.
+  SVG support is not enabled.
 </svg>''';
     final explained = await explain(tester, html);
     expect(explained, equals('[SvgPicture:bytesLoader=SvgStringLoader]'));

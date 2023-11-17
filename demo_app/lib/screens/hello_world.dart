@@ -125,7 +125,7 @@ const kHtml = '''
   </g>
   <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
 
-  <code>SVG</code> support is not enabled.
+  SVG support is not enabled.
 </svg>
 
 <h4>&lt;VIDEO&gt;</h4>
