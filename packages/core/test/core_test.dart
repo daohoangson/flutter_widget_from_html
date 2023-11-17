@@ -410,14 +410,8 @@ Future<void> main() async {
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
   SVG support is not enabled.
 </svg>''';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[RichText:(:(+font=Courier+fonts=monospace:SVG)'
-          '(: support is not enabled.))]',
-        ),
-      );
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:SVG support is not enabled.)]'));
     });
 
     testWidgets('skips VIDEO tag', (WidgetTester tester) async {
