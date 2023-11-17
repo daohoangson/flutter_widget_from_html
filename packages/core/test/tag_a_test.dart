@@ -54,7 +54,7 @@ void main() {
   });
 
   group('display: inline', () {
-    testWidgets('renders DIV tag inside', (WidgetTester tester) async {
+    testWidgets('renders DIV tag', (WidgetTester tester) async {
       const html = '<a href="$kHref"><div>Foo</div></a>';
       final explained = await explain(tester, html);
       expect(
@@ -67,7 +67,7 @@ void main() {
       );
     });
 
-    testWidgets('renders DIV tags inside', (WidgetTester tester) async {
+    testWidgets('renders DIV tags', (WidgetTester tester) async {
       const html = '<a href="$kHref"><div>Foo</div><div>Bar</div></a>';
       final explained = await explain(tester, html);
       expect(
@@ -83,19 +83,33 @@ void main() {
       );
     });
 
-    testWidgets('renders SPAN tag inside', (WidgetTester tester) async {
+    testWidgets('renders SPAN tag', (WidgetTester tester) async {
       const html = '<a href="$kHref"><span>Foo</span></a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
     });
 
-    testWidgets('renders SPAN tags inside', (WidgetTester tester) async {
+    testWidgets('renders SPAN tags', (WidgetTester tester) async {
       const html = '<a href="$kHref"><span>Foo</span> <span>bar</span></a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo bar)]'));
     });
 
-    testWidgets('renders empty inside', (tester) async {
+    testWidgets('renders DIV and SPAN tags', (tester) async {
+      const html = '<a href="$kHref"><div>Foo</div> <span>bar</span></a>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+          '[RichText:(#FF123456+u+onTap:bar)]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('renders empty', (tester) async {
       const html = '<a href="$kHref""></a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
@@ -103,7 +117,7 @@ void main() {
   });
 
   group('display: block', () {
-    testWidgets('renders DIV tag inside', (tester) async {
+    testWidgets('renders DIV tag', (tester) async {
       const html = '<a href="$kHref" style="display: block"><div>Foo</div></a>';
       final explained = await explain(tester, html);
       expect(
@@ -116,7 +130,7 @@ void main() {
       );
     });
 
-    testWidgets('renders DIV tags inside', (tester) async {
+    testWidgets('renders DIV tags', (tester) async {
       const html = '<a href="$kHref" style="display: block">'
           '<div>Foo</div><div>Bar</div></a>';
       final explained = await explain(tester, html);
@@ -132,7 +146,7 @@ void main() {
       );
     });
 
-    testWidgets('renders SPAN tag inside', (tester) async {
+    testWidgets('renders SPAN tag', (tester) async {
       const html =
           '<a href="$kHref" style="display: block"><span>Foo</span></a>';
       final explained = await explain(tester, html);
@@ -146,7 +160,7 @@ void main() {
       );
     });
 
-    testWidgets('renders SPAN tags inside', (tester) async {
+    testWidgets('renders SPAN tags', (tester) async {
       const html = '<a href="$kHref" style="display: block">'
           '<span>Foo</span> <span>bar</span></a>';
       final explained = await explain(tester, html);
@@ -160,7 +174,23 @@ void main() {
       );
     });
 
-    testWidgets('renders empty inside', (tester) async {
+    testWidgets('renders DIV and SPAN tags', (tester) async {
+      const html = '<a href="$kHref" style="display: block">'
+          '<div>Foo</div> <span>bar</span></a>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[MouseRegion:child=[GestureDetector:child='
+          '[Column:children='
+          '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
+          '[RichText:(#FF123456+u:bar)]'
+          ']]]]',
+        ),
+      );
+    });
+
+    testWidgets('renders empty', (tester) async {
       const html = '<a href="$kHref" style="display: block"></a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
