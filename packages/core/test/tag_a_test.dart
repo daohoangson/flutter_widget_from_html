@@ -16,6 +16,21 @@ void main() {
     expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
   });
 
+  testWidgets('renders A tags', (WidgetTester tester) async {
+    const html = 'Hello <a href="$kHref">foo</a> & <a href="$kHref">bar</a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[RichText:(:Hello '
+        '(#FF123456+u+onTap:foo)'
+        '(: & )'
+        '(#FF123456+u+onTap:bar)'
+        ')]',
+      ),
+    );
+  });
+
   group('renders without erroneous white spaces', () {
     testWidgets('first', (WidgetTester tester) async {
       const html = '<a href="$kHref"> Foo</a>';
