@@ -23,7 +23,8 @@ set -euo pipefail
     echo 'packages/fwfh_svg OK'
 )
 
-if [ -z "$UPDATE_GOLDENS" ]; then
+if [ -z ${UPDATE_GOLDENS+x} ]; then
+  # UPDATE_GOLDENS is unset, run all packages
   (
     cd ./packages/fwfh_cached_network_image &&
       flutter analyze &&
