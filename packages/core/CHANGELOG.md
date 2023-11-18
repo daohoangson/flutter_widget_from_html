@@ -1,3 +1,9 @@
+## 0.14.7
+
+- Add support for Flutter 3.13.9 (#1093)
+- Add support for Flutter 3.16.0 (#1100)
+- Fix `onTapUrl` doesn't work for links with `display: block` (#1104)
+
 ## 0.14.6
 
 - Add support for `background-image` (#1057, authored by @anttileppa 🎉)
