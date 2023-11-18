@@ -1,3 +1,7 @@
+## 0.14.7
+
+- Render video player on macOS (#1100)
+
 ## 0.14.2
 
 - Requires Flutter 3.7 (#899)
