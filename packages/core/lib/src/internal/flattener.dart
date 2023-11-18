@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 
@@ -52,8 +53,8 @@ class Flattener implements Flattened {
 
     placeholder.wrapWith((context, widget) {
       final resolved = scopedInheritanceResolvers.resolve(context);
-      final recognizer = resolved.gestureRecognizer;
-      if (recognizer != null && _needsInlineRecognizer(context, resolved)) {
+      final recognizer = _getInlineRecognizer(context, resolved);
+      if (recognizer != null) {
         return wf.buildGestureDetector(scopedTree, widget, recognizer);
       }
 
@@ -73,20 +74,8 @@ class Flattener implements Flattened {
   void widget(Widget value) {
     _completeLoop();
 
-    final placeholder = WidgetPlaceholder.lazy(
-      value,
-      debugLabel: '${_bit.parent.element.localName}--Flattener.widget',
-    );
-    final scopedInheritanceResolvers = _inheritanceResolvers;
-    placeholder.wrapWith((context, child) {
-      final resolved = scopedInheritanceResolvers.resolve(context);
-      final recognizer = resolved.gestureRecognizer;
-      final detector = recognizer != null
-          ? wf.buildGestureDetector(tree, child, recognizer)
-          : null;
-      return detector ?? child;
-    });
-
+    final debugLabel = '${_bit.parent.element.localName}--Flattener.widget';
+    final placeholder = WidgetPlaceholder.lazy(value, debugLabel: debugLabel);
     _widgets.add(placeholder);
     _logger.finest('Added ${placeholder.debugLabel} widget');
   }
@@ -178,9 +167,7 @@ class Flattener implements Flattened {
           }
 
           return wf.buildTextSpan(
-            recognizer: _needsInlineRecognizer(context, resolved)
-                ? resolved.gestureRecognizer
-                : null,
+            recognizer: _getInlineRecognizer(context, resolved),
             style: resolved.style,
             text: text,
           );
@@ -245,9 +232,7 @@ class Flattener implements Flattened {
         } else {
           span = wf.buildTextSpan(
             children: children,
-            recognizer: _needsInlineRecognizer(context, resolved)
-                ? resolved.gestureRecognizer
-                : null,
+            recognizer: _getInlineRecognizer(context, resolved),
             style: resolved.style,
             text: text,
           );
@@ -271,16 +256,22 @@ class Flattener implements Flattened {
     _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
-  bool _needsInlineRecognizer(
+  GestureRecognizer? _getInlineRecognizer(
     BuildContext context,
     InheritedProperties resolved,
   ) {
+    final resolvedRecognizer = resolved.gestureRecognizer;
+    if (resolvedRecognizer == null) {
+      return null;
+    }
+
     final rootProperties = tree.inheritanceResolvers.resolve(context);
-    return resolved.gestureRecognizer != null &&
-        !identical(
-          resolved.gestureRecognizer,
-          rootProperties.gestureRecognizer,
-        );
+    final rootRecognizer = rootProperties.gestureRecognizer;
+    if (identical(resolvedRecognizer, rootRecognizer)) {
+      return null;
+    }
+
+    return resolvedRecognizer;
   }
 }
 

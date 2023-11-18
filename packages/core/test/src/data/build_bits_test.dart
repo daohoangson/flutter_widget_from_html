@@ -182,7 +182,7 @@ void main() {
 
     test('WidgetBit.block returns', () {
       final text = _text();
-      final child = WidgetPlaceholder();
+      final child = WidgetPlaceholder(child: const Text('foo'));
       final bit = WidgetBit.block(text, child);
 
       final text2 = _text();
