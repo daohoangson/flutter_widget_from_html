@@ -57,6 +57,10 @@ class TagImg {
   }
 
   static StylesMap _defaultStyles(dom.Element element) {
+    // other tags that share the same logic:
+    // - IFRAME
+    //
+    // consider update them together if this changes
     final attrs = element.attributes;
     final height = attrs[kAttributeImgHeight];
     final width = attrs[kAttributeImgWidth];
