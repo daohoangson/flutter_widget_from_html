@@ -90,6 +90,24 @@ mixin WebViewFactory on WidgetFactory {
         meta.register(
           _tagIframe ??= BuildOp(
             // TODO: set debugLabel when our minimum core version >= 1.0
+            defaultStyles: (element) {
+              // other tags that share the same logic:
+              // - IMG
+              //
+              // consider update them together if this changes
+              final attrs = element.attributes;
+              final height = attrs[kAttributeIframeHeight];
+              final width = attrs[kAttributeIframeWidth];
+
+              return {
+                'height': 'auto',
+                'min-width': '0px',
+                'min-height': '0px',
+                'width': 'auto',
+                if (height != null) 'height': '${height}px',
+                if (width != null) 'width': '${width}px',
+              };
+            },
             onWidgets: (meta, widgets) {
               if (defaultTargetPlatform != TargetPlatform.android &&
                   defaultTargetPlatform != TargetPlatform.iOS &&
