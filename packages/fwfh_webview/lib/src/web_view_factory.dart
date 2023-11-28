@@ -98,6 +98,7 @@ mixin WebViewFactory on WidgetFactory {
               final attrs = element.attributes;
               final height = attrs[kAttributeIframeHeight];
               final width = attrs[kAttributeIframeWidth];
+
               return {
                 'height': 'auto',
                 'min-width': '0px',

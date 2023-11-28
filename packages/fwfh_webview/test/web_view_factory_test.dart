@@ -7,6 +7,8 @@ import '_.dart';
 import 'mock_webview_platform.dart';
 
 void main() {
+  const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
@@ -16,7 +18,14 @@ void main() {
   testWidgets('renders clickable text', (tester) async {
     const html = '<iframe src="$src"></iframe>';
     final explained = await explain(tester, html, webView: false);
-    expect(explained, equals('[GestureDetector:child=[Text:$src]]'));
+    expect(
+      explained,
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[GestureDetector:child=[Text:$src]]'
+        ']',
+      ),
+    );
   });
 
   group('renders web view', () {
@@ -34,11 +43,12 @@ void main() {
       expect(
         explained,
         equals(
+          '[CssSizing:$sizingConstraints,child='
           '[WebView:'
           'url=$fullUrl,'
           'aspectRatio=$defaultAspectRatio,'
           'autoResize=true'
-          ']',
+          ']]',
         ),
       );
     }
@@ -112,7 +122,14 @@ void main() {
   testWidgets('renders web view with specified dimensions', (tester) async {
     const html = '<iframe src="$src" width="400" height="300"></iframe>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[WebView:url=$src,aspectRatio=1.33]'));
+    expect(
+      explained,
+      equals(
+        '[CssSizing:height≥0.0,height=300.0,width≥0.0,width=400.0,child='
+        '[WebView:url=$src,aspectRatio=1.33]'
+        ']',
+      ),
+    );
   });
 
   group('gestureTapCallback', () {
@@ -149,32 +166,67 @@ void main() {
   group('sandbox', () {
     testWidgets('renders with js', (tester) async {
       const html = '<iframe src="$src"></iframe>';
-      final e = await explain(tester, html);
-      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,autoResize=true]'));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=1.78,autoResize=true]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders without js', (tester) async {
       const html = '<iframe src="$src" sandbox></iframe>';
-      final e = await explain(tester, html);
-      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=1.78,js=false]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders without js (empty)', (tester) async {
       const html = '<iframe src="$src" sandbox=""></iframe>';
-      final e = await explain(tester, html);
-      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=1.78,js=false]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders without js (allow-forms)', (tester) async {
       const html = '<iframe src="$src" sandbox="allow-forms"></iframe>';
-      final e = await explain(tester, html);
-      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=1.78,js=false]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders with js (allow-scripts)', (tester) async {
       const html = '<iframe src="$src" sandbox="allow-scripts"></iframe>';
-      final e = await explain(tester, html);
-      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,autoResize=true]'));
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=1.78,autoResize=true]'
+          ']',
+        ),
+      );
     });
   });
 
