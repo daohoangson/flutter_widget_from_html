@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.14.7
+  flutter_widget_from_html: ^0.14.8
 ```
 
 ### Platform specific configuration
