@@ -1,3 +1,7 @@
+## 0.14.8
+
+- Fix IFRAME does not respect width attribute (#1115)
+
 ## 0.14.7
 
 - Add support for Flutter 3.13.9 (#1093)
