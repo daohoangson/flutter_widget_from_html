@@ -216,7 +216,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
           '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
           ']]',
@@ -320,7 +320,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
           '[RichText:align=justify,(:X_X_X)]'
           ']]',

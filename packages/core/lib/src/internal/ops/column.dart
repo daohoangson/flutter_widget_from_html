@@ -135,7 +135,7 @@ extension on InheritedProperties {
       case TextAlign.end:
         return CrossAxisAlignment.end;
       case TextAlign.justify:
-        return CrossAxisAlignment.stretch;
+        return CrossAxisAlignment.start;
       case TextAlign.left:
         return isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start;
       case TextAlign.right:
