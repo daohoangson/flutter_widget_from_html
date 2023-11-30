@@ -520,6 +520,14 @@ Future<void> main() async {
       expect(box.size.width, equals(foo.width));
       expect(box.size.height, greaterThan(.0));
     });
+
+    testWidgets('renders P tag inside justify', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1118
+      const html =
+          '<table style="text-align: justify;"><tr><td><p>Foo</p></td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:align=justify,(:Foo)]'));
+    });
   });
 
   group('error handling', () {
