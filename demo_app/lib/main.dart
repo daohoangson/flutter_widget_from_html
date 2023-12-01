@@ -1,5 +1,6 @@
 import 'package:demo_app/screens/home.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -29,8 +30,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) => PopupMenuStateProvider(
         builder: (context) => MaterialApp(
           title: 'Flutter Widget from HTML',
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          theme: FlexThemeData.light(scheme: FlexScheme.blueM3),
+          darkTheme: FlexThemeData.dark(scheme: FlexScheme.blueM3),
           showPerformanceOverlay: context.showPerformanceOverlay,
 
           // let HomeScreen handle all the routings
