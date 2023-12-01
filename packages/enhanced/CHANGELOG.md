@@ -1,3 +1,7 @@
+## 0.14.9
+
+- Fix justify text inside a table (#1120)
+
 ## 0.14.8
 
 - Fix IFRAME does not respect width attribute (#1115)
