@@ -220,7 +220,7 @@ class TagTable {
     final borderSpacing = tryParseDoubleFromMap(attrs, kAttributeCellSpacing);
 
     return {
-      if (border > 0.0) kCssBorder: '${border}px solid black',
+      if (border > 0.0) kCssBorder: '${border}px solid',
       kCssBorderCollapse: kCssBorderCollapseSeparate,
       kCssBorderSpacing: '${borderSpacing ?? 2.0}px',
     };

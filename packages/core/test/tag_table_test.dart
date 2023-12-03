@@ -174,6 +174,9 @@ Future<void> main() async {
       final table = tester.table;
       expect(table.border, isNotNull);
       expect(tester.table.borderSpacing, equals(2.0));
+
+      // default border color must match text color
+      expect(table.border?.top.color, equals(const Color(0xFF001234)));
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
