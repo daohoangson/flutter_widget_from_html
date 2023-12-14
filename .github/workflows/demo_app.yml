@@ -2,6 +2,9 @@ name: Demo
 on:
   push:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     defaults:
@@ -9,6 +12,10 @@ jobs:
         working-directory: demo_app
     environment:
       name: vercel
+    permissions:
+      # write permissions are needed for `comment-on-github` step
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -84,7 +91,7 @@ jobs:
             _url=$( now --token "$TOKEN" )
           fi
           echo "url=${_url}" >> $GITHUB_OUTPUT
-      - name: Create commit comment
+      - name: Create comment
         if: steps.now.conclusion == 'success'
         uses: daohoangson/comment-on-github@35b21121fdbadf807678bec8210cdd7f22a934fe # v2.2.2
         env:
