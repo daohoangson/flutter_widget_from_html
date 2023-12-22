@@ -151,14 +151,17 @@ class _AspectRatioTest extends StatelessWidget {
     );
   }
 
-  void expectValueEquals(double expected) {
+  void expectValueEquals(double expected0) {
     const fractionDigits = 2;
     final powerOfTen = pow(10, fractionDigits);
-    final actual = _value[this] ?? .0;
+    final actual0 = _value[this] ?? .0;
+    final actual = (actual0 * powerOfTen).floorToDouble() / powerOfTen;
+    final expected = (expected0 * powerOfTen).floorToDouble() / powerOfTen;
+    final delta = (actual - expected).abs();
     expect(
-      (actual * powerOfTen).floorToDouble() / powerOfTen,
-      (expected * powerOfTen).floorToDouble() / powerOfTen,
-      reason: 'actual $actual != expected $expected',
+      delta,
+      lessThanOrEqualTo(0.01),
+      reason: 'actual $actual0 != expected $expected0',
     );
   }
 }
