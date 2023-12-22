@@ -10,4 +10,8 @@ if [ ! -z "$JAVA_HOME_17_X64" ]; then
   echo "JAVA_HOME=$JAVA_HOME"
 fi
 
-exec flutter test --reporter expanded integration_test/auto_resize_test.dart
+if [ ! which patrol ]; then
+  dart pub global activate patrol_cli
+fi
+
+exec patrol test -t integration_test/auto_resize_test.dart
