@@ -81,3 +81,5 @@ patrol:
   app_name: Flutter Widget from HTML
   android:
     package_name: dev.fwfh.demo_app
+  ios:
+    bundle_id: dev.fwfh.demoApp
