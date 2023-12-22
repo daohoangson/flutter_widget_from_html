@@ -10,7 +10,7 @@ if [ ! -z "$JAVA_HOME_17_X64" ]; then
   echo "JAVA_HOME=$JAVA_HOME"
 fi
 
-if [ ! which patrol ]; then
+if ! which patrol; then
   dart pub global activate patrol_cli
 fi
 
