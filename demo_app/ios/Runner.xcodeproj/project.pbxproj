@@ -843,7 +843,7 @@
 		};
 		DB6C60602B35E20D00BB8AAC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D0C34373A54FBF4BB01AF487 /* Pods-Runner-RunnerUITests.debug.xcconfig */;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -873,7 +873,7 @@
 		};
 		DB6C60612B35E20D00BB8AAC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 012F110E1818C097CD2ABB5C /* Pods-Runner-RunnerUITests.release.xcconfig */;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -902,7 +902,7 @@
 		};
 		DB6C60622B35E20D00BB8AAC /* Profile */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 944340B24DAA485011A0BB7F /* Pods-Runner-RunnerUITests.profile.xcconfig */;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
