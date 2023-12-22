@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
 import 'package:fwfh_webview/fwfh_webview.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:measurer/measurer.dart';
+import 'package:patrol/patrol.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  testWidgets('VideoPlayer', (WidgetTester tester) async {
+  patrolTest('VideoPlayer', ($) async {
     final test = _AspectRatioTest(
       child: VideoPlayer(
         'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
@@ -20,8 +18,7 @@ void main() {
       ),
     );
 
-    runApp(test);
-    await tester.pumpAndSettle();
+    await $.pumpWidgetAndSettle(test);
 
     test.expectValueEquals(16 / 9);
   });
@@ -33,16 +30,17 @@ void main() {
     WebViewTestCase(1.0, true),
   });
 
-  testWidgets(
+  patrolTest(
     'WebView',
-    (WidgetTester tester) async {
+    ($) async {
       final testCase = webViewTestCases.currentValue!;
-      final test = await testCase.run(tester);
+      final test = await testCase.run($);
 
       for (var i = 0;; i++) {
-        await tester.pump();
-        await tester.runAsync(() => Future.delayed(const Duration(seconds: 3)));
-        await tester.pump();
+        await $.pump();
+        await $.tester
+            .runAsync(() => Future.delayed(const Duration(seconds: 3)));
+        await $.pump();
 
         try {
           test.expectValueEquals(testCase.input);
@@ -55,8 +53,8 @@ void main() {
         }
       }
 
-      await tester.pump();
-      await tester.pumpWidget(const SizedBox.shrink());
+      await $.pump();
+      await $.pumpWidget(const SizedBox.shrink());
     },
     variant: webViewTestCases,
   );
@@ -69,7 +67,7 @@ class WebViewTestCase {
   // ignore: avoid_positional_boolean_parameters
   const WebViewTestCase(this.input, this.issue375);
 
-  Future<_AspectRatioTest> run(WidgetTester tester) async {
+  Future<_AspectRatioTest> run(PatrolIntegrationTester $) async {
     final html = '''
 <!doctype html>
 <head>
@@ -117,7 +115,7 @@ class WebViewTestCase {
     );
     final test = _AspectRatioTest(child: webView);
 
-    runApp(test);
+    await $.pumpWidget(test);
 
     return test;
   }
