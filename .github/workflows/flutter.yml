@@ -80,6 +80,7 @@ jobs:
       # also: avoid error `./gradlew: No such file or directory`
       # see https://github.com/leancodepl/patrol/issues/1541
       - run: flutter build apk --debug
+        working-directory: demo_app
 
       - name: Run tests on Android emulator
         uses: reactivecircus/android-emulator-runner@99a4aac18b4df9b3af66c4a1f04c1f23fa10c270 # v2.29.0
