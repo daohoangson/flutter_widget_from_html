@@ -3,12 +3,12 @@
 [![Flutter](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
-  
+
 Flutter package to render html as widgets that focuses on correctness and extensibility.
 Supports [70+ most popular tags](https://demo.fwfh.dev/supported/tags.html).
 
 | [Live demo](https://demo.fwfh.dev/#/helloworldcore)                                                                                 |                                                                                                                                     |
-|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/core/example/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/core/example/HelloWorldCoreScreen2.jpg) |
 
 ## Getting Started
