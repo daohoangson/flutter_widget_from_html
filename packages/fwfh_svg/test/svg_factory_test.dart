@@ -31,12 +31,19 @@ Future<void> main() async {
 
   testWidgets('renders SVG tag', (WidgetTester tester) async {
     const html = '''
-<svg height="100" width="100">
+<svg height="100px" width="100px">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
   SVG support is not enabled.
 </svg>''';
     final explained = await explain(tester, html);
-    expect(explained, equals('[SvgPicture:bytesLoader=SvgStringLoader]'));
+    expect(
+      explained,
+      equals(
+        '[CssSizing:height≥0.0,height=100.0,width≥0.0,width=100.0,child='
+        '[SvgPicture:bytesLoader=SvgStringLoader]'
+        ']',
+      ),
+    );
   });
 
   group('IMG', () {
