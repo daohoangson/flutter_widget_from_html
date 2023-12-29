@@ -1,5 +1,6 @@
-## 0.14.10
+## 0.14.10+1
 
+- Fix default border color to match text color (#1123)
 - Fix SVG does not respect width/height attributes (#1144)
 
 ## 0.14.9
