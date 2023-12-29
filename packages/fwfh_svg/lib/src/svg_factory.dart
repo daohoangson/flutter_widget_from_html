@@ -8,6 +8,10 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 
+const kAttributeSvgHeight = 'height';
+const kAttributeSvgWidth = 'width';
+const kTagSvg = 'svg';
+
 /// A mixin that can render SVG with `flutter_svg` plugin.
 mixin SvgFactory on WidgetFactory {
   BuildOp? _tagSvg;
@@ -89,10 +93,29 @@ mixin SvgFactory on WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
-      case 'svg':
+      case kTagSvg:
         meta.register(
           _tagSvg ??= BuildOp(
             // TODO: set debugLabel when our minimum core version >= 1.0
+            defaultStyles: (element) {
+              // other tags that share the same logic:
+              // - IFRAME
+              // - IMG
+              //
+              // consider update them together if this changes
+              final attrs = element.attributes;
+              final height = attrs[kAttributeSvgHeight];
+              final width = attrs[kAttributeSvgWidth];
+
+              return {
+                'height': 'auto',
+                'min-width': '0px',
+                'min-height': '0px',
+                'width': 'auto',
+                if (height != null) 'height': height,
+                if (width != null) 'width': width,
+              };
+            },
             onWidgets: (meta, widgets) {
               final bytesLoader = SvgStringLoader(meta.element.outerHtml);
               const src = ImageSource('');
