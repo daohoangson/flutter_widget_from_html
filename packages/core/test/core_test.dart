@@ -406,7 +406,7 @@ Future<void> main() async {
 
     testWidgets('skips SVG tag', (WidgetTester tester) async {
       const html = '''
-<svg height="100" width="100">
+<svg height="100px" width="100px">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
   SVG support is not enabled.
 </svg>''';

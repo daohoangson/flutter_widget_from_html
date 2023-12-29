@@ -59,6 +59,7 @@ class TagImg {
   static StylesMap _defaultStyles(dom.Element element) {
     // other tags that share the same logic:
     // - IFRAME
+    // - SVG
     //
     // consider update them together if this changes
     final attrs = element.attributes;
