@@ -8,7 +8,7 @@ Flutter package to render html as widgets that supports hyperlink, image, audio,
 and [70+ other tags](https://demo.fwfh.dev/supported/tags.html).
 
 | [Live demo](https://demo.fwfh.dev/#/helloworld)                                                                                     |                                                                                                                                     |                                                                                                                                     |
-|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0001010/packages/enhanced/example/HelloWorldScreen3.gif) |
 
 This package supports most common HTML tags for easy usage.
@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.14.9
+  flutter_widget_from_html: ^0.14.10
 ```
 
 ### Platform specific configuration
