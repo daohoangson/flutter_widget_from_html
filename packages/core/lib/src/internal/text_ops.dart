@@ -190,6 +190,9 @@ double? _lineHeightTryParse(InheritedProperties resolved, css.Expression v) {
   if (lengthValue == null) {
     return null;
   }
+  if (fontSize == .0) {
+    return null;
+  }
 
   return lengthValue / fontSize;
 }
