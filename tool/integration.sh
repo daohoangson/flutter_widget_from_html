@@ -8,6 +8,4 @@ if ! which patrol; then
   dart pub global activate patrol_cli
 fi
 
-flutter --no-version-check --suppress-analytics --version --machine
-
 exec patrol test -t integration_test/auto_resize_test.dart
