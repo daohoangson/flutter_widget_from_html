@@ -121,7 +121,7 @@ You can modify inherited properties, including text styles, using the `inherit` 
 // simple resolver setting text color
 tree.inherit(
   (resolving, _) => resolving.copyWith(
-    style: resolving.style.copyWith(
+    style: TextStyle(
       color: Colors.red,
     ),
   ),
@@ -130,7 +130,7 @@ tree.inherit(
 // resolver uses the second param to set height
 tree.inherit(
   (resolving, height) => resolving.copyWith(
-    style: resolving.style.copyWith(
+    style: TextStyle(
       height: height,
     ),
   ),

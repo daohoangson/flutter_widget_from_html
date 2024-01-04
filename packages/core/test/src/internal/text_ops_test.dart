@@ -67,7 +67,7 @@ Future<void> main() async {
     });
 
     group('reset to normal', () {
-      testWidgets('cannot reset to null', (tester) async {
+      testWidgets('reset to null', (tester) async {
         const html = '<span style="line-height: 2">Foo '
             '<em style="line-height: normal">bar</em></span>';
         final explained = await explain(
@@ -76,10 +76,7 @@ Future<void> main() async {
           // ignore: avoid_redundant_argument_values
           height: null,
         );
-        expect(
-          explained,
-          equals('[RichText:(:(+height=2.0:Foo )(+height=2.0+i:bar))]'),
-        );
+        expect(explained, equals('[RichText:(:(+height=2.0:Foo )(+i:bar))]'));
       });
 
       testWidgets('reset to 1', (tester) async {

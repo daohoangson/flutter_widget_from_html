@@ -57,7 +57,7 @@ InheritedProperties textDecorationColor(
   Color value,
 ) =>
     resolving.copyWith(
-      style: resolving.style.copyWith(
+      style: TextStyle(
         decorationColor: value,
         debugLabel: 'fwfh: $kCssTextDecorationColor',
       ),
@@ -100,7 +100,7 @@ InheritedProperties textDecorationLine(
 
   final combined = TextDecoration.combine(list);
   return resolving.copyWith(
-    style: resolving.style.copyWith(
+    style: TextStyle(
       decoration: combined,
       debugLabel: 'fwfh: $kCssTextDecorationLine',
     ),
@@ -112,7 +112,7 @@ InheritedProperties textDecorationStyle(
   TextDecorationStyle value,
 ) =>
     resolving.copyWith(
-      style: resolving.style.copyWith(
+      style: TextStyle(
         decorationStyle: value,
         debugLabel: 'fwfh: $kCssTextDecorationStyle',
       ),
@@ -123,7 +123,7 @@ InheritedProperties textDecorationThickness(
   double value,
 ) =>
     resolving.copyWith(
-      style: resolving.style.copyWith(
+      style: TextStyle(
         decorationThickness: value,
         debugLabel: 'fwfh: $kCssTextDecorationThickness',
       ),

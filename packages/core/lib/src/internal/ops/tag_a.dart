@@ -69,7 +69,7 @@ class TagA {
       context == null
           ? resolving
           : resolving.copyWith(
-              style: resolving.style.copyWith(
+              style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
                 debugLabel: 'fwfh: a[href] default color',
               ),

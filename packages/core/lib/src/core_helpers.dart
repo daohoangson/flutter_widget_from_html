@@ -10,7 +10,6 @@ import 'core_widget_factory.dart';
 import 'widgets/inline_custom_widget.dart';
 
 export 'external/csslib.dart';
-export 'external/text_scale_factor.dart';
 export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/horizontal_margin.dart';
