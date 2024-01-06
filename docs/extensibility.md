@@ -32,7 +32,7 @@ HtmlWidget(
   },
 ),
 ```
-  
+
 [Try with fwfh.dev](https://try.fwfh.dev/?id=08173c5e5d837293837c383d00f9f792)
 
 </td>
@@ -51,8 +51,9 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />
 
 Notes:
-  - By default, the custom widget will take the full width
-  - Wrap it in `InlineCustomWidget` to inline with surrounding text
+
+- By default, the custom widget will take the full width
+- Wrap it in `InlineCustomWidget` to inline with surrounding text
 
 # Custom factory
 
@@ -87,7 +88,7 @@ flowchart TD
         -->|yes\n\ncustomWidgetBuilder| ifIsInlineCustomWidget{inline\nwidget?}
         --->|no| appendWidgetBitBlock[/render\nblock widget/]
         ---> bitOK
-    
+
     ifIsInlineCustomWidget
         -->|yes\n\nInlineCustomWidget| flattener
         -->|onRenderInline| RichText[/render\nRichText/]
@@ -113,15 +114,15 @@ flowchart TD
 
 You can modify inherited properties, including text styles, using the `inherit` function and registering your resolver callback to be invoked once the `BuildContext` is prepared. Here's how it works:
 
-  - Your callback will be supplied with two parameters.
-  - The first parameter is an immutable `InheritedProperties` object, calculated from the root to each element. To make changes, your callback must return a new `InheritedProperties` by calling `copyWith`. If no changes are required, it's recommended to return the same object.
-  - Additionally, you can pass a dynamic value when you call `inherit`, and your callback will receive it as the second parameter during execution.
+- Your callback will be supplied with two parameters.
+- The first parameter is an immutable `InheritedProperties` object, calculated from the root to each element. To make changes, your callback must return a new `InheritedProperties` by calling `copyWith`. If no changes are required, it's recommended to return the same object.
+- Additionally, you can pass a dynamic value when you call `inherit`, and your callback will receive it as the second parameter during execution.
 
 ```dart
 // simple resolver setting text color
 tree.inherit(
   (resolving, _) => resolving.copyWith(
-    style: resolving.style.copyWith(
+    style: TextStyle(
       color: Colors.red,
     ),
   ),
@@ -130,7 +131,7 @@ tree.inherit(
 // resolver uses the second param to set height
 tree.inherit(
   (resolving, height) => resolving.copyWith(
-    style: resolving.style.copyWith(
+    style: TextStyle(
       height: height,
     ),
   ),
@@ -139,11 +140,12 @@ tree.inherit(
 ```
 
 Notes:
-  - Use the `resolving.copyWith<Foo>(value: foo)` method to store various data types within the tree. Children elements can access this value through `resolved.get<Foo>()`.
+
+- Use the `resolving.copyWith<Foo>(value: foo)` method to store various data types within the tree. Children elements can access this value through `resolved.get<Foo>()`.
 
 ## Build ops
 
-Complex functionalities can be implemented using `BuildOp` or `BuildOp.inline`. Internally, all of the HTML tags are supported with the same architecture.  This means that by adopting this method, your potential for customization is virtually limitless. If you encounter any obstacles while trying to create custom rendering, please don't hesitate to open a GitHub enhancement issue.
+Complex functionalities can be implemented using `BuildOp` or `BuildOp.inline`. Internally, all of the HTML tags are supported with the same architecture. This means that by adopting this method, your potential for customization is virtually limitless. If you encounter any obstacles while trying to create custom rendering, please don't hesitate to open a GitHub enhancement issue.
 
 ```dart
 tree.register(BuildOp(

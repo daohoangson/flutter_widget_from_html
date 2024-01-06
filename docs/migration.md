@@ -130,6 +130,38 @@ In this version, we've introduce a new factory to simplify the rendering of cust
 
 The entire `TextStyleHtml` class has been marked as deprecated, its successor is the `InheritedProperties` class. However, if you have legacy code using `TextStyleHtml`, it will continue to work.
 
+### style
+
+Use `prepareTextStyle` to obtain a `TextStyle` object for custom spans or widgets. This update is to improve efficiency, as the `style` getter method had to account for line height, making repeated calls inefficient.
+
+In the past, this getter was essential for modifying certain text style attributes. However, this is no longer necessary. The updated `InheritedProperties.copyWith` method merges changes rather than directly replacing the current style.
+
+<table><tr><th>Before</th><th>After</th></tr><tr><td>
+
+```dart
+tree.inherit(
+  (resolving, _) => resolving.copyWith(
+    style: resolving.style.copyWith(
+      color: Colors.red,
+    ),
+  ),
+);
+```
+
+</td><td>
+
+```dart
+tree.inherit(
+  (resolving, _) => resolving.copyWith(
+    style: TextStyle(
+      color: Colors.red,
+    ),
+  ),
+);
+```
+
+</td></tr></table>
+
 ### getDependency
 
 Similarly, the `getDependency` method has been deprecated, and you should use `get` to retrieve values by their type. It's worth noting that, for performance reasons, `v0.14` no longer depends on `MediaQueryData` to avoid excessive rebuild. Therefore, attempting to use either `getDependency<MediaQueryData>` or `get<MediaQueryData>` will not work.

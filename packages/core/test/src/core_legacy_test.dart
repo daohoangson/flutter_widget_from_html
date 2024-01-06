@@ -420,9 +420,19 @@ void main() {
   });
 
   group('TextStyleHtml', () {
+    group('style', () {
+      const textStyle = TextStyle(fontSize: 20.0);
+      final props = InheritedProperties.root(const [textStyle]);
+
+      test('returns value', () {
+        final fontSize = props.style.fontSize;
+        expect(fontSize, equals(20.0));
+      });
+    });
+
     group('getDependency', () {
       final dep1 = _LegacyTextStyleHtmlDep1();
-      final style = InheritedProperties([dep1]);
+      final style = InheritedProperties.root([dep1]);
 
       test('returns value', () {
         final dep = style.getDependency<_LegacyTextStyleHtmlDep1>();

@@ -363,7 +363,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final textStyle = resolved.style;
+    final textStyle = resolved.prepareTextStyle();
     if (text.isNotEmpty) {
       return buildText(tree, resolved, TextSpan(style: textStyle, text: text));
     }
