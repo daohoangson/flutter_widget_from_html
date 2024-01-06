@@ -198,7 +198,7 @@ class CssBorderSide {
       return null;
     }
 
-    final scopedColor = color ?? resolved.style.color;
+    final scopedColor = color ?? resolved.get<TextStyle>()?.color;
     if (scopedColor == null) {
       return null;
     }
@@ -266,7 +266,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= resolved.fontSize;
+        baseValue ??= resolved.get<TextStyle>()?.fontSize;
         if (baseValue == null) {
           return null;
         }

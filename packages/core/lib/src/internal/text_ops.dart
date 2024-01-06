@@ -69,7 +69,7 @@ double? _fontSizeTryParse(InheritedProperties resolved, css.Expression v) {
 double? _fontSizeTryParseCssLength(InheritedProperties resolved, CssLength v) =>
     v.getValue(
       resolved,
-      baseValue: resolved.parent?.fontSize,
+      baseValue: resolved.parent?.get<TextStyle>()?.fontSize,
       scaleFactor: resolved.get<TextScaleFactor>()?.value,
     );
 
@@ -91,10 +91,10 @@ double? _fontSizeTryParseTerm(InheritedProperties resolved, String value) {
       return _fontSizeMultiplyRootWith(resolved, .5625);
 
     case kCssFontSizeLarger:
-      final parent = resolved.parent?.fontSize;
+      final parent = resolved.parent?.get<TextStyle>()?.fontSize;
       return _fontSizeMultiplyWith(parent, 1.2);
     case kCssFontSizeSmaller:
-      final parent = resolved.parent?.fontSize;
+      final parent = resolved.parent?.get<TextStyle>()?.fontSize;
       return _fontSizeMultiplyWith(parent, 15 / 18);
   }
 
@@ -107,7 +107,7 @@ double? _fontSizeMultiplyRootWith(InheritedProperties resolved, double value) {
     root = x;
   }
 
-  return _fontSizeMultiplyWith(root.fontSize, value);
+  return _fontSizeMultiplyWith(root.get<TextStyle>()?.fontSize, value);
 }
 
 double? _fontSizeMultiplyWith(double? fontSize, double value) =>

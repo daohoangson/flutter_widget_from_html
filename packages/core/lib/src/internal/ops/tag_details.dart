@@ -38,7 +38,7 @@ class TagDetails {
           return column
             ..wrapWith((context, child) {
               final resolved = tree.inheritanceResolvers.resolve(context);
-              final textStyle = resolved.style;
+              final textStyle = resolved.prepareTextStyle();
               final summary = summaryOrNull ??
                   wf.buildText(
                     tree,
@@ -100,7 +100,7 @@ class TagDetails {
       WidgetPlaceholder(
         builder: (context, _) {
           final resolved = summaryTree.inheritanceResolvers.resolve(context);
-          return HtmlDetailsMarker(style: resolved.style);
+          return HtmlDetailsMarker(style: resolved.prepareTextStyle());
         },
         debugLabel: '$kTagSummary--inlineMarker',
       ),

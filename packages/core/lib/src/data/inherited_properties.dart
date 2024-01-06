@@ -18,50 +18,10 @@ class InheritedProperties {
 
   const InheritedProperties._(this.parent, this.values, this._style);
 
-  /// The size of fonts (in logical pixels).
-  ///
-  /// See [TextStyle.fontSize].
-  double? get fontSize => _style.fontSize;
-
   /// The [TextStyle].
-  TextStyle get style {
-    final height = get<CssLineHeight>();
-    if (height == null) {
-      return _style;
-    }
-
-    final length = height.value;
-    if (length == null) {
-      final normal = get<NormalLineHeight>();
-      if (normal == null) {
-        return _style;
-      } else {
-        return _style.copyWith(
-          debugLabel: 'fwfh: line-height normal',
-          height: normal.value,
-        );
-      }
-    }
-
-    final fontSize = _style.fontSize;
-    if (fontSize == null || fontSize == .0) {
-      return _style;
-    }
-
-    final lengthValue = length.getValue(
-      this,
-      baseValue: fontSize,
-      scaleFactor: get<TextScaleFactor>()?.value,
-    );
-    if (lengthValue == null) {
-      return _style;
-    }
-
-    return _style.copyWith(
-      debugLabel: 'fwfh: line-height',
-      height: lengthValue / fontSize,
-    );
-  }
+  @Deprecated('Use `prepareTextStyle` to build one. '
+      'For usage in resolving.copyWith, check the migration guide.')
+  TextStyle get style => prepareTextStyle();
 
   /// Creates the root properties set.
   factory InheritedProperties.root([
@@ -116,7 +76,56 @@ class InheritedProperties {
   ///
   /// The initial set of values are populated by [WidgetFactory.getDependencies].
   /// Parser and builder may use [BuildTree.inherit] to enqueue more.
-  T? get<T>() => _get(values);
+  T? get<T>() {
+    if (T == TextStyle) {
+      // by default, `get` will return the TextStyle from the original deps list
+      // let's intercept here and return the active object instead
+      // this also acts as an escape hatch to get the TextStyle directly without preparing
+      return _style as T;
+    }
+
+    return _get(values);
+  }
+
+  /// Prepares [TextStyle] with correct line-height.
+  TextStyle prepareTextStyle() {
+    final height = get<CssLineHeight>();
+    if (height == null) {
+      return _style;
+    }
+
+    final length = height.value;
+    if (length == null) {
+      final normal = get<NormalLineHeight>();
+      if (normal == null) {
+        return _style;
+      } else {
+        return _style.copyWith(
+          debugLabel: 'fwfh: line-height normal',
+          height: normal.value,
+        );
+      }
+    }
+
+    final fontSize = _style.fontSize;
+    if (fontSize == null || fontSize == .0) {
+      return _style;
+    }
+
+    final lengthValue = length.getValue(
+      this,
+      baseValue: fontSize,
+      scaleFactor: get<TextScaleFactor>()?.value,
+    );
+    if (lengthValue == null) {
+      return _style;
+    }
+
+    return _style.copyWith(
+      debugLabel: 'fwfh: line-height',
+      height: lengthValue / fontSize,
+    );
+  }
 
   static T? _get<T>(Iterable<dynamic> values) {
     for (final value in values.whereType<T>()) {
