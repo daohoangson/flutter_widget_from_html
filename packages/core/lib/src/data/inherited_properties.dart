@@ -12,10 +12,6 @@ class InheritedProperties {
 
   final TextStyle _style;
 
-  const InheritedProperties(this.values)
-      : parent = null,
-        _style = const TextStyle();
-
   const InheritedProperties._(this.parent, this.values, this._style);
 
   /// Creates the root properties set.
@@ -197,8 +193,8 @@ class InheritanceResolvers {
   ///
   /// If the parent's values are unchanged, the cached resolved set will be used.
   InheritedProperties resolve(BuildContext context) {
-    final parentResolved =
-        parent?.resolve(context) ?? const InheritedProperties([]);
+    final parentResolved = parent?.resolve(context) ??
+        const InheritedProperties._(null, [], TextStyle());
     final scopedCallbacks = _callbacks;
     if (scopedCallbacks == null) {
       return parentResolved;

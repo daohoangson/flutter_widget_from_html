@@ -432,7 +432,7 @@ void main() {
 
     group('getDependency', () {
       final dep1 = _LegacyTextStyleHtmlDep1();
-      final style = InheritedProperties([dep1]);
+      final style = InheritedProperties.root([dep1]);
 
       test('returns value', () {
         final dep = style.getDependency<_LegacyTextStyleHtmlDep1>();

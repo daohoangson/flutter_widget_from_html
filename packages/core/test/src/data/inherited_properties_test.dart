@@ -11,7 +11,7 @@ void main() {
   group('InheritedProperties', () {
     group('get', () {
       final dep1 = _Dep1();
-      final resolved = InheritedProperties([dep1]);
+      final resolved = InheritedProperties.root([dep1]);
 
       test('returns value', () {
         final dep = resolved.get<_Dep1>();
@@ -131,7 +131,7 @@ void main() {
 
       test('returns parent properties', () {
         final parent = _MockInheritanceResolvers();
-        final parentProperties = InheritedProperties([DateTime.now()]);
+        final parentProperties = InheritedProperties.root([DateTime.now()]);
         when(() => parent.resolve(any())).thenReturn(parentProperties);
 
         final resolvers = InheritanceResolvers(parent);
@@ -143,7 +143,7 @@ void main() {
         final parent = _MockInheritanceResolvers();
         final now = DateTime.now();
         when(() => parent.resolve(any()))
-            .thenReturn(InheritedProperties([now]));
+            .thenReturn(InheritedProperties.root([now]));
 
         final resolvers = InheritanceResolvers(parent);
         final dep1 = _Dep1();
@@ -157,7 +157,7 @@ void main() {
       test('returns cached output', () {
         final parent = _MockInheritanceResolvers();
         when(() => parent.resolve(any()))
-            .thenReturn(const InheritedProperties([]));
+            .thenReturn(InheritedProperties.root());
 
         final resolvers = InheritanceResolvers(parent);
         resolvers.enqueue((r, _) => r.copyWith(value: DateTime.now()));
@@ -169,7 +169,8 @@ void main() {
 
       test('throws if output is not copied with', () {
         final resolvers = InheritanceResolvers();
-        resolvers.enqueue((_, __) => InheritedProperties([DateTime.now()]));
+        resolvers
+            .enqueue((_, __) => InheritedProperties.root([DateTime.now()]));
 
         expect(
           () => resolvers.resolve(_MockBuildContext()),
