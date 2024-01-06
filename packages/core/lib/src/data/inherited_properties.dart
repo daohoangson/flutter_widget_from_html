@@ -39,7 +39,7 @@ class InheritedProperties {
       null,
       [
         ...deps,
-        NormalLineHeight(style.height),
+        if (style.height != null) NormalLineHeight(style.height),
       ],
       style,
     );
@@ -91,13 +91,13 @@ class InheritedProperties {
 
     final length = height.value;
     if (length == null) {
-      final normal = get<NormalLineHeight>();
-      if (normal == null) {
+      final normalValue = get<NormalLineHeight>()?.value;
+      if (normalValue == null) {
         return _style;
       } else {
         return _style.copyWith(
           debugLabel: 'fwfh: line-height normal',
-          height: normal.value,
+          height: normalValue,
         );
       }
     }

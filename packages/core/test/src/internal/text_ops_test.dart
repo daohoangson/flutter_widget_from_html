@@ -4,6 +4,12 @@ import '../../_.dart';
 
 Future<void> main() async {
   group('line-height', () {
+    testWidgets('renders auto', (WidgetTester tester) async {
+      const html = '<span style="line-height: auto">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
     testWidgets('renders number', (WidgetTester tester) async {
       const html = '<span style="line-height: 1">Foo</span>';
       final explained = await explain(tester, html);
