@@ -266,7 +266,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= resolved.unsupportedStyleWithoutHeight.fontSize;
+        baseValue ??= resolved.fontSize;
         if (baseValue == null) {
           return null;
         }

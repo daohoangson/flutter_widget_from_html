@@ -18,6 +18,11 @@ class InheritedProperties {
 
   const InheritedProperties._(this.parent, this.values, this._style);
 
+  /// The size of fonts (in logical pixels).
+  ///
+  /// See [TextStyle.fontSize].
+  double? get fontSize => _style.fontSize;
+
   /// The [TextStyle].
   TextStyle get style {
     final height = get<CssLineHeight>();
@@ -57,8 +62,6 @@ class InheritedProperties {
       height: lengthValue / fontSize,
     );
   }
-
-  TextStyle get unsupportedStyleWithoutHeight => _style;
 
   /// Creates the root properties set.
   factory InheritedProperties.root([

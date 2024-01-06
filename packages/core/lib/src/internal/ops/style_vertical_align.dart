@@ -92,7 +92,7 @@ class StyleVerticalAlign {
     EdgeInsets padding,
   ) {
     final resolved = tree.inheritanceResolvers.resolve(context);
-    final fontSize = resolved.unsupportedStyleWithoutHeight.fontSize;
+    final fontSize = resolved.fontSize;
     if (fontSize == null) {
       return child;
     }

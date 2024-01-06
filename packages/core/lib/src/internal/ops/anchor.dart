@@ -21,10 +21,7 @@ class Anchor {
         onRenderInline: (tree) {
           final widget = WidgetPlaceholder(
             builder: (context, _) => SizedBox(
-              height: tree.inheritanceResolvers
-                  .resolve(context)
-                  .unsupportedStyleWithoutHeight
-                  .fontSize,
+              height: tree.inheritanceResolvers.resolve(context).fontSize,
               key: anchor,
             ),
             debugLabel: '${tree.element.localName}--anchor#$id',
