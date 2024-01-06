@@ -22,6 +22,42 @@ void main() {
         expect(resolved.get<_Dep2>(), isNull);
       });
     });
+
+    group('get<TextStyle>', () {
+      const height40px = CssLineHeight(CssLength(40.0));
+
+      test('returns original line-height null', () {
+        const textStyle = TextStyle(fontSize: 20.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith<CssLineHeight>(value: height40px);
+        final height = props.get<TextStyle>()!.height;
+        expect(height, isNull);
+      });
+
+      test('returns original line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith<CssLineHeight>(value: height40px);
+        final height = props.get<TextStyle>()!.height;
+        expect(height, equals(1.0));
+      });
+    });
+
+    group('prepareTextStyle', () {
+      test('returns original line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith();
+        expect(props.prepareTextStyle().height, equals(1.0));
+      });
+
+      test('returns CSS line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith(value: const CssLineHeight(CssLength(40)));
+        expect(props.prepareTextStyle().height, equals(2.0));
+      });
+    });
   });
 
   group('InheritanceResolvers', () {

@@ -18,11 +18,6 @@ class InheritedProperties {
 
   const InheritedProperties._(this.parent, this.values, this._style);
 
-  /// The [TextStyle].
-  @Deprecated('Use `prepareTextStyle` to build one. '
-      'For usage in resolving.copyWith, check the migration guide.')
-  TextStyle get style => prepareTextStyle();
-
   /// Creates the root properties set.
   factory InheritedProperties.root([
     Iterable<dynamic> deps = const [],
