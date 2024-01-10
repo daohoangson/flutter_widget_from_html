@@ -19,6 +19,7 @@ import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'internal/text_ops.dart' as text_ops;
+import 'utils/roman_numerals_converter.dart';
 
 final _logger = Logger('fwfh.WidgetFactory');
 
@@ -519,33 +520,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssListStyleTypeDecimal:
         return '$i.';
       case kCssListStyleTypeRomanLower:
-        final roman = _getListMarkerRoman(i)?.toLowerCase();
+        final roman = intToRomanNumerals(i)?.toLowerCase();
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeRomanUpper:
-        final roman = _getListMarkerRoman(i);
+        final roman = intToRomanNumerals(i);
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeNone:
       default:
         return '';
     }
-  }
-
-  String? _getListMarkerRoman(int i) {
-    // TODO: find some lib to generate programatically
-    const map = <int, String>{
-      1: 'I',
-      2: 'II',
-      3: 'III',
-      4: 'IV',
-      5: 'V',
-      6: 'VI',
-      7: 'VII',
-      8: 'VIII',
-      9: 'IX',
-      10: 'X',
-    };
-
-    return map[i];
   }
 
   /// Returns an [AssetImage].
