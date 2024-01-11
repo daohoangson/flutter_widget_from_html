@@ -231,7 +231,7 @@ class _PositionSlider extends StatelessWidget {
         builder: (_, duration) => StreamBuilder<Duration>(
           builder: (_, position) {
             final max = duration.data?.inMilliseconds.toDouble();
-            if (max == null) {
+            if (max == null || max == 0) {
               return widget0;
             }
 
