@@ -86,7 +86,11 @@ class _TextShadowScreenState extends State<TextShadowScreen> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const HtmlWidget(_kHtml),
+              const Expanded(
+                child: SingleChildScrollView(
+                  child: HtmlWidget(_kHtml),
+                ),
+              ),
             ],
           ),
         ),

@@ -89,11 +89,14 @@ Shadow? _parseExpressionToShadow(
   // Parse color
   // Color is ALWAYS either the first or the last index
   int colorOffsetIndex = 0;
+
   color = tryParseColor(expressions.last);
 
   if (color == null) {
     color = tryParseColor(expressions.first);
-    colorOffsetIndex = 1;
+    if (color != null) {
+      colorOffsetIndex = 1;
+    }
   }
 
   if (color == null && expressions.length > 3) {
