@@ -4,11 +4,12 @@ const String kCssTextShadow = 'text-shadow';
 
 /// Refer https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 void textShadowApply(BuildTree tree, css.Declaration style) {
-  final styleExpression = style.expression as css.Expressions?;
-  final expressions = styleExpression?.expressions;
-
-  if (expressions?.isNotEmpty == true) {
-    tree.inherit(_textShadow, _extractToIndividualExpressions(expressions!));
+  final expressions = style.values;
+  if (expressions.isNotEmpty) {
+    tree.inherit(
+      _textShadow,
+      _extractToIndividualExpressions(expressions),
+    );
   }
 }
 
@@ -86,38 +87,47 @@ Shadow? _parseExpressionToShadow(
     return null;
   }
 
-  // Parse color
   // Color is ALWAYS either the first or the last index
-  int colorOffsetIndex = 0;
-
+  // If color is first expression
+  //    then offsetX index would be increment by 1
+  // else
+  //    offsetX index = 0
+  int offsetXStartIndex = 0;
   color = tryParseColor(expressions.last);
 
   if (color == null) {
+    // Try to parse color in first expression
     color = tryParseColor(expressions.first);
     if (color != null) {
-      colorOffsetIndex = 1;
+      offsetXStartIndex = 1;
     }
   }
 
   if (color == null && expressions.length > 3) {
     return null;
   }
+
   // Parse size + blur radius
   // According to the docs, the valid ordering must always be
   // offset-x , off-set-y , blur-radius (optional)
   offsetX = tryParseCssLength(
-    expressions.safeGetAt(0 + colorOffsetIndex),
+    expressions.safeGetAt(offsetXStartIndex),
   )?.number;
   offsetY = tryParseCssLength(
-    expressions.safeGetAt(1 + colorOffsetIndex),
+    expressions.safeGetAt(1 + offsetXStartIndex),
   )?.number;
+
+  if (offsetX == null || offsetY == null) {
+    return null;
+  }
+
   blurRadius = tryParseCssLength(
-    expressions.safeGetAt(2 + colorOffsetIndex),
+    expressions.safeGetAt(2 + offsetXStartIndex),
   )?.number;
 
   return Shadow(
     color: color ?? defaultColor,
-    offset: Offset(offsetX ?? 0.0, offsetY ?? 0.0),
+    offset: Offset(offsetX, offsetY),
     blurRadius: blurRadius ?? 0.0,
   );
 }
