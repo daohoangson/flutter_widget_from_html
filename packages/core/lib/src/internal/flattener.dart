@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import '../utils/string_utils.dart';
 import 'core_ops.dart';
 import 'margin_vertical.dart';
 
@@ -207,11 +208,13 @@ class Flattener implements Flattened {
           }
         }
 
-        final text = scopedStrings.toText(
-          resolved.whitespaceOrNormal,
-          isFirst: true,
-          isLast: isLast_,
-        );
+        final text = scopedStrings
+            .toText(
+              resolved.whitespaceOrNormal,
+              isFirst: true,
+              isLast: isLast_,
+            )
+            .applyTextTransform(resolved.get<CssTextTransform>());
         InlineSpan? span;
         if (text.isEmpty && children.isEmpty) {
           final nonWhitespaceStrings = scopedStrings
@@ -272,6 +275,21 @@ class Flattener implements Flattened {
     }
 
     return resolvedRecognizer;
+  }
+}
+
+extension on String {
+  String applyTextTransform(CssTextTransform? textTransform) {
+    switch (textTransform) {
+      case CssTextTransform.uppercase:
+        return toUpperCase();
+      case CssTextTransform.lowercase:
+        return toLowerCase();
+      case CssTextTransform.capitalize:
+        return toUpperCaseAllWords();
+      default:
+        return this;
+    }
   }
 }
 

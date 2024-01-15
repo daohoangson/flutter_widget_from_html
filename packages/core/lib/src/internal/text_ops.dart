@@ -253,3 +253,22 @@ CssWhitespace? whitespaceTryParse(String value) {
 
   return null;
 }
+
+InheritedProperties textTransform(
+  InheritedProperties resolving,
+  CssTextTransform textTransform,
+) =>
+    resolving.copyWith(value: textTransform);
+
+CssTextTransform tryParseTextTransform(String? value) {
+  switch (value) {
+    case kCssTextTransformCapitalize:
+      return CssTextTransform.capitalize;
+    case kCssTextTransformUppercase:
+      return CssTextTransform.uppercase;
+    case kCssTextTransformLowercase:
+      return CssTextTransform.lowercase;
+    default:
+      return CssTextTransform.none;
+  }
+}

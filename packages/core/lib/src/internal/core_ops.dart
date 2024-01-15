@@ -95,6 +95,12 @@ const kCssWhitespaceNormal = 'normal';
 const kCssWhitespaceNowrap = 'nowrap';
 const kCssWhitespacePre = 'pre';
 
+const kCssTextTransform = 'text-transform';
+const kCssTextTransformNone = 'none';
+const kCssTextTransformCapitalize = 'capitalize';
+const kCssTextTransformUppercase = 'uppercase';
+const kCssTextTransformLowercase = 'lowercase';
+
 extension on InheritedProperties {
   TextDirection get directionOrLtr => get() ?? TextDirection.ltr;
 }

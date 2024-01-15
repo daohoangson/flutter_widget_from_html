@@ -1126,6 +1126,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssTextShadow:
         textShadowApply(tree, style);
         break;
+
+      case kCssTextTransform:
+        final textTransform = style.term != null
+            ? text_ops.tryParseTextTransform(style.term)
+            : null;
+        if (textTransform != null) {
+          tree.inherit(text_ops.textTransform, textTransform);
+        }
+        break;
     }
 
     if (key.startsWith(kCssBackground)) {

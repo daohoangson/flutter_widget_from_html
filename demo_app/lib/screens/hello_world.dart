@@ -137,9 +137,6 @@ const kHtml = '''
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>
 
-<p>Anchor: <a href="#top">Scroll to top</a>.</p>
-<br />
-<br />
 ''';
 
 class HelloWorldScreen extends StatelessWidget {
