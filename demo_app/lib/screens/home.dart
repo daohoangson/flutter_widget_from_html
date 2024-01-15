@@ -11,6 +11,7 @@ import 'package:demo_app/screens/img.dart';
 import 'package:demo_app/screens/img_file.dart';
 import 'package:demo_app/screens/photo_view.dart';
 import 'package:demo_app/screens/smilie.dart';
+import 'package:demo_app/screens/text_shadow_screen.dart';
 import 'package:demo_app/screens/video.dart';
 import 'package:demo_app/screens/wordpress.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
@@ -33,6 +34,7 @@ class HomeScreen extends StatelessWidget {
     'Photo View': () => const PhotoViewScreen(),
     'Smilie': () => const SmilieScreen(),
     'Wordpress': () => const WordpressScreen(),
+    'Text Shadow': () => const TextShadowScreen(),
   };
 
   const HomeScreen({super.key});

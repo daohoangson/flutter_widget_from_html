@@ -512,6 +512,7 @@ class Explainer {
 
     s += _textStyleFontStyle(style);
     s += _textStyleFontWeight(style);
+    s += _textStyleShadow(style);
 
     return s;
   }
@@ -566,6 +567,22 @@ class Explainer {
       return '+b';
     }
     return '+w${FontWeight.values.indexOf(fontWeight)}';
+  }
+
+  String _textStyleShadow(TextStyle style) {
+    final shadows = style.shadows;
+    if (shadows?.isNotEmpty != true) {
+      return '';
+    }
+
+    String s = '';
+
+    shadows?.forEach((element) {
+      s +=
+          'Shadow=[color=${_color(element.color)},offset=${element.offset},blurRadius=${element.blurRadius}]';
+    });
+
+    return s;
   }
 
   List<String> _flex(Flex flex) {
