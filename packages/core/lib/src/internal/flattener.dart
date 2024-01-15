@@ -73,6 +73,7 @@ class Flattener implements Flattened {
 
   @override
   void widget(Widget value) {
+    print('zzll widget () ');
     _completeLoop();
 
     final debugLabel = '${_bit.parent.element.localName}--Flattener.widget';
@@ -197,6 +198,8 @@ class Flattener implements Flattened {
     final placeholder = WidgetPlaceholder(
       builder: (context, _) {
         final resolved = scopedInheritanceResolvers.resolve(context);
+        print('zzll ya ${resolved.get<CssTextTransform>()}');
+        print('zzll ${resolved.values}');
         final children = <InlineSpan>[];
 
         var isLast_ = true;

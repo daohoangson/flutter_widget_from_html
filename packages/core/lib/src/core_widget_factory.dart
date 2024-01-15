@@ -1128,10 +1128,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
 
       case kCssTextTransform:
+        print('zzll yep kCssTextTransform');
         final textTransform = style.term != null
             ? text_ops.tryParseTextTransform(style.term)
             : null;
         if (textTransform != null) {
+          print('zzll yep kCssTextTransform != null');
           tree.inherit(text_ops.textTransform, textTransform);
         }
         break;
