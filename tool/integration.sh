@@ -4,10 +4,10 @@ set -euo pipefail
 
 cd "$(dirname $(dirname ${BASH_SOURCE[0]}))"/demo_app
 
-if [ ! -z "$JAVA_HOME_17_X64" ]; then
-  # switch to Java 17 in GitHub Actions
-  export JAVA_HOME=$JAVA_HOME_17_X64
-  echo "JAVA_HOME=$JAVA_HOME"
+if ! which patrol; then
+  dart pub global activate patrol_cli
 fi
 
-exec flutter test --reporter expanded integration_test/auto_resize_test.dart
+flutter --no-version-check --suppress-analytics --version --machine
+
+exec patrol test -t integration_test/auto_resize_test.dart
