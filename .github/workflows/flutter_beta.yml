@@ -28,4 +28,4 @@ jobs:
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
+      - uses: codecov/codecov-action@f30e4959ba63075080d4f7f90cacc18d9f3fafd7 # v4.0.0
