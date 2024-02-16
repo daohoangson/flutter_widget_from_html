@@ -24,6 +24,8 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   lint: any
   measurer: ^2.1.1
   plugin_platform_interface: any
