@@ -59,7 +59,8 @@ if [ -z ${UPDATE_GOLDENS+x} ]; then
         flutter drive \
           -d web-server \
           --driver=test_driver/integration_test.dart \
-          --target=integration_test/js_interop_test.dart
+          --target=integration_test/js_interop_test.dart &&
+        echo 'packages/fwfh_webview JavaScript interop OK'
     )
   fi
 
