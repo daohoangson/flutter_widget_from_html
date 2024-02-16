@@ -53,7 +53,7 @@ if [ -z ${UPDATE_GOLDENS+x} ]; then
       echo 'packages/fwfh_webview OK'
   )
 
-  if [ -z ${CHROMEDRIVER_PORT_4444+x} ]; then
+  if [ ! -z ${CHROMEDRIVER_PORT_4444+x} ]; then
     (
       cd ./packages/fwfh_webview &&
         flutter drive \
