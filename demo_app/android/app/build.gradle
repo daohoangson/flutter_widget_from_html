@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "dev.fwfh.demo_app"
-    compileSdkVersion 33
+    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -42,6 +42,9 @@ android {
 
     defaultConfig {
         applicationId "dev.fwfh.demo_app"
+
+        // TODO: remove hard-coded value when `flutter.minSdkVersion` >= 21
+        // open $(dirname $(dirname $(which flutter)))/packages/flutter_tools
         minSdkVersion 21
 
         targetSdkVersion flutter.targetSdkVersion
