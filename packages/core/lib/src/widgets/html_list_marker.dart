@@ -1,3 +1,5 @@
+// TODO: remove lint ignore when our minimum Flutter version >= 3.19
+// ignore: unnecessary_import
 import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
