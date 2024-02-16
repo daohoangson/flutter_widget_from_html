@@ -4,14 +4,15 @@ description: WidgetFactory extension to render IFRAME with the official WebView 
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=3.7.0"
-  sdk: ">=2.19.0 <4.0.0"
+  flutter: ">=3.16.0"
+  sdk: ">=3.2.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ">=0.10.5 <0.15.0"
   logging: ^1.0.0
+  web: ">=0.3.0 <0.6.0"
   webview_flutter: ^4.0.1
   webview_flutter_android: ^3.10.0
   webview_flutter_wkwebview: ^3.6.0
