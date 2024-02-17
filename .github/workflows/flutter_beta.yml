@@ -22,10 +22,4 @@ jobs:
         uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.12.0
         with:
           channel: beta
-      - run: ./tool/test.sh --coverage
-      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-        if: failure()
-        with:
-          name: failures
-          path: demo_app/test/failures/
-      - uses: codecov/codecov-action@e0b68c6749509c5f83f984dd99a76a1c1a231044 # v4.0.1
+      - run: ./tool/test.sh

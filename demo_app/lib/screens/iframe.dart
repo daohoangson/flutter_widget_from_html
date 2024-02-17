@@ -4,9 +4,9 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 const html = '''
 <h1>Introducing Flutter</h1>
 <h3>Google Developers</h3>
-<p>Get started at <a href="https://flutter.io">https://flutter.io</a> today.</p>
+<p>Get started at <a href="https://flutter.dev">https://flutter.dev</a> today.</p>
 
-<p>Flutter is Google’s mobile UI framework for crafting high-quality native interfaces on iOS and Android in record time. Flutter works with existing code, is used by developers and organizations around the world, and is free and open source.</p>
+<p>Flutter is Google's mobile UI framework for crafting high-quality native interfaces on iOS and Android in record time. Flutter works with existing code, is used by developers and organizations around the world, and is free and open source.</p>
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/fq4N0hgOWzU"></iframe>
 
