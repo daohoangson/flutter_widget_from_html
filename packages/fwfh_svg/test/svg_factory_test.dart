@@ -406,9 +406,26 @@ class _MockHttpClient extends Mock implements HttpClient {
   set autoUncompress(bool _) {}
 }
 
-class _MockHttpClientRequest extends Mock implements HttpClientRequest {}
+class _MockHttpClientRequest extends Mock implements HttpClientRequest {
+  @override
+  Future addStream(Stream<List<int>> stream) async {
+    // intentionally left empty
+  }
+}
 
-class _MockHttpClientResponse extends Mock implements HttpClientResponse {}
+class _MockHttpClientResponse extends Mock implements HttpClientResponse {
+  @override
+  bool get isRedirect => false;
+
+  @override
+  bool get persistentConnection => false;
+
+  @override
+  String get reasonPhrase => '';
+
+  @override
+  List<RedirectInfo> get redirects => const [];
+}
 
 class _MockHttpHeaders extends Mock implements HttpHeaders {}
 
@@ -418,13 +435,8 @@ HttpClient _createMockSvgImageHttpClient() {
   final response = _MockHttpClientResponse();
   final headers = _MockHttpHeaders();
 
+  // TODO: remove when our minimum flutter_svg version >=2.0.10
   when(() => client.getUrl(any())).thenAnswer((_) async => request);
-  when(() => request.headers).thenReturn(headers);
-  when(() => request.close()).thenAnswer((_) async => response);
-  when(() => response.compressionState)
-      .thenReturn(HttpClientResponseCompressionState.notCompressed);
-  when(() => response.contentLength).thenReturn(redTriangleBytes.length);
-  when(() => response.statusCode).thenReturn(HttpStatus.ok);
   when(
     () => response.listen(
       any(),
@@ -445,6 +457,17 @@ HttpClient _createMockSvgImageHttpClient() {
       onDone?.call();
     });
   });
+
+  when(() => client.openUrl(any(), any())).thenAnswer((_) async => request);
+  when(() => request.headers).thenReturn(headers);
+  when(() => request.close()).thenAnswer((_) async => response);
+  when(() => response.compressionState)
+      .thenReturn(HttpClientResponseCompressionState.notCompressed);
+  when(() => response.contentLength).thenReturn(redTriangleBytes.length);
+  when(() => response.headers).thenReturn(headers);
+  when(() => response.statusCode).thenReturn(HttpStatus.ok);
+  when(() => response.handleError(any(), test: any(named: 'test')))
+      .thenAnswer((_) => Stream.fromIterable(<List<int>>[redTriangleBytes]));
 
   return client;
 }
