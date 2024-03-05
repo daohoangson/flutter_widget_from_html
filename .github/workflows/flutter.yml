@@ -20,7 +20,7 @@ jobs:
       - uses: actions/dependency-review-action@9129d7d40b8c12c1ed0f60400d00c92d437adcce # v4.1.3
         if: github.base_ref
       - name: Setup Flutter
-        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.12.0
+        uses: subosito/flutter-action@62f096cacda5168a3bd7b95793373be14fa4fbaf # v2.13.0
         with:
           cache: true
       - run: dart format --set-exit-if-changed --output none .
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Setup Flutter
-        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.12.0
+        uses: subosito/flutter-action@62f096cacda5168a3bd7b95793373be14fa4fbaf # v2.13.0
         with:
           cache: true
       - name: Gradle cache
@@ -101,7 +101,7 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Setup Flutter
-        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.12.0
+        uses: subosito/flutter-action@62f096cacda5168a3bd7b95793373be14fa4fbaf # v2.13.0
         with:
           cache: true
 
