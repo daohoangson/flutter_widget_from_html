@@ -96,7 +96,7 @@ flowchart TD
 
     ifCustomWidget
         -->|no| _parseEverything[parser]
-        -->|WidgetFactory.parse\n\ndefaultStyles\n\ncustomStylesBuilder| _parseOK( )
+        -->|WidgetFactory.parse\n\ndefaultStyles\n\ncustomStylesBuilder\n\nstyle attribute| _parseOK( )
         ~~~ _addBitsFromNodeOK
 
     _parseOK
