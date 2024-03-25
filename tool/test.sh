@@ -53,6 +53,17 @@ if [ -z ${UPDATE_GOLDENS+x} ]; then
       echo 'packages/fwfh_webview OK'
   )
 
+  if [ ! -z ${CHROMEDRIVER_PORT_4444+x} ]; then
+    (
+      cd ./packages/fwfh_webview &&
+        flutter drive \
+          -d web-server \
+          --driver=test_driver/integration_test.dart \
+          --target=integration_test/js_interop_test.dart &&
+        echo 'packages/fwfh_webview JavaScript interop OK'
+    )
+  fi
+
   (
     cd ./packages/enhanced &&
       flutter analyze &&

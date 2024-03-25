@@ -1,20 +1,18 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' show IFrameElement;
+import 'dart:ui_web';
 
 import 'package:flutter/widgets.dart';
+import 'package:web/web.dart';
 
-import '../external/dart_ui.dart' as ui;
 import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
-  final _iframeElement = IFrameElement();
+  final _iframeElement = document.createElement('iframe') as HTMLIFrameElement;
   late Widget _iframeWidget;
 
   @override
   void initState() {
     super.initState();
 
-    // ignore: unsafe_html
     _iframeElement.src = widget.url;
     _iframeElement.style.border = 'none';
 
@@ -24,8 +22,7 @@ class WebViewState extends State<WebView> {
 
     final viewType = '$this#$hashCode';
 
-    ui.platformViewRegistry
-        .registerViewFactory(viewType, (_) => _iframeElement);
+    platformViewRegistry.registerViewFactory(viewType, (_) => _iframeElement);
 
     // TODO: switch to `webview_flutter_web` when it's endorsed
     _iframeWidget = HtmlElementView(viewType: viewType);
