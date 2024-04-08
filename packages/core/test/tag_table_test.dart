@@ -1064,16 +1064,8 @@ Future<void> main() async {
               HtmlTableCell(
                 columnStart: 0,
                 rowStart: 0,
-                child: Text.rich(
-                  const TextSpan(
-                    children: [
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.baseline,
-                        baseline: TextBaseline.alphabetic,
-                        child: Text('Foo foo foo foo'),
-                      ),
-                    ],
-                  ),
+                child: LayoutBuilder(
+                  builder: (_, __) => const Text('Foo foo foo foo'),
                   key: left,
                 ),
               ),
