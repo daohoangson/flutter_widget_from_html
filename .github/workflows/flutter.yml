@@ -58,7 +58,7 @@ jobs:
         with:
           cache: true
       - name: Gradle cache
-        uses: gradle/gradle-build-action@fe59895742b4f984530980e4f693943577526b61 # v3.2.0
+        uses: gradle/gradle-build-action@4c39dd82cd5e1ec7c6fa0173bb41b4b6bb3b86ff # v3.3.2
         with:
           # only update gradle cache from demo_app.yml jobs
           cache-read-only: false
