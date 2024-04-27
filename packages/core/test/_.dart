@@ -605,6 +605,10 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is CssSizingHint) {
+      return _widget(widget.child);
+    }
+
     if (widget is LayoutBuilder) {
       return _widget(
         widget.builder(

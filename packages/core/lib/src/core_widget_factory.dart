@@ -232,12 +232,25 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
     TextBaseline textBaseline = TextBaseline.alphabetic,
   }) {
-    return Flex(
-      crossAxisAlignment: crossAxisAlignment,
-      direction: direction,
-      mainAxisAlignment: mainAxisAlignment,
-      textBaseline: textBaseline,
-      children: children,
+    return LayoutBuilder(
+      builder: (_, bc) {
+        Widget built = Flex(
+          crossAxisAlignment: crossAxisAlignment,
+          direction: direction,
+          mainAxisAlignment: mainAxisAlignment,
+          textBaseline: textBaseline,
+          children: children,
+        );
+        switch (direction) {
+          case Axis.horizontal:
+            built = CssSizingHint(maxWidth: bc.maxWidth, child: built);
+            break;
+          case Axis.vertical:
+            built = CssSizingHint(maxHeight: bc.maxHeight, child: built);
+            break;
+        }
+        return built;
+      },
     );
   }
 
