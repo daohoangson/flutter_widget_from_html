@@ -58,18 +58,29 @@ Future<void> main() async {
       const html = '<div style="display: flex">'
           '<div style="width: 9999px">Foo</div>'
           '</div>';
-      final explained = await explain(tester, html);
-      expect(explained, contains('[RichText:(:Foo)]'));
+      await explain(tester, html);
       final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
       expect(box.size.width, equals(tester.windowWidth));
+    });
+
+    testWidgets('renders super wide contents with margins', (tester) async {
+      const html = '<div style="display: flex; margin: 5px">'
+          '<div style="width: 9999px">Foo</div>'
+          '</div>';
+      await explain(tester, html);
+      final box1 = findText('Foo').evaluate().first.renderObject! as RenderBox;
+      expect(box1.size.width, equals(tester.windowWidth - 10));
+
+      await explain(tester, html.replaceFirst('margin: 5px', 'margin: 50px'));
+      final box2 = findText('Foo').evaluate().first.renderObject! as RenderBox;
+      expect(box2.size.width, equals(tester.windowWidth - 100));
     });
 
     testWidgets('renders super tall contents', (WidgetTester tester) async {
       const html = '<div style="display: flex; flex-direction: column">'
           '<div style="height: 9999px">Foo</div>'
           '</div>';
-      final explained = await explain(tester, html);
-      expect(explained, contains('[RichText:(:Foo)]'));
+      await explain(tester, html);
       final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
       expect(box.size.height, equals(tester.windowHeight));
     });
