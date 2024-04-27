@@ -6,7 +6,7 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
-Future<void> main() async {
+void main() {
   const imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   testWidgets('renders empty string', (WidgetTester tester) async {
@@ -187,7 +187,7 @@ Future<void> main() async {
       );
     });
 
-    testWidgets('renders new line between DIVs, 1 of 3', (tester) async {
+    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
       const html = '<div>1<br /></div><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -201,7 +201,7 @@ Future<void> main() async {
       );
     });
 
-    testWidgets('renders new line between DIVs, 2 of 3', (tester) async {
+    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
       const html = '<div>1</div><br /><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -212,25 +212,6 @@ Future<void> main() async {
           '[SizedBox:0.0x10.0],'
           '[CssBlock:child=[RichText:(:2)]]'
           ']',
-        ),
-      );
-    });
-
-    testWidgets('renders new line between DIVs, 3 of 3', (tester) async {
-      const html = '<div>1</div><br /><div>2</div>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          '_RootWidget\n'
-          '└ColumnPlaceholder(root--column)\n'
-          ' └Column()\n'
-          '  ├CssBlock()\n'
-          '  │└RichText(text: "1")\n'
-          '  ├HeightPlaceholder(root--1.0em)\n'
-          '  │└SizedBox(height: 10.0)\n'
-          '  └CssBlock()\n'
-          '   └RichText(text: "2")\n\n',
         ),
       );
     });
