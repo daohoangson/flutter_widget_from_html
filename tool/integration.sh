@@ -10,4 +10,4 @@ fi
 
 flutter --no-version-check --suppress-analytics --version --machine
 
-exec patrol test -t integration_test/auto_resize_test.dart
+exec patrol test --no-uninstall --target integration_test/auto_resize_test.dart
