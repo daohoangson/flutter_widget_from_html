@@ -53,6 +53,28 @@ Future<void> main() async {
     );
   });
 
+  group('error handling', () {
+    testWidgets('#1169: renders super wide contents', (tester) async {
+      const html = '<div style="display: flex">'
+          '<div style="width: 9999px">Foo</div>'
+          '</div>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:(:Foo)]'));
+      final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
+      expect(box.size.width, equals(tester.windowWidth));
+    });
+
+    testWidgets('renders super tall contents', (WidgetTester tester) async {
+      const html = '<div style="display: flex; flex-direction: column">'
+          '<div style="height: 9999px">Foo</div>'
+          '</div>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:(:Foo)]'));
+      final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
+      expect(box.size.height, equals(tester.windowHeight));
+    });
+  });
+
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux

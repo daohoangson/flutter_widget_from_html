@@ -883,6 +883,13 @@ extension RenderBoxGetter on GlobalKey {
 }
 
 extension WindowTester on WidgetTester {
+  double get windowHeight =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.height /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
   double get windowWidth =>
       // TODO: remove lint ignore when our minimum Flutter version >= 3.10
       // ignore: deprecated_member_use
