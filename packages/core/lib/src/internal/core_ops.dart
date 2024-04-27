@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:csslib/visitor.dart' as css;
+import 'package:csslib/visitor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show
@@ -14,6 +15,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import '../utils/list_utils.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
 import 'text_ops.dart' as text_ops;
@@ -31,6 +33,7 @@ part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
 part 'ops/style_text_align.dart';
 part 'ops/style_text_decoration.dart';
+part 'ops/style_text_shadow.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_br.dart';

@@ -11,7 +11,7 @@ void main() {
   group('InheritedProperties', () {
     group('get', () {
       final dep1 = _Dep1();
-      final resolved = InheritedProperties([dep1]);
+      final resolved = InheritedProperties.root([dep1]);
 
       test('returns value', () {
         final dep = resolved.get<_Dep1>();
@@ -20,6 +20,42 @@ void main() {
 
       test('returns null', () {
         expect(resolved.get<_Dep2>(), isNull);
+      });
+    });
+
+    group('get<TextStyle>', () {
+      const height40px = CssLineHeight(CssLength(40.0));
+
+      test('returns original line-height null', () {
+        const textStyle = TextStyle(fontSize: 20.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith<CssLineHeight>(value: height40px);
+        final height = props.get<TextStyle>()!.height;
+        expect(height, isNull);
+      });
+
+      test('returns original line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith<CssLineHeight>(value: height40px);
+        final height = props.get<TextStyle>()!.height;
+        expect(height, equals(1.0));
+      });
+    });
+
+    group('prepareTextStyle', () {
+      test('returns original line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith();
+        expect(props.prepareTextStyle().height, equals(1.0));
+      });
+
+      test('returns CSS line-height value', () {
+        const textStyle = TextStyle(fontSize: 20.0, height: 1.0);
+        final root = InheritedProperties.root(const [textStyle]);
+        final props = root.copyWith(value: const CssLineHeight(CssLength(40)));
+        expect(props.prepareTextStyle().height, equals(2.0));
       });
     });
   });
@@ -95,7 +131,7 @@ void main() {
 
       test('returns parent properties', () {
         final parent = _MockInheritanceResolvers();
-        final parentProperties = InheritedProperties([DateTime.now()]);
+        final parentProperties = InheritedProperties.root([DateTime.now()]);
         when(() => parent.resolve(any())).thenReturn(parentProperties);
 
         final resolvers = InheritanceResolvers(parent);
@@ -107,7 +143,7 @@ void main() {
         final parent = _MockInheritanceResolvers();
         final now = DateTime.now();
         when(() => parent.resolve(any()))
-            .thenReturn(InheritedProperties([now]));
+            .thenReturn(InheritedProperties.root([now]));
 
         final resolvers = InheritanceResolvers(parent);
         final dep1 = _Dep1();
@@ -121,7 +157,7 @@ void main() {
       test('returns cached output', () {
         final parent = _MockInheritanceResolvers();
         when(() => parent.resolve(any()))
-            .thenReturn(const InheritedProperties([]));
+            .thenReturn(InheritedProperties.root());
 
         final resolvers = InheritanceResolvers(parent);
         resolvers.enqueue((r, _) => r.copyWith(value: DateTime.now()));
@@ -133,7 +169,8 @@ void main() {
 
       test('throws if output is not copied with', () {
         final resolvers = InheritanceResolvers();
-        resolvers.enqueue((_, __) => InheritedProperties([DateTime.now()]));
+        resolvers
+            .enqueue((_, __) => InheritedProperties.root([DateTime.now()]));
 
         expect(
           () => resolvers.resolve(_MockBuildContext()),

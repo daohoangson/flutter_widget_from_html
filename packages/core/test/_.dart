@@ -512,6 +512,7 @@ class Explainer {
 
     s += _textStyleFontStyle(style);
     s += _textStyleFontWeight(style);
+    s += _textStyleShadow(style);
 
     return s;
   }
@@ -568,6 +569,22 @@ class Explainer {
     return '+w${FontWeight.values.indexOf(fontWeight)}';
   }
 
+  String _textStyleShadow(TextStyle style) {
+    final shadows = style.shadows;
+    if (shadows?.isNotEmpty != true) {
+      return '';
+    }
+
+    String s = '';
+
+    shadows?.forEach((element) {
+      s +=
+          'Shadow=[color=${_color(element.color)},offset=${element.offset},blurRadius=${element.blurRadius}]';
+    });
+
+    return s;
+  }
+
   List<String> _flex(Flex flex) {
     final List<String> result = [];
 
@@ -619,6 +636,10 @@ class Explainer {
     }
 
     if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'CssSizingHint') {
+        // v0.15+
+        return _widget(widget.child);
+      }
       if (widget.runtimeType.toString() == 'TshWidget') {
         // v0.5+
         return _widget(widget.child);
@@ -866,6 +887,13 @@ extension RenderBoxGetter on GlobalKey {
 }
 
 extension WindowTester on WidgetTester {
+  double get windowHeight =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.height /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
   double get windowWidth =>
       // TODO: remove lint ignore when our minimum Flutter version >= 3.10
       // ignore: deprecated_member_use

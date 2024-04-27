@@ -2,6 +2,10 @@ name: Demo
 on:
   push:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -20,11 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Setup Flutter
-        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225 # v2.12.0
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           cache: true
       - name: Gradle cache
-        uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2.11.1
+        uses: gradle/gradle-build-action@fe59895742b4f984530980e4f693943577526b61 # v3.2.0
       - run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
 
       - run: flutter build apk --debug

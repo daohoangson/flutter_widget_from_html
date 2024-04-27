@@ -1,3 +1,8 @@
+## 0.14.11
+
+- Fix infinite `TextStyle.height` (#1147)
+- Deprecate `InheritedProperties.style` getter (#1147)
+
 ## 0.14.10+1
 
 - Fix default border color to match text color (#1123)

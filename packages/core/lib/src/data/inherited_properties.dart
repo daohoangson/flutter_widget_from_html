@@ -8,16 +8,11 @@ class InheritedProperties {
   /// The parent set.
   final InheritedProperties? parent;
 
-  /// The [TextStyle].
-  final TextStyle style;
-
   final Iterable<dynamic> values;
 
-  const InheritedProperties(
-    this.values, {
-    this.parent,
-    this.style = const TextStyle(),
-  });
+  final TextStyle _style;
+
+  const InheritedProperties._(this.parent, this.values, this._style);
 
   /// Creates the root properties set.
   factory InheritedProperties.root([
@@ -36,12 +31,13 @@ class InheritedProperties {
       );
     }
 
-    return InheritedProperties(
+    return InheritedProperties._(
+      null,
       [
         ...deps,
-        NormalLineHeight(style.height),
+        if (style.height != null) NormalLineHeight(style.height),
       ],
-      style: style,
+      style,
     );
   }
 
@@ -51,10 +47,19 @@ class InheritedProperties {
     TextStyle? style,
     T? value,
   }) {
-    return InheritedProperties(
+    var newStyle = _style;
+    if (style != null) {
+      if (style.inherit) {
+        newStyle = newStyle.merge(style);
+      } else {
+        newStyle = style;
+      }
+    }
+
+    return InheritedProperties._(
+      parent ?? this.parent,
       value != null ? [...values.where((e) => e is! T), value] : values,
-      parent: parent ?? this.parent,
-      style: style ?? this.style,
+      newStyle,
     );
   }
 
@@ -62,7 +67,56 @@ class InheritedProperties {
   ///
   /// The initial set of values are populated by [WidgetFactory.getDependencies].
   /// Parser and builder may use [BuildTree.inherit] to enqueue more.
-  T? get<T>() => _get(values);
+  T? get<T>() {
+    if (T == TextStyle) {
+      // by default, `get` will return the TextStyle from the original deps list
+      // let's intercept here and return the active object instead
+      // this also acts as an escape hatch to get the TextStyle directly without preparing
+      return _style as T;
+    }
+
+    return _get(values);
+  }
+
+  /// Prepares [TextStyle] with correct line-height.
+  TextStyle prepareTextStyle() {
+    final height = get<CssLineHeight>();
+    if (height == null) {
+      return _style;
+    }
+
+    final length = height.value;
+    if (length == null) {
+      final normalValue = get<NormalLineHeight>()?.value;
+      if (normalValue == null) {
+        return _style;
+      } else {
+        return _style.copyWith(
+          debugLabel: 'fwfh: line-height normal',
+          height: normalValue,
+        );
+      }
+    }
+
+    final fontSize = _style.fontSize;
+    if (fontSize == null || fontSize == .0) {
+      return _style;
+    }
+
+    final lengthValue = length.getValue(
+      this,
+      baseValue: fontSize,
+      scaleFactor: get<TextScaleFactor>()?.value,
+    );
+    if (lengthValue == null) {
+      return _style;
+    }
+
+    return _style.copyWith(
+      debugLabel: 'fwfh: line-height',
+      height: lengthValue / fontSize,
+    );
+  }
 
   static T? _get<T>(Iterable<dynamic> values) {
     for (final value in values.whereType<T>()) {
@@ -139,8 +193,8 @@ class InheritanceResolvers {
   ///
   /// If the parent's values are unchanged, the cached resolved set will be used.
   InheritedProperties resolve(BuildContext context) {
-    final parentResolved =
-        parent?.resolve(context) ?? const InheritedProperties([]);
+    final parentResolved = parent?.resolve(context) ??
+        const InheritedProperties._(null, [], TextStyle());
     final scopedCallbacks = _callbacks;
     if (scopedCallbacks == null) {
       return parentResolved;

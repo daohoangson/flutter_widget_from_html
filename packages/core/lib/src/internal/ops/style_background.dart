@@ -72,7 +72,7 @@ class StyleBackground {
     Color color,
   ) =>
       resolving.copyWith(
-        style: resolving.style.copyWith(
+        style: TextStyle(
           background: Paint()..color = color,
           debugLabel: 'fwfh: $kCssBackgroundColor',
         ),
