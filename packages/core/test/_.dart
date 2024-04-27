@@ -605,10 +605,6 @@ class Explainer {
       return '[widget0]';
     }
 
-    if (widget is CssSizingHint) {
-      return _widget(widget.child);
-    }
-
     if (widget is LayoutBuilder) {
       return _widget(
         widget.builder(
@@ -640,6 +636,10 @@ class Explainer {
     }
 
     if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'CssSizingHint') {
+        // v0.15+
+        return _widget(widget.child);
+      }
       if (widget.runtimeType.toString() == 'TshWidget') {
         // v0.5+
         return _widget(widget.child);
