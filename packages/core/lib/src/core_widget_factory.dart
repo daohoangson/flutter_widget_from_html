@@ -5,7 +5,6 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
         Tooltip;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
