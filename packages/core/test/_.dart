@@ -636,6 +636,10 @@ class Explainer {
     }
 
     if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'CssSizingHint') {
+        // v0.15+
+        return _widget(widget.child);
+      }
       if (widget.runtimeType.toString() == 'TshWidget') {
         // v0.5+
         return _widget(widget.child);
@@ -883,6 +887,13 @@ extension RenderBoxGetter on GlobalKey {
 }
 
 extension WindowTester on WidgetTester {
+  double get windowHeight =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.height /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
   double get windowWidth =>
       // TODO: remove lint ignore when our minimum Flutter version >= 3.10
       // ignore: deprecated_member_use
