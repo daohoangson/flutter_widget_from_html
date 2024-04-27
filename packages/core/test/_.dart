@@ -605,6 +605,10 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is Builder) {
+      return _widget(widget.builder(context));
+    }
+
     if (widget is LayoutBuilder) {
       return _widget(
         widget.builder(
