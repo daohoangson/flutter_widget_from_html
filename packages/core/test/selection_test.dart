@@ -74,6 +74,33 @@ void main() async {
     expect(content?.plainText, 'FooListView');
   });
 
+  testWidgets('#1224: supports nested HtmlWidget in ListView', (tester) async {
+    const html = '<p>Foo</p><span>?</span><p>Bar</p>';
+
+    SelectedContent? content;
+    await explain(
+      tester,
+      null,
+      hw: SelectionArea(
+        onSelectionChanged: (v) => content = v,
+        child: HtmlWidget(
+          html,
+          customWidgetBuilder: (element) {
+            if (element.localName == 'span') {
+              return const HtmlWidget('Nested');
+            }
+            return null;
+          },
+          key: hwKey,
+          renderMode: RenderMode.listView,
+        ),
+      ),
+    );
+
+    await selectGesture(tester, 'Foo', 'Bar');
+    expect(content?.plainText, 'FooNested');
+  });
+
   testWidgets('allows text selection in SliverList', (tester) async {
     const html = '<p>Foo</p><p>SliverList</p><p>Bar</p>';
 
