@@ -125,4 +125,33 @@ void main() {
     await selectGesture(tester, 'Foo', 'Bar');
     expect(content?.plainText, 'FooSliverList');
   });
+
+  testWidgets('supports nested HtmlWidget in SliverList', (tester) async {
+    const html = '<p>Foo</p><span>?</span><p>Bar</p>';
+
+    SelectedContent? content;
+    await explain(
+      tester,
+      null,
+      hw: SelectionArea(
+        onSelectionChanged: (v) => content = v,
+        child: CustomScrollView(slivers: [
+          HtmlWidget(
+            html,
+            customWidgetBuilder: (element) {
+              if (element.localName == 'span') {
+                return const HtmlWidget('Nested');
+              }
+              return null;
+            },
+            key: hwKey,
+            renderMode: RenderMode.sliverList,
+          ),
+        ]),
+      ),
+    );
+
+    await selectGesture(tester, 'Foo', 'Bar');
+    expect(content?.plainText, 'FooNested');
+  });
 }
