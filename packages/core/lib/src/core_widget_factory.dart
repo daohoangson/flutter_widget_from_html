@@ -5,7 +5,6 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
         Tooltip;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
@@ -411,26 +410,39 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     InheritedProperties resolved,
     InlineSpan text,
   ) {
-    const selectionColorDefault = DefaultSelectionStyle.defaultColor;
-    final selectionRegistrar = resolved.get<SelectionRegistrar>();
-    final selectionStyle = resolved.get<DefaultSelectionStyle>();
+    // pre-compute as many parameters as possible
+    final maxLines = tree.maxLines > 0 ? tree.maxLines : null;
+    final softWrap = resolved.get<CssWhitespace>() != CssWhitespace.nowrap;
+    final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
+    final textDirection = resolved.get<TextDirection>();
 
-    Widget built = RichText(
-      maxLines: tree.maxLines > 0 ? tree.maxLines : null,
-      overflow: tree.overflow,
-      selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
-      selectionRegistrar: selectionRegistrar,
-      softWrap: resolved.get<CssWhitespace>() != CssWhitespace.nowrap,
-      text: text,
-      textAlign: resolved.get() ?? TextAlign.start,
-      textDirection: resolved.get(),
+    return Builder(
+      builder: (context) {
+        // TODO: remove Builder when ListView stops providing its own registrar
+        final selectionRegistrar = SelectionContainer.maybeOf(context);
+        final selectionColor = selectionRegistrar != null
+            ? DefaultSelectionStyle.of(context).selectionColor ??
+                DefaultSelectionStyle.defaultColor
+            : null;
+
+        Widget built = RichText(
+          maxLines: maxLines,
+          overflow: tree.overflow,
+          selectionColor: selectionColor,
+          selectionRegistrar: selectionRegistrar,
+          softWrap: softWrap,
+          text: text,
+          textAlign: textAlign,
+          textDirection: textDirection,
+        );
+
+        if (selectionRegistrar != null) {
+          built = MouseRegion(cursor: SystemMouseCursors.text, child: built);
+        }
+
+        return built;
+      },
     );
-
-    if (selectionRegistrar != null) {
-      built = MouseRegion(cursor: SystemMouseCursors.text, child: built);
-    }
-
-    return built;
   }
 
   /// Builds [TextSpan].
@@ -494,13 +506,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// final direction = resolved.get<TextDirection>();
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) {
-    final selectionRegistrar = SelectionContainer.maybeOf(context);
     return [
       CssWhitespace.normal,
       Directionality.maybeOf(context) ?? TextDirection.ltr,
-      DefaultSelectionStyle.of(context),
       DefaultTextStyle.of(context).style,
-      if (selectionRegistrar != null) selectionRegistrar,
 
       // performance critical
       // avoid adding broad dependencies like MediaQuery.of(context)
