@@ -135,19 +135,21 @@ void main() {
       null,
       hw: SelectionArea(
         onSelectionChanged: (v) => content = v,
-        child: CustomScrollView(slivers: [
-          HtmlWidget(
-            html,
-            customWidgetBuilder: (element) {
-              if (element.localName == 'span') {
-                return const HtmlWidget('Nested');
-              }
-              return null;
-            },
-            key: hwKey,
-            renderMode: RenderMode.sliverList,
-          ),
-        ]),
+        child: CustomScrollView(
+          slivers: [
+            HtmlWidget(
+              html,
+              customWidgetBuilder: (element) {
+                if (element.localName == 'span') {
+                  return const HtmlWidget('Nested');
+                }
+                return null;
+              },
+              key: hwKey,
+              renderMode: RenderMode.sliverList,
+            ),
+          ],
+        ),
       ),
     );
 
