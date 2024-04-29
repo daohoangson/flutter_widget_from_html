@@ -1490,25 +1490,67 @@ void main() {
       testWidgets('renders without inline styling', (tester) async {
         const html = '<pre>Foo\nbar</pre>';
         final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[SingleChildScrollView:child='
-            '[RichText:(+font=Courier+fonts=monospace:Foo\nbar)]]]',
-          ),
-        );
+        expect(explained, contains('Foo\nbar'));
       });
 
       testWidgets('renders normal', (tester) async {
         const html = '<pre style="white-space: normal">Foo\nbar</pre>';
         final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[SingleChildScrollView:child='
-            '[RichText:(+font=Courier+fonts=monospace:Foo bar)]]]',
-          ),
-        );
+        expect(explained, contains('Foo bar'));
+      });
+
+      testWidgets('renders whitespace prefix', (tester) async {
+        const html = '<pre>  foo</pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  foo'));
+      });
+
+      testWidgets('renders whitespace suffix', (tester) async {
+        const html = '<pre>foo  </pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('foo  '));
+      });
+
+      testWidgets('renders whitespace prefix & suffix', (tester) async {
+        const html = '<pre>  foo  </pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  foo  '));
+      });
+
+      testWidgets('renders SPAN with prefix', (tester) async {
+        const html = '<pre><span style="color: red">  foo</span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  (#FFFF0000:foo)'));
+      });
+
+      testWidgets('renders SPAN with suffix', (tester) async {
+        const html = '<pre><span style="color: red">foo  </span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('foo  '));
+      });
+
+      testWidgets('renders SPAN with prefix & suffix', (tester) async {
+        const html = '<pre><span style="color: red">  foo  </span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  (#FFFF0000:foo  )'));
+      });
+
+      testWidgets('renders SPANs with prefix', (tester) async {
+        const html = '<pre><span>  foo</span>\n<span>  bar</span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  foo\n  bar'));
+      });
+
+      testWidgets('renders SPANs with suffix', (tester) async {
+        const html = '<pre><span>foo  </span>\n<span>bar  </span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('foo  \nbar  '));
+      });
+
+      testWidgets('renders SPANs with prefix & suffix', (tester) async {
+        const html = '<pre><span>  foo  </span>\n<span>  bar  </span></pre>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('  foo  \n  bar  '));
       });
     });
   });
