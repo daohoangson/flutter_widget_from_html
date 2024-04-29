@@ -369,14 +369,13 @@ extension on List<_String> {
 
     for (var i = min; i <= max; i++) {
       final str = this[i];
-      if (str.shouldBeSwallowed) {
-        continue;
-      }
 
       if (str.isWhitespace) {
         switch (whitespace) {
           case CssWhitespace.normal:
-            buffer.write(' ');
+            if (!str.shouldBeSwallowed) {
+              buffer.write(' ');
+            }
             break;
           case CssWhitespace.nowrap:
             buffer.write('\u00A0');
