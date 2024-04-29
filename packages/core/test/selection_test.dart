@@ -35,7 +35,7 @@ Future<void> selectGesture(
   await tester.pump();
 }
 
-void main() async {
+void main() {
   testWidgets('allows text selection in Column', (WidgetTester tester) async {
     const html = '<p>Foo</p><p>Column</p><p>Bar</p>';
 

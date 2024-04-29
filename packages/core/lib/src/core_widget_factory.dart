@@ -397,12 +397,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     InheritedProperties resolved,
     InlineSpan text,
   ) {
+    // pre-compute as many parameters as possible
+    final maxLines = tree.maxLines > 0 ? tree.maxLines : null;
     final softWrap = resolved.get<CssWhitespace>() != CssWhitespace.nowrap;
     final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
     final textDirection = resolved.get<TextDirection>();
 
     return Builder(
       builder: (context) {
+        // TODO: remove Builder when ListView stops providing its own registrar
         final selectionRegistrar = SelectionContainer.maybeOf(context);
         final selectionColor = selectionRegistrar != null
             ? DefaultSelectionStyle.of(context).selectionColor ??
@@ -410,7 +413,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             : null;
 
         Widget built = RichText(
-          maxLines: tree.maxLines > 0 ? tree.maxLines : null,
+          maxLines: maxLines,
           overflow: tree.overflow,
           selectionColor: selectionColor,
           selectionRegistrar: selectionRegistrar,
