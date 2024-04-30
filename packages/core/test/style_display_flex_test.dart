@@ -17,8 +17,9 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Flex:direction=horizontal,mainAxisAlignment=start,'
-        'crossAxisAlignment=start,children=[RichText:(:Foo)]]',
+        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[CssSizing:child=[RichText:(:Foo)]]'
+        ']',
       ),
     );
   });
