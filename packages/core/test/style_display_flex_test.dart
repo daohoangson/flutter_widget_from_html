@@ -72,6 +72,29 @@ Future<void> main() async {
       expect(box.size.width, equals(tester.windowWidth));
     });
 
+    testWidgets('#1152: renders super wide block', (tester) async {
+      final lipsum =
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 999;
+      final html =
+          '<div style="display: flex"><div>Foo</div><div>$lipsum</div></div>';
+      final building = await explain(tester, html, useExplainer: false);
+      expect(building, contains('ProgressIndicator'));
+
+      await tester.runAsync(() => Future.delayed(Duration.zero));
+      await tester.pump();
+      final built = await explainWithoutPumping(useExplainer: false);
+      expect(built, isNot(contains('ProgressIndicator')));
+
+      final boxes = find.byType(RichText).evaluate();
+      expect(boxes.length, equals(2));
+
+      final width = boxes.fold(
+        .0,
+        (width, e) => width + (e.renderObject! as RenderBox).size.width,
+      );
+      expect(width, equals(tester.windowWidth));
+    });
+
     testWidgets('#1169: renders super wide contents', (tester) async {
       const html = '<div style="display: flex">'
           '<div style="width: 9999px">Foo</div>'
