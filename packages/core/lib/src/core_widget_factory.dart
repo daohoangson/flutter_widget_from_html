@@ -240,26 +240,14 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           textBaseline: textBaseline,
           children: children,
         );
-
-        bool needsScrollView;
         switch (direction) {
           case Axis.horizontal:
             built = CssSizingHint(maxWidth: bc.maxWidth, child: built);
-            needsScrollView = bc.maxWidth.isFinite;
             break;
           case Axis.vertical:
             built = CssSizingHint(maxHeight: bc.maxHeight, child: built);
-            needsScrollView = bc.maxHeight.isFinite;
             break;
         }
-
-        if (needsScrollView) {
-          built = SingleChildScrollView(
-            scrollDirection: direction,
-            child: built,
-          );
-        }
-
         return built;
       },
     );

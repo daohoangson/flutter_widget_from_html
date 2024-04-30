@@ -17,10 +17,8 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[SingleChildScrollView:child='
-        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
-        '[RichText:(:Foo)]'
-        ']]',
+        '[Flex:direction=horizontal,mainAxisAlignment=start,'
+        'crossAxisAlignment=start,children=[RichText:(:Foo)]]',
       ),
     );
   });
@@ -32,11 +30,10 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[SingleChildScrollView:child='
         '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
-        ']]',
+        ']',
       ),
     );
   });
@@ -48,11 +45,10 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[SingleChildScrollView:child='
         '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
-        ']]',
+        ']',
       ),
     );
   });
@@ -72,7 +68,7 @@ Future<void> main() async {
 
       final box =
           find.byType(RichText).evaluate().first.renderObject! as RenderBox;
-      expect(box.size.width, greaterThan(tester.windowWidth));
+      expect(box.size.width, equals(tester.windowWidth));
     });
 
     testWidgets('#1169: renders super wide contents', (tester) async {
