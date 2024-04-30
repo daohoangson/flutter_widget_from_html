@@ -56,11 +56,8 @@ class StyleDisplayFlex {
           debugLabel: kCssDisplayFlex,
           builder: (context, _) {
             final unwrapped = children
-                // adjustment 1: remove empty children to avoid incorrect layout
                 .map((child) => WidgetPlaceholder.unwrap(context, child))
                 .where((child) => child != widget0)
-                // adjustment 2: enforce sizing hint for each child (see `buildFlex`)
-                .map((child) => CssSizing(child: child))
                 .toList(growable: false);
             return wf.buildFlex(
               tree,
