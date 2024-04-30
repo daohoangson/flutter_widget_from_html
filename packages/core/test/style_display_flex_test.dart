@@ -54,6 +54,23 @@ Future<void> main() async {
   });
 
   group('error handling', () {
+    testWidgets('#1152: renders super long text', (WidgetTester tester) async {
+      final lipsum =
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 999;
+      final html = '<div style="display: flex">$lipsum</div>';
+      final building = await explain(tester, html, useExplainer: false);
+      expect(building, contains('ProgressIndicator'));
+
+      await tester.runAsync(() => Future.delayed(Duration.zero));
+      await tester.pump();
+      final built = await explainWithoutPumping(useExplainer: false);
+      expect(built, isNot(contains('ProgressIndicator')));
+
+      final box =
+          find.byType(RichText).evaluate().first.renderObject! as RenderBox;
+      expect(box.size.width, equals(tester.windowWidth));
+    });
+
     testWidgets('#1169: renders super wide contents', (tester) async {
       const html = '<div style="display: flex">'
           '<div style="width: 9999px">Foo</div>'
