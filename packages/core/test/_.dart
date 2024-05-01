@@ -682,7 +682,7 @@ class Explainer {
       return _sizedBox(widget);
     }
 
-    final type = '${widget.runtimeType}';
+    var type = '${widget.runtimeType}';
     final attr = <String>[];
 
     final maxLines = widget is RichText
@@ -803,6 +803,7 @@ class Explainer {
     }
 
     if (widget is! Column && (widget is Flex)) {
+      type = 'Flex';
       attr.addAll(_flex(widget));
     }
 

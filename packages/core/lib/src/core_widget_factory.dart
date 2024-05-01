@@ -233,7 +233,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   }) {
     return LayoutBuilder(
       builder: (_, bc) {
-        Widget built = Flex(
+        Widget built = HtmlFlex(
           crossAxisAlignment: crossAxisAlignment,
           direction: direction,
           mainAxisAlignment: mainAxisAlignment,
