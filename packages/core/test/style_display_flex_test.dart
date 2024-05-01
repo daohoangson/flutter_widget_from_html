@@ -17,9 +17,8 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
-        '[CssSizing:child=[RichText:(:Foo)]]'
-        ']',
+        '[Flex:direction=horizontal,mainAxisAlignment=start,'
+        'crossAxisAlignment=start,children=[RichText:(:Foo)]]',
       ),
     );
   });
@@ -128,7 +127,7 @@ Future<void> main() async {
 
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
-      ? Platform.isMacOS
+      ? Platform.isLinux
           ? null
           : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';
