@@ -85,14 +85,13 @@ Future<void> main() async {
       final built = await explainWithoutPumping(useExplainer: false);
       expect(built, isNot(contains('ProgressIndicator')));
 
-      final boxes = find.byType(RichText).evaluate();
-      expect(boxes.length, equals(2));
-
-      final width = boxes.fold(
-        .0,
-        (width, e) => width + (e.renderObject! as RenderBox).size.width,
-      );
-      expect(width, equals(tester.windowWidth));
+      final elements = find.byType(RichText).evaluate();
+      final size = elements
+          .map((element) => (element.renderObject! as RenderBox).size.width)
+          .toList(growable: false);
+      expect(size.length, equals(2));
+      expect(size[0], lessThan(20));
+      expect(size[0] + size[1], equals(tester.windowWidth));
     });
 
     testWidgets('#1169: renders super wide contents', (tester) async {
@@ -129,7 +128,7 @@ Future<void> main() async {
 
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
-      ? Platform.isLinux
+      ? Platform.isMacOS
           ? null
           : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';

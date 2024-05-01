@@ -55,16 +55,10 @@ class StyleDisplayFlex {
         return WidgetPlaceholder(
           debugLabel: kCssDisplayFlex,
           builder: (context, _) {
-            var unwrapped = children
+            final unwrapped = children
                 .map((child) => WidgetPlaceholder.unwrap(context, child))
-                // adjustment 1: remove empty children to avoid incorrect layout
                 .where((child) => child != widget0)
                 .toList(growable: false);
-
-            if (unwrapped.length == 1) {
-              // adjustment 2: enforce sizing hint for the only child
-              unwrapped = [CssSizing(child: unwrapped[0])];
-            }
 
             return wf.buildFlex(
               tree,

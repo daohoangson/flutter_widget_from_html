@@ -703,6 +703,7 @@ class _HtmlFlexRenderObject extends RenderBox
         0.0; // Sum of the sizes of the non-flexible children.
     RenderBox? child = firstChild;
     RenderBox? lastFlexChild;
+    final fwfhFlex = Expando<int>();
     while (child != null) {
       final FlexParentData childParentData =
           child.parentData! as FlexParentData;
@@ -733,8 +734,16 @@ class _HtmlFlexRenderObject extends RenderBox
           }
         }
         final Size childSize = layoutChild(child, innerConstraints);
-        allocatedSize += _getMainSize(childSize);
-        crossSize = math.max(crossSize, _getCrossSize(childSize));
+        final mainSize = _getMainSize(childSize);
+        if (constraints.hasBoundedWidth && mainSize > constraints.maxWidth) {
+          final newFlex = (mainSize - constraints.maxWidth).toInt();
+          fwfhFlex[child] = newFlex;
+          totalFlex += newFlex;
+          lastFlexChild = child;
+        } else {
+          allocatedSize += mainSize;
+          crossSize = math.max(crossSize, _getCrossSize(childSize));
+        }
       }
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;
@@ -749,7 +758,7 @@ class _HtmlFlexRenderObject extends RenderBox
           canFlex ? (freeSpace / totalFlex) : double.nan;
       child = firstChild;
       while (child != null) {
-        final int flex = _getFlex(child);
+        final int flex = fwfhFlex[child] ?? _getFlex(child);
         if (flex > 0) {
           final double maxChildExtent = canFlex
               ? (child == lastFlexChild
