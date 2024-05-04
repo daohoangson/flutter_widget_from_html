@@ -25,7 +25,10 @@ if (flutterVersionName == null) {
 android {
     namespace "dev.fwfh.demo_app"
     compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+
+    // TODO: remove hard-coded value when `flutter.ndkVersion` is sufficient
+    // open $(dirname $(dirname $(which flutter)))/packages/flutter_tools
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -43,7 +46,7 @@ android {
     defaultConfig {
         applicationId "dev.fwfh.demo_app"
 
-        // TODO: remove hard-coded value when `flutter.minSdkVersion` >= 21
+        // TODO: remove hard-coded value when `flutter.minSdkVersion` is sufficient
         // open $(dirname $(dirname $(which flutter)))/packages/flutter_tools
         minSdkVersion 21
 
