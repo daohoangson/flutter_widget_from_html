@@ -682,7 +682,7 @@ class Explainer {
       return _sizedBox(widget);
     }
 
-    final type = '${widget.runtimeType}';
+    var type = '${widget.runtimeType}';
     final attr = <String>[];
 
     final maxLines = widget is RichText
@@ -715,9 +715,11 @@ class Explainer {
       _textDirection(
         widget is Column
             ? widget.textDirection
-            : widget is RichText
+            : widget is Flex
                 ? widget.textDirection
-                : (widget is Text ? widget.textDirection : null),
+                : widget is RichText
+                    ? widget.textDirection
+                    : (widget is Text ? widget.textDirection : null),
       ),
     );
 
@@ -803,6 +805,9 @@ class Explainer {
     }
 
     if (widget is! Column && (widget is Flex)) {
+      if (type == 'HtmlFlex') {
+        type = 'Flex'; // rename our widget, we may come back to Flutter's soon
+      }
       attr.addAll(_flex(widget));
     }
 
@@ -882,12 +887,24 @@ class HitTestApp extends StatelessWidget {
       );
 }
 
-extension RenderBoxGetter on GlobalKey {
-  RenderBox get renderBox => currentContext!.findRenderObject()! as RenderBox;
+extension RenderBoxElement on Element {
+  RenderBox get renderBox => renderObject!.renderBox;
+}
 
-  Size get size => renderBox.size;
+extension RenderBoxGlobalKey on GlobalKey {
+  RenderBox get renderBox => currentContext!.findRenderObject()!.renderBox;
 
-  double get width => size.width;
+  double get width => renderBox.size.width;
+}
+
+extension RenderBoxRenderBox on RenderBox {
+  double get left => localToGlobal(Offset.zero).dx;
+
+  double get top => localToGlobal(Offset.zero).dy;
+}
+
+extension RenderBoxRenderObject on RenderObject {
+  RenderBox get renderBox => this as RenderBox;
 }
 
 extension WindowTester on WidgetTester {

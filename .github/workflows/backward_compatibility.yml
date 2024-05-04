@@ -120,3 +120,15 @@ jobs:
         with:
           channel: ${{ matrix.channel }}
       - run: flutter test
+
+  html_flex:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Verify hashes
+        run: |
+          set -e
+
+          _scripts=$( cat packages/core/lib/src/widgets/html_flex.dart | head -n 22 | tail -n 21 )
+          bash -c "$_scripts"
