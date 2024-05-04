@@ -54,7 +54,7 @@ jobs:
             channel: canary
             target: aosp_atd
     name: Integration test (Android)
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Setup Flutter
@@ -101,7 +101,7 @@ jobs:
 
   integration_test_ios:
     name: Integration test (iOS)
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Setup Flutter
