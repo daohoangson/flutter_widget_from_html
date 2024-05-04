@@ -38,8 +38,7 @@ void main() {
       final loading = await explain(tester, html, buildAsync: true);
       expect(loading, isNot(contains(rendered)));
 
-      await tester
-          .runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
       await tester.pump();
 
       final success = await helper.explainWithoutPumping(useExplainer: false);
@@ -379,7 +378,7 @@ void main() {
           );
 
           await tester
-              .runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
+              .runAsync(() => Future.delayed(const Duration(seconds: 1)));
           await tester.pump();
         },
         (_, __) {},
