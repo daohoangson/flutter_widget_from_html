@@ -402,6 +402,22 @@ Future<void> main() async {
         expect(flexBox.getMinIntrinsicWidth(100), equals(fooBox.size.width));
       });
     });
+
+    testWidgets('hitTestChildren', (tester) async {
+      const href = 'href';
+      final urls = <String>[];
+
+      await tester.pumpWidget(
+        HitTestApp(
+          html: '<div style="display: flex"><a href="$href">Tap me</a></div>',
+          list: urls,
+        ),
+      );
+      expect(await tapText(tester, 'Tap me'), equals(1));
+
+      await tester.pumpAndSettle();
+      expect(urls, equals(const [href]));
+    });
   });
 
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
