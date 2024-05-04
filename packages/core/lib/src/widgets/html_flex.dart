@@ -736,14 +736,14 @@ class _HtmlFlexRenderObject extends RenderBox
           }
         }
         final Size childSize = layoutChild(child, innerConstraints);
-        final mainSize = _getMainSize(childSize);
-        if (constraints.hasBoundedWidth && mainSize > constraints.maxWidth) {
-          final newFlex = (mainSize - constraints.maxWidth).toInt();
+        final childMainSize = _getMainSize(childSize);
+        if (canFlex && childMainSize > maxMainSize) {
+          final newFlex = (childMainSize - maxMainSize).toInt();
           fwfhFlex[child] = newFlex;
           totalFlex += newFlex;
           lastFlexChild = child;
         } else {
-          allocatedSize += mainSize;
+          allocatedSize += childMainSize;
           crossSize = math.max(crossSize, _getCrossSize(childSize));
         }
       }
