@@ -61,7 +61,7 @@ Future<void> main() async {
       final building = await explain(tester, html, useExplainer: false);
       expect(building, contains('ProgressIndicator'));
 
-      await tester.runAsync(() => Future.delayed(Duration.zero));
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
       await tester.pump();
       final built = await explainWithoutPumping(useExplainer: false);
       expect(built, isNot(contains('ProgressIndicator')));
