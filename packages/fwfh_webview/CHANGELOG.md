@@ -1,3 +1,7 @@
+## 0.15.0
+
+- Requires Flutter 3.16 (#1188)
+
 ## 0.14.8
 
 - Fix IFRAME does not respect width attribute (#1115)
