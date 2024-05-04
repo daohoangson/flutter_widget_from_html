@@ -2,18 +2,18 @@
 
 set -euo pipefail
 
-_widgetHash=$( curl https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
+_widgetHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
 echo "_widgetHash=$_widgetHash"
-_widgetStableHash=$( curl https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
+_widgetStableHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
 echo "_widgetStableHash=$_widgetStableHash"
 if [ "$_widgetHash" != "$_widgetStableHash" ]; then
   echo "Widget hashes are different"
   exit 1
 fi
 
-_renderObjectHash=$( curl https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
+_renderObjectHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
 echo "_renderObjectHash=$_renderObjectHash"
-_renderObjectStableHash=$( curl https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
+_renderObjectStableHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
 echo "_renderObjectStableHash=$_renderObjectStableHash"
 if [ "$_renderObjectHash" != "$_renderObjectStableHash" ]; then
   echo "RenderObject hashes are different"
