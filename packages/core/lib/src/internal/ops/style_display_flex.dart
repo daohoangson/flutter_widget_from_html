@@ -59,7 +59,6 @@ class StyleDisplayFlex {
                 .map((child) => WidgetPlaceholder.unwrap(context, child))
                 .where((child) => child != widget0)
                 .toList(growable: false);
-
             return wf.buildFlex(
               tree,
               unwrapped,

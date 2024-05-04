@@ -803,7 +803,9 @@ class Explainer {
     }
 
     if (widget is! Column && (widget is Flex)) {
-      type = 'Flex';
+      if (type == 'HtmlFlex') {
+        type = 'Flex'; // rename our widget, we may come back to Flutter's soon
+      }
       attr.addAll(_flex(widget));
     }
 
