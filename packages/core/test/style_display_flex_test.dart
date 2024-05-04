@@ -265,6 +265,7 @@ Future<void> main() async {
       testWidgets('direction=horizontal', (WidgetTester tester) async {
         final flex = GlobalKey();
         final foo = GlobalKey();
+        final bar = GlobalKey();
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -273,7 +274,7 @@ Future<void> main() async {
                 key: flex,
                 children: [
                   Text('Foo', key: foo),
-                  const Text('Bar'),
+                  Text('Bar', key: bar),
                 ],
               ),
             ),
@@ -282,13 +283,16 @@ Future<void> main() async {
         await tester.pumpAndSettle();
 
         final flexBox = flex.renderBox;
-        final fooBox = foo.renderBox;
+        final fooSize = foo.renderBox.size;
+        final barSize = bar.renderBox.size;
         expect(
-          flexBox.getDryLayout(const BoxConstraints(
-            maxHeight: 100,
-            maxWidth: 100,
-          )),
-          equals(Size(100, fooBox.size.height)),
+          flexBox.getDryLayout(const BoxConstraints()),
+          equals(
+            Size(
+              fooSize.width + barSize.width,
+              max(fooSize.height, barSize.height),
+            ),
+          ),
         );
       });
 
@@ -313,14 +317,16 @@ Future<void> main() async {
         await tester.pumpAndSettle();
 
         final flexBox = flex.renderBox;
-        final fooBox = foo.renderBox;
-        final barBox = bar.renderBox;
+        final fooSize = foo.renderBox.size;
+        final barSize = bar.renderBox.size;
         expect(
-          flexBox.getDryLayout(const BoxConstraints(
-            maxHeight: 100,
-            maxWidth: 100,
-          )),
-          equals(Size(max(fooBox.size.width, barBox.size.width), 100)),
+          flexBox.getDryLayout(const BoxConstraints()),
+          equals(
+            Size(
+              max(fooSize.width, barSize.width),
+              fooSize.height + barSize.height,
+            ),
+          ),
         );
       });
     });
