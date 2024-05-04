@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -257,6 +258,142 @@ Future<void> main() async {
           ),
         );
         await tester.pumpAndSettle();
+      });
+    });
+
+    group('computeDryLayout', () {
+      testWidgets('direction=horizontal', (WidgetTester tester) async {
+        final flex = GlobalKey();
+        final foo = GlobalKey();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HtmlFlex(
+                direction: Axis.horizontal,
+                key: flex,
+                children: [
+                  Text('Foo', key: foo),
+                  const Text('Bar'),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final flexBox = flex.renderBox;
+        final fooBox = foo.renderBox;
+        expect(
+          flexBox.getDryLayout(const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          )),
+          equals(Size(100, fooBox.size.height)),
+        );
+      });
+
+      testWidgets('direction=vertical', (WidgetTester tester) async {
+        final flex = GlobalKey();
+        final foo = GlobalKey();
+        final bar = GlobalKey();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HtmlFlex(
+                direction: Axis.vertical,
+                key: flex,
+                children: [
+                  Text('Foo', key: foo),
+                  Text('Bar', key: bar),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final flexBox = flex.renderBox;
+        final fooBox = foo.renderBox;
+        final barBox = bar.renderBox;
+        expect(
+          flexBox.getDryLayout(const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          )),
+          equals(Size(max(fooBox.size.width, barBox.size.width), 100)),
+        );
+      });
+    });
+
+    group('computeIntrinsic', () {
+      testWidgets('direction=horizontal', (WidgetTester tester) async {
+        final flex = GlobalKey();
+        final foo = GlobalKey();
+        final bar = GlobalKey();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HtmlFlex(
+                direction: Axis.horizontal,
+                key: flex,
+                children: [
+                  Text('Foo', key: foo),
+                  Text('Bar', key: bar),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final flexBox = flex.renderBox;
+        final fooBox = foo.renderBox;
+        final barBox = bar.renderBox;
+        expect(flexBox.getMaxIntrinsicHeight(100), equals(fooBox.size.height));
+        expect(
+          flexBox.getMaxIntrinsicWidth(100),
+          equals(fooBox.size.width + barBox.size.width),
+        );
+        expect(flexBox.getMinIntrinsicHeight(100), equals(fooBox.size.height));
+        expect(
+          flexBox.getMinIntrinsicWidth(100),
+          equals(fooBox.size.width + barBox.size.width),
+        );
+      });
+
+      testWidgets('direction=vertical', (WidgetTester tester) async {
+        final flex = GlobalKey();
+        final foo = GlobalKey();
+        final bar = GlobalKey();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HtmlFlex(
+                direction: Axis.vertical,
+                key: flex,
+                children: [
+                  Text('Foo', key: foo),
+                  Text('Bar', key: bar),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final flexBox = flex.renderBox;
+        final fooBox = foo.renderBox;
+        final barBox = bar.renderBox;
+        expect(
+          flexBox.getMaxIntrinsicHeight(100),
+          equals(fooBox.size.height + barBox.size.height),
+        );
+        expect(flexBox.getMaxIntrinsicWidth(100), equals(fooBox.size.width));
+        expect(
+          flexBox.getMinIntrinsicHeight(100),
+          equals(fooBox.size.height + barBox.size.height),
+        );
+        expect(flexBox.getMinIntrinsicWidth(100), equals(fooBox.size.width));
       });
     });
   });
