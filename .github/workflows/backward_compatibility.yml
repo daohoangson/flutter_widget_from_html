@@ -122,14 +122,13 @@ jobs:
       - run: flutter test
 
   html_flex:
-    name: Make sure HtmlFlex is up-to-date
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Verify hashes
         run: |
-          set -e
+          set -euo pipefail
 
           _scripts=$( cat packages/core/lib/src/widgets/html_flex.dart | head -n 16 | tail -n 15 )
           bash -c "$_scripts"
