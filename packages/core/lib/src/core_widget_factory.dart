@@ -230,6 +230,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     required Axis direction,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
     TextBaseline textBaseline = TextBaseline.alphabetic,
+    TextDirection textDirection = TextDirection.ltr,
   }) {
     return LayoutBuilder(
       builder: (_, bc) {
@@ -238,6 +239,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           direction: direction,
           mainAxisAlignment: mainAxisAlignment,
           textBaseline: textBaseline,
+          textDirection: textDirection,
           children: children,
         );
         switch (direction) {

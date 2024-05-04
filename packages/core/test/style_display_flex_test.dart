@@ -67,8 +67,8 @@ Future<void> main() async {
       expect(built, isNot(contains('ProgressIndicator')));
 
       final box =
-          find.byType(RichText).evaluate().first.renderObject! as RenderBox;
-      expect(box.size.width, equals(tester.windowWidth));
+          find.byType(RichText).evaluate().first.renderObject?.renderBox;
+      expect(box?.size.width, equals(tester.windowWidth));
     });
 
     testWidgets('#1152: renders super wide block', (tester) async {
@@ -86,7 +86,7 @@ Future<void> main() async {
 
       final elements = find.byType(RichText).evaluate();
       final size = elements
-          .map((element) => (element.renderObject! as RenderBox).size.width)
+          .map((element) => element.renderBox.size.width)
           .toList(growable: false);
       expect(size.length, equals(2));
       expect(size[0], lessThan(20));
@@ -98,8 +98,7 @@ Future<void> main() async {
           '<div style="width: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
-      final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
-      expect(box.size.width, equals(tester.windowWidth));
+      expect(tester.foo.size.width, equals(tester.windowWidth));
     });
 
     testWidgets('renders super wide contents with margins', (tester) async {
@@ -107,12 +106,10 @@ Future<void> main() async {
           '<div style="width: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
-      final box1 = findText('Foo').evaluate().first.renderObject! as RenderBox;
-      expect(box1.size.width, equals(tester.windowWidth - 10));
+      expect(tester.foo.size.width, equals(tester.windowWidth - 10));
 
       await explain(tester, html.replaceFirst('margin: 5px', 'margin: 50px'));
-      final box2 = findText('Foo').evaluate().first.renderObject! as RenderBox;
-      expect(box2.size.width, equals(tester.windowWidth - 100));
+      expect(tester.foo.size.width, equals(tester.windowWidth - 100));
     });
 
     testWidgets('renders super tall contents', (WidgetTester tester) async {
@@ -120,8 +117,147 @@ Future<void> main() async {
           '<div style="height: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
-      final box = findText('Foo').evaluate().first.renderObject! as RenderBox;
-      expect(box.size.height, equals(tester.windowHeight));
+      expect(tester.foo.size.height, equals(tester.windowHeight));
+    });
+  });
+
+  group('HtmlFlex', () {
+    group('_HtmlFlexRenderObject setters', () {
+      testWidgets('updates crossAxisAlignment', (WidgetTester tester) async {
+        await explain(
+          tester,
+          '<div style="display: flex; flex-direction: column; align-items: flex-end">'
+          '<div style="background: red; width: 200px">Foo</div>'
+          '<div style="background: blue; width: 200px">Bar</div>'
+          '</div>',
+        );
+        final fooBefore = tester.foo.size.width;
+        final barBefore = tester.bar.size.width;
+
+        await explain(
+          tester,
+          '<div style="display: flex; flex-direction: column; align-items: stretch">'
+          '<div style="background: red; width: 200px">Foo</div>'
+          '<div style="background: blue; width: 200px">Bar</div>'
+          '</div>',
+        );
+        final fooAfter = tester.foo.size.width;
+        final barAfter = tester.bar.size.width;
+        expect(fooAfter, greaterThan(fooBefore));
+        expect(barAfter, greaterThan(barBefore));
+      });
+
+      testWidgets('updates direction', (WidgetTester tester) async {
+        await explain(
+          tester,
+          '<div style="display: flex; flex-direction: column">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final fooBefore = tester.foo;
+        final barBefore = tester.bar;
+        expect(fooBefore.left, equals(barBefore.left));
+        expect(fooBefore.top, lessThan(barBefore.top));
+
+        await explain(
+          tester,
+          '<div style="display: flex; flex-direction: row">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final fooAfter = tester.foo;
+        final barAfter = tester.bar;
+        expect(fooAfter.left, lessThan(barAfter.left));
+        expect(fooAfter.top, equals(barAfter.top));
+      });
+
+      testWidgets('updates mainAxisAlignment', (WidgetTester tester) async {
+        await explain(
+          tester,
+          '<div style="display: flex; justify-content: flex-start">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final barBefore = tester.bar;
+        final barRightBefore = barBefore.left + barBefore.size.width;
+        expect(barRightBefore, lessThan(tester.windowWidth));
+
+        await explain(
+          tester,
+          '<div style="display: flex; justify-content: space-between">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final barAfter = tester.bar;
+        final barRightAfter = barAfter.left + barAfter.size.width;
+        expect(barRightAfter, equals(tester.windowWidth));
+      });
+
+      testWidgets('updates textDirection', (WidgetTester tester) async {
+        await explain(
+            tester,
+            '<div dir="ltr"><div style="display: flex; flex-direction: row">'
+            '<div>Foo</div><div>Bar</div>'
+            '</div></div>');
+        expect(tester.foo.left, lessThan(tester.bar.left));
+
+        await explain(
+            tester,
+            '<div dir="rtl"><div style="display: flex; flex-direction: row">'
+            '<div>Foo</div><div>Bar</div>'
+            '</div></div>');
+        expect(tester.foo.left, greaterThan(tester.bar.left));
+      });
+    });
+
+    group('computeDistanceToActualBaseline', () {
+      testWidgets('direction=horizontal', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  HtmlFlex(
+                    direction: Axis.horizontal,
+                    children: const [Text('Foo')],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text('Bar'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('direction=vertical', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  HtmlFlex(
+                    direction: Axis.vertical,
+                    children: const [Text('Foo')],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text('Bar'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+      });
     });
   });
 
@@ -191,6 +327,12 @@ Future<void> main() async {
       fileNameFactory: (name) => '$kGoldenFilePrefix/flex/$name.png',
     ),
   );
+}
+
+extension on WidgetTester {
+  RenderBox get bar => findText('Bar').evaluate().first.renderBox;
+
+  RenderBox get foo => findText('Foo').evaluate().first.renderBox;
 }
 
 class _Golden extends StatelessWidget {
