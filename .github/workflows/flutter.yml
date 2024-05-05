@@ -90,6 +90,7 @@ jobs:
             --app build/app/outputs/apk/debug/app-debug.apk \
             --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --device model="$ANDROID_DEVICE_MODEL",version="$ANDROID_DEVICE_VERSION",locale=en,orientation=portrait \
+            --results-bucket=fwfh-dev-patrol-public \
             --timeout 10m \
             --use-orchestrator \
             --environment-variables clearPackageData=true
@@ -142,4 +143,5 @@ jobs:
             --type xctest \
             --test ios_tests.zip \
             --device model="$IOS_DEVICE_MODEL",version="$IOS_DEVICE_VERSION",locale=en_US,orientation=portrait \
+            --results-bucket=fwfh-dev-patrol-public \
             --timeout 10m
