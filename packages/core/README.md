@@ -126,7 +126,7 @@ These tags and their contents will be ignored:
 ### Inline stylings
 
 - background: 1 value (color)
-  - background-color: hex values, `rgb()`, `hsl()` or named colors
+  - background-color: `currentcolor`, hex values, `rgb()`, `hsl()` or named colors
   - background-image: `url()` with support for asset (`asset://`), data uri, local file (`file://`) and network image
   - background-repeat: no-repeat/repeat/repeat-x/repeat-y
   - background-position: single or double instances of bottom/center/left/right/top (e.g. `top left`)
@@ -163,11 +163,16 @@ These tags and their contents will be ignored:
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align (similar to `align` attribute)
 - text-decoration
-  - text-decoration-color
+  - text-decoration-color: `currentcolor`, hex values, `rgb()`, `hsl()` or named colors
   - text-decoration-line: line-through/none/overline/underline
   - text-decoration-style: dotted/dashed/double/solid
   - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
+- text-shadow:
+  - 4 values (color x y blur, color x y blur)
+  - 3 values (x y color, color x y)
+  - Or 2 values (x y)
+  - Multiple shadows
 - white-space: pre/normal/nowrap
 - Sizing: `auto` or values in `em`, `%`, `pt` and `px`
   - width, max-width, min-width
