@@ -1,0 +1,35 @@
+default_platform(:ios)
+
+platform :ios do
+  lane :generate_profiles do
+    api_key_path = 'fastlane/4TV2PTBPVG.json'
+
+    match(
+      api_key_path: api_key_path,
+      app_identifier: ["dev.fwfh.demoApp", "dev.fwfh.demoApp.RunnerTests"],
+      fail_on_name_taken: true,
+      type: 'appstore'
+    )
+
+    match(
+      api_key_path: api_key_path,
+      app_identifier: ["dev.fwfh.demoApp.RunnerUITests.xctrunner"],
+      fail_on_name_taken: true,
+      type: 'development'
+    )
+  end
+
+  lane :download_profiles do
+    match(
+      app_identifier: ["dev.fwfh.demoApp", "dev.fwfh.demoApp.RunnerTests"],
+      type: 'appstore',
+      readonly: true
+    )
+
+    match(
+      app_identifier: ["dev.fwfh.demoApp.RunnerUITests.xctrunner"],
+      type: 'development',
+      readonly: true
+    )
+  end
+end
