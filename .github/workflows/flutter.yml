@@ -75,8 +75,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
       - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
-      - run: gcloud info
-      - name: Upload to Firebase
+      - name: Firebase Test Lab
         run: |
           set -e
 
@@ -86,14 +85,14 @@ jobs:
 
           # https://github.com/leancodepl/patrol/blob/master/dev/e2e_app/run_android_testlab
           gcloud firebase test android run \
-            --type instrumentation \
             --app build/app/outputs/apk/debug/app-debug.apk \
-            --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --client-details matrixLabel="GitHub #${{ github.run_id }}" \
             --device model="$ANDROID_DEVICE_MODEL",version="$ANDROID_DEVICE_VERSION",locale=en,orientation=portrait \
             --results-bucket=fwfh-dev-patrol-public \
+            --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --timeout 10m \
-            --use-orchestrator \
-            --environment-variables clearPackageData=true
+            --type instrumentation \
+            --use-orchestrator
 
   integration_test_ios:
     name: Integration test (iOS)
@@ -127,8 +126,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
       - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
-      - run: gcloud info
-      - name: Upload to Firebase
+      - name: Firebase Test Lab
         run: |
           set -e
 
@@ -140,8 +138,9 @@ jobs:
           zip -r ios_tests.zip Release-iphoneos/*.app *.xctestrun
 
           gcloud firebase test ios run \
-            --type xctest \
-            --test ios_tests.zip \
+            --client-details matrixLabel="GitHub #${{ github.run_id }}" \
             --device model="$IOS_DEVICE_MODEL",version="$IOS_DEVICE_VERSION",locale=en_US,orientation=portrait \
             --results-bucket=fwfh-dev-patrol-public \
-            --timeout 10m
+            --test ios_tests.zip \
+            --timeout 10m \
+            --type xctest
