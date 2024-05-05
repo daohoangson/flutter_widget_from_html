@@ -29,12 +29,9 @@ jobs:
           cache: true
       - name: Gradle cache
         uses: gradle/gradle-build-action@4c39dd82cd5e1ec7c6fa0173bb41b4b6bb3b86ff # v3.3.2
+      - run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
 
-      - name: Run flutter build apk --debug
-        run: |
-          set -e
-          export JAVA_HOME=$JAVA_HOME_17_X64
-          flutter build apk --debug
+      - run: flutter build apk --debug
       - name: Upload debug APK
         id: appetize
         run: |
@@ -60,11 +57,7 @@ jobs:
           ( cd ./test/goldens && php tags.php >tags.html )
           cp -R ./test/goldens build/web/supported
 
-      - name: Run flutter build apk --release
-        run: |
-          set -e
-          export JAVA_HOME=$JAVA_HOME_17_X64
-          flutter build apk --release --split-per-abi
+      - run: flutter build apk --release --split-per-abi
       - name: Copy APKs
         run: cp -R build/app/outputs/apk/release build/web/apks
 

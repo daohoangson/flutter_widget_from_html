@@ -1,3 +1,6 @@
+# https://patrol.leancode.co/getting-started
+/integration_test/test_bundle.dart
+
 # Miscellaneous
 *.class
 *.log

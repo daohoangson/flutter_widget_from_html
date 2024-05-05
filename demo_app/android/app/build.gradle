@@ -53,6 +53,10 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        // https://patrol.leancode.co/getting-started
+        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: "true"
     }
 
     signingConfigs {
@@ -72,10 +76,18 @@ android {
             signingConfig signingConfigs.demo
         }
     }
+
+    testOptions {
+        // https://patrol.leancode.co/getting-started
+        execution "ANDROIDX_TEST_ORCHESTRATOR"
+    }
 }
 
 flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    // https://patrol.leancode.co/getting-started
+    androidTestUtil "androidx.test:orchestrator:1.4.2"
+}
