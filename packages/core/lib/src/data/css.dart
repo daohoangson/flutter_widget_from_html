@@ -235,6 +235,51 @@ class CssBorderSide {
   }
 }
 
+// A color.
+@immutable
+abstract class CssColor {
+  /// Returns the raw value.
+  Color? get rawValue;
+
+  /// Calculates [Color].
+  Color? getValue(InheritedProperties resolved);
+
+  /// Creates a color with the given integer value.
+  factory CssColor(int value) => _CssColorValue(Color(value));
+
+  /// Creates a `currentcolor`.
+  ///
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentcolor_keyword
+  factory CssColor.current() => const _CssColorCurrent();
+
+  /// Creates a color with the given value.
+  factory CssColor.value(Color value) => _CssColorValue(value);
+
+  /// Creates a transparent color.
+  factory CssColor.transparent() => const _CssColorValue(Color(0x00000000));
+}
+
+class _CssColorCurrent implements CssColor {
+  const _CssColorCurrent();
+
+  @override
+  Color? get rawValue => null;
+
+  @override
+  Color? getValue(InheritedProperties resolved) =>
+      resolved.get<TextStyle>()?.color;
+}
+
+class _CssColorValue implements CssColor {
+  @override
+  final Color rawValue;
+
+  const _CssColorValue(this.rawValue);
+
+  @override
+  Color? getValue(InheritedProperties resolved) => rawValue;
+}
+
 /// A length measurement.
 @immutable
 class CssLength {
