@@ -68,8 +68,13 @@ jobs:
           dart pub global activate patrol_cli
 
           cd demo_app
-          patrol build android --target integration_test/auto_resize_test.dart
+          patrol build android --verbose --target integration_test/auto_resize_test.dart
 
+      - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
+      - run: gcloud info
       - name: Upload to Firebase
         run: |
           set -e
@@ -98,12 +103,6 @@ jobs:
         with:
           cache: true
 
-      - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
-      - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
-      - run: gcloud info
-
       - name: Unlock Fastlane secrets
         env:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
@@ -115,7 +114,6 @@ jobs:
           git-crypt unlock /tmp/git-crypt-key
       - run: fastlane download_profiles
         working-directory: demo_app/ios
-
       - name: Run patrol build
         run: |
           set -e
@@ -123,8 +121,13 @@ jobs:
           dart pub global activate patrol_cli
 
           cd demo_app
-          patrol build ios --release --target integration_test/auto_resize_test.dart
+          patrol build ios --release --verbose --target integration_test/auto_resize_test.dart
 
+      - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
+      - run: gcloud info
       - name: Upload to Firebase
         run: |
           set -e
