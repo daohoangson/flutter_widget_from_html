@@ -101,6 +101,13 @@ void main() {
       final e = await explain(tester, html);
       expect(e, equals('[RichText:(:(+l/#FFFF0000:foo )(+l/#FF00FF00:bar))]'));
     });
+
+    testWidgets('renders currentcolor', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: red line-through">foo '
+          '<span style="text-decoration-color: currentcolor">bar</span></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+l/#FFFF0000:foo )(+l:bar))]'));
+    });
   });
 
   group('text-decoration-line', () {

@@ -825,6 +825,12 @@ void main() {
       });
     });
 
+    testWidgets('ignores currentcolor', (WidgetTester tester) async {
+      const html = '<span style="color: currentcolor">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
     testWidgets('renders transparent', (WidgetTester tester) async {
       const html = '<span style="color: transparent">Foo</span>';
       final explained = await explain(tester, html);

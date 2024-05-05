@@ -1047,7 +1047,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final key = style.property;
     switch (key) {
       case kCssColor:
-        final color = tryParseColor(style.value);
+        final color = tryParseColor(style.value)?.rawValue;
         if (color != null) {
           tree.inherit(text_ops.color, color);
         }
