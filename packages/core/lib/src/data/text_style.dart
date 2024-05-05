@@ -10,6 +10,16 @@ class NormalLineHeight {
   const NormalLineHeight(this.value);
 }
 
+/// The background of text.
+///
+/// See [TextStyle.background].
+@immutable
+class TextStyleBackground {
+  final CssColor value;
+
+  const TextStyleBackground(this.value);
+}
+
 /// The height of text.
 ///
 /// See [TextStyle.height].

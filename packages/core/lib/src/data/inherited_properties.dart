@@ -81,6 +81,7 @@ class InheritedProperties {
   /// Prepares [TextStyle] with correct line-height.
   TextStyle prepareTextStyle() {
     var style = _style;
+    style = _prepareBackground(style, this);
     style = _prepareLineHeight(style, this);
     return style;
   }

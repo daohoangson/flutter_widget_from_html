@@ -6,6 +6,7 @@ import 'core_helpers.dart';
 import 'core_legacy.dart';
 import 'core_widget_factory.dart';
 
+part 'data/inherited_properties/background.dart';
 part 'data/inherited_properties/line_height.dart';
 part 'data/build_bits.dart';
 part 'data/build_op.dart';
