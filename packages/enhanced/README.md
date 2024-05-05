@@ -160,7 +160,7 @@ These tags and their contents will be ignored:
   - border-top-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
-- color (similar to `background-color` inline styling)
+- color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - display: block/flex/inline/inline-block/none
   - In `flex` mode:
