@@ -80,42 +80,9 @@ class InheritedProperties {
 
   /// Prepares [TextStyle] with correct line-height.
   TextStyle prepareTextStyle() {
-    final height = get<CssLineHeight>();
-    if (height == null) {
-      return _style;
-    }
-
-    final length = height.value;
-    if (length == null) {
-      final normalValue = get<NormalLineHeight>()?.value;
-      if (normalValue == null) {
-        return _style;
-      } else {
-        return _style.copyWith(
-          debugLabel: 'fwfh: line-height normal',
-          height: normalValue,
-        );
-      }
-    }
-
-    final fontSize = _style.fontSize;
-    if (fontSize == null || fontSize == .0) {
-      return _style;
-    }
-
-    final lengthValue = length.getValue(
-      this,
-      baseValue: fontSize,
-      scaleFactor: get<TextScaleFactor>()?.value,
-    );
-    if (lengthValue == null) {
-      return _style;
-    }
-
-    return _style.copyWith(
-      debugLabel: 'fwfh: line-height',
-      height: lengthValue / fontSize,
-    );
+    var style = _style;
+    style = _prepareLineHeight(style, this);
+    return style;
   }
 
   static T? _get<T>(Iterable<dynamic> values) {
