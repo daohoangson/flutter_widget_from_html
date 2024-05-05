@@ -68,6 +68,7 @@ jobs:
           dart pub global activate patrol_cli
 
           cd demo_app
+          flutter build apk --config-only
           patrol build android --verbose --target integration_test/auto_resize_test.dart
 
       - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
