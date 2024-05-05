@@ -52,6 +52,12 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals(expected));
     });
+
+    testWidgets('renders currentcolor', (WidgetTester tester) async {
+      const html = '<span style="border: currentcolor solid 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('1.0@solid#FF001234'));
+    });
   });
 
   group('2 values', () {

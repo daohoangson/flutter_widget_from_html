@@ -73,6 +73,12 @@ Future<void> main() async {
       expect(explained, equals('[RichText:(:Foo (color=#FFFF0000:bar))]'));
     });
 
+    testWidgets('renders currentcolor', (WidgetTester tester) async {
+      const html = '<div style="background-color: currentcolor">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('color=#FF001234'));
+    });
+
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
         const html = 'Foo<span style="background-color: #f00"> bar</span>';
