@@ -113,16 +113,14 @@ jobs:
           brew install git-crypt
           echo "${GIT_CRYPT_KEY}" | base64 -d >/tmp/git-crypt-key
           git-crypt unlock /tmp/git-crypt-key
-      - run: fastlane download_profiles
-        working-directory: demo_app/ios
       - name: Run patrol build
         run: |
           set -e
 
           dart pub global activate patrol_cli
 
-          cd demo_app
-          patrol build ios --release --verbose --target integration_test/auto_resize_test.dart
+          cd demo_app/ios
+          fastlane patrol_build
 
       - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
         with:

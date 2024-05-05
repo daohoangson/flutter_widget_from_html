@@ -19,7 +19,9 @@ platform :ios do
     )
   end
 
-  lane :download_profiles do
+  lane :patrol_build do
+    setup_ci
+
     match(
       app_identifier: ["dev.fwfh.demoApp", "dev.fwfh.demoApp.RunnerTests"],
       type: 'appstore',
@@ -31,5 +33,7 @@ platform :ios do
       type: 'development',
       readonly: true
     )
+
+    sh('cd .. && patrol build ios --release --verbose --target integration_test/auto_resize_test.dart')
   end
 end
