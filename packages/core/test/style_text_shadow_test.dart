@@ -90,8 +90,8 @@ void main() {
       equals(
         '[CssBlock:child=[RichText:('
         'Shadow=[color=#FF558ABB,offset=Offset(1.0, 1.0),blurRadius=2.0]'
-        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=1.0]'
-        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=0.2]'
+        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=10.0]'
+        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=2.0]'
         ':Anime)]]',
       ),
     );
