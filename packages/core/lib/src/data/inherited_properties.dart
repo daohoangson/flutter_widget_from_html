@@ -82,6 +82,7 @@ class InheritedProperties {
   TextStyle prepareTextStyle() {
     var style = _style;
     style = _prepareBackground(style, this);
+    style = _prepareDecorationColor(style, this);
     style = _prepareLineHeight(style, this);
     return style;
   }

@@ -20,6 +20,16 @@ class TextStyleBackground {
   const TextStyleBackground(this.value);
 }
 
+/// The text decoration color.
+///
+/// See [TextStyle.decorationColor].
+@immutable
+class TextStyleDecorationColor {
+  final CssColor value;
+
+  const TextStyleDecorationColor(this.value);
+}
+
 /// The height of text.
 ///
 /// See [TextStyle.height].
