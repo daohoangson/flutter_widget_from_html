@@ -1009,6 +1009,36 @@ void main() {
         ),
       );
     });
+
+    testWidgets('overwrites width', (tester) async {
+      const html =
+          '<span style="border: solid; border-top: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'border=($_border2,$_border1,$_border1,$_border1),'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('overwrites width and resets color', (tester) async {
+      const html =
+          '<span style="border: red solid; border-top: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      const borderRed = '1.0@solid#FFFF0000';
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          // this behavior is unintuitive but matches browser's implementations
+          'border=($_border2,$borderRed,$borderRed,$borderRed),'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
   });
 
   group('isBlockElement', () {
