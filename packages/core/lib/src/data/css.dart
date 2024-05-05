@@ -174,7 +174,7 @@ class CssRadius {
 @immutable
 class CssBorderSide {
   /// The color of this side of the border.
-  final Color? color;
+  final CssColor? color;
 
   /// The style of this side of the border.
   final TextDecorationStyle? style;
@@ -198,7 +198,7 @@ class CssBorderSide {
       return null;
     }
 
-    final scopedColor = color ?? resolved.get<TextStyle>()?.color;
+    final scopedColor = color?.getValue(resolved);
     if (scopedColor == null) {
       return null;
     }
