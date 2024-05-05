@@ -46,15 +46,8 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   integration_test_android:
-    strategy:
-      matrix:
-        include:
-          - api-level: 30
-            arch: x86
-            channel: canary
-            target: aosp_atd
     name: Integration test (Android)
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Setup Flutter
@@ -65,45 +58,39 @@ jobs:
         uses: gradle/gradle-build-action@4c39dd82cd5e1ec7c6fa0173bb41b4b6bb3b86ff # v3.3.2
         with:
           # only update gradle cache from demo_app.yml jobs
-          cache-read-only: false
+          cache-read-only: true
       - run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
 
-      - name: AVD cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@6b0df4b0efb23bb0ec63d881db79aefbc976e4b2 # v2.30.1
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          channel: ${{ matrix.channel }}
-          target: ${{ matrix.target }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+      - name: Run patrol build
+        run: |
+          set -e
 
-      - name: Run tests on Android emulator
-        uses: reactivecircus/android-emulator-runner@6b0df4b0efb23bb0ec63d881db79aefbc976e4b2 # v2.30.1
-        with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
-          channel: ${{ matrix.channel }}
-          target: ${{ matrix.target }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./tool/integration.sh
+          dart pub global activate patrol_cli
+
+          cd demo_app
+          patrol build android --target integration_test/auto_resize_test.dart
+
+      - name: Upload to Firebase
+        run: |
+          set -e
+
+          cd demo_app
+          export ANDROID_DEVICE_MODEL=redfin
+          export ANDROID_DEVICE_VERSION=30
+
+          # https://github.com/leancodepl/patrol/blob/master/dev/e2e_app/run_android_testlab
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app build/app/outputs/apk/debug/app-debug.apk \
+            --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --device model="$ANDROID_DEVICE_MODEL",version="$ANDROID_DEVICE_VERSION",locale=en,orientation=portrait \
+            --timeout 10m \
+            --use-orchestrator \
+            --environment-variables clearPackageData=true
 
   integration_test_ios:
     name: Integration test (iOS)
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Setup Flutter
@@ -111,20 +98,46 @@ jobs:
         with:
           cache: true
 
-      - name: Create iOS simulator
+      - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}
+      - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
+      - run: gcloud info
+
+      - name: Unlock Fastlane secrets
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
         run: |
           set -e
 
-          _runtime=$(xcrun simctl list runtimes ios -j | jq -r '.runtimes[-1]')
-          _runtimeId=$(echo $_runtime | jq -r .identifier)
-          echo "_runtimeId=$_runtimeId"
+          brew install git-crypt
+          echo "${GIT_CRYPT_KEY}" | base64 -d >/tmp/git-crypt-key
+          git-crypt unlock /tmp/git-crypt-key
+      - run: fastlane download_profiles
+        working-directory: demo_app/ios
 
-          _deviceType=$(echo $_runtime | jq -r '.supportedDeviceTypes[-1]')
-          _deviceTypeName=$(echo $_deviceType | jq -r .name)
-          echo "_deviceTypeName=$_deviceTypeName"
-          _deviceTypeId=$(echo $_deviceType | jq -r .identifier)
-          echo "_deviceTypeId=$_deviceTypeId"
+      - name: Run patrol build
+        run: |
+          set -e
 
-          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runtimeId" | xargs xcrun simctl boot
-      - name: Run tests on iOS simulator
-        run: ./tool/integration.sh
+          dart pub global activate patrol_cli
+
+          cd demo_app
+          patrol build ios --release --target integration_test/auto_resize_test.dart
+
+      - name: Upload to Firebase
+        run: |
+          set -e
+
+          export IOS_DEVICE_MODEL=iphone13pro
+          export IOS_DEVICE_VERSION=16.6
+
+          # https://github.com/leancodepl/patrol/blob/master/dev/e2e_app/run_ios_testlab
+          cd demo_app/build/ios_integ/Build/Products
+          zip -r ios_tests.zip Release-iphoneos/*.app *.xctestrun
+
+          gcloud firebase test ios run \
+            --type xctest \
+            --test ios_tests.zip \
+            --device model="$IOS_DEVICE_MODEL",version="$IOS_DEVICE_VERSION",locale=en_US,orientation=portrait \
+            --timeout 10m
