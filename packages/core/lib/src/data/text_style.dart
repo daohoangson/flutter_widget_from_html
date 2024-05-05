@@ -39,3 +39,13 @@ class TextStyleLineHeight {
 
   const TextStyleLineHeight([this.value]);
 }
+
+/// The shadows of text.
+///
+/// See [TextStyle.shadows].
+@immutable
+class TextStyleShadows {
+  final List<CssShadow> value;
+
+  const TextStyleShadows(this.value);
+}

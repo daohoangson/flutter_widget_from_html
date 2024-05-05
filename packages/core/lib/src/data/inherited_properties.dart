@@ -84,6 +84,7 @@ class InheritedProperties {
     style = _prepareBackground(style, this);
     style = _prepareDecorationColor(style, this);
     style = _prepareLineHeight(style, this);
+    style = _prepareShadows(style, this);
     return style;
   }
 

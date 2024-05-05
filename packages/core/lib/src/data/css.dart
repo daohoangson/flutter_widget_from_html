@@ -468,6 +468,68 @@ enum CssLengthUnit {
   px,
 }
 
+/// A single shadow.
+///
+/// See [Shadow].
+class CssShadow {
+  /// The blur radius.
+  ///
+  /// See [Shadow.blurRadius].
+  final CssLength blurRadius;
+
+  /// Color that the shadow will be drawn with.
+  ///
+  /// See [Shadow.color].
+  final CssColor color;
+
+  /// The x component of [Shadow.offset].
+  ///
+  /// See [Offset.dx].
+  final CssLength offsetX;
+
+  /// The y component of [Shadow.offset].
+  ///
+  /// See [Offset.dy]
+  final CssLength offsetY;
+
+  /// Creates a single shadow.
+  CssShadow({
+    required this.blurRadius,
+    required this.color,
+    required this.offsetX,
+    required this.offsetY,
+  });
+
+  /// Calculates [Shadow].
+  Shadow? getValue(InheritedProperties resolved) {
+    final color = this.color.getValue(resolved);
+    if (color == null) {
+      return null;
+    }
+
+    final offsetX = this.offsetX.getValue(resolved);
+    if (offsetX == null) {
+      return null;
+    }
+
+    final offsetY = this.offsetY.getValue(resolved);
+    if (offsetY == null) {
+      return null;
+    }
+
+    final blurRadius = this.blurRadius.getValue(resolved);
+    if (blurRadius == null) {
+      return null;
+    }
+
+    return Shadow(
+      blurRadius: blurRadius,
+      color: color,
+      offset: Offset(offsetX, offsetY),
+    );
+  }
+}
+
 /// The whitespace behavior.
 enum CssWhitespace {
   /// Sequences of white space are collapsed.
