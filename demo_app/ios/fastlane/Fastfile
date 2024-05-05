@@ -34,6 +34,6 @@ platform :ios do
       readonly: true
     )
 
-    sh('cd .. && patrol build ios --release --verbose --target integration_test/auto_resize_test.dart')
+    sh('cd ../.. && patrol build ios --release --verbose --target integration_test/auto_resize_test.dart')
   end
 end
