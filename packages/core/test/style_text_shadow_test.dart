@@ -42,7 +42,7 @@ void main() {
     );
   });
 
-  testWidgets('text-shadow red x y', (WidgetTester tester) async {
+  testWidgets('text-shadow color x y', (WidgetTester tester) async {
     const html = '<p style="text-shadow: red 2px 5px;">Anime</p>';
     final explained = await explain(tester, html);
     expect(
@@ -68,19 +68,6 @@ void main() {
     );
   });
 
-  testWidgets('text-shadow x y color', (WidgetTester tester) async {
-    const html = '<p style="text-shadow: 1px 1px 2px #558ABB;">Anime</p>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[CssBlock:child=[RichText:('
-        'Shadow=[color=#FF558ABB,offset=Offset(1.0, 1.0),blurRadius=2.0]'
-        ':Anime)]]',
-      ),
-    );
-  });
-
   testWidgets('text-shadow multiple shadows', (WidgetTester tester) async {
     const html =
         '<p style="text-shadow: 1px 1px 2px #558ABB, 0 0 1em #FC0, 0 0 0.2em #FC0;">Anime</p>';
@@ -90,15 +77,14 @@ void main() {
       equals(
         '[CssBlock:child=[RichText:('
         'Shadow=[color=#FF558ABB,offset=Offset(1.0, 1.0),blurRadius=2.0]'
-        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=1.0]'
-        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=0.2]'
+        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=10.0]'
+        'Shadow=[color=#FFFFCC00,offset=Offset(0.0, 0.0),blurRadius=2.0]'
         ':Anime)]]',
       ),
     );
   });
 
-  testWidgets('text-shadow no shadow on missing offset',
-      (WidgetTester tester) async {
+  testWidgets('text-shadow no shadow on missing offset', (tester) async {
     const html = '<p style="text-shadow: 1px #558ABB;">Anime</p>';
     final explained = await explain(tester, html);
     expect(
@@ -135,8 +121,7 @@ void main() {
     );
   });
 
-  testWidgets('text-shadow no shadow only has color',
-      (WidgetTester tester) async {
+  testWidgets('text-shadow no shadow only has color', (tester) async {
     const html = '<p style="text-shadow: #558ABB;">Anime</p>';
     final explained = await explain(tester, html);
     expect(

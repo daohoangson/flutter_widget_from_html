@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_just_audio: ^0.14.2
+  fwfh_just_audio: ^0.14.3
 ```
 
 ### Platform specific configuration

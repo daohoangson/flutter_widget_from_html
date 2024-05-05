@@ -52,6 +52,12 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals(expected));
     });
+
+    testWidgets('renders currentcolor', (WidgetTester tester) async {
+      const html = '<span style="border: currentcolor solid 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('1.0@solid#FF001234'));
+    });
   });
 
   group('2 values', () {
@@ -999,6 +1005,36 @@ void main() {
         equals(
           '[Container:'
           'border=(1.0@solid#FFFF0000,$_border1,$_border1,$_border1),'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('overwrites width', (tester) async {
+      const html =
+          '<span style="border: solid; border-top: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'border=($_border2,$_border1,$_border1,$_border1),'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('overwrites width and resets color', (tester) async {
+      const html =
+          '<span style="border: red solid; border-top: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      const borderRed = '1.0@solid#FFFF0000';
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          // this behavior is unintuitive but matches browser's implementations
+          'border=($_border2,$borderRed,$borderRed,$borderRed),'
           'child=[RichText:(:Foo)]]',
         ),
       );

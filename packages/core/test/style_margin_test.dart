@@ -843,7 +843,7 @@ void main() {
 
 extension on WidgetTester {
   RenderBox get horizontalMargin =>
-      renderObject(find.byType(HorizontalMargin)) as RenderBox;
+      renderObject(find.byType(HorizontalMargin)).renderBox;
 
   Future<GlobalKey> pumpSizedBox({
     bool isNull = false,

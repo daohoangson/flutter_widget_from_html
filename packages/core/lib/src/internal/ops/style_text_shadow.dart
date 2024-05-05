@@ -42,20 +42,16 @@ InheritedProperties _textShadow(
   InheritedProperties resolving,
   List<List<Expression>> expressions,
 ) {
-  final List<Shadow> shadows = [];
-  final defaultColor =
-      resolving.parent?.get<TextStyle>()?.color ?? const Color(0xff000000);
+  final shadows = <CssShadow>[];
 
   for (final List<Expression> exp in expressions) {
-    final shadow = _parseExpressionToShadow(exp, defaultColor);
+    final shadow = _parseExpressionToShadow(exp);
     if (shadow != null) {
       shadows.add(shadow);
     }
   }
 
-  return resolving.copyWith(
-    style: TextStyle(shadows: shadows),
-  );
+  return resolving.copyWith(value: TextStyleShadows(shadows));
 }
 
 ///
@@ -74,14 +70,11 @@ InheritedProperties _textShadow(
 /// offset-x | offset-y
 /// text-shadow: 5px 10px
 ///
-Shadow? _parseExpressionToShadow(
-  List<Expression> expressions,
-  Color defaultColor,
-) {
-  Color? color;
-  double? offsetX;
-  double? offsetY;
-  double? blurRadius;
+CssShadow? _parseExpressionToShadow(List<Expression> expressions) {
+  CssColor? color;
+  CssLength? offsetX;
+  CssLength? offsetY;
+  CssLength? blurRadius;
 
   if (expressions.length < 2 || expressions.length > 4) {
     return null;
@@ -110,24 +103,18 @@ Shadow? _parseExpressionToShadow(
   // Parse size + blur radius
   // According to the docs, the valid ordering must always be
   // offset-x , off-set-y , blur-radius (optional)
-  offsetX = tryParseCssLength(
-    expressions.safeGetAt(offsetXStartIndex),
-  )?.number;
-  offsetY = tryParseCssLength(
-    expressions.safeGetAt(1 + offsetXStartIndex),
-  )?.number;
-
+  offsetX = tryParseCssLength(expressions.safeGetAt(offsetXStartIndex));
+  offsetY = tryParseCssLength(expressions.safeGetAt(1 + offsetXStartIndex));
   if (offsetX == null || offsetY == null) {
     return null;
   }
 
-  blurRadius = tryParseCssLength(
-    expressions.safeGetAt(2 + offsetXStartIndex),
-  )?.number;
+  blurRadius = tryParseCssLength(expressions.safeGetAt(2 + offsetXStartIndex));
 
-  return Shadow(
-    color: color ?? defaultColor,
-    offset: Offset(offsetX, offsetY),
-    blurRadius: blurRadius ?? 0.0,
+  return CssShadow(
+    blurRadius: blurRadius ?? CssLength.zero,
+    color: color ?? CssColor.current(),
+    offsetX: offsetX,
+    offsetY: offsetY,
   );
 }

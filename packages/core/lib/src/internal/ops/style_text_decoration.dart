@@ -54,14 +54,9 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
 
 InheritedProperties textDecorationColor(
   InheritedProperties resolving,
-  Color value,
+  CssColor value,
 ) =>
-    resolving.copyWith(
-      style: TextStyle(
-        decorationColor: value,
-        debugLabel: 'fwfh: $kCssTextDecorationColor',
-      ),
-    );
+    resolving.copyWith(value: TextStyleDecorationColor(value));
 
 InheritedProperties textDecorationLine(
   InheritedProperties resolving,
