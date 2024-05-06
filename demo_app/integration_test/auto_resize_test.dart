@@ -104,13 +104,6 @@ class WebViewTestCase {
       Uri.dataFromString(html, mimeType: 'text/html').toString(),
       aspectRatio: 16 / 9,
       autoResize: true,
-      autoResizeIntervals: const [
-        Duration(seconds: 1),
-        Duration(seconds: 2),
-        Duration(seconds: 3),
-        Duration(seconds: 5),
-        Duration(seconds: 8),
-      ],
       debuggingEnabled: true,
     );
     final test = _AspectRatioTest(child: webView);

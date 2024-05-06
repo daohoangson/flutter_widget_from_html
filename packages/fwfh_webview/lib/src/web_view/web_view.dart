@@ -20,14 +20,6 @@ class WebView extends StatefulWidget {
   /// Flutter Web is not supported.
   final bool autoResize;
 
-  /// The auto resize intevals.
-  ///
-  /// By default, resizing will be attempted three times
-  /// - On page load
-  /// - After 1s
-  /// - After another 2s
-  final List<Duration> autoResizeIntervals;
-
   /// {@template web_view.debuggingEnabled}
   /// Controls whether debugging is enabled.
   ///
@@ -97,11 +89,6 @@ class WebView extends StatefulWidget {
     this.url, {
     required this.aspectRatio,
     bool? autoResize,
-    this.autoResizeIntervals = const [
-      Duration.zero,
-      Duration(seconds: 1),
-      Duration(seconds: 2),
-    ],
     this.debuggingEnabled = false,
     this.interceptNavigationRequest,
     this.js = true,
