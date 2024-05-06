@@ -14,8 +14,7 @@ void main() {
 
   group('autoResize', () {
     const defaultAspectRatio = 16 / 9;
-    const url = 'http://domain.com/?document.body.scrollWidth=1000&'
-        'document.body.scrollHeight=1000';
+    const url = 'http://foo.bar/?name=_DocumentResizeObserver&message=[10,10]';
 
     var aspectRatio = double.nan;
 
@@ -62,15 +61,6 @@ void main() {
     testWidgets('ratio 1.0', (tester) async {
       await run(tester);
       expectAspectRatioEquals(1.0);
-      await cleanUp(tester);
-    });
-
-    testWidgets('handles js error', (tester) async {
-      await run(
-        tester,
-        urlQueryParams: 'runJavaScriptReturningResult=error',
-      );
-      expectAspectRatioEquals(defaultAspectRatio);
       await cleanUp(tester);
     });
   });

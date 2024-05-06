@@ -131,17 +131,6 @@ class WebViewState extends State<WebView> {
     super.dispose();
   }
 
-  Future<String> eval(String js) async {
-    try {
-      final result = await _controller.runJavaScriptReturningResult(js);
-      return '$result';
-    } catch (error, stackTrace) {
-      _logger.warning('Could not eval JS', error, stackTrace);
-    }
-
-    return '';
-  }
-
   Future<void> _autoResize(Size size) async {
     if (!mounted) {
       return;

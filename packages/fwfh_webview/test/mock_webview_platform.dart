@@ -44,6 +44,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
 
   Uri? _currentUri;
   _FakeNavigationDelegate? _handler;
+  final _channels = <String, JavaScriptChannelParams>{};
   Timer? _onPageFinishedTimer;
   final _uris = <Uri>[];
 
@@ -59,6 +60,11 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   }) async {
     final req = NavigationRequest(url: url, isMainFrame: isMainFrame);
     return _handler?._onNavigationRequest?.call(req);
+  }
+
+  @override
+  Future<void> addJavaScriptChannel(JavaScriptChannelParams params) async {
+    _channels[params.name] = params;
   }
 
   @override
@@ -86,22 +92,19 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   }
 
   @override
-  Future<Object> runJavaScriptReturningResult(String javascript) async {
+  Future<void> runJavaScript(String javascript) async {
     final params = _currentUri?.queryParameters;
     if (params == null) {
-      return '';
+      return;
     }
 
-    const queryParam = 'runJavaScriptReturningResult';
-    if (params[queryParam] == 'error') {
-      throw PlatformException(code: queryParam);
+    final name = params['name'];
+    final message = params['message'];
+    if (name == null || message == null) {
+      return;
     }
 
-    if (params.containsKey(javascript)) {
-      return params[javascript] ?? '';
-    } else {
-      return '';
-    }
+    _channels[name]?.onMessageReceived(JavaScriptMessage(message: message));
   }
 
   @override
