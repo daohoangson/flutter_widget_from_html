@@ -230,7 +230,7 @@ class _DocumentResizeObserver {
     window.$_channelName.postMessage(JSON.stringify(size));
   })
 
-  resizeObserver.observe(document.documentElement);
+  resizeObserver.observe(document.body);
 })();
 ''');
   }
