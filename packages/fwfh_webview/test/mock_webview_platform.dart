@@ -42,9 +42,9 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   JavaScriptMode? javaScriptMode;
   String? userAgent;
 
+  final _channels = <String, JavaScriptChannelParams>{};
   Uri? _currentUri;
   _FakeNavigationDelegate? _handler;
-  final _channels = <String, JavaScriptChannelParams>{};
   Timer? _onPageFinishedTimer;
   final _uris = <Uri>[];
 

@@ -20,6 +20,10 @@ class WebView extends StatefulWidget {
   /// Flutter Web is not supported.
   final bool autoResize;
 
+  /// A legacy field that is no longer used.
+  @Deprecated('No longer used.')
+  final List<Duration> autoResizeIntervals;
+
   /// {@template web_view.debuggingEnabled}
   /// Controls whether debugging is enabled.
   ///
@@ -88,6 +92,7 @@ class WebView extends StatefulWidget {
   const WebView(
     this.url, {
     required this.aspectRatio,
+    @Deprecated('No longer used.') this.autoResizeIntervals = const [],
     bool? autoResize,
     this.debuggingEnabled = false,
     this.interceptNavigationRequest,
