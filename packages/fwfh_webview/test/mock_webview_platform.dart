@@ -98,13 +98,14 @@ abstract class FakeWebViewController extends PlatformWebViewController {
       return;
     }
 
-    final name = params['name'];
     final message = params['message'];
-    if (name == null || message == null) {
+    if (message == null) {
       return;
     }
 
-    _channels[name]?.onMessageReceived(JavaScriptMessage(message: message));
+    for (final channel in _channels.values) {
+      channel.onMessageReceived(JavaScriptMessage(message: message));
+    }
   }
 
   @override

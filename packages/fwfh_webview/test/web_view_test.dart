@@ -13,55 +13,59 @@ void main() {
   mockWebViewPlatform();
 
   group('autoResize', () {
-    const defaultAspectRatio = 16 / 9;
-    const url = 'http://foo.bar/?name=_DocumentResizeObserver&message=[10,10]';
-
     var aspectRatio = double.nan;
+    const defaultAspectRatio = 16 / 9;
 
-    // ignore: prefer_function_declarations_over_variables
-    final run = (
-      WidgetTester tester, {
-      String urlQueryParams = '',
-      Widget Function(Widget)? wrapper,
-    }) async {
+    Future<void> runAutoResizeApp(WidgetTester tester, String url) async {
       final child = Measurer(
         onMeasure: (v, _) => aspectRatio = v.width / v.height,
-        child: WebView(
-          '$url&$urlQueryParams',
-          aspectRatio: defaultAspectRatio,
-        ),
+        child: WebView(url, aspectRatio: defaultAspectRatio),
       );
 
-      runApp(
-        MaterialApp(
-          home: Scaffold(
-            body: wrapper?.call(child) ?? child,
-          ),
-        ),
-      );
-
+      aspectRatio = double.nan;
+      runApp(MaterialApp(home: Scaffold(body: child)));
       await tester.runAsync(
         () => Future.delayed(const Duration(milliseconds: 100)),
       );
       await tester.pumpAndSettle();
-    };
-
-    // ignore: prefer_function_declarations_over_variables
-    final expectAspectRatioEquals = (double expected) => expect(
-          aspectRatio.toStringAsFixed(2),
-          equals(expected.toStringAsFixed(2)),
-        );
-
-    // ignore: prefer_function_declarations_over_variables
-    final cleanUp = (WidgetTester tester) async {
-      runApp(const SizedBox.shrink());
-      await tester.pumpAndSettle();
-    };
+    }
 
     testWidgets('ratio 1.0', (tester) async {
-      await run(tester);
-      expectAspectRatioEquals(1.0);
-      await cleanUp(tester);
+      const url = 'http://foo.bar/?message=[10,10]';
+      await runAutoResizeApp(tester, url);
+      expect(aspectRatio, equals(1.0));
+    });
+
+    testWidgets('ratio 2.0', (tester) async {
+      const url = 'http://foo.bar/?message=[20.0,10]';
+      await runAutoResizeApp(tester, url);
+      expect(aspectRatio, equals(2.0));
+    });
+
+    testWidgets('ratio .5', (tester) async {
+      const url = 'http://foo.bar/?message=[10.0,20.0]';
+      await runAutoResizeApp(tester, url);
+      expect(aspectRatio, equals(.5));
+    });
+
+    group('error handling', () {
+      testWidgets('empty array', (tester) async {
+        const url = 'http://foo.bar/?message=[]';
+        await runAutoResizeApp(tester, url);
+        expect(aspectRatio, equals(defaultAspectRatio));
+      });
+
+      testWidgets('array of one item', (tester) async {
+        const url = 'http://foo.bar/?message=[10]';
+        await runAutoResizeApp(tester, url);
+        expect(aspectRatio, equals(defaultAspectRatio));
+      });
+
+      testWidgets('array of string', (tester) async {
+        const url = 'http://foo.bar/?message=["10","10"]';
+        await runAutoResizeApp(tester, url);
+        expect(aspectRatio, equals(defaultAspectRatio));
+      });
     });
   });
 
