@@ -70,8 +70,10 @@ class TagImg {
       kCssMinWidth: '0px',
       kCssMinHeight: '0px',
       kCssWidth: kCssLengthAuto,
-      if (height != null) kCssHeight: '${height}px',
-      if (width != null) kCssWidth: '${width}px',
+      if (height != null && width != null) ...{
+        kCssHeight: '${height}px',
+        kCssWidth: '${width}px',
+      },
     };
   }
 
