@@ -443,7 +443,6 @@ class _BuildMetadataStyleOperators extends WidgetFactory {
                 final fontSize = length?.getValue(p);
                 return p.copyWith(style: p.style.copyWith(fontSize: fontSize));
               },
-              null,
             );
           },
         ),

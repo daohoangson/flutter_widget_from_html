@@ -329,7 +329,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      tree.inherit((style, _) => style.copyWith(), null);
+      tree.inherit((style, _) => style.copyWith());
     }
 
     super.parse(tree);
