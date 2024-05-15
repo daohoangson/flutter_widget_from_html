@@ -72,6 +72,7 @@ jobs:
         uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           cache: true
+          flutter-version: 3.19
 
       - name: Unlock Fastlane secrets
         env:
