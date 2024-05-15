@@ -214,7 +214,7 @@ Future<void> main() async {
     group('computeDistanceToActualBaseline', () {
       testWidgets('direction=horizontal', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -222,9 +222,9 @@ Future<void> main() async {
                 children: [
                   HtmlFlex(
                     direction: Axis.horizontal,
-                    children: const [Text('Foo')],
+                    children: [Text('Foo')],
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(10),
                     child: Text('Bar'),
                   ),
@@ -238,7 +238,7 @@ Future<void> main() async {
 
       testWidgets('direction=vertical', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -246,9 +246,9 @@ Future<void> main() async {
                 children: [
                   HtmlFlex(
                     direction: Axis.vertical,
-                    children: const [Text('Foo')],
+                    children: [Text('Foo')],
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(10),
                     child: Text('Bar'),
                   ),

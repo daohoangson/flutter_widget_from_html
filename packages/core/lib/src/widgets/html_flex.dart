@@ -70,9 +70,7 @@ class HtmlFlex extends MultiChildRenderObjectWidget
     implements
         // ignore: avoid_implementing_value_types
         flutter.Flex {
-  // TODO: make this const when our minimum Flutter version >= 3.10
-  // ignore: prefer_const_constructors_in_immutables
-  HtmlFlex({
+  const HtmlFlex({
     super.key,
     required this.direction,
     this.mainAxisAlignment = MainAxisAlignment.start,
