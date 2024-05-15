@@ -428,9 +428,7 @@ class _TestImageProvider extends ImageProvider<Object> {
       SynchronousFuture<_TestImageProvider>(this);
 
   @override
-  // TODO: switch to use `loadImage` when our minimum Flutter version >= 3.10
-  // ignore: deprecated_member_use
-  ImageStreamCompleter loadBuffer(Object key, DecoderBufferCallback decode) =>
+  ImageStreamCompleter loadImage(Object key, ImageDecoderCallback decode) =>
       streamCompleter;
 }
 
