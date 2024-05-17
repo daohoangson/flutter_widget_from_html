@@ -75,11 +75,11 @@ jobs:
           cd ./build/web
           echo '{' >vercel.json
           echo '  "headers": [ { "source": "/(.*)", "headers": [' >>vercel.json
-          echo '    { "key": "Cross-Origin-Embedder-Policy", "value": "credentialless" }' >>vercel.json
+          echo '    { "key": "Cross-Origin-Embedder-Policy", "value": "credentialless" },' >>vercel.json
           echo '    { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }' >>vercel.json
-          echo '  ] } ]' >>vercel.json
+          echo '  ] } ],' >>vercel.json
           echo '  "rewrites":[ { "source": "/(.*)", "destination":"/" } ]' >>vercel.json
-          echo '}' >vercel.json
+          echo '}' >>vercel.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
             _url=$( vercel  --prod --token "${VERCEL_TOKEN}" )
