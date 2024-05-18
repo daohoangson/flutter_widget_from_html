@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-_widgetHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
+_widgetHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/1a0dc8f/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
 echo "_widgetHash=$_widgetHash"
 _widgetStableHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/widgets/basic.dart | openssl md5 )
 echo "_widgetStableHash=$_widgetStableHash"
@@ -11,7 +11,7 @@ if [ "$_widgetHash" != "$_widgetStableHash" ]; then
   exit 1
 fi
 
-_renderObjectHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/54e6646/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
+_renderObjectHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/60d28ad/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
 echo "_renderObjectHash=$_renderObjectHash"
 _renderObjectStableHash=$( curl -s https://raw.githubusercontent.com/flutter/flutter/stable/packages/flutter/lib/src/rendering/flex.dart | openssl md5 )
 echo "_renderObjectStableHash=$_renderObjectStableHash"
@@ -35,44 +35,11 @@ import 'package:flutter/widgets.dart'
     show BuildContext, Directionality, MultiChildRenderObjectWidget;
 import 'package:flutter/widgets.dart' as flutter show Flex;
 
-bool? _startIsTopLeft(
-  Axis direction,
-  TextDirection? textDirection,
-  VerticalDirection? verticalDirection,
-) {
-  // If the relevant value of textDirection or verticalDirection is null, this returns null too.
-  switch (direction) {
-    case Axis.horizontal:
-      switch (textDirection) {
-        case TextDirection.ltr:
-          return true;
-        case TextDirection.rtl:
-          return false;
-        case null:
-          return null;
-      }
-    case Axis.vertical:
-      switch (verticalDirection) {
-        case VerticalDirection.down:
-          return true;
-        case VerticalDirection.up:
-          return false;
-        case null:
-          return null;
-      }
-  }
-}
-
-// ignore: avoid_private_typedef_functions
-typedef _ChildSizingFunction = double Function(RenderBox child, double extent);
-
 class HtmlFlex extends MultiChildRenderObjectWidget
     implements
         // ignore: avoid_implementing_value_types
         flutter.Flex {
-  // TODO: make this const when our minimum Flutter version >= 3.10
-  // ignore: prefer_const_constructors_in_immutables
-  HtmlFlex({
+  const HtmlFlex({
     super.key,
     required this.direction,
     this.mainAxisAlignment = MainAxisAlignment.start,
@@ -145,9 +112,7 @@ class HtmlFlex extends MultiChildRenderObjectWidget
 
   @override
   void updateRenderObject(
-    BuildContext context,
-    covariant flutter.RenderFlex renderObject,
-  ) {
+      BuildContext context, covariant flutter.RenderFlex renderObject) {
     renderObject
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
@@ -178,6 +143,34 @@ class HtmlFlex extends MultiChildRenderObjectWidget
         defaultValue: null));
   }
 }
+
+bool? _startIsTopLeft(Axis direction, TextDirection? textDirection,
+    VerticalDirection? verticalDirection) {
+  // If the relevant value of textDirection or verticalDirection is null, this returns null too.
+  switch (direction) {
+    case Axis.horizontal:
+      switch (textDirection) {
+        case TextDirection.ltr:
+          return true;
+        case TextDirection.rtl:
+          return false;
+        case null:
+          return null;
+      }
+    case Axis.vertical:
+      switch (verticalDirection) {
+        case VerticalDirection.down:
+          return true;
+        case VerticalDirection.up:
+          return false;
+        case null:
+          return null;
+      }
+  }
+}
+
+// ignore: avoid_private_typedef_functions
+typedef _ChildSizingFunction = double Function(RenderBox child, double extent);
 
 class _HtmlFlexRenderObject extends RenderBox
     with
@@ -671,10 +664,8 @@ class _HtmlFlexRenderObject extends RenderBox
 
     // Determine used flex factor, size inflexible items, calculate free space.
     int totalFlex = 0;
-    final double maxMainSize = _direction == Axis.horizontal
-        ? constraints.maxWidth
-        : constraints.maxHeight;
-    final bool canFlex = maxMainSize < double.infinity;
+    final double maxMainSize = _getMainSize(constraints.biggest);
+    final bool canFlex = maxMainSize.isFinite;
 
     double crossSize = 0.0;
     double allocatedSize =
@@ -682,6 +673,24 @@ class _HtmlFlexRenderObject extends RenderBox
     RenderBox? child = firstChild;
     RenderBox? lastFlexChild;
     final fwfhFlex = Expando<int>();
+    final bool stretched;
+    switch (crossAxisAlignment) {
+      case CrossAxisAlignment.start:
+        stretched = false;
+        break;
+      case CrossAxisAlignment.center:
+        stretched = false;
+        break;
+      case CrossAxisAlignment.end:
+        stretched = false;
+        break;
+      case CrossAxisAlignment.baseline:
+        stretched = false;
+        break;
+      case CrossAxisAlignment.stretch:
+        stretched = true;
+        break;
+    }
     while (child != null) {
       final FlexParentData childParentData =
           child.parentData! as FlexParentData;
@@ -691,7 +700,7 @@ class _HtmlFlexRenderObject extends RenderBox
         lastFlexChild = child;
       } else {
         final BoxConstraints innerConstraints;
-        if (crossAxisAlignment == CrossAxisAlignment.stretch) {
+        if (stretched) {
           switch (_direction) {
             case Axis.horizontal:
               innerConstraints =
@@ -746,47 +755,27 @@ class _HtmlFlexRenderObject extends RenderBox
           late final double minChildExtent;
           switch (_getFit(child)) {
             case FlexFit.tight:
-              assert(maxChildExtent < double.infinity);
               minChildExtent = maxChildExtent;
               break;
             case FlexFit.loose:
               minChildExtent = 0.0;
           }
+          assert(minChildExtent.isFinite);
+          final double minCrossSize =
+              stretched ? _getCrossSize(constraints.biggest) : 0.0;
           final BoxConstraints innerConstraints;
-          if (crossAxisAlignment == CrossAxisAlignment.stretch) {
-            switch (_direction) {
-              case Axis.horizontal:
-                innerConstraints = BoxConstraints(
+          switch (_direction) {
+            case Axis.horizontal:
+              innerConstraints = constraints.copyWith(
+                  minHeight: minCrossSize,
                   minWidth: minChildExtent,
-                  maxWidth: maxChildExtent,
-                  minHeight: constraints.maxHeight,
-                  maxHeight: constraints.maxHeight,
-                );
-                break;
-              case Axis.vertical:
-                innerConstraints = BoxConstraints(
-                  minWidth: constraints.maxWidth,
-                  maxWidth: constraints.maxWidth,
+                  maxWidth: maxChildExtent);
+              break;
+            case Axis.vertical:
+              innerConstraints = constraints.copyWith(
+                  minWidth: minCrossSize,
                   minHeight: minChildExtent,
-                  maxHeight: maxChildExtent,
-                );
-            }
-          } else {
-            switch (_direction) {
-              case Axis.horizontal:
-                innerConstraints = BoxConstraints(
-                  minWidth: minChildExtent,
-                  maxWidth: maxChildExtent,
-                  maxHeight: constraints.maxHeight,
-                );
-                break;
-              case Axis.vertical:
-                innerConstraints = BoxConstraints(
-                  maxWidth: constraints.maxWidth,
-                  minHeight: minChildExtent,
-                  maxHeight: maxChildExtent,
-                );
-            }
+                  maxHeight: maxChildExtent);
           }
           final Size childSize = layoutChild(child, innerConstraints);
           final double childMainSize = _getMainSize(childSize);
@@ -883,8 +872,56 @@ class _HtmlFlexRenderObject extends RenderBox
     final double actualSizeDelta = actualSize - allocatedSize;
     _overflow = math.max(0.0, -actualSizeDelta);
     final double remainingSpace = math.max(0.0, actualSizeDelta);
-    late final double leadingSpace;
-    late final double betweenSpace;
+    final double betweenSpace;
+    switch (_mainAxisAlignment) {
+      case MainAxisAlignment.start:
+      case MainAxisAlignment.end:
+      case MainAxisAlignment.center:
+        betweenSpace = 0.0;
+        break;
+      case MainAxisAlignment.spaceBetween:
+        if (childCount > 1) {
+          betweenSpace = remainingSpace / (childCount - 1);
+        } else {
+          betweenSpace = 0.0;
+        }
+        break;
+      case MainAxisAlignment.spaceAround:
+        if (childCount > 0) {
+          betweenSpace = remainingSpace / childCount;
+        } else {
+          betweenSpace = 0.0;
+        }
+        break;
+      case MainAxisAlignment.spaceEvenly:
+        if (childCount > 0) {
+          betweenSpace = remainingSpace / (childCount + 1);
+        } else {
+          betweenSpace = 0.0;
+        }
+        break;
+    }
+    final double leadingSpace;
+    switch (_mainAxisAlignment) {
+      case MainAxisAlignment.start:
+        leadingSpace = 0.0;
+        break;
+      case MainAxisAlignment.end:
+        leadingSpace = remainingSpace;
+        break;
+      case MainAxisAlignment.center:
+        leadingSpace = remainingSpace / 2.0;
+        break;
+      case MainAxisAlignment.spaceBetween:
+        leadingSpace = 0.0;
+        break;
+      case MainAxisAlignment.spaceAround:
+        leadingSpace = betweenSpace / 2.0;
+        break;
+      case MainAxisAlignment.spaceEvenly:
+        leadingSpace = betweenSpace;
+    }
+
     // flipMainAxis is used to decide whether to lay out
     // left-to-right/top-to-bottom (false), or right-to-left/bottom-to-top
     // (true). The _startIsTopLeft will return null if there's only one child
@@ -892,31 +929,6 @@ class _HtmlFlexRenderObject extends RenderBox
     // to flip, but that doesn't have any detectable effect.
     final bool flipMainAxis =
         !(_startIsTopLeft(direction, textDirection, verticalDirection) ?? true);
-    switch (_mainAxisAlignment) {
-      case MainAxisAlignment.start:
-        leadingSpace = 0.0;
-        betweenSpace = 0.0;
-        break;
-      case MainAxisAlignment.end:
-        leadingSpace = remainingSpace;
-        betweenSpace = 0.0;
-        break;
-      case MainAxisAlignment.center:
-        leadingSpace = remainingSpace / 2.0;
-        betweenSpace = 0.0;
-        break;
-      case MainAxisAlignment.spaceBetween:
-        leadingSpace = 0.0;
-        betweenSpace = childCount > 1 ? remainingSpace / (childCount - 1) : 0.0;
-        break;
-      case MainAxisAlignment.spaceAround:
-        betweenSpace = childCount > 0 ? remainingSpace / childCount : 0.0;
-        leadingSpace = betweenSpace / 2.0;
-        break;
-      case MainAxisAlignment.spaceEvenly:
-        betweenSpace = childCount > 0 ? remainingSpace / (childCount + 1) : 0.0;
-        leadingSpace = betweenSpace;
-    }
 
     // Position elements
     double childMainPosition =

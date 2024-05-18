@@ -29,14 +29,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: [TextDirection.ltr].
   final TextDirection textDirection;
 
-  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-  // https://github.com/flutter/flutter/pull/119195
-  // https://github.com/flutter/flutter/commit/6a5405925dffb5b4121e1fba898d3d2068dac77c
-
   /// Creates a TABLE widget.
-  // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-  // ignore: prefer_const_constructors_in_immutables
-  HtmlTable({
+  const HtmlTable({
     this.border,
     this.borderCollapse = false,
     this.borderSpacing = 0.0,

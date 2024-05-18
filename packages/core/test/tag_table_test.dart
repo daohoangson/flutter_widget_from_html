@@ -841,14 +841,14 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [
+                  children: [
                     HtmlTableCell(
                       columnStart: 0,
                       rowStart: 0,
@@ -856,7 +856,7 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Bar'),
                 ),
@@ -870,14 +870,14 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline with 2 cells', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [
+                  children: [
                     HtmlTableCell(
                       columnStart: 0,
                       rowStart: 0,
@@ -890,7 +890,7 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Foo'),
                 ),
@@ -904,16 +904,16 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline without cell', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [],
+                  children: [],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Foo'),
                 ),

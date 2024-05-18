@@ -29,16 +29,14 @@ Future<void> main() async {
       _duration = const Duration(milliseconds: 10);
       _playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
 
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-      // ignore: deprecated_member_use
-      audioSessionMc.setMockMethodCallHandler((_) async {});
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        audioSessionMc,
+        (_) => null,
+      );
     });
 
     tearDown(() {
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-      // ignore: deprecated_member_use
-      audioSessionMc.setMockMethodCallHandler((_) async {});
-
       _playbackEvents.close();
     });
 
@@ -93,15 +91,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows remaining (narrow)', (tester) async {
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-      // ignore: deprecated_member_use
-      tester.binding.window.physicalSizeTestValue = const Size(320, 568);
-      // ignore: deprecated_member_use
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      // ignore: deprecated_member_use
-      tester.binding.window.devicePixelRatioTestValue = 1;
-      // ignore: deprecated_member_use
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.setWindowSize(const Size(320, 568));
 
       _duration = const Duration(minutes: 12, seconds: 34);
 

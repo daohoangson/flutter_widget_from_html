@@ -171,9 +171,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     if (borderRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
-        // TODO: require uniform color & style when our minimum Flutter version >= 3.10
-        // support for non-uniform border has been improved since this commit
-        // https://github.com/flutter/flutter/commit/5054b6e514a7af91db9859b4eb55d71177d19cfa
+        // TODO: add support for non-uniform border
+        // https://github.com/flutter/flutter/commit/5054b6e
+        // https://pub.dev/packages/non_uniform_border
         decoration = decoration.copyWith(borderRadius: borderRadius);
         clipBehavior = Clip.hardEdge;
       }
@@ -516,7 +516,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       // performance critical
       // avoid adding broad dependencies like MediaQuery.of(context)
       // because it may invalidate our root properties too often
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.16
       // ignore: deprecated_member_use
       TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
     ];

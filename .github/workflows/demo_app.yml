@@ -16,6 +16,7 @@ jobs:
         working-directory: demo_app
     environment:
       name: vercel
+      url: ${{ steps.now.outputs.url }}
     permissions:
       # write permissions are needed for `comment-on-github` step
       contents: write
@@ -49,7 +50,7 @@ jobs:
 
           _url=$( cat build/appetize.json | jq -r .publicURL )
           echo "url=${_url}" >> $GITHUB_OUTPUT
-      - run: flutter build web
+      - run: flutter build web --wasm
       - name: Generate supported/tags.html
         run: |
           set -e
@@ -62,30 +63,28 @@ jobs:
         run: cp -R build/app/outputs/apk/release build/web/apks
 
       - name: Deploy via Vercel
+        # https://github.com/vercel/vercel/discussions/4468
         id: now
         env:
-          PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}
-          TOKEN: ${{ secrets.ZEIT_TOKEN }}
-        if: env.PROJECT_JSON != null && env.TOKEN != null
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.ZEIT_TOKEN }}
         run: |
           set -e
 
           cd ./build/web
-          { \
-            echo '{'; \
-            echo '  "version": 2,'; \
-            echo '  "builds": ['; \
-            echo '  	{ "src": "./**/*", "use": "@now/static" }'; \
-            echo '  ]'; \
-            echo '}'; \
-          } > ./now.json
-
-          mkdir -p ./.now && echo "$PROJECT_JSON" > ./.now/project.json
+          echo '{' >vercel.json
+          echo '  "headers": [ { "source": "/(.*)", "headers": [' >>vercel.json
+          echo '    { "key": "Cross-Origin-Embedder-Policy", "value": "credentialless" },' >>vercel.json
+          echo '    { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }' >>vercel.json
+          echo '  ] } ],' >>vercel.json
+          echo '  "rewrites":[ { "source": "/(.*)", "destination":"/" } ]' >>vercel.json
+          echo '}' >>vercel.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
-            _url=$( now  --prod --token "$TOKEN" )
+            _url=$( vercel  --prod --token "${VERCEL_TOKEN}" )
           else
-            _url=$( now --token "$TOKEN" )
+            _url=$( vercel --token "${VERCEL_TOKEN}" )
           fi
           echo "url=${_url}" >> $GITHUB_OUTPUT
       - name: Create comment
@@ -102,7 +101,7 @@ jobs:
             - [app-x86_64-release.apk](${{ steps.now.outputs.url }}/apks/app-x86_64-release.apk)
             - [Debug APK](${{ steps.appetize.outputs.url }}) via https://appetize.io
 
-            Web build has been deployed to ${{ steps.now.outputs.url }}. Quick links:
+            WebAssembly build has been deployed to ${{ steps.now.outputs.url }}. Quick links:
 
             - [supported/tags.html](${{ steps.now.outputs.url }}/supported/tags.html)
             - [Hello World](${{ steps.now.outputs.url }}/#/helloworld)
