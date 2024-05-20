@@ -652,10 +652,10 @@ packages:
     dependency: transitive
     description:
       name: patrol_finders
-      sha256: ac33527cc1b63e3aa131dbd7107cfda8ee2df0fb4a4a423c067174a2e60db77b
+      sha256: e14214e88c84d34a1d7c89778ddf5c5a913bfc0a6a308da47d3ebca374a1f5f4
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   petitparser:
     dependency: transitive
     description:
