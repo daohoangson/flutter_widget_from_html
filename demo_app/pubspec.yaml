@@ -48,7 +48,11 @@ dev_dependencies:
   golden_toolkit: ^0.15.0
   lint: any
   measurer: ^2.1.1
-  patrol: ^3.3.0
+  patrol:
+    git:
+      url: https://github.com/daohoangson/patrol
+      ref: 17f967c
+      path: packages/patrol
   test: any
 
 flutter:

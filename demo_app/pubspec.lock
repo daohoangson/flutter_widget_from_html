@@ -643,10 +643,11 @@ packages:
   patrol:
     dependency: "direct dev"
     description:
-      name: patrol
-      sha256: "4ff72b8df68aaf1172d8250dffdead6aedc1c55407650444a5bc04ce6242595b"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/patrol"
+      ref: "17f967c"
+      resolved-ref: "17f967c3d50ccb0c25794db6073f6e36c9f88fdc"
+      url: "https://github.com/daohoangson/patrol"
+    source: git
     version: "3.7.0"
   patrol_finders:
     dependency: transitive
