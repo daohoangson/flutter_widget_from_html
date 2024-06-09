@@ -1,10 +1,11 @@
-## 0.15.1-rc.1
+## 0.15.1
 
 - Replace timers with ResizeObserver (#1241)
 - Only apply IFRAME width & height if it has both attributes (#1244)
 - Set IFRAME width & height to conform to platform view constraints (#1253)
 - Add support for `WebViewFactory.webViewGestureRecognizers` (#1268, authored by @stanislav216)
 - Add support for `WebViewFactory.webViewUnsupportedWorkaroundForIssue37` (#1268)
+- Add support for flutter_widget_from_html_core@0.15.1 (#1269)
 
 ## 0.15.0
 
