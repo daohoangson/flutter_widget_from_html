@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -19,6 +20,10 @@ mixin WebViewFactory on WidgetFactory {
 
   /// {@macro web_view.debuggingEnabled}
   bool get webViewDebuggingEnabled => false;
+
+  /// {@macro web_view.gestureRecognizers}
+  Set<Factory<OneSequenceGestureRecognizer>> get webViewGestureRecognizers =>
+      const <Factory<OneSequenceGestureRecognizer>>{};
 
   /// {@macro web_view.js}
   bool get webViewJs => true;
@@ -60,6 +65,7 @@ mixin WebViewFactory on WidgetFactory {
       aspectRatio: dimensOk ? width / height : 16 / 9,
       autoResize: !dimensOk && js,
       debuggingEnabled: webViewDebuggingEnabled,
+      gestureRecognizers: webViewGestureRecognizers,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) {
           return false;

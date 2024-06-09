@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
@@ -159,9 +158,7 @@ class WebViewState extends State<WebView> {
 
   Widget _buildWebView() => lib.WebViewWidget(
         controller: _controller,
-        gestureRecognizers: const {
-          Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
-        },
+        gestureRecognizers: widget.gestureRecognizers,
         key: Key(widget.url),
       );
 

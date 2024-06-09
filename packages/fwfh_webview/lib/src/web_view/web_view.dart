@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import 'fallback.dart'
@@ -36,6 +38,11 @@ class WebView extends StatefulWidget {
   /// Flutter Web is not supported.
   /// {@endtemplate}
   final bool debuggingEnabled;
+
+  /// {@template web_view.gestureRecognizers}
+  /// Specifies which gestures should be consumed by the web view.
+  /// {@endtemplate}
+  final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
 
   /// The callback to handle navigation request.
   ///
@@ -103,6 +110,7 @@ class WebView extends StatefulWidget {
       Duration(seconds: 2),
     ],
     this.debuggingEnabled = false,
+    this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
     this.interceptNavigationRequest,
     this.js = true,
     this.mediaPlaybackAlwaysAllow = false,
