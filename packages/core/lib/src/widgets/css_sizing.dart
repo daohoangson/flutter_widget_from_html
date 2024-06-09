@@ -314,9 +314,11 @@ class _RenderCssSizing extends RenderProxyBox {
     final sizeWidth = scopedChild.getDryLayout(tightWidth);
 
     final childAspectRatio = sizeWidth.width / sizeWidth.height;
+    final sizeHeightRatio = sizeHeight.width / sizeHeight.height;
     const epsilon = 0.01;
-    if ((childAspectRatio - sizeHeight.width / sizeHeight.height).abs() >
-        epsilon) {
+    if (childAspectRatio.isNaN ||
+        sizeHeightRatio.isNaN ||
+        (childAspectRatio - sizeHeightRatio).abs() > epsilon) {
       return null;
     }
 

@@ -381,6 +381,16 @@ void main() {
   });
 
   group('error handing', () {
+    testWidgets('renders zero dimensions', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1260
+      const html = '<img src="${helper.kDataUri}" width="0" height="0" />';
+      final explained = await helper.explain(tester, html);
+      expect(
+        explained,
+        contains('[CssSizing:height≥0.0,height=0.0,width≥0.0,width=0.0,child='),
+      );
+    });
+
     testWidgets('executes errorBuilder', (WidgetTester tester) async {
       const html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
       await tester.pumpWidget(
