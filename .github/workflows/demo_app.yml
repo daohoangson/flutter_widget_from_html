@@ -49,7 +49,7 @@ jobs:
 
           _url=$( cat build/appetize.json | jq -r .publicURL )
           echo "url=${_url}" >> $GITHUB_OUTPUT
-      - run: flutter build web --wasm
+      - run: flutter build web
       - name: Generate supported/tags.html
         run: |
           set -e
@@ -100,7 +100,7 @@ jobs:
             - [app-x86_64-release.apk](${{ steps.now.outputs.url }}/apks/app-x86_64-release.apk)
             - [Debug APK](${{ steps.appetize.outputs.url }}) via https://appetize.io
 
-            WebAssembly build has been deployed to ${{ steps.now.outputs.url }}. Quick links:
+            Web build has been deployed to ${{ steps.now.outputs.url }}. Quick links:
 
             - [supported/tags.html](${{ steps.now.outputs.url }}/supported/tags.html)
             - [Hello World](${{ steps.now.outputs.url }}/#/helloworld)
