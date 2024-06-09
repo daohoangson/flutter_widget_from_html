@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import '../../core/test/_.dart' as helper;
 import '_.dart';
@@ -15,17 +17,103 @@ void main() {
   const src = 'http://domain.com';
   const defaultAspectRatio = '1.78';
 
-  testWidgets('renders clickable text', (tester) async {
+  group('getters', () {
     const html = '<iframe src="$src"></iframe>';
-    final explained = await explain(tester, html, webView: false);
-    expect(
-      explained,
-      equals(
-        '[CssSizing:$sizingConstraints,child='
-        '[GestureDetector:child=[Text:$src]]'
-        ']',
-      ),
-    );
+
+    testWidgets('webView=false', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewFalse(),
+        ),
+      );
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[GestureDetector:child=[Text:$src]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('webViewDebuggingEnabled', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        explainer: webViewExplainer,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewDebuggingEnabled(),
+        ),
+      );
+      expect(explained, contains('debuggingEnabled=true'));
+    });
+
+    testWidgets('webViewGestureRecognizers={Eager}', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        explainer: webViewExplainer,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewEagerGestureRecognizer(),
+        ),
+      );
+      expect(
+        explained,
+        contains(
+          'gestureRecognizers={Factory(type: OneSequenceGestureRecognizer)}',
+        ),
+      );
+    });
+
+    testWidgets('webViewMediaPlaybackAlwaysAllow', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        explainer: webViewExplainer,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewMediaPlaybackAlwaysAllow(),
+        ),
+      );
+      expect(explained, contains('mediaPlaybackAlwaysAllow=true'));
+    });
+
+    testWidgets('webViewUnsupportedWorkaroundForIssue37', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        explainer: webViewExplainer,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewUnsupportedWorkaroundForIssue37False(),
+        ),
+      );
+      expect(explained, contains('unsupportedWorkaroundForIssue37=false'));
+    });
+
+    testWidgets('webViewUserAgent=foo', (tester) async {
+      final explained = await helper.explain(
+        tester,
+        null,
+        explainer: webViewExplainer,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => _WebViewUserAgentFoo(),
+        ),
+      );
+      expect(explained, contains('userAgent=foo'));
+    });
   });
 
   group('renders web view', () {
@@ -243,4 +331,39 @@ void main() {
       expect(explained, equals('[widget0]'));
     });
   });
+}
+
+class _WebViewFalse extends WidgetFactory with WebViewFactory {
+  @override
+  bool get webView => false;
+}
+
+class _WebViewDebuggingEnabled extends WidgetFactory with WebViewFactory {
+  @override
+  bool get webViewDebuggingEnabled => true;
+}
+
+class _WebViewEagerGestureRecognizer extends WidgetFactory with WebViewFactory {
+  @override
+  Set<Factory<OneSequenceGestureRecognizer>> get webViewGestureRecognizers =>
+      const {
+        Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
+      };
+}
+
+class _WebViewMediaPlaybackAlwaysAllow extends WidgetFactory
+    with WebViewFactory {
+  @override
+  bool get webViewMediaPlaybackAlwaysAllow => true;
+}
+
+class _WebViewUnsupportedWorkaroundForIssue37False extends WidgetFactory
+    with WebViewFactory {
+  @override
+  bool get webViewUnsupportedWorkaroundForIssue37 => false;
+}
+
+class _WebViewUserAgentFoo extends WidgetFactory with WebViewFactory {
+  @override
+  String? get webViewUserAgent => 'foo';
 }

@@ -10,6 +10,9 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
     final debuggingEnabled = widget.debuggingEnabled
         ? ',debuggingEnabled=${widget.debuggingEnabled}'
         : '';
+    final gestureRecognizers = widget.gestureRecognizers.isNotEmpty
+        ? ',gestureRecognizers=${widget.gestureRecognizers}'
+        : '';
     final mediaPlaybackAlwaysAllow = widget.mediaPlaybackAlwaysAllow
         ? ',mediaPlaybackAlwaysAllow=${widget.mediaPlaybackAlwaysAllow}'
         : '';
@@ -26,6 +29,7 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
         "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
         '$debuggingEnabled'
+        '$gestureRecognizers'
         "${!widget.js ? ',js=${widget.js}' : ''}"
         '$mediaPlaybackAlwaysAllow'
         '$unsupportedWorkaroundForIssue37'
@@ -41,7 +45,6 @@ Future<String> explain(
   String html, {
   Uri? baseUrl,
   bool useExplainer = true,
-  bool webView = true,
 }) async =>
     helper.explain(
       tester,
@@ -51,16 +54,9 @@ Future<String> explain(
         html,
         baseUrl: baseUrl,
         key: helper.hwKey,
-        factoryBuilder: () => WebViewWidgetFactory(webView: webView),
+        factoryBuilder: () => WebViewWidgetFactory(),
       ),
       useExplainer: useExplainer,
     );
 
-class WebViewWidgetFactory extends WidgetFactory with WebViewFactory {
-  final bool? _webView;
-
-  WebViewWidgetFactory({bool? webView}) : _webView = webView;
-
-  @override
-  bool get webView => _webView ?? super.webView;
-}
+class WebViewWidgetFactory extends WidgetFactory with WebViewFactory {}

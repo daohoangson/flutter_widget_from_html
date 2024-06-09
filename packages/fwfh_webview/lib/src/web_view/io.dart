@@ -147,6 +147,7 @@ class WebViewState extends State<WebView> {
 
   Widget _buildWebView() => lib.WebViewWidget(
         controller: _controller,
+        gestureRecognizers: widget.gestureRecognizers,
         key: Key(widget.url),
       );
 
