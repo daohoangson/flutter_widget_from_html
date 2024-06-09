@@ -1,0 +1,2 @@
+demo_app/ios/fastlane/4TV2PTBPVG.json filter=git-crypt diff=git-crypt
+demo_app/ios/gc_keys.json filter=git-crypt diff=git-crypt

@@ -133,7 +133,7 @@ InheritedProperties lineHeight(
   InheritedProperties resolving,
   css.Expression expression,
 ) {
-  final CssLineHeight? height = _lineHeightTryParse(expression);
+  final height = _lineHeightTryParse(expression);
   if (height == null) {
     return resolving;
   }
@@ -141,18 +141,19 @@ InheritedProperties lineHeight(
   return resolving.copyWith(value: height);
 }
 
-CssLineHeight? _lineHeightTryParse(css.Expression expression) {
+TextStyleLineHeight? _lineHeightTryParse(css.Expression expression) {
   if (expression is css.LiteralTerm) {
     if (expression is css.NumberTerm) {
       final number = expression.number.toDouble();
       if (number > 0) {
-        return CssLineHeight(CssLength(number * 100, CssLengthUnit.percentage));
+        final percentage = CssLength(number * 100, CssLengthUnit.percentage);
+        return TextStyleLineHeight(percentage);
       }
     }
 
     switch (expression.valueAsString) {
       case kCssLineHeightNormal:
-        return const CssLineHeight();
+        return const TextStyleLineHeight();
     }
   }
 
@@ -161,7 +162,7 @@ CssLineHeight? _lineHeightTryParse(css.Expression expression) {
     return null;
   }
 
-  return CssLineHeight(length);
+  return TextStyleLineHeight(length);
 }
 
 InheritedProperties textDirection(InheritedProperties resolving, String v) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,26 +13,31 @@ import 'web_view.dart';
 
 final _logger = Logger('fwfh_webview');
 
-Future<void> _ignoreError(Future<void> future) => future.onError(
+Future<void>? _ignoreError(Future<void>? future) => future?.onError(
       (error, stackTrace) {
         _logger.warning('Ignored controller error', error, stackTrace);
       },
     );
 
 class WebViewState extends State<WebView> {
-  final _timers = <Timer>[];
   late final lib.WebViewController _controller;
 
   late double _aspectRatio;
   String? _firstFinishedUrl;
   _Issue37? _issue37;
+  _ResizeObserver? _resizeObserver;
 
   @override
   void initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    _ignoreError(_initController());
+    if (widget.autoResize) {
+      _resizeObserver = _ResizeObserver(this);
+      _resizeObserver?.stream.stream.listen(_autoResize);
+    }
+
+    unawaited(_ignoreError(_initController()));
 
     if (widget.unsupportedWorkaroundForIssue37) {
       WidgetsBinding.instance.addObserver(_issue37 = _Issue37(this));
@@ -53,6 +59,10 @@ class WebViewState extends State<WebView> {
     await _controller.setJavaScriptMode(
       widget.js ? lib.JavaScriptMode.unrestricted : lib.JavaScriptMode.disabled,
     );
+    if (widget.js) {
+      await _ignoreError(_resizeObserver?.initialize());
+    }
+
     await _controller.setNavigationDelegate(
       lib.NavigationDelegate(
         onPageFinished: _onPageFinished,
@@ -111,44 +121,23 @@ class WebViewState extends State<WebView> {
 
   @override
   void dispose() {
-    for (final timer in _timers) {
-      timer.cancel();
-    }
-
     final observer = _issue37;
     if (observer != null) {
       WidgetsBinding.instance.removeObserver(observer);
     }
 
+    _resizeObserver?.close();
+
     super.dispose();
   }
 
-  Future<String> eval(String js) async {
-    try {
-      final result = await _controller.runJavaScriptReturningResult(js);
-      return '$result';
-    } catch (error, stackTrace) {
-      _logger.warning('Could not eval JS', error, stackTrace);
-    }
-
-    return '';
-  }
-
-  Future<void> _autoResize() async {
+  Future<void> _autoResize(Size size) async {
     if (!mounted) {
       return;
     }
 
-    final evals = await Future.wait([
-      eval('document.body.scrollWidth'),
-      eval('document.body.scrollHeight'),
-    ]);
-    if (!mounted) {
-      return;
-    }
-
-    final w = double.tryParse(evals[0]) ?? 0;
-    final h = double.tryParse(evals[1]) ?? 0;
+    final w = size.width;
+    final h = size.height;
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed) {
@@ -195,18 +184,7 @@ class WebViewState extends State<WebView> {
 
   void _onPageFinished(String url) {
     _firstFinishedUrl ??= url;
-
-    if (widget.autoResize) {
-      for (final interval in widget.autoResizeIntervals) {
-        if (interval == Duration.zero) {
-          // get dimensions immediately
-          _autoResize();
-        } else {
-          // or wait for the specified duration
-          _timers.add(Timer(interval, _autoResize));
-        }
-      }
-    }
+    unawaited(_ignoreError(_resizeObserver?.observe('document.body')));
   }
 }
 
@@ -220,5 +198,57 @@ class _Issue37 with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) {
       wvs._controller.reload();
     }
+  }
+}
+
+class _ResizeObserver {
+  final String channelName;
+  final stream = StreamController<Size>();
+  final WebViewState wvs;
+
+  _ResizeObserver(this.wvs)
+      : channelName = 'FwfhWebViewResizeObserver${wvs.hashCode}';
+
+  Future<dynamic> close() => stream.close();
+
+  Future<void> initialize() async {
+    await wvs._controller.addJavaScriptChannel(
+      channelName,
+      onMessageReceived: (message) {
+        final parsed = jsonDecode(message.message);
+        if (parsed is List && parsed.length == 2) {
+          final width = parsed[0];
+          final height = parsed[1];
+          if (width is num && height is num) {
+            stream.sink.add(Size(width.toDouble(), height.toDouble()));
+          }
+        }
+      },
+    );
+  }
+
+  Future<void> observe(String target) async {
+    if (!wvs.mounted) {
+      return;
+    }
+
+    await wvs._controller.runJavaScript('''
+(function() {
+  if (typeof window['$channelName'] === 'undefined') { return; }
+  const channel = window['$channelName'];
+  delete window['$channelName'];
+
+  const resizeObserver = new ResizeObserver(entries => {
+    let size = []
+    for (const entry of entries) {
+      const { target } = entry
+      size = [ target.scrollWidth, target.scrollHeight ]
+    }
+    channel.postMessage(JSON.stringify(size));
+  })
+
+  resizeObserver.observe($target);
+})();
+''');
   }
 }

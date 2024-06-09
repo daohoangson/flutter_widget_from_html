@@ -115,8 +115,10 @@ mixin WebViewFactory on WidgetFactory {
                 'min-width': '0px',
                 'min-height': '0px',
                 'width': 'auto',
-                if (height != null) 'height': '${height}px',
-                if (width != null) 'width': '${width}px',
+                if (height != null && width != null) ...{
+                  'height': '${height}px',
+                  'width': '${width}px',
+                },
               };
             },
             onWidgets: (meta, widgets) {

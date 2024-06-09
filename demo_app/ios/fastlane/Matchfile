@@ -1,0 +1,3 @@
+google_cloud_bucket_name("flutterttdemo-fastlane-match")
+platform("ios")
+storage_mode("google_cloud")

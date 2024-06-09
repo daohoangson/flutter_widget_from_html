@@ -605,6 +605,10 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is Builder) {
+      return _widget(widget.builder(context));
+    }
+
     if (widget is LayoutBuilder) {
       return _widget(
         widget.builder(
@@ -636,6 +640,10 @@ class Explainer {
     }
 
     if (widget is InheritedWidget) {
+      if (widget.runtimeType.toString() == 'CssSizingHint') {
+        // v0.15+
+        return _widget(widget.child);
+      }
       if (widget.runtimeType.toString() == 'TshWidget') {
         // v0.5+
         return _widget(widget.child);
@@ -674,7 +682,7 @@ class Explainer {
       return _sizedBox(widget);
     }
 
-    final type = '${widget.runtimeType}';
+    var type = '${widget.runtimeType}';
     final attr = <String>[];
 
     final maxLines = widget is RichText
@@ -707,9 +715,11 @@ class Explainer {
       _textDirection(
         widget is Column
             ? widget.textDirection
-            : widget is RichText
+            : widget is Flex
                 ? widget.textDirection
-                : (widget is Text ? widget.textDirection : null),
+                : widget is RichText
+                    ? widget.textDirection
+                    : (widget is Text ? widget.textDirection : null),
       ),
     );
 
@@ -795,6 +805,9 @@ class Explainer {
     }
 
     if (widget is! Column && (widget is Flex)) {
+      if (type == 'HtmlFlex') {
+        type = 'Flex'; // rename our widget, we may come back to Flutter's soon
+      }
       attr.addAll(_flex(widget));
     }
 
@@ -874,15 +887,34 @@ class HitTestApp extends StatelessWidget {
       );
 }
 
-extension RenderBoxGetter on GlobalKey {
-  RenderBox get renderBox => currentContext!.findRenderObject()! as RenderBox;
+extension RenderBoxElement on Element {
+  RenderBox get renderBox => renderObject!.renderBox;
+}
 
-  Size get size => renderBox.size;
+extension RenderBoxGlobalKey on GlobalKey {
+  RenderBox get renderBox => currentContext!.findRenderObject()!.renderBox;
 
-  double get width => size.width;
+  double get width => renderBox.size.width;
+}
+
+extension RenderBoxRenderBox on RenderBox {
+  double get left => localToGlobal(Offset.zero).dx;
+
+  double get top => localToGlobal(Offset.zero).dy;
+}
+
+extension RenderBoxRenderObject on RenderObject {
+  RenderBox get renderBox => this as RenderBox;
 }
 
 extension WindowTester on WidgetTester {
+  double get windowHeight =>
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: deprecated_member_use
+      binding.window.physicalSize.height /
+      // ignore: deprecated_member_use
+      binding.window.devicePixelRatio;
+
   double get windowWidth =>
       // TODO: remove lint ignore when our minimum Flutter version >= 3.10
       // ignore: deprecated_member_use

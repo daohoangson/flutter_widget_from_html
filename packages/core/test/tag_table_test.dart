@@ -519,7 +519,7 @@ Future<void> main() async {
         findsNWidgets(2),
         reason: 'Implementation details: HR renders two `Container` widgets.',
       );
-      final box = tester.firstRenderObject(containerFinder) as RenderBox;
+      final box = tester.firstRenderObject(containerFinder).renderBox;
       expect(box.size.width, equals(foo.width));
       expect(box.size.height, greaterThan(.0));
     });
@@ -841,14 +841,14 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [
+                  children: [
                     HtmlTableCell(
                       columnStart: 0,
                       rowStart: 0,
@@ -856,7 +856,7 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Bar'),
                 ),
@@ -870,14 +870,14 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline with 2 cells', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [
+                  children: [
                     HtmlTableCell(
                       columnStart: 0,
                       rowStart: 0,
@@ -890,7 +890,7 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Foo'),
                 ),
@@ -904,16 +904,16 @@ Future<void> main() async {
 
     testWidgets('computeDistanceToActualBaseline without cell', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlTable(
-                  children: const [],
+                  children: [],
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Text('Foo'),
                 ),
@@ -1064,16 +1064,8 @@ Future<void> main() async {
               HtmlTableCell(
                 columnStart: 0,
                 rowStart: 0,
-                child: Text.rich(
-                  const TextSpan(
-                    children: [
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.baseline,
-                        baseline: TextBaseline.alphabetic,
-                        child: Text('Foo foo foo foo'),
-                      ),
-                    ],
-                  ),
+                child: LayoutBuilder(
+                  builder: (_, __) => const Text('Foo foo foo foo'),
                   key: left,
                 ),
               ),
@@ -1464,8 +1456,8 @@ Future<void> main() async {
       );
       await tester.pumpAndSettle();
 
-      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
-      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      final fooTop = foo.renderBox.top;
+      final barTop = bar.renderBox.top;
       expect(fooTop, equals(padding.top));
       expect(barTop, equals(fooTop));
     });
@@ -1500,8 +1492,8 @@ Future<void> main() async {
       );
       await tester.pumpAndSettle();
 
-      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
-      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      final fooTop = foo.renderBox.top;
+      final barTop = bar.renderBox.top;
       expect(fooTop, equals(padding.top));
       expect(barTop, equals(fooTop));
     });

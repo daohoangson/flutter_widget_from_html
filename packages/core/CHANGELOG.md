@@ -1,3 +1,11 @@
+## 0.14.12
+
+- Expand roman support to 3999 (#1154, authored by @ngthailam)
+- Add support for `text-shadow` (#1158, also by @ngthailam 🎉)
+- Improve support for `display: flex` (#1229, #1235)
+- Fix bug cannot select text of nested HtmlWidget inside list view render mode (#1231)
+- Fix white spaces are removed in PRE tag (#1233)
+
 ## 0.14.11
 
 - Fix infinite `TextStyle.height` (#1147)

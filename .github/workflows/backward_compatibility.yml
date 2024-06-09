@@ -8,6 +8,10 @@ on:
       - release/beta
       - release/master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -34,7 +38,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -76,7 +80,7 @@ jobs:
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@1c5eb12d812966ca84680edc38353a0851c8fd56 # v2.14.0
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - run: flutter test
@@ -99,7 +103,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -112,7 +116,19 @@ jobs:
           # output for debugging
           cat pubspec.yaml
       - name: Setup Flutter
-        uses: subosito/flutter-action@1c5eb12d812966ca84680edc38353a0851c8fd56 # v2.14.0
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           channel: ${{ matrix.channel }}
       - run: flutter test
+
+  html_flex:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - name: Verify hashes
+        run: |
+          set -e
+
+          _scripts=$( cat packages/core/lib/src/widgets/html_flex.dart | head -n 22 | tail -n 21 )
+          bash -c "$_scripts"

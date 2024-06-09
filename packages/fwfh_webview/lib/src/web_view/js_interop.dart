@@ -20,6 +20,11 @@ class WebViewState extends State<WebView> {
       _iframeElement.allow = 'autoplay';
     }
 
+    // https://docs.flutter.dev/release/breaking-changes/platform-views-using-html-slots-web
+    _iframeElement.style
+      ..height = '100%'
+      ..width = '100%';
+
     final viewType = '$this#$hashCode';
 
     platformViewRegistry.registerViewFactory(viewType, (_) => _iframeElement);
