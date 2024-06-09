@@ -1,3 +1,9 @@
+## 0.15.1
+
+- Drop support for Flutter 3.7 (#1250)
+- Add support for `currentcolor` (#1240)
+- Fix zero size image (#1266)
+
 ## 0.14.12
 
 - Expand roman support to 3999 (#1154, authored by @ngthailam)

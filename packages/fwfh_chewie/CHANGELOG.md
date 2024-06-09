@@ -1,3 +1,7 @@
+## 0.14.8
+
+- Add support for flutter_widget_from_html_core@0.15.1 (#1269)
+
 ## 0.14.7
 
 - Render video player on macOS (#1100)

@@ -1,3 +1,7 @@
+## 0.14.3
+
+- Add support for flutter_widget_from_html_core@0.15.1 (#1269)
+
 ## 0.14.2
 
 - Requires Flutter 3.7 (#899)

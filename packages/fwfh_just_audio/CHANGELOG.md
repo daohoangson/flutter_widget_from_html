@@ -1,3 +1,8 @@
+## 0.15.1
+
+- Drop support for Flutter@3.7 (#1250)
+- Add support for flutter_widget_from_html_core@0.15.1 (#1269)
+
 ## 0.14.3
 
 - Fix `audio_player` throws exception when max value is 0 (#1156, authored by @ngthailam)
