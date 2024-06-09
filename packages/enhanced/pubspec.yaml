@@ -15,7 +15,7 @@ dependencies:
   fwfh_chewie: ^0.14.8
   fwfh_just_audio: ^0.15.1
   fwfh_svg: ^0.8.2
-  fwfh_url_launcher: ^0.9.0+4
+  fwfh_url_launcher: ^0.9.1
   fwfh_webview: ^0.15.1-0
   html: ^0.15.0
 
