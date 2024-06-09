@@ -85,11 +85,13 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final void Function(Widget child)? onAndroidShowCustomWidget;
 
+  /// {@template web_view.unsupportedWorkaroundForIssue37}
   /// Controls whether or not to apply workaround for
   /// [video continue playing after locking the phone or navigate to another screen](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
   /// issue.
   ///
   /// Default: `true`.
+  /// {@endtemplate}
   final bool unsupportedWorkaroundForIssue37;
 
   /// {@template web_view.userAgent}

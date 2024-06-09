@@ -37,6 +37,9 @@ mixin WebViewFactory on WidgetFactory {
   /// {@macro web_view.onAndroidShowCustomWidget}
   void Function(Widget widget)? get webViewOnAndroidShowCustomWidget => null;
 
+  /// {@macro web_view.unsupportedWorkaroundForIssue37}
+  bool get webViewUnsupportedWorkaroundForIssue37 => true;
+
   /// {@macro web_view.userAgent}
   String? get webViewUserAgent => null;
 
@@ -78,6 +81,7 @@ mixin WebViewFactory on WidgetFactory {
       mediaPlaybackAlwaysAllow: webViewMediaPlaybackAlwaysAllow,
       onAndroidHideCustomWidget: webViewOnAndroidHideCustomWidget,
       onAndroidShowCustomWidget: webViewOnAndroidShowCustomWidget,
+      unsupportedWorkaroundForIssue37: webViewUnsupportedWorkaroundForIssue37,
       userAgent: webViewUserAgent,
     );
   }
