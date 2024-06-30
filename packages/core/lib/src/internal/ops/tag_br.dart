@@ -25,7 +25,15 @@ class TagBrBit extends BuildBit {
   BuildBit copyWith({BuildTree? parent}) => TagBrBit(parent ?? this.parent);
 
   @override
-  void flatten(Flattened f) => f.write(text: '\n');
+  void flatten(Flattened f) {
+    final previousBit = parent.bits.isNotEmpty ? parent.bits.last : null;
+    if (previousBit is TagBrBit) {
+      // Do not add extra space if the previous bit is also a <br> tag
+      return;
+    }
+
+    f.write(text: '\n');
+  }
 
   @override
   String toString() => '<BR />';
