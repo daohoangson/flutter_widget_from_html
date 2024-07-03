@@ -25,4 +25,16 @@ void main() {
       });
     });
   });
+
+  group('isValidCss', () {
+    test('returns true for valid CSS', () {
+      final cssString = 'body { background-color: red; }';
+      expect(isValidCss(cssString), isTrue);
+    });
+
+    test('returns false for invalid CSS', () {
+      final cssString = 'body { background-color: red; # }';
+      expect(isValidCss(cssString), isFalse);
+    });
+  });
 }

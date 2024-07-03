@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
+import 'package:csslib/parser.dart' as css_parser;
+import 'package:csslib/visitor.dart' as css_visitor;
 
 import 'core_data.dart';
 import 'core_html_widget.dart';
@@ -216,4 +218,16 @@ int? tryParseIntFromMap(Map<dynamic, String> map, String key) {
   }
 
   return int.tryParse(value);
+}
+
+/// Checks if a CSS string is valid.
+bool isValidCss(String cssString) {
+  try {
+    final errors = <css_parser.Message>[];
+    final parser = css_parser.Parser();
+    parser.parse(cssString, errors: errors);
+    return errors.isEmpty;
+  } catch (e) {
+    return false;
+  }
 }

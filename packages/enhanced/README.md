@@ -100,6 +100,15 @@ HtmlWidget(
 
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
+
+  // handle invalid HTML/CSS
+  onErrorBuilder: (context, element, error) {
+    if (error is css_parser.Message) {
+      // Ignore invalid CSS errors
+      return null;
+    }
+    return const Text('Error parsing the message!');
+  },
 ),
 ```
 

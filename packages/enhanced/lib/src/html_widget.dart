@@ -31,4 +31,17 @@ class HtmlWidget extends core.HtmlWidget {
   }) : super(factoryBuilder: factoryBuilder ?? _getEnhancedWf);
 
   static WidgetFactory _getEnhancedWf() => WidgetFactory();
+
+  @override
+  Widget? onErrorBuilder(
+    BuildContext context,
+    dom.Element element,
+    dynamic error,
+  ) {
+    if (error is css_parser.Message) {
+      // Ignore invalid CSS errors
+      return null;
+    }
+    return super.onErrorBuilder(context, element, error);
+  }
 }
