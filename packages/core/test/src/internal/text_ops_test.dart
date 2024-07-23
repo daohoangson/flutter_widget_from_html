@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/src/core_data.dart';
+import 'package:flutter_widget_from_html_core/src/internal/text_ops.dart';
 
 import '../../_.dart';
 
@@ -97,6 +99,38 @@ Future<void> main() async {
           ),
         );
       });
+    });
+  });
+
+  group('text-transformation', () {
+    test('test tryParseTextTransform capitalize', () {
+      const value = 'capitalize';
+      final actual = tryParseTextTransform(value);
+      expect(actual, CssTextTransform.capitalize);
+    });
+
+    test('test tryParseTextTransform uppercase', () {
+      const value = 'uppercase';
+      final actual = tryParseTextTransform(value);
+      expect(actual, CssTextTransform.uppercase);
+    });
+
+    test('test tryParseTextTransform lowercase', () {
+      const value = 'lowercase';
+      final actual = tryParseTextTransform(value);
+      expect(actual, CssTextTransform.lowercase);
+    });
+
+    test('test tryParseTextTransform none', () {
+      const value = 'none';
+      final actual = tryParseTextTransform(value);
+      expect(actual, CssTextTransform.none);
+    });
+
+    test('test tryParseTextTransform default', () {
+      const value = 'random string';
+      final actual = tryParseTextTransform(value);
+      expect(actual, CssTextTransform.none);
     });
   });
 }
