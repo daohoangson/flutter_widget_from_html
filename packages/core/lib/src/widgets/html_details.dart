@@ -112,7 +112,7 @@ extension on BuildContext {
 
 class _HtmlDetailsInherited extends InheritedWidget {
   final bool isOpen;
-  final void Function(bool) setIsOpen;
+  final void Function(bool value) setIsOpen;
 
   const _HtmlDetailsInherited({
     required super.child,

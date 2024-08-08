@@ -466,7 +466,7 @@ class _TagTableData {
   final footer = _TagTableRowGroup(kCssDisplayTableFooterGroup);
   final header = _TagTableRowGroup(kCssDisplayTableHeaderGroup);
 
-  final builders = <HtmlTableCell? Function(BuildContext)>[];
+  final builders = <HtmlTableCell? Function(BuildContext context)>[];
   final cells = <int, Map<int, int>>{};
   int columns = 0;
   int rows = 0;

@@ -27,7 +27,7 @@ Widget? buildCurrentState({GlobalKey? key}) {
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  String? Function(Explainer, Widget)? explainer,
+  String? Function(Explainer explainer, Widget child)? explainer,
   double? height,
   Widget? hw,
   GlobalKey? key,
@@ -82,7 +82,7 @@ Future<String> explain(
 }
 
 Future<String> explainWithoutPumping({
-  String? Function(Explainer, Widget)? explainer,
+  String? Function(Explainer explainer, Widget child)? explainer,
   GlobalKey? key,
   bool useExplainer = true,
 }) async {
@@ -216,7 +216,7 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String? Function(Explainer, Widget)? explainer;
+  final String? Function(Explainer explainer, Widget child)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})

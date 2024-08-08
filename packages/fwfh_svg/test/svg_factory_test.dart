@@ -446,7 +446,7 @@ HttpClient _createMockSvgImageHttpClient() {
     ),
   ).thenAnswer((invocation) {
     final onData =
-        invocation.positionalArguments[0] as void Function(List<int>);
+        invocation.positionalArguments[0] as void Function(List<int> data);
     final onDone =
         invocation.namedArguments[const Symbol('onDone')] as Function?;
     return Stream.fromIterable(<List<int>>[redTriangleBytes])

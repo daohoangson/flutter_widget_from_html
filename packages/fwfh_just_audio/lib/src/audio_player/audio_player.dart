@@ -216,7 +216,7 @@ class _PositionText extends StatelessWidget {
 class _PositionSlider extends StatelessWidget {
   final Stream<Duration?> durationStream;
   final Stream<Duration> positionStream;
-  final void Function(Duration) seek;
+  final void Function(Duration duration) seek;
   final double size;
 
   const _PositionSlider({
@@ -257,7 +257,7 @@ class _PositionSlider extends StatelessWidget {
 }
 
 class _MuteButton extends StatelessWidget {
-  final Future<void> Function(double) setVolume;
+  final Future<void> Function(double value) setVolume;
   final double size;
   final Stream<double> stream;
 
