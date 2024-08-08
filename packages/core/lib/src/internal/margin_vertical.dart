@@ -36,7 +36,7 @@ class HeightPlaceholder extends WidgetPlaceholder {
   }
 
   @override
-  HeightPlaceholder wrapWith(Widget? Function(BuildContext, Widget) builder) =>
+  HeightPlaceholder wrapWith(Widget? Function(BuildContext context, Widget child) builder) =>
       this;
 
   static Widget _build(

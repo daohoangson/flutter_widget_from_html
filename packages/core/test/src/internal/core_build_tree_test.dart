@@ -99,8 +99,8 @@ dom.NodeList _parseHtml(String html) =>
     parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;
 
 class _WidgetFactory extends WidgetFactory {
-  final void Function(BuildTree)? onParse;
-  final void Function(BuildTree)? onParseStyle;
+  final void Function(BuildTree value)? onParse;
+  final void Function(BuildTree value)? onParseStyle;
 
   _WidgetFactory({
     this.onParse,
