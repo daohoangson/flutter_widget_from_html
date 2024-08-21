@@ -256,8 +256,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
           ? SliverToBoxAdapter(child: child)
           : child;
 
-  Widget _wrapper(Widget child) =>
-      _RootWidget(resolved: _rootProperties, child: child);
+  Widget _wrapper(Widget child) => _RootWidget(
+        resolved: _rootProperties,
+        child: child != widget0 ? child : _sliverToBoxAdapterIfNeeded(child),
+      );
 }
 
 class _RootResolvers extends InheritanceResolvers {
