@@ -222,6 +222,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Future<bool> scrollToAnchor(String id) => _wf.onTapUrl('#$id');
 
   Future<Widget> _buildAsync() async {
+    if (widget.html.isEmpty) {
+      return Future.sync(() => widget0);
+    }
+
     final domNodes = await compute(_parseHtml, widget.html);
     if (!mounted) {
       return widget0;
@@ -235,6 +239,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
   }
 
   Widget _buildSync() {
+    if (widget.html.isEmpty) {
+      return widget0;
+    }
+
     Timeline.startSync('Build $widget (sync)');
 
     Widget built;
