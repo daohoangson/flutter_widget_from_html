@@ -15,7 +15,8 @@ class Flattener implements Flattened {
   final WidgetFactory wf;
   final _widgets = <WidgetPlaceholder>[];
 
-  List<InlineSpan? Function(BuildContext context, {bool? isLast})>? _childrenBuilder;
+  List<InlineSpan? Function(BuildContext context, {bool? isLast})>?
+      _childrenBuilder;
   late InheritanceResolvers _firstInheritanceResolvers;
   late List<_String> _firstStrings;
 
