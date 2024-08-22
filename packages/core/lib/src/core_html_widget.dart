@@ -314,8 +314,8 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final rootTree = state._rootTree;
   rootTree.addBitsFromNodes(domNodes);
 
-  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ??
-      state._sliverToBoxAdapterIfNeeded(widget0);
+  final built =
+      rootTree.build()?.wrapWith(wf.buildBodyWidget) ?? state._sliverOrWidget0;
 
   _logger.fine('Built body successfuly.');
 
