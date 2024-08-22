@@ -46,7 +46,7 @@ class WebView extends StatefulWidget {
   /// Returning `true` will stop web view from navigating.
   ///
   /// Flutter Web is not supported.
-  final bool Function(String)? interceptNavigationRequest;
+  final bool Function(String value)? interceptNavigationRequest;
 
   /// {@template web_view.js}
   /// Controls whether to enable JavaScript.
