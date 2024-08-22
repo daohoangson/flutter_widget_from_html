@@ -672,7 +672,7 @@ class Explainer {
       return _sizedBox(widget);
     }
 
-    var type = '${widget.runtimeType}';
+    final type = '${widget.runtimeType}';
     final attr = <String>[];
 
     final maxLines = widget is RichText
@@ -767,11 +767,19 @@ class Explainer {
       switch (widget.runtimeType.toString()) {
         case 'HtmlFlex':
           attr.add(
-              'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''));
-          attr.add('mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
-              .replaceAll('MainAxisAlignment.', ''));
-          attr.add('crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
-              .replaceAll('CrossAxisAlignment.', ''));
+            // ignore: avoid_dynamic_calls
+            'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''),
+          );
+          attr.add(
+            // ignore: avoid_dynamic_calls
+            'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
+                .replaceAll('MainAxisAlignment.', ''),
+          );
+          attr.add(
+            // ignore: avoid_dynamic_calls
+            'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
+                .replaceAll('CrossAxisAlignment.', ''),
+          );
           break;
       }
     }

@@ -82,7 +82,8 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
         (_needTextDirection ? Directionality.maybeOf(context) : null);
   }
 
-  _HtmlFlexRenderObject createRenderObject(BuildContext context) {
+  @override
+  RenderObject createRenderObject(BuildContext context) {
     return _HtmlFlexRenderObject(
       direction: direction,
       mainAxisAlignment: mainAxisAlignment,
@@ -97,7 +98,9 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, covariant _HtmlFlexRenderObject renderObject) {
+      BuildContext context,
+      // ignore: library_private_types_in_public_api
+      covariant _HtmlFlexRenderObject renderObject) {
     renderObject
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
