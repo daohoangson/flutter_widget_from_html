@@ -30,15 +30,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart' hide RenderFlex;
-import 'package:flutter/rendering.dart' as flutter show RenderFlex;
 import 'package:flutter/widgets.dart'
     show BuildContext, Directionality, MultiChildRenderObjectWidget;
-import 'package:flutter/widgets.dart' as flutter show Flex;
 
-class HtmlFlex extends MultiChildRenderObjectWidget
-    implements
-        // ignore: avoid_implementing_value_types
-        flutter.Flex {
+class HtmlFlex extends MultiChildRenderObjectWidget {
   const HtmlFlex({
     super.key,
     required this.direction,
@@ -56,28 +51,20 @@ class HtmlFlex extends MultiChildRenderObjectWidget
             'textBaseline is required if you specify the crossAxisAlignment with CrossAxisAlignment.baseline');
   // Cannot use == in the assert above instead of identical because of https://github.com/dart-lang/language/issues/1811.
 
-  @override
   final Axis direction;
 
-  @override
   final MainAxisAlignment mainAxisAlignment;
 
-  @override
   final MainAxisSize mainAxisSize;
 
-  @override
   final CrossAxisAlignment crossAxisAlignment;
 
-  @override
   final TextDirection? textDirection;
 
-  @override
   final VerticalDirection verticalDirection;
 
-  @override
   final TextBaseline? textBaseline;
 
-  @override
   final Clip clipBehavior;
 
   bool get _needTextDirection {
@@ -90,14 +77,13 @@ class HtmlFlex extends MultiChildRenderObjectWidget
     }
   }
 
-  @override
   TextDirection? getEffectiveTextDirection(BuildContext context) {
     return textDirection ??
         (_needTextDirection ? Directionality.maybeOf(context) : null);
   }
 
   @override
-  flutter.RenderFlex createRenderObject(BuildContext context) {
+  RenderObject createRenderObject(BuildContext context) {
     return _HtmlFlexRenderObject(
       direction: direction,
       mainAxisAlignment: mainAxisAlignment,
@@ -112,7 +98,9 @@ class HtmlFlex extends MultiChildRenderObjectWidget
 
   @override
   void updateRenderObject(
-      BuildContext context, covariant flutter.RenderFlex renderObject) {
+      BuildContext context,
+      // ignore: library_private_types_in_public_api
+      covariant _HtmlFlexRenderObject renderObject) {
     renderObject
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
@@ -176,8 +164,7 @@ class _HtmlFlexRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, FlexParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, FlexParentData>,
-        DebugOverflowIndicatorMixin
-    implements flutter.RenderFlex {
+        DebugOverflowIndicatorMixin {
   /// Creates a flex render object.
   ///
   /// By default, the flex layout is horizontal and children are aligned to the
@@ -203,10 +190,8 @@ class _HtmlFlexRenderObject extends RenderBox
     addAll(children);
   }
 
-  @override
   Axis get direction => _direction;
   Axis _direction;
-  @override
   set direction(Axis value) {
     if (_direction != value) {
       _direction = value;
@@ -214,10 +199,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   MainAxisAlignment get mainAxisAlignment => _mainAxisAlignment;
   MainAxisAlignment _mainAxisAlignment;
-  @override
   set mainAxisAlignment(MainAxisAlignment value) {
     if (_mainAxisAlignment != value) {
       _mainAxisAlignment = value;
@@ -225,10 +208,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   MainAxisSize get mainAxisSize => _mainAxisSize;
   MainAxisSize _mainAxisSize;
-  @override
   set mainAxisSize(MainAxisSize value) {
     if (_mainAxisSize != value) {
       _mainAxisSize = value;
@@ -236,10 +217,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   CrossAxisAlignment get crossAxisAlignment => _crossAxisAlignment;
   CrossAxisAlignment _crossAxisAlignment;
-  @override
   set crossAxisAlignment(CrossAxisAlignment value) {
     if (_crossAxisAlignment != value) {
       _crossAxisAlignment = value;
@@ -247,10 +226,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   TextDirection? get textDirection => _textDirection;
   TextDirection? _textDirection;
-  @override
   set textDirection(TextDirection? value) {
     if (_textDirection != value) {
       _textDirection = value;
@@ -258,10 +235,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   VerticalDirection get verticalDirection => _verticalDirection;
   VerticalDirection _verticalDirection;
-  @override
   set verticalDirection(VerticalDirection value) {
     if (_verticalDirection != value) {
       _verticalDirection = value;
@@ -269,10 +244,8 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  @override
   TextBaseline? get textBaseline => _textBaseline;
   TextBaseline? _textBaseline;
-  @override
   set textBaseline(TextBaseline? value) {
     assert(_crossAxisAlignment != CrossAxisAlignment.baseline || value != null);
     if (_textBaseline != value) {
@@ -323,10 +296,8 @@ class _HtmlFlexRenderObject extends RenderBox
   // are treated as not overflowing.
   bool get _hasOverflow => _overflow > precisionErrorTolerance;
 
-  @override
   Clip get clipBehavior => _clipBehavior;
   Clip _clipBehavior = Clip.none;
-  @override
   set clipBehavior(Clip value) {
     if (value != _clipBehavior) {
       _clipBehavior = value;
