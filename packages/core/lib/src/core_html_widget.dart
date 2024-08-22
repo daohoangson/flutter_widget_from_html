@@ -134,6 +134,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
         wf: _wf,
       );
 
+  Widget get _sliverOrWidget0 => _sliverToBoxAdapterIfNeeded(widget0);
+
   @override
   void initState() {
     super.initState();
@@ -223,12 +225,12 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     if (widget.html.isEmpty) {
-      return Future.sync(() => widget0);
+      return Future.sync(() => _sliverOrWidget0);
     }
 
     final domNodes = await compute(_parseHtml, widget.html);
     if (!mounted) {
-      return widget0;
+      return _sliverOrWidget0;
     }
 
     Timeline.startSync('Build $widget (async)');
@@ -240,7 +242,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Widget _buildSync() {
     if (widget.html.isEmpty) {
-      return widget0;
+      return _sliverOrWidget0;
     }
 
     Timeline.startSync('Build $widget (sync)');
@@ -261,13 +263,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
       widget.renderMode == RenderMode.sliverList
-          ? SliverToBoxAdapter(child: child)
+          ? child == widget0
+              ? const SliverToBoxAdapter(child: widget0)
+              : SliverToBoxAdapter(child: child)
           : child;
 
-  Widget _wrapper(Widget child) => _RootWidget(
-        resolved: _rootProperties,
-        child: child != widget0 ? child : _sliverToBoxAdapterIfNeeded(child),
-      );
+  Widget _wrapper(Widget child) =>
+      _RootWidget(resolved: _rootProperties, child: child);
 }
 
 class _RootResolvers extends InheritanceResolvers {
@@ -312,7 +314,8 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final rootTree = state._rootTree;
   rootTree.addBitsFromNodes(domNodes);
 
-  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ??
+      state._sliverToBoxAdapterIfNeeded(widget0);
 
   _logger.fine('Built body successfuly.');
 
