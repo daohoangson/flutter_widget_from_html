@@ -27,7 +27,7 @@ Widget? buildCurrentState({GlobalKey? key}) {
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  String? Function(Explainer, Widget)? explainer,
+  String? Function(Explainer explainer, Widget child)? explainer,
   double? height,
   Widget? hw,
   GlobalKey? key,
@@ -82,7 +82,7 @@ Future<String> explain(
 }
 
 Future<String> explainWithoutPumping({
-  String? Function(Explainer, Widget)? explainer,
+  String? Function(Explainer explainer, Widget child)? explainer,
   GlobalKey? key,
   bool useExplainer = true,
 }) async {
@@ -216,7 +216,7 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String? Function(Explainer, Widget)? explainer;
+  final String? Function(Explainer explainer, Widget child)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -585,16 +585,6 @@ class Explainer {
     return s;
   }
 
-  List<String> _flex(Flex flex) {
-    final List<String> result = [];
-
-    result.add('direction=${flex.direction.name}');
-    result.add('mainAxisAlignment=${flex.mainAxisAlignment.name}');
-    result.add('crossAxisAlignment=${flex.crossAxisAlignment.name}');
-
-    return result;
-  }
-
   String _widget(Widget widget) {
     final explained = explainer?.call(this, widget);
     if (explained != null) {
@@ -682,7 +672,7 @@ class Explainer {
       return _sizedBox(widget);
     }
 
-    var type = '${widget.runtimeType}';
+    final type = '${widget.runtimeType}';
     final attr = <String>[];
 
     final maxLines = widget is RichText
@@ -772,6 +762,28 @@ class Explainer {
       attr.add(_limitBox(widget));
     }
 
+    if (widget is MultiChildRenderObjectWidget) {
+      final dynamicWidget = widget as dynamic;
+      switch (widget.runtimeType.toString()) {
+        case 'HtmlFlex':
+          attr.add(
+            // ignore: avoid_dynamic_calls
+            'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''),
+          );
+          attr.add(
+            // ignore: avoid_dynamic_calls
+            'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
+                .replaceAll('MainAxisAlignment.', ''),
+          );
+          attr.add(
+            // ignore: avoid_dynamic_calls
+            'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
+                .replaceAll('CrossAxisAlignment.', ''),
+          );
+          break;
+      }
+    }
+
     if (widget is Padding) {
       attr.add(_edgeInsets(widget.padding));
     }
@@ -802,13 +814,6 @@ class Explainer {
 
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
-    }
-
-    if (widget is! Column && (widget is Flex)) {
-      if (type == 'HtmlFlex') {
-        type = 'Flex'; // rename our widget, we may come back to Flutter's soon
-      }
-      attr.addAll(_flex(widget));
     }
 
     // Special cases

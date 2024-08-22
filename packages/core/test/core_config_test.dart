@@ -679,7 +679,7 @@ class _OnErrorBuilderFactory extends WidgetFactory {
 
 class _OnTapUrlApp extends StatelessWidget {
   final String href;
-  final FutureOr<bool> Function(String)? onTapUrl;
+  final FutureOr<bool> Function(String url)? onTapUrl;
   final List? onTapCallbackResults;
 
   const _OnTapUrlApp({
