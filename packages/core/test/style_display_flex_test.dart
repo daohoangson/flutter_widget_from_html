@@ -18,7 +18,7 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Flex:direction=horizontal,mainAxisAlignment=start,'
+        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,'
         'crossAxisAlignment=start,children=[RichText:(:Foo)]]',
       ),
     );
@@ -31,7 +31,7 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
         ']',
@@ -46,7 +46,7 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
         ']',

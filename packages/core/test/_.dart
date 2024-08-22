@@ -585,16 +585,6 @@ class Explainer {
     return s;
   }
 
-  List<String> _flex(Flex flex) {
-    final List<String> result = [];
-
-    result.add('direction=${flex.direction.name}');
-    result.add('mainAxisAlignment=${flex.mainAxisAlignment.name}');
-    result.add('crossAxisAlignment=${flex.crossAxisAlignment.name}');
-
-    return result;
-  }
-
   String _widget(Widget widget) {
     final explained = explainer?.call(this, widget);
     if (explained != null) {
@@ -772,6 +762,20 @@ class Explainer {
       attr.add(_limitBox(widget));
     }
 
+    if (widget is MultiChildRenderObjectWidget) {
+      final dynamicWidget = widget as dynamic;
+      switch (widget.runtimeType.toString()) {
+        case 'HtmlFlex':
+          attr.add(
+              'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''));
+          attr.add('mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
+              .replaceAll('MainAxisAlignment.', ''));
+          attr.add('crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
+              .replaceAll('CrossAxisAlignment.', ''));
+          break;
+      }
+    }
+
     if (widget is Padding) {
       attr.add(_edgeInsets(widget.padding));
     }
@@ -802,13 +806,6 @@ class Explainer {
 
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
-    }
-
-    if (widget is! Column && (widget is Flex)) {
-      if (type == 'HtmlFlex') {
-        type = 'Flex'; // rename our widget, we may come back to Flutter's soon
-      }
-      attr.addAll(_flex(widget));
     }
 
     // Special cases
