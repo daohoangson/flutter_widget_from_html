@@ -642,6 +642,35 @@ void main() {
         reason: '$explained has too many `CssBlock`s',
       );
     });
+
+    testWidgets('renders empty string', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1320
+      final e = await explain(tester, RenderMode.sliverList, html: '');
+      expect(e, contains('└SizedBox.shrink'));
+    });
+
+    testWidgets('renders empty string (async)', (WidgetTester tester) async {
+      await explain(tester, RenderMode.sliverList, buildAsync: true, html: '');
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      await tester.pump();
+
+      final success = await helper.explainWithoutPumping(useExplainer: false);
+      expect(success, contains('└SizedBox.shrink'));
+    });
+
+    testWidgets('renders single space', (WidgetTester tester) async {
+      final e = await explain(tester, RenderMode.sliverList, html: ' ');
+      expect(e, contains('└SizedBox.shrink'));
+    });
+
+    testWidgets('renders single space (async)', (WidgetTester tester) async {
+      await explain(tester, RenderMode.sliverList, buildAsync: true, html: ' ');
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      await tester.pump();
+
+      final success = await helper.explainWithoutPumping(useExplainer: false);
+      expect(success, contains('└SizedBox.shrink'));
+    });
   });
 
   group('textStyle', () {
