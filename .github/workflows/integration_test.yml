@@ -39,7 +39,7 @@ jobs:
           flutter build apk --config-only
           patrol build android --verbose --target integration_test/auto_resize_test.dart
 
-      - uses: google-github-actions/auth@71fee32a0bb7e97b4d33d548e7d957010649d8fa # v2.1.3
+      - uses: google-github-actions/auth@62cf5bd3e4211a0a0b51f2c6d6a37129d828611d # v2.1.5
         with:
           credentials_json: ${{ secrets.FIREBASE_TEST_LAB_CREDENTIALS_JSON }}
       - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
@@ -89,7 +89,7 @@ jobs:
           cd demo_app/ios
           fastlane patrol_build
 
-      - uses: google-github-actions/auth@71fee32a0bb7e97b4d33d548e7d957010649d8fa # v2.1.3
+      - uses: google-github-actions/auth@62cf5bd3e4211a0a0b51f2c6d6a37129d828611d # v2.1.5
         with:
           credentials_json: ${{ secrets.FIREBASE_TEST_LAB_CREDENTIALS_JSON }}
       - uses: google-github-actions/setup-gcloud@98ddc00a17442e89a24bbf282954a3b65ce6d200 # v2.1.0
