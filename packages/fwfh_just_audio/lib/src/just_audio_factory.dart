@@ -13,7 +13,7 @@ mixin JustAudioFactory on WidgetFactory {
 
   /// Builds [AudioPlayer].
   Widget? buildAudioPlayer(
-    BuildMetadata meta,
+    BuildTree tree,
     String url, {
     required bool autoplay,
     required bool loop,
@@ -29,13 +29,12 @@ mixin JustAudioFactory on WidgetFactory {
       );
 
   @override
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    switch (tree.element.localName) {
       case kTagAudio:
-        _tagAudio ??= TagAudio(this).buildOp;
-        meta.register(_tagAudio!);
+        tree.register(_tagAudio ??= TagAudio(this).buildOp);
         break;
     }
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
