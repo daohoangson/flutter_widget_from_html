@@ -11,7 +11,7 @@ void main() {
   patrolTest('VideoPlayer', ($) async {
     final test = _AspectRatioTest(
       child: VideoPlayer(
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        'https://files.daohoangson.com/public/fwfh/flower.mp4',
         aspectRatio: 1,
         loadingBuilder: (_, __, ___) =>
             const Center(child: CircularProgressIndicator()),
