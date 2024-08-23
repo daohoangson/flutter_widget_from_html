@@ -1,3 +1,8 @@
+## 0.15.2
+
+- Add support for web@v1 (#1298)
+- Fix unnamed function parameters (#1309, authored by hassony105)
+
 ## 0.15.1
 
 - Replace timers with ResizeObserver (#1241)

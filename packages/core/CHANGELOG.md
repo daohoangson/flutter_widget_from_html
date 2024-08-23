@@ -1,3 +1,10 @@
+## 0.15.2
+
+- Add support for Flutter 3.24 (#1308)
+- Fix `HtmlFlex` incompatibility with Flutter@master (#1308)
+- Fix unnamed function parameters (#1309, authored by hassony105)
+- Fix RenderSliver mode error when html input is empty (#1321, authored by vanvixi)
+
 ## 0.15.1
 
 - Drop support for Flutter 3.7 (#1250)

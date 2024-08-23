@@ -1,3 +1,7 @@
+## 0.8.3
+
+- Fix unnamed function parameters (#1309, authored by hassony105)
+
 ## 0.8.2
 
 - Add support for flutter_widget_from_html_core@0.15.1 (#1269)
