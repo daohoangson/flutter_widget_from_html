@@ -65,7 +65,7 @@ class _State extends State<VideoScreen> {
                 _html,
                 key: Key(_html),
                 baseUrl: Uri.parse(
-                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html',
+                  'https://files.daohoangson.com/public/fwfh/',
                 ),
               ),
             ),
@@ -97,7 +97,7 @@ class _State extends State<VideoScreen> {
         _html = """
 <figure>
   <video ${attributes.join(' ')}>
-    <source src="/media/cc0-videos/flower.mp4" type="video/mp4">
+    <source src="flower.mp4" type="video/mp4">
     <code>VIDEO</code> support is not enabled.
   </video>
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
