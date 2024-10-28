@@ -13,8 +13,8 @@ dependencies:
   flutter_widget_from_html_core: ">=0.10.5 <0.16.0"
   logging: ^1.0.0
   web: ">=0.3.0 <2.0.0"
-  webview_flutter: ^4.0.1
-  webview_flutter_android: ^3.10.0
+  webview_flutter: ^4.10.0
+  webview_flutter_android: ^4.0.0
   webview_flutter_wkwebview: ^3.6.0
 
 dependency_overrides:
