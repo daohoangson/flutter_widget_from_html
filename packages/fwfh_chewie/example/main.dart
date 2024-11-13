@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           child: HtmlWidget(
             '''
 <video controls width="250">
-  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+  <source src="https://files.daohoangson.com/public/fwfh/flower.mp4" type="video/mp4">
   <code>VIDEO</code> support is not enabled.
 </video>''',
             factoryBuilder: () => MyWidgetFactory(),

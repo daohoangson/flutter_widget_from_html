@@ -4,7 +4,8 @@ version: 0.0.1
 publish_to: "none"
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.24.0"
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   carousel_slider: ^5.0.0
@@ -48,7 +49,7 @@ dev_dependencies:
   golden_toolkit: ^0.15.0
   lint: any
   measurer: ^2.1.1
-  patrol: ^3.7.2
+  patrol: ^3.12.0
   test: any
 
 flutter:
