@@ -59,6 +59,7 @@ void main() {
 
     testWidgets('tsb.build', (tester) async {
       const html = '<span class="build-op">Foo</span>';
+      const abcdef = Color(0x00abcdef);
       final buildOp = BuildOp(
         onTree: (_, tree) => tree.append(
           WidgetBit.block(
@@ -66,7 +67,7 @@ void main() {
             WidgetPlaceholder(
               builder: (context, child) {
                 final style = tree.tsb.build(context).style;
-                final colored = style.copyWith(color: const Color(0x00abcdef));
+                final colored = style.copyWith(color: abcdef);
                 return Text('hi', style: colored);
               },
             ),
@@ -83,7 +84,7 @@ void main() {
         ),
         useExplainer: false,
       );
-      expect(explained, contains('0x00abcdef'));
+      expect(explained, contains(abcdef.toString()));
     });
   });
 

@@ -1000,14 +1000,16 @@ Future<void> main() async {
         '<ul style="color: #f00"><li>Foo</li></ul>',
         useExplainer: false,
       );
-      expect(disc, contains('Color(0xffff0000)'));
+      const red = Color(0xffff0000);
+      expect(disc, contains(red.toString()));
 
       final circle = await explain(
         tester,
         '<ul style="color: #0f0"><li>Foo</li></ul>',
         useExplainer: false,
       );
-      expect(circle, contains('Color(0xff00ff00)'));
+      const green = Color(0xff00ff00);
+      expect(circle, contains(green.toString()));
     });
   });
 }
