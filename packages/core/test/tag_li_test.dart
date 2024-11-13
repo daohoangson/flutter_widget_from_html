@@ -1000,16 +1000,20 @@ Future<void> main() async {
         '<ul style="color: #f00"><li>Foo</li></ul>',
         useExplainer: false,
       );
+
+      // TODO: use hard coded value when our minimum Flutter version > 3.24
       const red = Color(0xffff0000);
-      expect(disc, contains(red.toString()));
+      expect(disc, contains(red.toString().replaceAll('ColorSpace.', '')));
 
       final circle = await explain(
         tester,
         '<ul style="color: #0f0"><li>Foo</li></ul>',
         useExplainer: false,
       );
+
+      // TODO: use hard coded value when our minimum Flutter version > 3.24
       const green = Color(0xff00ff00);
-      expect(circle, contains(green.toString()));
+      expect(circle, contains(green.toString().replaceAll('ColorSpace.', '')));
     });
   });
 }
