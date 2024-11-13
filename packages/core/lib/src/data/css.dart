@@ -546,6 +546,30 @@ enum CssWhitespace {
   pre,
 }
 
+/// https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
+/// TODO: add support for
+/// Keyword values
+/// text-transform: full-width;
+/// text-transform: full-size-kana;
+/// Global values
+/// text-transform: inherit;
+/// text-transform: initial;
+/// text-transform: revert;
+/// text-transform: revert-layer;
+/// text-transform: unset;
+enum CssTextTransform {
+  none,
+
+  /// toUpperCase every first letter of a word
+  capitalize,
+
+  /// toLoweCase all characters
+  uppercase,
+
+  /// toUpperCase all characters
+  lowercase,
+}
+
 extension on InheritedProperties {
   bool get isRtl => get<TextDirection>() == TextDirection.rtl;
 }

@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import '../utils/string_utils.dart';
 import 'core_ops.dart';
 import 'margin_vertical.dart';
 
@@ -73,6 +74,7 @@ class Flattener implements Flattened {
 
   @override
   void widget(Widget value) {
+    print('zzll widget () ');
     _completeLoop();
 
     final debugLabel = '${_bit.parent.element.localName}--Flattener.widget';
@@ -197,6 +199,8 @@ class Flattener implements Flattened {
     final placeholder = WidgetPlaceholder(
       builder: (context, _) {
         final resolved = scopedInheritanceResolvers.resolve(context);
+        print('zzll ya ${resolved.get<CssTextTransform>()}');
+        print('zzll ${resolved.values}');
         final children = <InlineSpan>[];
 
         var isLast_ = true;
@@ -208,11 +212,13 @@ class Flattener implements Flattened {
           }
         }
 
-        final text = scopedStrings.toText(
-          resolved.whitespaceOrNormal,
-          isFirst: true,
-          isLast: isLast_,
-        );
+        final text = scopedStrings
+            .toText(
+              resolved.whitespaceOrNormal,
+              isFirst: true,
+              isLast: isLast_,
+            )
+            .applyTextTransform(resolved.get<CssTextTransform>());
         InlineSpan? span;
         if (text.isEmpty && children.isEmpty) {
           final nonWhitespaceStrings = scopedStrings
@@ -273,6 +279,21 @@ class Flattener implements Flattened {
     }
 
     return resolvedRecognizer;
+  }
+}
+
+extension on String {
+  String applyTextTransform(CssTextTransform? textTransform) {
+    switch (textTransform) {
+      case CssTextTransform.uppercase:
+        return toUpperCase();
+      case CssTextTransform.lowercase:
+        return toLowerCase();
+      case CssTextTransform.capitalize:
+        return toUpperCaseAllWords();
+      default:
+        return this;
+    }
   }
 }
 
