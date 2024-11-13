@@ -1,3 +1,7 @@
+## 0.15.3
+
+- Add support for webview_flutter_android@4 (#1366)
+
 ## 0.15.2
 
 - Add support for web@v1 (#1298)
