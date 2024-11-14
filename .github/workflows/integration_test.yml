@@ -23,6 +23,9 @@ jobs:
         uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           cache: true
+          # remove version pinning after this error has been resolved
+          # A constant constructor can't call a non-constant super constructor (PatrolIntegrationTester)
+          flutter-version: 3.24.4
       - uses: gradle/actions/setup-gradle@473878a77f1b98e2b5ac4af93489d1656a80a5ed # v4.2.0
         with:
           # only update gradle cache from demo_app.yml jobs
