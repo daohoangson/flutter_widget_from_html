@@ -34,6 +34,8 @@ platform :ios do
       readonly: true
     )
 
+    sh('security default-keychain')
+
     sh('cd ../.. && patrol build ios --release --verbose --target integration_test/auto_resize_test.dart')
   end
 end
