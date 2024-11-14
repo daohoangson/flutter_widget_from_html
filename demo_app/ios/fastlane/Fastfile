@@ -20,21 +20,24 @@ platform :ios do
   end
 
   lane :patrol_build do
+    sh('security default-keychain')
+
     setup_ci
+    sh('security default-keychain')
 
     match(
       app_identifier: ["dev.fwfh.demoApp", "dev.fwfh.demoApp.RunnerTests"],
       type: 'appstore',
       readonly: true
     )
+    sh('security find-identity -v -p codesigning')
 
     match(
       app_identifier: ["dev.fwfh.demoApp.RunnerUITests.xctrunner"],
       type: 'development',
       readonly: true
     )
-
-    sh('security default-keychain')
+    sh('security find-identity -v -p codesigning')
 
     sh('cd ../.. && patrol build ios --release --verbose --target integration_test/auto_resize_test.dart')
   end
