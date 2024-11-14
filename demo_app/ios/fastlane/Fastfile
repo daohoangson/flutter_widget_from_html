@@ -20,6 +20,8 @@ platform :ios do
   end
 
   lane :patrol_build do
+    setup_ci
+
     match(
       app_identifier: ["dev.fwfh.demoApp", "dev.fwfh.demoApp.RunnerTests"],
       type: 'appstore',
