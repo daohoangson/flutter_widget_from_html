@@ -43,6 +43,9 @@ class HtmlWidget extends StatefulWidget {
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
 
+  /// The Callback Function to be called when the html data is loaded
+  final void Function()? onHtmlDataLoaded;
+
   /// The custom error builder.
   final OnErrorBuilder? onErrorBuilder;
 
@@ -101,6 +104,7 @@ class HtmlWidget extends StatefulWidget {
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
+    this.onHtmlDataLoaded,
     super.key,
     this.onErrorBuilder,
     this.onLoadingBuilder,
@@ -190,6 +194,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            if(widget.onHtmlDataLoaded != null) {
+              widget.onHtmlDataLoaded!();
+            }
             return snapshot.requireData;
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
