@@ -224,6 +224,7 @@ FontWeight? fontWeightTryParse(css.Expression expression) {
           return FontWeight.w800;
         case 900:
           return FontWeight.w900;
+        default:
       }
     }
 
