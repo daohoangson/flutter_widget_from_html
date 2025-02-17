@@ -72,17 +72,13 @@ jobs:
           # restore SDK constraint
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
-          # extract Flutter version to install later
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's/^>=//' | sed -e 's/-0$//' )
-          echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
-
           # output for debugging
           cat pubspec.yaml
 
       - name: Setup Flutter
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+          flutter-version-file: packages/${{ matrix.package }}/pubspec.yaml
       - run: flutter test
 
   core:
