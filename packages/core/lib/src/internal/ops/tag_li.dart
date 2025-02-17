@@ -39,7 +39,6 @@ class TagLi {
             case kTagOrderedList:
             case kTagUnorderedList:
               element.elementDepth = subTree.increaseListDepth();
-              break;
             case kTagLi:
               if (element.parent == listTree.element) {
                 subTree.register(
@@ -56,7 +55,6 @@ class TagLi {
                   ),
                 );
               }
-              break;
           }
         },
         priority: Priority.tagLiList,

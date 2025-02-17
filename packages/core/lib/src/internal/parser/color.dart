@@ -35,7 +35,6 @@ CssColor? tryParseColor(css.Expression? expression) {
             return CssColor.value(hslValue);
           }
         }
-        break;
       case 'rgb':
       case 'rgba':
         final params = expression.params;
@@ -49,7 +48,6 @@ CssColor? tryParseColor(css.Expression? expression) {
             return CssColor.value(rgbValue);
           }
         }
-        break;
     }
   } else if (expression is css.HexColorTerm) {
     // cannot use expression.value directory due to issue with #f00 etc.
@@ -95,15 +93,12 @@ double _parseColorHue(num number, [int? unit]) {
     case css.TokenKind.UNIT_ANGLE_RAD:
       final rad = v;
       deg = rad * (180 / pi);
-      break;
     case css.TokenKind.UNIT_ANGLE_GRAD:
       final grad = v;
       deg = grad * 0.9;
-      break;
     case css.TokenKind.UNIT_ANGLE_TURN:
       final turn = v;
       deg = turn * 360;
-      break;
     default:
       deg = v;
   }

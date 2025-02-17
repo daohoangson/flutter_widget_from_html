@@ -450,6 +450,7 @@ class _LockableDeclarations extends LockableList<css.Declaration> {
 
 class _WidgetPlaceholderDefault extends StatelessWidget
     implements
+        // internal implementation detail of our own placeholder
         // ignore: avoid_implementing_value_types
         WidgetPlaceholder {
   const _WidgetPlaceholderDefault();

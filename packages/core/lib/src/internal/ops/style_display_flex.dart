@@ -41,13 +41,10 @@ class StyleDisplayFlex {
             switch (element.property) {
               case kCssFlexDirection:
                 flexDirection = value;
-                break;
               case kCssJustifyContent:
                 justifyContent = value;
-                break;
               case kCssAlignItems:
                 alignItems = value;
-                break;
             }
           }
         }

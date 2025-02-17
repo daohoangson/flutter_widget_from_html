@@ -223,26 +223,20 @@ extension on BuildTree {
             preferredAxis = Axis.vertical;
             preferredHeight = parsedHeight;
           }
-          break;
         case kCssMaxHeight:
           maxHeight = tryParseCssLength(value) ?? maxHeight;
-          break;
         case kCssMaxWidth:
           maxWidth = tryParseCssLength(value) ?? maxWidth;
-          break;
         case kCssMinHeight:
           minHeight = tryParseCssLength(value) ?? minHeight;
-          break;
         case kCssMinWidth:
           minWidth = tryParseCssLength(value) ?? minWidth;
-          break;
         case kCssWidth:
           final parsedWidth = tryParseCssLength(value);
           if (parsedWidth != null) {
             preferredAxis = Axis.horizontal;
             preferredWidth = parsedWidth;
           }
-          break;
       }
     }
 

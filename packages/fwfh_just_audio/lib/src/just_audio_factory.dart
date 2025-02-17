@@ -34,7 +34,6 @@ mixin JustAudioFactory on WidgetFactory {
       case kTagAudio:
         _tagAudio ??= TagAudio(this).buildOp;
         meta.register(_tagAudio!);
-        break;
     }
     return super.parse(meta);
   }

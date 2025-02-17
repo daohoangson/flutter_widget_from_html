@@ -106,13 +106,10 @@ extension on BuildTree {
               style.increaseIndex();
             }
           }
-          break;
         case kCssBackgroundColor:
           data = data.copyWithColor(style);
-          break;
         case kCssBackgroundImage:
           data = data.copyWithImageUrl(style);
-          break;
         case kCssBackgroundPosition:
           while (style.hasValue) {
             final prev = data;
@@ -122,11 +119,9 @@ extension on BuildTree {
               style.increaseIndex();
             }
           }
-          break;
         case kCssBackgroundRepeat:
         case kCssBackgroundSize:
           data = data.copyWithRepeatOrSize(style);
-          break;
       }
     }
 

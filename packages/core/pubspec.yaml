@@ -5,7 +5,7 @@ homepage: https://github.com/daohoangson/flutter_widget_from_html/tree/master/pa
 
 environment:
   flutter: ">=3.10.0"
-  sdk: ">=2.19.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   csslib: ">=0.17.0 <2.0.0"

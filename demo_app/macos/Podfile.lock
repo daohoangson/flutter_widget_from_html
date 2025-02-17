@@ -4,6 +4,7 @@ PODS:
   - CocoaAsyncSocket (7.6.5)
   - FlutterMacOS (1.0.0)
   - just_audio (0.0.1):
+    - Flutter
     - FlutterMacOS
   - package_info_plus (0.0.1):
     - FlutterMacOS
@@ -31,7 +32,7 @@ PODS:
 DEPENDENCIES:
   - audio_session (from `Flutter/ephemeral/.symlinks/plugins/audio_session/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - just_audio (from `Flutter/ephemeral/.symlinks/plugins/just_audio/macos`)
+  - just_audio (from `Flutter/ephemeral/.symlinks/plugins/just_audio/darwin`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - patrol (from `Flutter/ephemeral/.symlinks/plugins/patrol/darwin`)
@@ -51,7 +52,7 @@ EXTERNAL SOURCES:
   FlutterMacOS:
     :path: Flutter/ephemeral
   just_audio:
-    :path: Flutter/ephemeral/.symlinks/plugins/just_audio/macos
+    :path: Flutter/ephemeral/.symlinks/plugins/just_audio/darwin
   package_info_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
   path_provider_foundation:
@@ -70,19 +71,19 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/webview_flutter_wkwebview/darwin
 
 SPEC CHECKSUMS:
-  audio_session: dea1f41890dbf1718f04a56f1d6150fd50039b72
+  audio_session: eaca2512cf2b39212d724f35d11f46180ad3a33e
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  just_audio: 9b67ca7b97c61cfc9784ea23cd8cc55eb226d489
-  package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  patrol: 0564cee315ff6c86fb802b3647db05cc2d3d0624
-  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
-  url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
-  video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
-  wakelock_plus: 4783562c9a43d209c458cb9b30692134af456269
-  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
+  just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
+  package_info_plus: f0052d280d17aa382b932f399edf32507174e870
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  patrol: dd82ffedfee3aba87c1d0ed2daad0b77bfb8ee1f
+  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
+  video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
+  wakelock_plus: 21ddc249ac4b8d018838dbdabd65c5976c308497
+  webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

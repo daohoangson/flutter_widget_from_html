@@ -596,10 +596,8 @@ class _TableRenderLayouter {
         switch (tro._textDirection) {
           case TextDirection.ltr:
             x = calculatedX;
-            break;
           case TextDirection.rtl:
             x = calculatedWidth - childWidth - calculatedX;
-            break;
         }
 
         data.offset = Offset(x, calculatedY);
@@ -756,7 +754,6 @@ class _TableRenderObject extends RenderBox
   }
 
   bool _borderCollapse;
-  // ignore: avoid_positional_boolean_parameters
   void setBorderCollapse(bool v) {
     if (v != _borderCollapse) {
       _borderCollapse = v;

@@ -307,7 +307,6 @@ class TagTable {
             onRenderedBlock: (_, block) => data.captions.add(block),
           ),
         );
-        break;
       case kCssDisplayTableHeaderGroup:
       case kCssDisplayTableRowGroup:
       case kCssDisplayTableFooterGroup:
@@ -317,13 +316,10 @@ class TagTable {
                 ? data.newBody()
                 : data.footer;
         subTree.register(group._groupOp);
-        break;
       case kCssDisplayTableRow:
         subTree.register(data.newBody().newRow()._rowOp);
-        break;
       case kCssDisplayTableCell:
         data.latestBody.latestRow._registerCellOp(subTree);
-        break;
     }
   }
 

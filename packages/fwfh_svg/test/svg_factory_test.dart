@@ -402,6 +402,7 @@ class _GoldenDisallowFactory extends WidgetFactory with SvgFactory {
 
 class _MockHttpClient extends Mock implements HttpClient {
   @override
+  // suppress lint for tests
   // ignore: avoid_setters_without_getters
   set autoUncompress(bool _) {}
 }
@@ -453,6 +454,8 @@ HttpClient _createMockSvgImageHttpClient() {
         .listen((data) async {
       await Future.delayed(const Duration(milliseconds: 10));
       onData(data);
+
+      // suppress lint for tests
       // ignore: avoid_dynamic_calls
       onDone?.call();
     });

@@ -124,7 +124,6 @@ mixin SvgFactory on WidgetFactory {
             },
           ),
         );
-        break;
     }
 
     return super.parse(meta);

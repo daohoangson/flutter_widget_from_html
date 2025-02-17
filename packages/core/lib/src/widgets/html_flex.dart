@@ -24,8 +24,6 @@ If hashes are mismatched, then the code below should be updated.
 
 */
 
-// ignore_for_file: require_trailing_commas, avoid_multiple_declarations_per_line
-
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -46,9 +44,10 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
     this.clipBehavior = Clip.none,
     super.children,
   }) : assert(
-            !identical(crossAxisAlignment, CrossAxisAlignment.baseline) ||
-                textBaseline != null,
-            'textBaseline is required if you specify the crossAxisAlignment with CrossAxisAlignment.baseline');
+          !identical(crossAxisAlignment, CrossAxisAlignment.baseline) ||
+              textBaseline != null,
+          'textBaseline is required if you specify the crossAxisAlignment with CrossAxisAlignment.baseline',
+        );
   // Cannot use == in the assert above instead of identical because of https://github.com/dart-lang/language/issues/1811.
 
   final Axis direction;
@@ -98,9 +97,11 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context,
-      // ignore: library_private_types_in_public_api
-      covariant _HtmlFlexRenderObject renderObject) {
+    BuildContext context,
+    // TODO: rewrite HtmlFlex and get rid of this render object
+    // ignore: library_private_types_in_public_api
+    covariant _HtmlFlexRenderObject renderObject,
+  ) {
     renderObject
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
@@ -116,24 +117,54 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(EnumProperty<Axis>('direction', direction));
-    properties.add(EnumProperty<MainAxisAlignment>(
-        'mainAxisAlignment', mainAxisAlignment));
-    properties.add(EnumProperty<MainAxisSize>('mainAxisSize', mainAxisSize,
-        defaultValue: MainAxisSize.max));
-    properties.add(EnumProperty<CrossAxisAlignment>(
-        'crossAxisAlignment', crossAxisAlignment));
-    properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
-        defaultValue: null));
-    properties.add(EnumProperty<VerticalDirection>(
-        'verticalDirection', verticalDirection,
-        defaultValue: VerticalDirection.down));
-    properties.add(EnumProperty<TextBaseline>('textBaseline', textBaseline,
-        defaultValue: null));
+    properties.add(
+      EnumProperty<MainAxisAlignment>(
+        'mainAxisAlignment',
+        mainAxisAlignment,
+      ),
+    );
+    properties.add(
+      EnumProperty<MainAxisSize>(
+        'mainAxisSize',
+        mainAxisSize,
+        defaultValue: MainAxisSize.max,
+      ),
+    );
+    properties.add(
+      EnumProperty<CrossAxisAlignment>(
+        'crossAxisAlignment',
+        crossAxisAlignment,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextDirection>(
+        'textDirection',
+        textDirection,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      EnumProperty<VerticalDirection>(
+        'verticalDirection',
+        verticalDirection,
+        defaultValue: VerticalDirection.down,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextBaseline>(
+        'textBaseline',
+        textBaseline,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
-bool? _startIsTopLeft(Axis direction, TextDirection? textDirection,
-    VerticalDirection? verticalDirection) {
+bool? _startIsTopLeft(
+  Axis direction,
+  TextDirection? textDirection,
+  VerticalDirection? verticalDirection,
+) {
   // If the relevant value of textDirection or verticalDirection is null, this returns null too.
   switch (direction) {
     case Axis.horizontal:
@@ -156,9 +187,6 @@ bool? _startIsTopLeft(Axis direction, TextDirection? textDirection,
       }
   }
 }
-
-// ignore: avoid_private_typedef_functions
-typedef _ChildSizingFunction = double Function(RenderBox child, double extent);
 
 class _HtmlFlexRenderObject extends RenderBox
     with
@@ -259,9 +287,10 @@ class _HtmlFlexRenderObject extends RenderBox
       // i.e. there's more than one child
       switch (direction) {
         case Axis.horizontal:
-          assert(textDirection != null,
-              'Horizontal $runtimeType with multiple children has a null textDirection, so the layout order is undefined.');
-          break;
+          assert(
+            textDirection != null,
+            'Horizontal $runtimeType with multiple children has a null textDirection, so the layout order is undefined.',
+          );
         case Axis.vertical:
           break;
       }
@@ -270,9 +299,10 @@ class _HtmlFlexRenderObject extends RenderBox
         mainAxisAlignment == MainAxisAlignment.end) {
       switch (direction) {
         case Axis.horizontal:
-          assert(textDirection != null,
-              'Horizontal $runtimeType with $mainAxisAlignment has a null textDirection, so the alignment cannot be resolved.');
-          break;
+          assert(
+            textDirection != null,
+            'Horizontal $runtimeType with $mainAxisAlignment has a null textDirection, so the alignment cannot be resolved.',
+          );
         case Axis.vertical:
           break;
       }
@@ -283,8 +313,10 @@ class _HtmlFlexRenderObject extends RenderBox
         case Axis.horizontal:
           break;
         case Axis.vertical:
-          assert(textDirection != null,
-              'Vertical $runtimeType with $crossAxisAlignment has a null textDirection, so the alignment cannot be resolved.');
+          assert(
+            textDirection != null,
+            'Vertical $runtimeType with $crossAxisAlignment has a null textDirection, so the alignment cannot be resolved.',
+          );
       }
     }
     return true;
@@ -320,7 +352,7 @@ class _HtmlFlexRenderObject extends RenderBox
     required Axis sizingDirection,
     required double
         extent, // the extent in the direction that isn't the sizing direction
-    required _ChildSizingFunction
+    required double Function(RenderBox, double)
         childSize, // a method to find the size in the sizing direction
   }) {
     if (!_canComputeIntrinsics) {
@@ -378,7 +410,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               mainSize = child.getMaxIntrinsicWidth(double.infinity);
               crossSize = childSize(child, mainSize);
-              break;
             case Axis.vertical:
               mainSize = child.getMaxIntrinsicHeight(double.infinity);
               crossSize = childSize(child, mainSize);
@@ -493,10 +524,12 @@ class _HtmlFlexRenderObject extends RenderBox
   @protected
   Size computeDryLayout(covariant BoxConstraints constraints) {
     if (!_canComputeIntrinsics) {
-      assert(debugCannotComputeDryLayout(
-        reason:
-            'Dry layout cannot be computed for CrossAxisAlignment.baseline, which requires a full layout.',
-      ));
+      assert(
+        debugCannotComputeDryLayout(
+          reason:
+              'Dry layout cannot be computed for CrossAxisAlignment.baseline, which requires a full layout.',
+        ),
+      );
       return Size.zero;
     }
     FlutterError? constraintsError;
@@ -525,9 +558,10 @@ class _HtmlFlexRenderObject extends RenderBox
     }
   }
 
-  FlutterError? _debugCheckConstraints(
-      {required BoxConstraints constraints,
-      required bool reportParentConstraints}) {
+  FlutterError? _debugCheckConstraints({
+    required BoxConstraints constraints,
+    required bool reportParentConstraints,
+  }) {
     FlutterError? result;
     assert(() {
       final double maxMainSize = _direction == Axis.horizontal
@@ -544,13 +578,15 @@ class _HtmlFlexRenderObject extends RenderBox
               _direction == Axis.horizontal ? 'horizontal' : 'vertical';
           final String dimension =
               _direction == Axis.horizontal ? 'width' : 'height';
-          DiagnosticsNode error, message;
+          DiagnosticsNode error;
+          DiagnosticsNode message;
           final List<DiagnosticsNode> addendum = <DiagnosticsNode>[];
           if (!canFlex &&
               (mainAxisSize == MainAxisSize.max ||
                   _getFit(child) == FlexFit.tight)) {
             error = ErrorSummary(
-                'RenderFlex children have non-zero flex but incoming $dimension constraints are unbounded.');
+              'RenderFlex children have non-zero flex but incoming $dimension constraints are unbounded.',
+            );
             message = ErrorDescription(
               'When a $identity is in a parent that does not provide a finite $dimension constraint, for example '
               'if it is in a $axis scrollable, it will try to shrink-wrap its children along the $axis '
@@ -569,7 +605,6 @@ class _HtmlFlexRenderObject extends RenderBox
                   if (!node.constraints.hasBoundedWidth) {
                     node = null;
                   }
-                  break;
                 case Axis.vertical:
                   while (!node!.constraints.hasBoundedHeight &&
                       node.parent is RenderBox) {
@@ -580,12 +615,18 @@ class _HtmlFlexRenderObject extends RenderBox
                   }
               }
               if (node != null) {
-                addendum.add(node.describeForError(
-                    'The nearest ancestor providing an unbounded width constraint is'));
+                addendum.add(
+                  node.describeForError(
+                    'The nearest ancestor providing an unbounded width constraint is',
+                  ),
+                );
               }
             }
-            addendum.add(ErrorHint(
-                'See also: https://flutter.dev/unbounded-constraints'));
+            addendum.add(
+              ErrorHint(
+                'See also: https://flutter.dev/unbounded-constraints',
+              ),
+            );
           } else {
             return true;
           }
@@ -608,11 +649,15 @@ class _HtmlFlexRenderObject extends RenderBox
               '  https://flutter.dev/debugging/#rendering-layer\n'
               '  http://api.flutter.dev/flutter/rendering/debugDumpRenderTree.html',
             ),
-            describeForError('The affected RenderFlex is',
-                style: DiagnosticsTreeStyle.errorProperty),
+            describeForError(
+              'The affected RenderFlex is',
+              style: DiagnosticsTreeStyle.errorProperty,
+            ),
             DiagnosticsProperty<dynamic>(
-                'The creator information is set to', debugCreator,
-                style: DiagnosticsTreeStyle.errorProperty),
+              'The creator information is set to',
+              debugCreator,
+              style: DiagnosticsTreeStyle.errorProperty,
+            ),
             ...addendum,
             ErrorDescription(
               "If none of the above helps enough to fix this problem, please don't hesitate to file a bug:\n"
@@ -628,9 +673,10 @@ class _HtmlFlexRenderObject extends RenderBox
     return result;
   }
 
-  _LayoutSizes _computeSizes(
-      {required BoxConstraints constraints,
-      required ChildLayouter layoutChild}) {
+  _LayoutSizes _computeSizes({
+    required BoxConstraints constraints,
+    required ChildLayouter layoutChild,
+  }) {
     assert(_debugHasNecessaryDirections);
 
     // Determine used flex factor, size inflexible items, calculate free space.
@@ -648,19 +694,14 @@ class _HtmlFlexRenderObject extends RenderBox
     switch (crossAxisAlignment) {
       case CrossAxisAlignment.start:
         stretched = false;
-        break;
       case CrossAxisAlignment.center:
         stretched = false;
-        break;
       case CrossAxisAlignment.end:
         stretched = false;
-        break;
       case CrossAxisAlignment.baseline:
         stretched = false;
-        break;
       case CrossAxisAlignment.stretch:
         stretched = true;
-        break;
     }
     while (child != null) {
       final FlexParentData childParentData =
@@ -676,7 +717,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               innerConstraints =
                   BoxConstraints.tightFor(height: constraints.maxHeight);
-              break;
             case Axis.vertical:
               innerConstraints =
                   BoxConstraints.tightFor(width: constraints.maxWidth);
@@ -686,7 +726,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               innerConstraints =
                   BoxConstraints(maxHeight: constraints.maxHeight);
-              break;
             case Axis.vertical:
               innerConstraints = BoxConstraints(maxWidth: constraints.maxWidth);
           }
@@ -727,7 +766,6 @@ class _HtmlFlexRenderObject extends RenderBox
           switch (_getFit(child)) {
             case FlexFit.tight:
               minChildExtent = maxChildExtent;
-              break;
             case FlexFit.loose:
               minChildExtent = 0.0;
           }
@@ -738,15 +776,16 @@ class _HtmlFlexRenderObject extends RenderBox
           switch (_direction) {
             case Axis.horizontal:
               innerConstraints = constraints.copyWith(
-                  minHeight: minCrossSize,
-                  minWidth: minChildExtent,
-                  maxWidth: maxChildExtent);
-              break;
+                minHeight: minCrossSize,
+                minWidth: minChildExtent,
+                maxWidth: maxChildExtent,
+              );
             case Axis.vertical:
               innerConstraints = constraints.copyWith(
-                  minWidth: minCrossSize,
-                  minHeight: minChildExtent,
-                  maxHeight: maxChildExtent);
+                minWidth: minCrossSize,
+                minHeight: minChildExtent,
+                maxHeight: maxChildExtent,
+              );
           }
           final Size childSize = layoutChild(child, innerConstraints);
           final double childMainSize = _getMainSize(childSize);
@@ -803,7 +842,8 @@ class _HtmlFlexRenderObject extends RenderBox
         assert(() {
           if (textBaseline == null) {
             throw FlutterError(
-                'To use CrossAxisAlignment.baseline, you must also specify which baseline to use using the "textBaseline" argument.');
+              'To use CrossAxisAlignment.baseline, you must also specify which baseline to use using the "textBaseline" argument.',
+            );
           }
           return true;
         }());
@@ -834,7 +874,6 @@ class _HtmlFlexRenderObject extends RenderBox
         size = constraints.constrain(Size(actualSize, crossSize));
         actualSize = size.width;
         crossSize = size.height;
-        break;
       case Axis.vertical:
         size = constraints.constrain(Size(crossSize, actualSize));
         actualSize = size.height;
@@ -849,46 +888,37 @@ class _HtmlFlexRenderObject extends RenderBox
       case MainAxisAlignment.end:
       case MainAxisAlignment.center:
         betweenSpace = 0.0;
-        break;
       case MainAxisAlignment.spaceBetween:
         if (childCount > 1) {
           betweenSpace = remainingSpace / (childCount - 1);
         } else {
           betweenSpace = 0.0;
         }
-        break;
       case MainAxisAlignment.spaceAround:
         if (childCount > 0) {
           betweenSpace = remainingSpace / childCount;
         } else {
           betweenSpace = 0.0;
         }
-        break;
       case MainAxisAlignment.spaceEvenly:
         if (childCount > 0) {
           betweenSpace = remainingSpace / (childCount + 1);
         } else {
           betweenSpace = 0.0;
         }
-        break;
     }
     final double leadingSpace;
     switch (_mainAxisAlignment) {
       case MainAxisAlignment.start:
         leadingSpace = 0.0;
-        break;
       case MainAxisAlignment.end:
         leadingSpace = remainingSpace;
-        break;
       case MainAxisAlignment.center:
         leadingSpace = remainingSpace / 2.0;
-        break;
       case MainAxisAlignment.spaceBetween:
         leadingSpace = 0.0;
-        break;
       case MainAxisAlignment.spaceAround:
         leadingSpace = betweenSpace / 2.0;
-        break;
       case MainAxisAlignment.spaceEvenly:
         leadingSpace = betweenSpace;
     }
@@ -913,18 +943,18 @@ class _HtmlFlexRenderObject extends RenderBox
         case CrossAxisAlignment.start:
         case CrossAxisAlignment.end:
           childCrossPosition = _startIsTopLeft(
-                      flipAxis(direction), textDirection, verticalDirection) ==
+                    flipAxis(direction),
+                    textDirection,
+                    verticalDirection,
+                  ) ==
                   (_crossAxisAlignment == CrossAxisAlignment.start)
               ? 0.0
               : crossSize - _getCrossSize(child.size);
-          break;
         case CrossAxisAlignment.center:
           childCrossPosition =
               crossSize / 2.0 - _getCrossSize(child.size) / 2.0;
-          break;
         case CrossAxisAlignment.stretch:
           childCrossPosition = 0.0;
-          break;
         case CrossAxisAlignment.baseline:
           if (_direction == Axis.horizontal) {
             assert(textBaseline != null);
@@ -946,7 +976,6 @@ class _HtmlFlexRenderObject extends RenderBox
         case Axis.horizontal:
           childParentData.offset =
               Offset(childMainPosition, childCrossPosition);
-          break;
         case Axis.vertical:
           childParentData.offset =
               Offset(childCrossPosition, childMainPosition);
@@ -1018,14 +1047,17 @@ class _HtmlFlexRenderObject extends RenderBox
         case Axis.horizontal:
           overflowChildRect =
               Rect.fromLTWH(0.0, 0.0, size.width + _overflow, 0.0);
-          break;
         case Axis.vertical:
           overflowChildRect =
               Rect.fromLTWH(0.0, 0.0, 0.0, size.height + _overflow);
       }
       paintOverflowIndicator(
-          context, offset, Offset.zero & size, overflowChildRect,
-          overflowHints: debugOverflowHints);
+        context,
+        offset,
+        Offset.zero & size,
+        overflowChildRect,
+        overflowHints: debugOverflowHints,
+      );
       return true;
     }());
   }
@@ -1066,18 +1098,40 @@ class _HtmlFlexRenderObject extends RenderBox
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(EnumProperty<Axis>('direction', direction));
-    properties.add(EnumProperty<MainAxisAlignment>(
-        'mainAxisAlignment', mainAxisAlignment));
+    properties.add(
+      EnumProperty<MainAxisAlignment>(
+        'mainAxisAlignment',
+        mainAxisAlignment,
+      ),
+    );
     properties.add(EnumProperty<MainAxisSize>('mainAxisSize', mainAxisSize));
-    properties.add(EnumProperty<CrossAxisAlignment>(
-        'crossAxisAlignment', crossAxisAlignment));
-    properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
-        defaultValue: null));
-    properties.add(EnumProperty<VerticalDirection>(
-        'verticalDirection', verticalDirection,
-        defaultValue: null));
-    properties.add(EnumProperty<TextBaseline>('textBaseline', textBaseline,
-        defaultValue: null));
+    properties.add(
+      EnumProperty<CrossAxisAlignment>(
+        'crossAxisAlignment',
+        crossAxisAlignment,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextDirection>(
+        'textDirection',
+        textDirection,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      EnumProperty<VerticalDirection>(
+        'verticalDirection',
+        verticalDirection,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextBaseline>(
+        'textBaseline',
+        textBaseline,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
