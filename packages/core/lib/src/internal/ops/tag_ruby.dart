@@ -74,10 +74,8 @@ extension TagRuby on WidgetFactory {
             priority: Early.tagRp,
           ),
         );
-        break;
       case kTagRt:
         subTree.inherit(text_ops.fontSizeEm, .5);
-        break;
     }
   }
 }

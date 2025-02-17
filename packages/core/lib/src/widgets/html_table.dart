@@ -596,10 +596,8 @@ class _TableRenderLayouter {
         switch (tro._textDirection) {
           case TextDirection.ltr:
             x = calculatedX;
-            break;
           case TextDirection.rtl:
             x = calculatedWidth - childWidth - calculatedX;
-            break;
         }
 
         data.offset = Offset(x, calculatedY);

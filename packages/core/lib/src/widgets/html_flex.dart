@@ -291,7 +291,6 @@ class _HtmlFlexRenderObject extends RenderBox
             textDirection != null,
             'Horizontal $runtimeType with multiple children has a null textDirection, so the layout order is undefined.',
           );
-          break;
         case Axis.vertical:
           break;
       }
@@ -304,7 +303,6 @@ class _HtmlFlexRenderObject extends RenderBox
             textDirection != null,
             'Horizontal $runtimeType with $mainAxisAlignment has a null textDirection, so the alignment cannot be resolved.',
           );
-          break;
         case Axis.vertical:
           break;
       }
@@ -412,7 +410,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               mainSize = child.getMaxIntrinsicWidth(double.infinity);
               crossSize = childSize(child, mainSize);
-              break;
             case Axis.vertical:
               mainSize = child.getMaxIntrinsicHeight(double.infinity);
               crossSize = childSize(child, mainSize);
@@ -608,7 +605,6 @@ class _HtmlFlexRenderObject extends RenderBox
                   if (!node.constraints.hasBoundedWidth) {
                     node = null;
                   }
-                  break;
                 case Axis.vertical:
                   while (!node!.constraints.hasBoundedHeight &&
                       node.parent is RenderBox) {
@@ -698,19 +694,14 @@ class _HtmlFlexRenderObject extends RenderBox
     switch (crossAxisAlignment) {
       case CrossAxisAlignment.start:
         stretched = false;
-        break;
       case CrossAxisAlignment.center:
         stretched = false;
-        break;
       case CrossAxisAlignment.end:
         stretched = false;
-        break;
       case CrossAxisAlignment.baseline:
         stretched = false;
-        break;
       case CrossAxisAlignment.stretch:
         stretched = true;
-        break;
     }
     while (child != null) {
       final FlexParentData childParentData =
@@ -726,7 +717,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               innerConstraints =
                   BoxConstraints.tightFor(height: constraints.maxHeight);
-              break;
             case Axis.vertical:
               innerConstraints =
                   BoxConstraints.tightFor(width: constraints.maxWidth);
@@ -736,7 +726,6 @@ class _HtmlFlexRenderObject extends RenderBox
             case Axis.horizontal:
               innerConstraints =
                   BoxConstraints(maxHeight: constraints.maxHeight);
-              break;
             case Axis.vertical:
               innerConstraints = BoxConstraints(maxWidth: constraints.maxWidth);
           }
@@ -777,7 +766,6 @@ class _HtmlFlexRenderObject extends RenderBox
           switch (_getFit(child)) {
             case FlexFit.tight:
               minChildExtent = maxChildExtent;
-              break;
             case FlexFit.loose:
               minChildExtent = 0.0;
           }
@@ -792,7 +780,6 @@ class _HtmlFlexRenderObject extends RenderBox
                 minWidth: minChildExtent,
                 maxWidth: maxChildExtent,
               );
-              break;
             case Axis.vertical:
               innerConstraints = constraints.copyWith(
                 minWidth: minCrossSize,
@@ -887,7 +874,6 @@ class _HtmlFlexRenderObject extends RenderBox
         size = constraints.constrain(Size(actualSize, crossSize));
         actualSize = size.width;
         crossSize = size.height;
-        break;
       case Axis.vertical:
         size = constraints.constrain(Size(crossSize, actualSize));
         actualSize = size.height;
@@ -902,46 +888,37 @@ class _HtmlFlexRenderObject extends RenderBox
       case MainAxisAlignment.end:
       case MainAxisAlignment.center:
         betweenSpace = 0.0;
-        break;
       case MainAxisAlignment.spaceBetween:
         if (childCount > 1) {
           betweenSpace = remainingSpace / (childCount - 1);
         } else {
           betweenSpace = 0.0;
         }
-        break;
       case MainAxisAlignment.spaceAround:
         if (childCount > 0) {
           betweenSpace = remainingSpace / childCount;
         } else {
           betweenSpace = 0.0;
         }
-        break;
       case MainAxisAlignment.spaceEvenly:
         if (childCount > 0) {
           betweenSpace = remainingSpace / (childCount + 1);
         } else {
           betweenSpace = 0.0;
         }
-        break;
     }
     final double leadingSpace;
     switch (_mainAxisAlignment) {
       case MainAxisAlignment.start:
         leadingSpace = 0.0;
-        break;
       case MainAxisAlignment.end:
         leadingSpace = remainingSpace;
-        break;
       case MainAxisAlignment.center:
         leadingSpace = remainingSpace / 2.0;
-        break;
       case MainAxisAlignment.spaceBetween:
         leadingSpace = 0.0;
-        break;
       case MainAxisAlignment.spaceAround:
         leadingSpace = betweenSpace / 2.0;
-        break;
       case MainAxisAlignment.spaceEvenly:
         leadingSpace = betweenSpace;
     }
@@ -973,14 +950,11 @@ class _HtmlFlexRenderObject extends RenderBox
                   (_crossAxisAlignment == CrossAxisAlignment.start)
               ? 0.0
               : crossSize - _getCrossSize(child.size);
-          break;
         case CrossAxisAlignment.center:
           childCrossPosition =
               crossSize / 2.0 - _getCrossSize(child.size) / 2.0;
-          break;
         case CrossAxisAlignment.stretch:
           childCrossPosition = 0.0;
-          break;
         case CrossAxisAlignment.baseline:
           if (_direction == Axis.horizontal) {
             assert(textBaseline != null);
@@ -1002,7 +976,6 @@ class _HtmlFlexRenderObject extends RenderBox
         case Axis.horizontal:
           childParentData.offset =
               Offset(childMainPosition, childCrossPosition);
-          break;
         case Axis.vertical:
           childParentData.offset =
               Offset(childCrossPosition, childMainPosition);
@@ -1074,7 +1047,6 @@ class _HtmlFlexRenderObject extends RenderBox
         case Axis.horizontal:
           overflowChildRect =
               Rect.fromLTWH(0.0, 0.0, size.width + _overflow, 0.0);
-          break;
         case Axis.vertical:
           overflowChildRect =
               Rect.fromLTWH(0.0, 0.0, 0.0, size.height + _overflow);

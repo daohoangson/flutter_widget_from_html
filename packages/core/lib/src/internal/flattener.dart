@@ -377,25 +377,19 @@ extension on List<_String> {
             if (!str.shouldBeSwallowed) {
               buffer.write(' ');
             }
-            break;
           case CssWhitespace.nowrap:
             buffer.write('\u00A0');
-            break;
           case CssWhitespace.pre:
             buffer.write(str.data);
-            break;
         }
       } else {
         switch (whitespace) {
           case CssWhitespace.normal:
             buffer.write(str.data);
-            break;
           case CssWhitespace.nowrap:
             buffer.write(str.data.replaceAll(' ', '\u00A0'));
-            break;
           case CssWhitespace.pre:
             buffer.write(str.data);
-            break;
         }
       }
     }

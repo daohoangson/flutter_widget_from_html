@@ -245,10 +245,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         switch (direction) {
           case Axis.horizontal:
             built = CssSizingHint(maxWidth: bc.maxWidth, child: built);
-            break;
           case Axis.vertical:
             built = CssSizingHint(maxHeight: bc.maxHeight, child: built);
-            break;
         }
         return built;
       },
@@ -690,7 +688,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (name != null) {
           tree.register(Anchor(this, name).buildOp);
         }
-        break;
 
       case 'abbr':
       case kTagAcronym:
@@ -701,7 +698,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagAcronym,
           ),
         );
-        break;
 
       case kTagAddress:
         tree.register(
@@ -711,7 +707,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagAddress,
           ),
         );
-        break;
       case 'article':
       case 'aside':
       case 'dl':
@@ -729,7 +724,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagDiv,
           ),
         );
-        break;
 
       case 'blockquote':
       case kTagFigure:
@@ -740,23 +734,18 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagFigure,
           ),
         );
-        break;
 
       case 'b':
       case 'strong':
         tree.inherit(text_ops.fontWeight, FontWeight.bold);
-        break;
 
       case 'big':
         tree.inherit(text_ops.fontSizeTerm, kCssFontSizeLarger);
-        break;
       case 'small':
         tree.inherit(text_ops.fontSizeTerm, kCssFontSizeSmaller);
-        break;
 
       case kTagBr:
         tree.register(tagBr);
-        break;
 
       case kTagCenter:
         tree.register(
@@ -766,7 +755,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagCenter,
           ),
         );
-        break;
 
       case 'cite':
       case 'dfn':
@@ -774,7 +762,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case 'i':
       case 'var':
         tree.inherit(text_ops.fontStyle, FontStyle.italic);
-        break;
 
       case kTagCode:
       case kTagKbd:
@@ -784,14 +771,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           text_ops.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
-        break;
       case kTagPre:
         tree.register(_tagPre ??= TagPre(this).buildOp);
-        break;
 
       case kTagDetails:
         tree.register(_tagDetails ??= TagDetails(this).buildOp);
-        break;
 
       case kTagDd:
         tree.register(
@@ -801,7 +785,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagDd,
           ),
         );
-        break;
       case kTagDt:
         tree.register(
           const BuildOp.v2(
@@ -810,7 +793,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagDt,
           ),
         );
-        break;
 
       case 'del':
       case 's':
@@ -822,11 +804,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagStrike,
           ),
         );
-        break;
 
       case kTagFont:
         tree.register(tagFont);
-        break;
 
       case kTagH1:
         tree.register(
@@ -836,7 +816,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH1,
           ),
         );
-        break;
       case kTagH2:
         tree.register(
           const BuildOp.v2(
@@ -845,7 +824,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH2,
           ),
         );
-        break;
       case kTagH3:
         tree.register(
           const BuildOp.v2(
@@ -854,7 +832,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH3,
           ),
         );
-        break;
       case kTagH4:
         tree.register(
           const BuildOp.v2(
@@ -863,7 +840,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH4,
           ),
         );
-        break;
       case kTagH5:
         tree.register(
           const BuildOp.v2(
@@ -872,7 +848,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH5,
           ),
         );
-        break;
       case kTagH6:
         tree.register(
           const BuildOp.v2(
@@ -881,7 +856,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagH6,
           ),
         );
-        break;
 
       case kTagHr:
         tree.register(
@@ -892,16 +866,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Priority.tagHr,
           ),
         );
-        break;
 
       case kTagImg:
         tree.register(_tagImg ??= TagImg(this).buildOp);
-        break;
 
       case kTagOrderedList:
       case kTagUnorderedList:
         tree.register(_tagLi ??= TagLi(this).buildOp);
-        break;
 
       case kTagMark:
         tree.register(
@@ -911,7 +882,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagMark,
           ),
         );
-        break;
 
       case kTagP:
         tree.register(
@@ -921,15 +891,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagP,
           ),
         );
-        break;
 
       case kTagQ:
         tree.register(tagQ);
-        break;
 
       case kTagRuby:
         tree.register(tagRuby);
-        break;
 
       case 'style':
       case kTagScript:
@@ -940,7 +907,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagScript,
           ),
         );
-        break;
 
       case kTagSub:
         tree.register(
@@ -950,7 +916,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagSub,
           ),
         );
-        break;
       case kTagSup:
         tree.register(
           const BuildOp.v2(
@@ -959,7 +924,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagSup,
           ),
         );
-        break;
 
       case kTagTable:
         final tagTable = _tagTable ??= TagTable(this);
@@ -973,7 +937,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           )
           ..register(tagTable.borderOp)
           ..register(tagTable.cellPaddingOp);
-        break;
       case kTagTableCell:
         tree.register(
           const BuildOp.v2(
@@ -982,7 +945,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagTableCellValignDefault,
           ),
         );
-        break;
       case kTagTableHeaderCell:
         tree.register(
           const BuildOp.v2(
@@ -991,7 +953,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagTableHeaderCellDefaultStyles,
           ),
         );
-        break;
       case kTagTableCaption:
         tree.register(
           const BuildOp.v2(
@@ -1000,7 +961,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagTableCaptionTextAlignCenter,
           ),
         );
-        break;
 
       case 'u':
       case kTagIns:
@@ -1011,7 +971,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             priority: Early.tagIns,
           ),
         );
-        break;
     }
 
     for (final attribute in attrs.entries) {
@@ -1024,7 +983,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
               priority: Early.attributeAlign,
             ),
           );
-          break;
         case kAttributeDir:
           tree.register(
             const BuildOp.v2(
@@ -1033,10 +991,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
               priority: Early.attributeDir,
             ),
           );
-          break;
         case kAttributeId:
           tree.register(Anchor(this, attribute.value).buildOp);
-          break;
       }
     }
   }
@@ -1051,26 +1007,22 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (color != null) {
           tree.inherit(text_ops.color, color);
         }
-        break;
 
       case kCssDirection:
         final term = style.term;
         if (term != null) {
           tree.inherit(text_ops.textDirection, term);
         }
-        break;
 
       case kCssFontFamily:
         final list = text_ops.fontFamilyTryParse(style.values);
         tree.inherit(text_ops.fontFamily, list);
-        break;
 
       case kCssFontSize:
         final value = style.value;
         if (value != null) {
           tree.inherit(text_ops.fontSize, value);
         }
-        break;
 
       case kCssFontStyle:
         final term = style.term;
@@ -1079,7 +1031,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (fontStyle != null) {
           tree.inherit(text_ops.fontStyle, fontStyle);
         }
-        break;
 
       case kCssFontWeight:
         final value = style.value;
@@ -1088,7 +1039,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (fontWeight != null) {
           tree.inherit(text_ops.fontWeight, fontWeight);
         }
-        break;
 
       case kCssHeight:
       case kCssMaxHeight:
@@ -1097,14 +1047,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssMinWidth:
       case kCssWidth:
         StyleSizing.registerSizingOp(this, tree);
-        break;
 
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
           tree.inherit(text_ops.lineHeight, value);
         }
-        break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
@@ -1112,11 +1060,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (maxLines != null) {
           tree.maxLines = maxLines;
         }
-        break;
 
       case kCssTextAlign:
         tree.register(styleTextAlign);
-        break;
 
       case kCssTextDecoration:
       case kCssTextDecorationColor:
@@ -1125,18 +1071,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssTextDecorationThickness:
       case kCssTextDecorationWidth:
         textDecorationApply(tree, style);
-        break;
 
       case kCssTextOverflow:
         final textOverflow = tryParseTextOverflow(style.value);
         if (textOverflow != null) {
           tree.overflow = textOverflow;
         }
-        break;
 
       case kCssVerticalAlign:
         tree.register(_styleVerticalAlign ??= StyleVerticalAlign(this).buildOp);
-        break;
 
       case kCssWhitespace:
         final term = style.term;
@@ -1145,11 +1088,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         if (whitespace != null) {
           tree.inherit(text_ops.whitespace, whitespace);
         }
-        break;
 
       case kCssTextShadow:
         textShadowApply(tree, style);
-        break;
     }
 
     if (key.startsWith(kCssBackground)) {
@@ -1176,20 +1117,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     switch (value) {
       case kCssDisplayFlex:
         tree.register(_styleDisplayFlex ??= StyleDisplayFlex(this).buildOp);
-        break;
       case kCssDisplayBlock:
         StyleSizing.registerBlockOp(this, tree);
-        break;
       case kCssDisplayInlineBlock:
         tree.register(displayInlineBlock);
-        break;
       case kCssDisplayNone:
         tree.register(displayNone);
-        break;
       case kCssDisplayTable:
         final tagTable = _tagTable ??= TagTable(this);
         tree.register(tagTable.tableOp);
-        break;
     }
   }
 

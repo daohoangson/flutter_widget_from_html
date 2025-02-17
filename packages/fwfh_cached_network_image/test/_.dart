@@ -77,7 +77,6 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
           final file = MemoryFileSystem().file(fileName)
             ..writeAsBytesSync(data.toList(growable: false));
           yield FileInfo(file, FileSource.Cache, ttl, url);
-          break;
         case 'error.jpg':
           final file = MemoryFileSystem().file(fileName)..writeAsStringSync('');
           yield FileInfo(file, FileSource.Cache, ttl, url);

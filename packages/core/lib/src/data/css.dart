@@ -318,7 +318,6 @@ class CssLength {
 
         value = baseValue * number;
         effectiveScaleFactor = 1;
-        break;
       case CssLengthUnit.percentage:
         if (baseValue == null) {
           return null;
@@ -326,13 +325,10 @@ class CssLength {
 
         value = baseValue * number / 100;
         effectiveScaleFactor = 1;
-        break;
       case CssLengthUnit.pt:
         value = number * 96 / 72;
-        break;
       case CssLengthUnit.px:
         value = number;
-        break;
     }
 
     return value * effectiveScaleFactor;

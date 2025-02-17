@@ -43,7 +43,6 @@ mixin ChewieFactory on WidgetFactory {
     switch (tree.element.localName) {
       case kTagVideo:
         tree.register(_tagVideo ??= TagVideo(this).buildOp);
-        break;
     }
     return super.parse(tree);
   }
