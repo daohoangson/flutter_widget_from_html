@@ -55,7 +55,7 @@ class _ListMarkerRenderObject extends RenderBox {
   _ListMarkerRenderObject(this._markerType, this._textStyle);
 
   HtmlListMarkerType _markerType;
-  // ignore: avoid_setters_without_getters
+  HtmlListMarkerType get markerType => _markerType;
   set markerType(HtmlListMarkerType v) {
     if (v == _markerType) {
       return;
@@ -86,7 +86,7 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 
   TextStyle _textStyle;
-  // ignore: avoid_setters_without_getters
+  TextStyle get textStyle => _textStyle;
   set textStyle(TextStyle v) {
     if (v == _textStyle) {
       return;

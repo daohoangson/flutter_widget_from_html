@@ -756,7 +756,6 @@ class _TableRenderObject extends RenderBox
   }
 
   bool _borderCollapse;
-  // ignore: avoid_positional_boolean_parameters
   void setBorderCollapse(bool v) {
     if (v != _borderCollapse) {
       _borderCollapse = v;

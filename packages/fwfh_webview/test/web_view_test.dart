@@ -91,8 +91,7 @@ void main() {
 
       testWidgets('renders false', (WidgetTester tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        // ignore: avoid_redundant_argument_values
-        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        runApp(WebView(url, aspectRatio: aspectRatio));
         expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
         debugDefaultTargetPlatformOverride = null;
       });
@@ -115,8 +114,7 @@ void main() {
 
       testWidgets('renders false', (WidgetTester tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        // ignore: avoid_redundant_argument_values
-        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        runApp(WebView(url, aspectRatio: aspectRatio));
         expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
         debugDefaultTargetPlatformOverride = null;
       });
@@ -254,14 +252,7 @@ void main() {
     });
 
     testWidgets('renders true', (WidgetTester tester) async {
-      runApp(
-        WebView(
-          url,
-          aspectRatio: aspectRatio,
-          // ignore: avoid_redundant_argument_values
-          js: true,
-        ),
-      );
+      runApp(WebView(url, aspectRatio: aspectRatio));
       expect(
         FakeWebViewController.instance?.javaScriptMode,
         JavaScriptMode.unrestricted,
@@ -313,14 +304,7 @@ void main() {
 
       testWidgets('renders false', (WidgetTester tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        runApp(
-          WebView(
-            url,
-            aspectRatio: aspectRatio,
-            // ignore: avoid_redundant_argument_values
-            mediaPlaybackAlwaysAllow: false,
-          ),
-        );
+        runApp(WebView(url, aspectRatio: aspectRatio));
         expect(
           FakeWebViewController
               .instance?.androidMediaPlaybackRequiresUserGesture,
@@ -331,8 +315,7 @@ void main() {
     });
 
     group('ios', () {
-      // ignore: prefer_function_declarations_over_variables
-      final expectMediaTypesRequiringUserAction = (bool require) {
+      void expectMediaTypesRequiringUserAction(bool require) {
         expect(
           FakeWebViewController.instance?.params,
           isA<WebKitWebViewControllerCreationParams>().having(
@@ -343,7 +326,7 @@ void main() {
                 : isEmpty,
           ),
         );
-      };
+      }
 
       testWidgets('renders without value', (WidgetTester tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
@@ -367,14 +350,7 @@ void main() {
 
       testWidgets('renders false', (WidgetTester tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        runApp(
-          WebView(
-            url,
-            aspectRatio: aspectRatio,
-            // ignore: avoid_redundant_argument_values
-            mediaPlaybackAlwaysAllow: false,
-          ),
-        );
+        runApp(WebView(url, aspectRatio: aspectRatio));
         expectMediaTypesRequiringUserAction(true);
         debugDefaultTargetPlatformOverride = null;
       });

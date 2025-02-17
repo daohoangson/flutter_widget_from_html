@@ -113,9 +113,7 @@ class WebView extends StatefulWidget {
     this.unsupportedWorkaroundForIssue37 = true,
     this.userAgent,
     super.key,
-  }) :
-        // ignore: avoid_bool_literals_in_conditional_expressions
-        autoResize = js ? (autoResize ?? js) : false;
+  }) : autoResize = js && (autoResize ?? js);
 
   @override
   State<WebView> createState() => WebViewState();

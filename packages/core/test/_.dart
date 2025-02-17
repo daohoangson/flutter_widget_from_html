@@ -20,6 +20,7 @@ Widget? buildCurrentState({GlobalKey? key}) {
     return null;
   }
 
+  // suppress lint for tests
   // ignore: invalid_use_of_protected_member
   return hws.build(hws.context);
 }
@@ -586,8 +587,9 @@ class Explainer {
     String s = '';
 
     shadows?.forEach((element) {
-      s +=
-          'Shadow=[color=${_color(element.color)},offset=${element.offset},blurRadius=${element.blurRadius}]';
+      s += 'Shadow=[color=${_color(element.color)},'
+          'offset=${element.offset},'
+          'blurRadius=${element.blurRadius}]';
     });
 
     return s;
@@ -612,9 +614,8 @@ class Explainer {
         widget.builder(
           context,
           BoxConstraints.loose(
-            // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-            // ignore: deprecated_member_use
-            TestWidgetsFlutterBinding.instance.window.physicalSize,
+            TestWidgetsFlutterBinding
+                .instance.platformDispatcher.implicitView!.physicalSize,
           ),
         ),
       );
@@ -653,11 +654,13 @@ class Explainer {
     }
 
     if (widget.runtimeType.toString() == 'InlineCustomWidget') {
+      // TODO: remove ignore when our minimum core version >= 1.0
       // ignore: avoid_dynamic_calls
       return _widget((widget as dynamic).child as Widget);
     }
 
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
+      // TODO: remove ignore when our minimum core version >= 1.0
       // ignore: avoid_dynamic_calls
       return _widget((widget as dynamic).child as Widget);
     }
@@ -775,15 +778,18 @@ class Explainer {
       switch (widget.runtimeType.toString()) {
         case 'HtmlFlex':
           attr.add(
+            // TODO: remove ignore when our minimum core version >= 1.0
             // ignore: avoid_dynamic_calls
             'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''),
           );
           attr.add(
+            // TODO: remove ignore when our minimum core version >= 1.0
             // ignore: avoid_dynamic_calls
             'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
                 .replaceAll('MainAxisAlignment.', ''),
           );
           attr.add(
+            // TODO: remove ignore when our minimum core version >= 1.0
             // ignore: avoid_dynamic_calls
             'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
                 .replaceAll('CrossAxisAlignment.', ''),
@@ -810,6 +816,7 @@ class Explainer {
           // TODO: remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
           final left = dynamicWidget.left as double;
+          // TODO: remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
           final right = dynamicWidget.right as double;
           attr.add(
@@ -921,40 +928,20 @@ extension RenderBoxRenderObject on RenderObject {
 }
 
 extension WindowTester on WidgetTester {
-  double get windowHeight =>
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-      // ignore: deprecated_member_use
-      binding.window.physicalSize.height /
-      // ignore: deprecated_member_use
-      binding.window.devicePixelRatio;
+  double get windowHeight => view.physicalSize.height / view.devicePixelRatio;
 
-  double get windowWidth =>
-      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-      // ignore: deprecated_member_use
-      binding.window.physicalSize.width /
-      // ignore: deprecated_member_use
-      binding.window.devicePixelRatio;
+  double get windowWidth => view.physicalSize.width / view.devicePixelRatio;
 
   void setTextScaleFactor(double value) {
-    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-    // ignore: deprecated_member_use
-    binding.window.platformDispatcher.textScaleFactorTestValue = value;
-    addTearDown(
-      // ignore: deprecated_member_use
-      binding.window.platformDispatcher.clearTextScaleFactorTestValue,
-    );
+    platformDispatcher.textScaleFactorTestValue = value;
+    addTearDown(platformDispatcher.clearTextScaleFactorTestValue);
   }
 
   void setWindowSize(Size size) {
-    // TODO: remove lint ignore when our minimum Flutter version >= 3.10
-    // ignore: deprecated_member_use
-    binding.window.physicalSizeTestValue = size;
-    // ignore: deprecated_member_use
-    addTearDown(binding.window.clearPhysicalSizeTestValue);
-    // ignore: deprecated_member_use
-    binding.window.devicePixelRatioTestValue = 1.0;
-    // ignore: deprecated_member_use
-    addTearDown(binding.window.clearDevicePixelRatioTestValue);
+    view.physicalSize = size;
+    addTearDown(view.resetPhysicalSize);
+    view.devicePixelRatio = 1.0;
+    addTearDown(view.resetDevicePixelRatio);
   }
 }
 

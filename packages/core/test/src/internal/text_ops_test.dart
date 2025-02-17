@@ -76,12 +76,7 @@ Future<void> main() async {
       testWidgets('reset to null', (tester) async {
         const html = '<span style="line-height: 2">Foo '
             '<em style="line-height: normal">bar</em></span>';
-        final explained = await explain(
-          tester,
-          html,
-          // ignore: avoid_redundant_argument_values
-          height: null,
-        );
+        final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:(+height=2.0:Foo )(+i:bar))]'));
       });
 
