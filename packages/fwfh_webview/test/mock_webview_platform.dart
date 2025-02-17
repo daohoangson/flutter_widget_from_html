@@ -16,6 +16,23 @@ void mockWebViewPlatform() {
   final emptyList = codec.encodeMessage([]);
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+  messenger.setMockMessageHandler(
+    // TODO: remove this when webview_flutter_android version >= 4.1.0
+    'dev.flutter.pigeon.webview_flutter_android.InstanceManagerHostApi.clear',
+    (_) => Future.value(emptyList),
+  );
+  messenger.setMockMessageHandler(
+    // TODO: remove this when webview_flutter_android version >= 4.1.0
+    'dev.flutter.pigeon.webview_flutter_android.WebViewHostApi.setWebContentsDebuggingEnabled',
+    (message) async {
+      final decodedMessage = codec.decodeMessage(message) as List<Object?>;
+      FakeWebViewController.instance?.debuggingEnabled =
+          decodedMessage[0] == true;
+      return emptyList;
+    },
+  );
+
   messenger.setMockMessageHandler(
     'dev.flutter.pigeon.webview_flutter_android.PigeonInternalInstanceManager.clear',
     (_) => Future.value(emptyList),
