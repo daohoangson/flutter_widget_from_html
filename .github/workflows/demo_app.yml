@@ -71,6 +71,8 @@ jobs:
         run: |
           set -e
 
+          npm install --global vercel@latest
+
           cd ./build/web
           echo '{' >vercel.json
           echo '  "headers": [ { "source": "/(.*)", "headers": [' >>vercel.json
