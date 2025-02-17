@@ -49,10 +49,8 @@ dev_dependencies:
   golden_toolkit: ^0.15.0
   lint: any
   measurer: ^2.1.1
-  patrol: ^3.12.0
-  # TODO: remove this when patrol version > 3.12, related to this error:
-  # A constant constructor can't call a non-constant super constructor (PatrolIntegrationTester)
-  patrol_finders: 2.1.3
+  patrol: ^3.14.0
+  patrol_finders: ^2.7.0
   test: any
 
 flutter:
