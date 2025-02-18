@@ -598,9 +598,13 @@ class RenderHtmlFlex extends RenderBox
     };
   }
 
+  static final _fwfhFlexByRenderBox = Expando<int>();
+
   static int _getFlex(RenderBox child) {
     final FlexParentData childParentData = child.parentData! as FlexParentData;
-    return childParentData.flex ?? 0;
+    final fwfhFlex = _fwfhFlexByRenderBox[child] ?? 0;
+    final fwfhFlexOrNull = fwfhFlex > 0 ? fwfhFlex : null;
+    return fwfhFlexOrNull ?? childParentData.flex ?? 0;
   }
 
   static FlexFit _getFit(RenderBox child) {
@@ -967,15 +971,25 @@ class RenderHtmlFlex extends RenderBox
           size: layoutChild(child, nonFlexChildConstraints),
           direction: direction,
         );
-        accumulatedSize += childSize;
 
-        final double? baselineOffset = textBaseline == null
-            ? null
-            : getBaseline(child, nonFlexChildConstraints, textBaseline);
-        accumulatedAscentDescent += _AscentDescent(
-          baselineOffset: baselineOffset,
-          crossSize: childSize.crossAxisExtent,
-        );
+        if (canFlex && childSize.mainAxisExtent > maxMainSize) {
+          // e.g. child is wider than available width -> flex it
+          final newFlex = (childSize.mainAxisExtent - maxMainSize).toInt();
+          _fwfhFlexByRenderBox[child] = newFlex;
+          totalFlex += newFlex;
+          firstFlexChild ??= child;
+        } else {
+          _fwfhFlexByRenderBox[child] = -1;
+          accumulatedSize += childSize;
+
+          final double? baselineOffset = textBaseline == null
+              ? null
+              : getBaseline(child, nonFlexChildConstraints, textBaseline);
+          accumulatedAscentDescent += _AscentDescent(
+            baselineOffset: baselineOffset,
+            crossSize: childSize.crossAxisExtent,
+          );
+        }
       }
     }
 
