@@ -27,7 +27,7 @@ jobs:
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
         with:
           cache: true
-      - run: dart format --set-exit-if-changed --output none .
+      - run: dart --version && dart format --set-exit-if-changed --output none .
       - name: Run chromedriver
         run: |
           set -e
