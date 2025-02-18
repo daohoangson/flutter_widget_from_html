@@ -778,6 +778,12 @@ class Explainer {
           attr.add(
             // TODO: remove ignore when our minimum core version >= 1.0
             // ignore: avoid_dynamic_calls
+            'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
+                .replaceAll('CrossAxisAlignment.', ''),
+          );
+          attr.add(
+            // TODO: remove ignore when our minimum core version >= 1.0
+            // ignore: avoid_dynamic_calls
             'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''),
           );
           attr.add(
@@ -786,12 +792,13 @@ class Explainer {
             'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
                 .replaceAll('MainAxisAlignment.', ''),
           );
-          attr.add(
-            // TODO: remove ignore when our minimum core version >= 1.0
-            // ignore: avoid_dynamic_calls
-            'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
-                .replaceAll('CrossAxisAlignment.', ''),
-          );
+
+          // TODO: remove ignore when our minimum core version >= 1.0
+          // ignore: avoid_dynamic_calls
+          final spacing = dynamicWidget.spacing as double;
+          if (spacing != 0.0) {
+            attr.add('spacing=$spacing');
+          }
       }
     }
 

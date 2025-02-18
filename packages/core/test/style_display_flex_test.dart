@@ -18,8 +18,8 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,'
-        'crossAxisAlignment=start,children=[RichText:(:Foo)]]',
+        '[HtmlFlex:crossAxisAlignment=start,direction=horizontal,'
+        'mainAxisAlignment=start,children=[RichText:(:Foo)]]',
       ),
     );
   });
@@ -31,7 +31,7 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[HtmlFlex:crossAxisAlignment=start,direction=horizontal,mainAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
         ']',
@@ -46,7 +46,7 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[HtmlFlex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start,children='
+        '[HtmlFlex:crossAxisAlignment=start,direction=horizontal,mainAxisAlignment=start,children='
         '[CssBlock:child=[RichText:(:Foo)]],'
         '[CssBlock:child=[RichText:(:Bar)]]'
         ']',
@@ -192,6 +192,27 @@ Future<void> main() async {
         final barAfter = tester.bar;
         final barRightAfter = barAfter.left + barAfter.size.width;
         expect(barRightAfter, equals(tester.windowWidth));
+      });
+
+      testWidgets('updates spacing', (WidgetTester tester) async {
+        await explain(
+          tester,
+          '<div style="display: flex; gap: 10px">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final barBefore = tester.bar;
+        final barLeftBefore = barBefore.left;
+
+        await explain(
+          tester,
+          '<div style="display: flex; gap: 20px">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div>',
+        );
+        final barAfter = tester.bar;
+        final barLeftAfter = barAfter.left;
+        expect(barLeftAfter, greaterThan(barLeftBefore));
       });
 
       testWidgets('updates textDirection', (WidgetTester tester) async {
@@ -445,6 +466,8 @@ Future<void> main() async {
             kCssAlignItemsStretch,
           ];
 
+          const List<double?> gaps = [null, 10];
+
           const justifyContents = [
             kCssJustifyContentFlexStart,
             kCssJustifyContentFlexEnd,
@@ -457,24 +480,28 @@ Future<void> main() async {
           for (final flexDirection in flexDirections) {
             for (final alignItem in alignItems) {
               for (final justifyContent in justifyContents) {
-                final key = '$flexDirection/$alignItem/$justifyContent';
-                testGoldens(
-                  key,
-                  (tester) async {
-                    await tester.pumpWidgetBuilder(
-                      _Golden(
-                        flexDirection: flexDirection,
-                        alignItem: alignItem,
-                        justifyContent: justifyContent,
-                      ),
-                      wrapper: materialAppWrapper(theme: ThemeData.light()),
-                      surfaceSize: const Size(316, 166),
-                    );
+                for (final gap in gaps) {
+                  final key =
+                      '$flexDirection/$alignItem/${gap != null ? 'gap-${gap}px' : ''}$justifyContent';
+                  testGoldens(
+                    key,
+                    (tester) async {
+                      await tester.pumpWidgetBuilder(
+                        _Golden(
+                          flexDirection: flexDirection,
+                          alignItem: alignItem,
+                          gap: gap,
+                          justifyContent: justifyContent,
+                        ),
+                        wrapper: materialAppWrapper(theme: ThemeData.light()),
+                        surfaceSize: const Size(316, 166),
+                      );
 
-                    await screenMatchesGolden(tester, key);
-                  },
-                  skip: goldenSkip != null,
-                );
+                      await screenMatchesGolden(tester, key);
+                    },
+                    skip: goldenSkip != null,
+                  );
+                }
               }
             }
           }
@@ -497,11 +524,13 @@ extension on WidgetTester {
 class _Golden extends StatelessWidget {
   final String flexDirection;
   final String alignItem;
+  final double? gap;
   final String justifyContent;
 
   const _Golden({
     required this.flexDirection,
     required this.alignItem,
+    this.gap,
     required this.justifyContent,
   });
 
@@ -510,6 +539,7 @@ class _Golden extends StatelessWidget {
     final inlineStyle = '$kCssDisplay: $kCssDisplayFlex; '
         '$kCssFlexDirection: $flexDirection; '
         '$kCssAlignItems: $alignItem; '
+        '${gap != null ? '$kCssGap: ${gap}px' : ''}'
         '$kCssJustifyContent: $justifyContent';
     return Scaffold(
       body: Padding(
@@ -518,6 +548,7 @@ class _Golden extends StatelessWidget {
 <div style="background: lightgray; height: 150px; width: 300px; $inlineStyle">
   <div style="background: red; padding: 5px">$flexDirection</div>
   <div style="background: green; margin-top: 5px; padding: 5px">$alignItem</div><!-- added margin to verify baseline alignment -->
+  ${gap != null ? '<div style="padding: 5px">gap-${gap}px</div>' : ''}
   <div style="background: blue; color: white; padding: 5px">$justifyContent</div>
 </div>'''),
       ),
