@@ -466,7 +466,7 @@ Future<void> main() async {
             kCssAlignItemsStretch,
           ];
 
-          const List<double?> gaps = [null, 10];
+          const List<int?> gaps = [null, 2];
 
           const justifyContents = [
             kCssJustifyContentFlexStart,
@@ -482,7 +482,7 @@ Future<void> main() async {
               for (final justifyContent in justifyContents) {
                 for (final gap in gaps) {
                   final key =
-                      '$flexDirection/$alignItem/${gap != null ? 'gap-${gap}px' : ''}$justifyContent';
+                      '$flexDirection/$alignItem/${gap != null ? 'gap-$gap/' : ''}$justifyContent';
                   testGoldens(
                     key,
                     (tester) async {
@@ -524,7 +524,7 @@ extension on WidgetTester {
 class _Golden extends StatelessWidget {
   final String flexDirection;
   final String alignItem;
-  final double? gap;
+  final int? gap;
   final String justifyContent;
 
   const _Golden({
@@ -539,7 +539,7 @@ class _Golden extends StatelessWidget {
     final inlineStyle = '$kCssDisplay: $kCssDisplayFlex; '
         '$kCssFlexDirection: $flexDirection; '
         '$kCssAlignItems: $alignItem; '
-        '${gap != null ? '$kCssGap: ${gap}px' : ''}'
+        '${gap != null ? '$kCssGap: ${gap}px; ' : ''}'
         '$kCssJustifyContent: $justifyContent';
     return Scaffold(
       body: Padding(
@@ -548,7 +548,6 @@ class _Golden extends StatelessWidget {
 <div style="background: lightgray; height: 150px; width: 300px; $inlineStyle">
   <div style="background: red; padding: 5px">$flexDirection</div>
   <div style="background: green; margin-top: 5px; padding: 5px">$alignItem</div><!-- added margin to verify baseline alignment -->
-  ${gap != null ? '<div style="padding: 5px">gap-${gap}px</div>' : ''}
   <div style="background: blue; color: white; padding: 5px">$justifyContent</div>
 </div>'''),
       ),
