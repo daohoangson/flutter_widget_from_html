@@ -171,11 +171,17 @@ class HtmlFlex extends MultiChildRenderObjectWidget {
   }
 }
 
-extension type const _AxisSize._(Size _size) {
+class _AxisSize {
+  final Size _size;
+
   _AxisSize({required double mainAxisExtent, required double crossAxisExtent})
-      : this._(Size(mainAxisExtent, crossAxisExtent));
-  _AxisSize.fromSize({required Size size, required Axis direction})
-      : this._(_convert(size, direction));
+      : _size = Size(mainAxisExtent, crossAxisExtent);
+
+  const _AxisSize._(this._size);
+
+  factory _AxisSize.fromSize({required Size size, required Axis direction}) {
+    return _AxisSize._(_convert(size, direction));
+  }
 
   static const _AxisSize empty = _AxisSize._(Size.zero);
 
@@ -207,8 +213,11 @@ extension type const _AxisSize._(Size _size) {
       );
 }
 
-extension type const _AscentDescent._(
-    (double ascent, double descent)? ascentDescent) {
+typedef _AscentDescentValue = (double ascent, double descent);
+
+class _AscentDescent {
+  final _AscentDescentValue? _value;
+
   factory _AscentDescent({
     required double? baselineOffset,
     required double crossSize,
@@ -217,12 +226,17 @@ extension type const _AscentDescent._(
         ? none
         : _AscentDescent._((baselineOffset, crossSize - baselineOffset));
   }
+
+  const _AscentDescent._(this._value);
+
   static const _AscentDescent none = _AscentDescent._(null);
 
-  double? get baselineOffset => ascentDescent?.$1;
+  double? get baselineOffset => _value?.$1;
 
-  _AscentDescent operator +(_AscentDescent other) => switch ((this, other)) {
-        (null, final _AscentDescent v) || (final _AscentDescent v, null) => v,
+  _AscentDescent operator +(_AscentDescent other) =>
+      switch ((_value, other._value)) {
+        (final _AscentDescentValue? _, null) => this,
+        (null, final _AscentDescentValue? _) => other,
         (
           (final double xAscent, final double xDescent),
           (final double yAscent, final double yDescent),
@@ -1006,7 +1020,7 @@ class RenderHtmlFlex extends RenderBox
     }
     assert(totalFlex == 0);
 
-    accumulatedSize += switch (accumulatedAscentDescent) {
+    accumulatedSize += switch (accumulatedAscentDescent._value) {
       null => _AxisSize.empty,
       (final double ascent, final double descent) => _AxisSize(
           mainAxisExtent: 0,
