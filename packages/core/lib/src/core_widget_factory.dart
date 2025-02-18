@@ -229,6 +229,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
     required Axis direction,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+    double spacing = 0.0,
     TextBaseline textBaseline = TextBaseline.alphabetic,
     TextDirection textDirection = TextDirection.ltr,
   }) {
@@ -238,6 +239,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           crossAxisAlignment: crossAxisAlignment,
           direction: direction,
           mainAxisAlignment: mainAxisAlignment,
+          spacing: spacing,
           textBaseline: textBaseline,
           textDirection: textDirection,
           children: children,

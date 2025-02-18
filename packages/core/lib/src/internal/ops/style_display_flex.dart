@@ -1,8 +1,18 @@
 part of '../core_ops.dart';
 
+const kCssAlignItems = 'align-items';
+const kCssAlignItemsFlexStart = 'flex-start';
+const kCssAlignItemsFlexEnd = 'flex-end';
+const kCssAlignItemsCenter = 'center';
+const kCssAlignItemsBaseline = 'baseline';
+const kCssAlignItemsStretch = 'stretch';
+
 const kCssFlexDirection = 'flex-direction';
 const kCssFlexDirectionColumn = 'column';
 const kCssFlexDirectionRow = 'row';
+
+const kCssGap = 'gap';
+
 const kCssJustifyContent = 'justify-content';
 const kCssJustifyContentFlexStart = 'flex-start';
 const kCssJustifyContentFlexEnd = 'flex-end';
@@ -10,12 +20,6 @@ const kCssJustifyContentCenter = 'center';
 const kCssJustifyContentSpaceBetween = 'space-between';
 const kCssJustifyContentSpaceAround = 'space-around';
 const kCssJustifyContentSpaceEvenly = 'space-evenly';
-const kCssAlignItems = 'align-items';
-const kCssAlignItemsFlexStart = 'flex-start';
-const kCssAlignItemsFlexEnd = 'flex-end';
-const kCssAlignItemsCenter = 'center';
-const kCssAlignItemsBaseline = 'baseline';
-const kCssAlignItemsStretch = 'stretch';
 
 class StyleDisplayFlex {
   final WidgetFactory wf;
@@ -30,21 +34,24 @@ class StyleDisplayFlex {
           return null;
         }
 
-        String flexDirection = kCssFlexDirectionRow;
-        String justifyContent = kCssJustifyContentFlexStart;
         String alignItems = kCssAlignItemsFlexStart;
+        String flexDirection = kCssFlexDirectionRow;
+        CssLength? gap;
+        String justifyContent = kCssJustifyContentFlexStart;
 
         for (final element in tree.element.styles) {
           final String? value = element.term;
 
           if (value != null) {
             switch (element.property) {
-              case kCssFlexDirection:
-                flexDirection = value;
-              case kCssJustifyContent:
-                justifyContent = value;
               case kCssAlignItems:
                 alignItems = value;
+              case kCssFlexDirection:
+                flexDirection = value;
+              case kCssGap:
+                gap = tryParseCssLength(element.value);
+              case kCssJustifyContent:
+                justifyContent = value;
             }
           }
         }
@@ -65,6 +72,7 @@ class StyleDisplayFlex {
                   ? Axis.horizontal
                   : Axis.vertical,
               mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+              spacing: gap?.getValue(resolved) ?? 0.0,
               textDirection: resolved.directionOrLtr,
             );
           },
