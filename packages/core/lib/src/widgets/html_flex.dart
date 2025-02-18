@@ -264,6 +264,21 @@ class _LayoutSizes {
   final double? spacePerFlex;
 }
 
+extension on CrossAxisAlignment {
+  double _getChildCrossAxisOffset(double freeSpace, bool flipped) {
+    return switch (this) {
+      CrossAxisAlignment.stretch || CrossAxisAlignment.baseline => 0.0,
+      CrossAxisAlignment.start => flipped ? freeSpace : 0.0,
+      CrossAxisAlignment.center => freeSpace / 2,
+      CrossAxisAlignment.end =>
+        CrossAxisAlignment.start._getChildCrossAxisOffset(
+          freeSpace,
+          !flipped,
+        ),
+    };
+  }
+}
+
 extension on MainAxisAlignment {
   (double leadingSpace, double betweenSpace) _distributeSpace(
     double freeSpace,
@@ -312,19 +327,24 @@ extension on MainAxisAlignment {
   }
 }
 
-extension on CrossAxisAlignment {
-  double _getChildCrossAxisOffset(double freeSpace, bool flipped) {
-    return switch (this) {
-      CrossAxisAlignment.stretch || CrossAxisAlignment.baseline => 0.0,
-      CrossAxisAlignment.start => flipped ? freeSpace : 0.0,
-      CrossAxisAlignment.center => freeSpace / 2,
-      CrossAxisAlignment.end =>
-        CrossAxisAlignment.start._getChildCrossAxisOffset(
-          freeSpace,
-          !flipped,
-        ),
-    };
-  }
+double? _getChildBaseline(
+  RenderBox child,
+  BoxConstraints constraints,
+  TextBaseline baseline,
+) {
+  // TODO: use ChildLayoutHelper.getBaseline when minimum Flutter version >= 3.24
+  assert(!child.debugNeedsLayout);
+  assert(child.constraints == constraints);
+  return child.getDistanceToBaseline(baseline, onlyReal: true);
+}
+
+double? _getChildBaselineDry(
+  RenderBox child,
+  BoxConstraints constraints,
+  TextBaseline baseline,
+) {
+  // TODO: use ChildLayoutHelper.getDryBaseline when minimum Flutter version >= 3.24
+  return child.getDryBaseline(constraints, baseline);
 }
 
 class RenderHtmlFlex extends RenderBox
@@ -544,7 +564,7 @@ class RenderHtmlFlex extends RenderBox
             ? BoxConstraints(maxWidth: extent)
             : BoxConstraints(maxHeight: extent),
         layoutChild: layoutChild,
-        getBaseline: ChildLayoutHelper.getDryBaseline,
+        getBaseline: _getChildBaselineDry,
       ).axisSize.crossAxisExtent;
     }
   }
@@ -728,7 +748,7 @@ class RenderHtmlFlex extends RenderBox
     final _LayoutSizes sizes = _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.dryLayoutChild,
-      getBaseline: ChildLayoutHelper.getDryBaseline,
+      getBaseline: _getChildBaselineDry,
     );
 
     if (_isBaselineAligned) {
@@ -816,7 +836,7 @@ class RenderHtmlFlex extends RenderBox
     return _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.dryLayoutChild,
-      getBaseline: ChildLayoutHelper.getDryBaseline,
+      getBaseline: _getChildBaselineDry,
     ).axisSize.toSize(direction);
   }
 
@@ -937,7 +957,11 @@ class RenderHtmlFlex extends RenderBox
   _LayoutSizes _computeSizes({
     required BoxConstraints constraints,
     required ChildLayouter layoutChild,
-    required ChildBaselineGetter getBaseline,
+    required double? Function(
+      RenderBox child,
+      BoxConstraints constraints,
+      TextBaseline baseline,
+    ) getBaseline,
   }) {
     assert(_debugHasNecessaryDirections);
 
@@ -1077,7 +1101,7 @@ class RenderHtmlFlex extends RenderBox
     final _LayoutSizes sizes = _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.layoutChild,
-      getBaseline: ChildLayoutHelper.getBaseline,
+      getBaseline: _getChildBaseline,
     );
 
     final double crossAxisExtent = sizes.axisSize.crossAxisExtent;
