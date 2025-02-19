@@ -13,8 +13,8 @@ void main() {
       child: VideoPlayer(
         'https://files.daohoangson.com/public/fwfh/flower.mp4',
         aspectRatio: 1,
-        loadingBuilder: (_, __, ___) =>
-            const Center(child: CircularProgressIndicator()),
+        loadingBuilder:
+            (_, _, _) => const Center(child: CircularProgressIndicator()),
       ),
     );
 
