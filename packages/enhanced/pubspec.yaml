@@ -43,6 +43,11 @@ dev_dependencies:
   lint: any
   mocktail: ^1.0.0
 
+  # trick Flutter@3.22 to use chewie@1.7.5
+  # otherwise it will install v1.8.7 which is in fact incompatible with Flutter@3.22
+  # TODO: remove this when our minimum Flutter version >= 3.24
+  chewie: ^1.7.5
+
 flutter:
   assets:
     - test/images/
