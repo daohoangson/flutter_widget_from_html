@@ -294,14 +294,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.15.3"
+    version: "0.16.0"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.15.2"
+    version: "0.16.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -316,42 +316,42 @@ packages:
       path: "../packages/fwfh_cached_network_image"
       relative: true
     source: path
-    version: "0.14.3"
+    version: "0.16.0"
   fwfh_chewie:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_chewie"
       relative: true
     source: path
-    version: "0.14.8"
+    version: "0.16.0"
   fwfh_just_audio:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_just_audio"
       relative: true
     source: path
-    version: "0.15.2"
+    version: "0.16.0"
   fwfh_svg:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_svg"
       relative: true
     source: path
-    version: "0.8.3"
+    version: "0.16.0"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_url_launcher"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.16.0"
   fwfh_webview:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_webview"
       relative: true
     source: path
-    version: "0.15.3"
+    version: "0.15.4"
   glob:
     dependency: transitive
     description:
@@ -1169,10 +1169,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: daf97c9d80197ed7b619040e86c8ab9a9dad285e7671ee7390f9180cc828a51e
+      sha256: b89e6e24d1454e149ab20fbb225af58660f0c0bf4475544650700d8e2da54aef
       url: "https://pub.dev"
     source: hosted
-    version: "5.10.1"
+    version: "5.11.0"
   xdg_directories:
     dependency: transitive
     description:
