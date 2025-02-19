@@ -1,3 +1,8 @@
+## 0.16.0
+
+- Requires Flutter 3.22 (#1403)
+- Add support for CSS `gap` (#1403)
+
 ## 0.15.3
 
 - Add support for webview_flutter_android@4 (#1366)
@@ -12,7 +17,6 @@
 
 ## 0.15.1
 
-- Drop support for Flutter 3.7 (#1250)
 - Add support for `currentcolor` (#1240)
 - Fix zero size image (#1266)
 - Replace webview timers with ResizeObserver (#1241)
