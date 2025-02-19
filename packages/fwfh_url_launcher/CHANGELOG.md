@@ -1,3 +1,8 @@
+## 0.16.0
+
+- Requires Flutter 3.10 (#1396)
+- Add support for flutter_widget_from_html_core@0.16.0 (#1405)
+
 ## 0.9.1
 
 - Add support for flutter_widget_from_html_core@0.15.1 (#1269)
