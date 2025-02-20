@@ -1,5 +1,14 @@
 {
   "extends": [
     "config:recommended"
+  ],
+  "ignoreDeps": [
+    "flutter_widget_from_html",
+    "flutter_widget_from_html_core",
+    "fwfh_cached_network_image",
+    "fwfh_chewie",
+    "fwfh_just_audio",
+    "fwfh_url_launcher",
+    "fwfh_webview"
   ]
 }
