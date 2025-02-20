@@ -1,3 +1,7 @@
+## 0.15.4
+
+- Add support for flutter_widget_from_html_core@0.16.0 (#1405)
+
 ## 0.15.3
 
 - Add support for webview_flutter_android@4 (#1366)

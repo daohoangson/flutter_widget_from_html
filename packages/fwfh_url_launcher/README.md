@@ -14,7 +14,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_url_launcher: ^0.9.1
+  fwfh_url_launcher: ^0.16.0
 ```
 
 ## Usage
