@@ -522,7 +522,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) async => false,
+          onTapUrl: (_) => false,
         ),
       );
       await tester.pumpAndSettle();
@@ -539,7 +539,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) async => true,
+          onTapUrl: (_) => true,
         ),
       );
       await tester.pumpAndSettle();

@@ -37,7 +37,7 @@ Future<String> explain(
   Widget? hw,
   GlobalKey? key,
   bool useExplainer = true,
-}) async {
+}) {
   key ??= helper.hwKey;
   return helper.explain(
     tester,

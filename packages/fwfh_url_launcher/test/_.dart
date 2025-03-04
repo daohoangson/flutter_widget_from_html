@@ -6,7 +6,7 @@ import '../../core/test/_.dart' as helper;
 
 const tapText = helper.tapText;
 
-Future<String> explain(WidgetTester tester, String html) async =>
+Future<String> explain(WidgetTester tester, String html) =>
     helper.explain(
       tester,
       null,
