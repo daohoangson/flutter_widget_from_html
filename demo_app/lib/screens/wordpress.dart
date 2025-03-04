@@ -160,7 +160,7 @@ class _PostsState extends State<_PostsList> {
     );
   }
 
-  List<_Post> _parseJson(json) {
+  List<_Post> _parseJson(dynamic json) {
     final posts = <_Post>[];
     if (json is List) {
       for (final postJson in json) {

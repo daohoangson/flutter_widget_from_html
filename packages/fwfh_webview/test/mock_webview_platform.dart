@@ -74,7 +74,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   FutureOr<NavigationDecision?> onNavigationRequest({
     required String url,
     required bool isMainFrame,
-  }) async {
+  }) {
     final req = NavigationRequest(url: url, isMainFrame: isMainFrame);
     return _handler?._onNavigationRequest?.call(req);
   }

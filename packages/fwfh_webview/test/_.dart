@@ -45,7 +45,7 @@ Future<String> explain(
   String html, {
   Uri? baseUrl,
   bool useExplainer = true,
-}) async =>
+}) =>
     helper.explain(
       tester,
       null,
