@@ -15,7 +15,7 @@ CssColor? tryParseColor(css.Expression? expression) {
       case 'hsla':
         final params = expression.params;
         if (params.length >= 3) {
-          final [param0, param1, param2] = params;
+          final param0 = params[0];
           final double? h;
           if (param0 is css.NumberTerm) {
             h = _parseColorHue(param0.number);
@@ -25,6 +25,7 @@ CssColor? tryParseColor(css.Expression? expression) {
             h = null;
           }
 
+          final param1 = params[1];
           final double? s;
           if (param1 is css.PercentageTerm) {
             s = param1.valueAsDouble.clamp(0.0, 1.0);
@@ -32,6 +33,7 @@ CssColor? tryParseColor(css.Expression? expression) {
             s = null;
           }
 
+          final param2 = params[2];
           final double? l;
           if (param2 is css.PercentageTerm) {
             l = param2.valueAsDouble.clamp(0.0, 1.0);
