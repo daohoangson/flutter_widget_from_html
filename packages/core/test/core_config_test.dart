@@ -718,7 +718,7 @@ class _OnTapUrlApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
         home: Scaffold(
           body: HtmlWidget(
             '<a href="$href">Tap me</a>',

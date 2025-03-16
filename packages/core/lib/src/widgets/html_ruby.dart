@@ -18,7 +18,7 @@ class HtmlRuby extends MultiChildRenderObjectWidget {
         );
 
   @override
-  RenderObject createRenderObject(BuildContext _) => _RubyRenderObject();
+  RenderObject createRenderObject(BuildContext context) => _RubyRenderObject();
 }
 
 class _RubyParentData extends ContainerBoxParentData<RenderBox> {}
