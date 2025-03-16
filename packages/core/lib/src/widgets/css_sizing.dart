@@ -12,11 +12,11 @@ class CssBlock extends SingleChildRenderObjectWidget {
   const CssBlock({super.child, super.key});
 
   @override
-  RenderObject createRenderObject(BuildContext _) =>
+  RenderObject createRenderObject(BuildContext context) =>
       _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
 
   @override
-  void updateRenderObject(BuildContext _, RenderObject renderObject) =>
+  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
       (renderObject as _RenderCssSizing).setPreferredSize(
         null,
         const CssSizingValue.percentage(100),

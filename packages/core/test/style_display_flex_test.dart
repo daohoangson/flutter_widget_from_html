@@ -535,7 +535,7 @@ class _Golden extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) {
+  Widget build(BuildContext context) {
     final inlineStyle = '$kCssDisplay: $kCssDisplayFlex; '
         '$kCssFlexDirection: $flexDirection; '
         '$kCssAlignItems: $alignItem; '

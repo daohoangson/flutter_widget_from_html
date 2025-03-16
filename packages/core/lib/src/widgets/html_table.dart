@@ -41,7 +41,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   });
 
   @override
-  RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
+  RenderObject createRenderObject(BuildContext context) => _TableRenderObject(
         border,
         textDirection,
         borderCollapse: borderCollapse,
@@ -74,7 +74,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
     (renderObject as _TableRenderObject)
       ..setBorder(border)
       ..setBorderCollapse(borderCollapse)

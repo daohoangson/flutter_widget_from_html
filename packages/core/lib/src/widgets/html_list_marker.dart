@@ -33,7 +33,7 @@ class HtmlListMarker extends LeafRenderObjectWidget {
       : markerType = HtmlListMarkerType.square;
 
   @override
-  RenderObject createRenderObject(BuildContext _) =>
+  RenderObject createRenderObject(BuildContext context) =>
       _ListMarkerRenderObject(markerType, textStyle);
 
   @override
@@ -44,7 +44,7 @@ class HtmlListMarker extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
     (renderObject as _ListMarkerRenderObject)
       ..markerType = markerType
       ..textStyle = textStyle;

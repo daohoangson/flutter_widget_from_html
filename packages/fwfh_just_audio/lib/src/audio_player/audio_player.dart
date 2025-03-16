@@ -151,7 +151,7 @@ class _PlayButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => StreamBuilder<bool>(
+  Widget build(BuildContext context) => StreamBuilder<bool>(
         builder: (_, snapshot) {
           final isPlaying = snapshot.data ?? false;
           return IconButton(
@@ -178,7 +178,7 @@ class _PositionText extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => StreamBuilder<Duration?>(
+  Widget build(BuildContext context) => StreamBuilder<Duration?>(
         builder: (_, duration) => StreamBuilder<Duration>(
           builder: (_, position) {
             final max = duration.data?.inSeconds ?? -1;
@@ -268,7 +268,7 @@ class _MuteButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => StreamBuilder<double>(
+  Widget build(BuildContext context) => StreamBuilder<double>(
         builder: (_, snapshot) {
           final isMuted = (snapshot.data ?? 1.0) == 0;
           return IconButton(

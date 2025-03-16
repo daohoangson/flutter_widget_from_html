@@ -462,7 +462,7 @@ class _ColumnTestApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -485,7 +485,7 @@ class _ListViewTestApp extends StatelessWidget {
   const _ListViewTestApp({this.html});
 
   @override
-  Widget build(BuildContext _) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: HtmlWidget(
           html ?? htmlDefault,
           factoryBuilder: () => _WidgetFactory(),
@@ -501,7 +501,7 @@ class _SliverListTestApp extends StatelessWidget {
   const _SliverListTestApp({this.keyBottom});
 
   @override
-  Widget build(BuildContext _) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: CustomScrollView(
           cacheExtent: 0,
           slivers: [
