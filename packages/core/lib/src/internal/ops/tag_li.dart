@@ -91,14 +91,23 @@ class TagLi {
   static StylesMap _defaultStyles(dom.Element element) {
     final attrs = element.attributes;
     final depth = element.elementDepth;
-    final listStyleType = element.localName == kTagOrderedList
-        ? (_listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
-            kCssListStyleTypeDecimal)
-        : depth == 0
-            ? kCssListStyleTypeDisc
-            : depth == 1
-                ? kCssListStyleTypeCircle
-                : kCssListStyleTypeSquare;
+
+    final String listStyleType;
+    if (element.localName == kTagOrderedList) {
+      listStyleType =
+          _listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
+              kCssListStyleTypeDecimal;
+    } else {
+      switch (depth) {
+        case 0:
+          listStyleType = kCssListStyleTypeDisc;
+        case 1:
+          listStyleType = kCssListStyleTypeCircle;
+        default:
+          listStyleType = kCssListStyleTypeSquare;
+      }
+    }
+
     return {
       kCssDisplay: kCssDisplayBlock,
       kCssListStyleType: listStyleType,

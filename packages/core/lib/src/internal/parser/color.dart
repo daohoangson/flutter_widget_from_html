@@ -15,20 +15,30 @@ CssColor? tryParseColor(css.Expression? expression) {
       case 'hsla':
         final params = expression.params;
         if (params.length >= 3) {
-          final param0 = params[0];
-          final h = param0 is css.NumberTerm
-              ? _parseColorHue(param0.number)
-              : param0 is css.AngleTerm
-                  ? _parseColorHue(param0.angle, param0.unit)
-                  : null;
-          final param1 = params[1];
-          final s = param1 is css.PercentageTerm
-              ? param1.valueAsDouble.clamp(0.0, 1.0)
-              : null;
-          final param2 = params[2];
-          final l = param2 is css.PercentageTerm
-              ? param2.valueAsDouble.clamp(0.0, 1.0)
-              : null;
+          final [param0, param1, param2] = params;
+          final double? h;
+          if (param0 is css.NumberTerm) {
+            h = _parseColorHue(param0.number);
+          } else if (param0 is css.AngleTerm) {
+            h = _parseColorHue(param0.angle, param0.unit);
+          } else {
+            h = null;
+          }
+
+          final double? s;
+          if (param1 is css.PercentageTerm) {
+            s = param1.valueAsDouble.clamp(0.0, 1.0);
+          } else {
+            s = null;
+          }
+
+          final double? l;
+          if (param2 is css.PercentageTerm) {
+            l = param2.valueAsDouble.clamp(0.0, 1.0);
+          } else {
+            l = null;
+          }
+
           final hslA = params.length >= 4 ? _parseColorAlpha(params[3]) : 1.0;
           if (h != null && s != null && l != null && hslA != null) {
             final hslValue = HSLColor.fromAHSL(hslA, h, s, l).toColor();

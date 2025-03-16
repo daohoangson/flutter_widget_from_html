@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
@@ -65,8 +67,9 @@ extension SkipBuildHeightPlaceholder on BuildContext {
   /// This type of placeholder has special merging logic so they need
   /// to be preserved during column contents traversal.
   set skipBuildHeightPlaceholder(bool newValue) {
-    final v = _skipBuildOrZero;
-    _skipBuild[this] = newValue ? (v + 1) : (v > 0 ? v - 1 : 0);
+    final delta = newValue ? 1 : -1;
+    final newCounter = _skipBuildOrZero + delta;
+    _skipBuild[this] = max(0, newCounter);
   }
 
   int get _skipBuildOrZero => _skipBuild[this] ?? 0;
