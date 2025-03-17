@@ -268,7 +268,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     if (recognizer is TapGestureRecognizer) {
       built = MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(onTap: recognizer.onTap, child: child),
+        child: Semantics(
+          button: true,
+          child: GestureDetector(onTap: recognizer.onTap, child: child),
+        ),
       );
     }
 
