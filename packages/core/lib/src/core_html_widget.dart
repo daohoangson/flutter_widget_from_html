@@ -261,12 +261,15 @@ class HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
-  Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
-      widget.renderMode == RenderMode.sliverList
-          ? child == widget0
-              ? const SliverToBoxAdapter(child: widget0)
-              : SliverToBoxAdapter(child: child)
-          : child;
+  Widget _sliverToBoxAdapterIfNeeded(Widget child) {
+    if (widget.renderMode != RenderMode.sliverList) {
+      return child;
+    }
+
+    return child == widget0
+        ? const SliverToBoxAdapter(child: widget0)
+        : SliverToBoxAdapter(child: child);
+  }
 
   Widget _wrapper(Widget child) =>
       _RootWidget(resolved: _rootProperties, child: child);

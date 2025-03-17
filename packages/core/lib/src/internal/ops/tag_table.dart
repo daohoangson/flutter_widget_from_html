@@ -156,13 +156,10 @@ class TagTable {
         }
 
         final columnSpan = cell.columnSpan > 0 ? cell.columnSpan : 1;
+        final rowSpanDefault = cell.rowSpan == 0 ? group.rows.length : 1;
         final rowSpan = min(
           rowSpanMax,
-          cell.rowSpan > 0
-              ? cell.rowSpan
-              : cell.rowSpan == 0
-                  ? group.rows.length
-                  : 1,
+          cell.rowSpan > 0 ? cell.rowSpan : rowSpanDefault,
         );
 
         final builderIndex = data.builders.length;
@@ -310,11 +307,15 @@ class TagTable {
       case kCssDisplayTableHeaderGroup:
       case kCssDisplayTableRowGroup:
       case kCssDisplayTableFooterGroup:
-        final group = which == kCssDisplayTableHeaderGroup
-            ? data.header
-            : which == kCssDisplayTableRowGroup
-                ? data.newBody()
-                : data.footer;
+        final _TagTableRowGroup group;
+        switch (which) {
+          case kCssDisplayTableHeaderGroup:
+            group = data.header;
+          case kCssDisplayTableRowGroup:
+            group = data.newBody();
+          default:
+            group = data.footer;
+        }
         subTree.register(group._groupOp);
       case kCssDisplayTableRow:
         subTree.register(data.newBody().newRow()._rowOp);

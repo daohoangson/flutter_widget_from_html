@@ -189,13 +189,17 @@ Uint8List? bytesFromDataUri(String dataUri) {
   final prefix = match[0]!;
   final encoding = match[1];
   final data = dataUri.substring(prefix.length);
-  final bytes = encoding == 'base64'
-      ? base64.decode(data)
-      : encoding == 'utf8'
-          ? Uint8List.fromList(data.codeUnits)
-          : null;
 
-  return bytes?.isNotEmpty == true ? bytes : null;
+  final Uint8List bytes;
+  if (encoding == 'base64') {
+    bytes = base64.decode(data);
+  } else if (encoding == 'utf8') {
+    bytes = Uint8List.fromList(data.codeUnits);
+  } else {
+    return null;
+  }
+
+  return bytes.isNotEmpty == true ? bytes : null;
 }
 
 /// Parses [key] from [map] as an double literal and return its value.
