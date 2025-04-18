@@ -1048,7 +1048,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        StyleSizing.registerSizingOp(this, tree);
+        StyleSizing.registerSizingOp(tree);
 
       case kCssLineHeight:
         final value = style.value;
@@ -1114,13 +1114,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   /// Parses display inline style.
   void parseStyleDisplay(BuildTree tree, String? value) {
-    StyleSizing.maybeRegisterChildOp(this, tree);
+    StyleSizing.maybeRegisterChildOp(tree);
 
     switch (value) {
       case kCssDisplayFlex:
         tree.register(_styleDisplayFlex ??= StyleDisplayFlex(this).buildOp);
       case kCssDisplayBlock:
-        StyleSizing.registerBlockOp(this, tree);
+        StyleSizing.registerBlockOp(tree);
       case kCssDisplayInlineBlock:
         tree.register(displayInlineBlock);
       case kCssDisplayNone:

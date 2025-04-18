@@ -18,7 +18,7 @@ class StyleSizing {
   static final _treeIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
-  static void maybeRegisterChildOp(WidgetFactory wf, BuildTree tree) {
+  static void maybeRegisterChildOp(BuildTree tree) {
     final parentElement = tree.element.parent;
     if (parentElement == null || _elementTree[parentElement] == null) {
       return;
@@ -27,7 +27,7 @@ class StyleSizing {
     tree.register(StyleSizing().childOp);
   }
 
-  static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
+  static void registerBlockOp(BuildTree tree) {
     _elementTree[tree.element] = tree;
     _treeIsBlock[tree] = true;
 
@@ -37,7 +37,7 @@ class StyleSizing {
       ..register(instance.sizingOp);
   }
 
-  static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
+  static void registerSizingOp(BuildTree tree) {
     _elementTree[tree.element] = tree;
     tree.register(StyleSizing().sizingOp);
   }

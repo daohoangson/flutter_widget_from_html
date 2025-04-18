@@ -407,7 +407,7 @@ class _TagTableRow {
 
     cellTree.register(_cellOp);
     StyleBorder.skip(cellTree);
-    StyleSizing.skip(cellTree);
+    StyleSizing.registerBlockOp(cellTree);
   }
 
   static StylesMap _cssVerticalAlignFromAttribute(dom.Element element) {
