@@ -653,81 +653,6 @@ Future<void> main() async {
     });
   });
 
-  group('background', () {
-    testWidgets('cell color', (WidgetTester tester) async {
-      // https://github.com/daohoangson/flutter_widget_from_html/issues/171
-      const html = '<table><tr>'
-          '<td style="background-color: #f00">Foo</td>'
-          '</tr></table>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[SingleChildScrollView:child=[HtmlTable:children='
-          '[HtmlTableCell:child='
-          '[Container:color=#FFFF0000,child='
-          '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Foo)]'
-          ']]]]]]',
-        ),
-      );
-    });
-
-    testWidgets('row color', (WidgetTester tester) async {
-      // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
-      const html = '<table><tr style="background-color: #f00">'
-          '<td>Foo</td><td>Bar</td>'
-          '</tr></table>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[SingleChildScrollView:child=[HtmlTable:children='
-          '[HtmlTableCell:child='
-          '[Container:color=#FFFF0000,child='
-          '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Foo)]'
-          ']]]],'
-          '[HtmlTableCell:child='
-          '[Container:color=#FFFF0000,child='
-          '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Bar)]'
-          ']]]]'
-          ']]',
-        ),
-      );
-    });
-
-    testWidgets('overwrites row color', (WidgetTester tester) async {
-      const html = '<table><tr style="background-color: #f00">'
-          '<td>Foo</td><td style="background-color: #0f0">Bar</td>'
-          '</tr></table>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[SingleChildScrollView:child=[HtmlTable:children='
-          '[HtmlTableCell:child='
-          '[Container:color=#FFFF0000,child='
-          '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Foo)]'
-          ']]]],'
-          '[HtmlTableCell:child='
-          '[Container:color=#FF00FF00,child='
-          '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Bar)]'
-          ']]]]'
-          ']]',
-        ),
-      );
-    });
-  });
-
   testWidgets('renders display: table', (WidgetTester tester) async {
     const html = '''
 <div style="display: table">
@@ -747,10 +672,10 @@ Future<void> main() async {
       equals(
         '[SingleChildScrollView:child=[HtmlTable:children='
         '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
-        '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
-        '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
-        '[HtmlTableCell:child=[RichText:(:Value 1)]],'
-        '[HtmlTableCell:child=[RichText:(:Value 2)]]'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(+b:Header 1)]]],'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(+b:Header 2)]]],'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(:Value 1)]]],'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(:Value 2)]]]'
         ']]',
       ),
     );
@@ -767,8 +692,8 @@ Future<void> main() async {
       explained,
       equals(
         '[SingleChildScrollView:child=[HtmlTable:children='
-        '[HtmlTableCell:child=[RichText:(:Foo)]],'
-        '[HtmlTableCell:child=[RichText:(:Bar)]]'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(:Foo)]]],'
+        '[HtmlTableCell:child=[CssBlock:child=[RichText:(:Bar)]]]'
         ']]',
       ),
     );
@@ -1214,8 +1139,9 @@ Future<void> main() async {
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/171
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
               'row_color': '''
-<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/1028 -->
 <table style="border-collapse: collapse;">
   <tr>
     <th>First Name</th>
@@ -1235,7 +1161,7 @@ Future<void> main() async {
   <tr style="background-color: #f2f2f2;">
     <td>Adam</td>
     <td>Johnson</td>
-    <td>67</td>
+    <td style="background-color: red;">67</td>
   </tr>
 </table>''',
               'rtl': '''
@@ -1282,6 +1208,18 @@ Future<void> main() async {
     <td>$multiline</td>
   </tr>
 </table>''',
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1322
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1446
+              'text_align_center': '''
+<table border="1">
+  <tr>
+    <td>Long long long text</td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">Short text</td>
+  </tr>
+</table>
+''',
               'width_redistribution_wide': '''
 <div style="background: red; width: 400px">
   <table border="1">
@@ -1528,8 +1466,8 @@ Future<String> explain(
 
 String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='
-    '[Align:alignment=centerLeft,widthFactor=1.0,child='
-    '$child]]]';
+    '[Align:alignment=centerLeft,widthFactor=1.0,child=[CssBlock:child='
+    '$child]]]]';
 
 final _loggerIsGitHubAction = Platform.environment['GITHUB_ACTIONS'] == 'true';
 final _loggerMessages = [];
