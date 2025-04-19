@@ -415,7 +415,7 @@ class _TableRenderLayouter {
           final layoutSize = layouter(child, step1.widthConstraints);
           childSizes[i] = layoutSize;
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
-          logger.fine('Got child#$i $layoutSize@${step1.widthConstraints}');
+          logger.fine('[3] Got child#$i $layoutSize@${step1.widthConstraints}');
           shouldLoop = true;
         }
 
@@ -525,7 +525,7 @@ class _TableRenderLayouter {
         // layout with tight constraints to get the expected width
         final cc1 = BoxConstraints.tightFor(width: childWidth);
         childSize = layouter(child, cc1);
-        logger.fine('Got child#$i $childSize@$cc1');
+        logger.fine('[4] Got child#$i $childSize@$cc1');
         childSizes[i] = childSize;
       }
 
@@ -687,6 +687,10 @@ class _TableDataStep1 {
 
   static double _calculateRemainingWidth(
       _TableRenderObject tro, int columnCount, double width) {
+    if (width.isZero) {
+      return 0;
+    }
+
     final columnGapsSum = (columnCount + 1) * tro.columnGap;
     final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
     return width - gapsAndPaddings;
