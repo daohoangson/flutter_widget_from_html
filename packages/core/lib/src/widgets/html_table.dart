@@ -383,8 +383,8 @@ class _TableRenderLayouter {
     final children = step1.children;
     final remainingMaxWidth = step1.remainingMaxWidth;
 
+    final cellSizes = List<Size?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
-    final childSizes = List<Size?>.filled(children.length, null);
     final maxColumnWidths =
         step2.naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
@@ -396,7 +396,6 @@ class _TableRenderLayouter {
         (remainingMaxWidth == null || columnWidths.sum <= remainingMaxWidth)) {
       return _TableDataStep3(
         step2,
-        childSizes: childSizes,
         columnWidths: columnWidths,
       );
     }
@@ -409,11 +408,11 @@ class _TableRenderLayouter {
         final child = children[i];
         final data = cells[i];
 
-        if (childSizes[i] == null) {
+        if (cellSizes[i] == null) {
           // side effect
           // layout cells for the initial width
           final layoutSize = layouter(child, step1.widthConstraints);
-          childSizes[i] = layoutSize;
+          cellSizes[i] = layoutSize;
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
           logger.fine('[3] Got child#$i $layoutSize@${step1.widthConstraints}');
           shouldLoop = true;
@@ -458,7 +457,6 @@ class _TableRenderLayouter {
 
     return _TableDataStep3(
       step2,
-      childSizes: childSizes,
       columnWidths: columnWidths,
     );
   }
@@ -506,7 +504,6 @@ class _TableRenderLayouter {
     final step1 = step2.step1;
     final cells = step1.cells;
     final children = step1.children;
-    final existingChildSizes = step3.childSizes;
 
     final childSizes = List.filled(children.length, Size.zero);
     final rowHeights = List.filled(step1.rowCount, .0);
@@ -515,19 +512,13 @@ class _TableRenderLayouter {
       final child = children[i];
       final data = cells[i];
 
+      // always re-layout because we cannot be sure whether
+      // children will render the same inside an unconstrained and a tight box
       final childWidth = data.calculateWidth(tro, step3.columnWidths);
-      var childSize = existingChildSizes[i];
-      if (childSize?.width == childWidth) {
-        // no need to re-layout if the width is the same
-        childSizes[i] = childSize!;
-      } else {
-        // side effect
-        // layout with tight constraints to get the expected width
-        final cc1 = BoxConstraints.tightFor(width: childWidth);
-        childSize = layouter(child, cc1);
-        logger.fine('[4] Got child#$i $childSize@$cc1');
-        childSizes[i] = childSize;
-      }
+      final cc1 = BoxConstraints.tightFor(width: childWidth);
+      final childSize = layouter(child, cc1);
+      logger.fine('[4] Got child#$i $childSize@$cc1');
+      childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
       final rowHeight =
@@ -713,12 +704,10 @@ class _TableDataStep2 {
 class _TableDataStep3 {
   final _TableDataStep2 step2;
 
-  final List<Size?> childSizes;
   final List<double> columnWidths;
 
   const _TableDataStep3(
     this.step2, {
-    required this.childSizes,
     required this.columnWidths,
   });
 }
