@@ -226,6 +226,9 @@ class __FakeWebKitWebViewController extends FakeWebViewController
       throw UnimplementedError();
 
   @override
+  Future<void> setAllowsLinkPreview(bool allow) => throw UnimplementedError();
+
+  @override
   Future<void> setOnCanGoBackChange(
     void Function(bool) onCanGoBackChangeCallback,
   ) =>
