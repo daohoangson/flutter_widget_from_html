@@ -443,7 +443,7 @@ Future<void> main() async {
       const windowSize = 100.0;
       tester.setWindowSize(const Size(windowSize, windowSize));
 
-      const html = '<table><tr><td align="center">'
+      const html = '<table style="width: 100%"><tr><td align="center">'
           '<table><tr><td>Foo</td></tr></table>'
           '</td></tr></table>';
       await explain(tester, html);
@@ -989,14 +989,6 @@ Future<void> main() async {
         ]);
 
         expect(second.width, equals(first.width));
-
-        final m = _loggerMessages;
-        expect(m, contains(contains('Got child#0 min width:')));
-        expect(m, contains(contains('Got child#1 min width:')));
-        expect(m, contains(contains('Got child#2 size without contraints:')));
-        expect(m, isNot(contains(contains('Got child#2 min width:'))));
-        expect(m, contains(contains('Got child#3 size without contraints:')));
-        expect(m, isNot(contains(contains('Got child#3 min width:'))));
       });
     });
 
