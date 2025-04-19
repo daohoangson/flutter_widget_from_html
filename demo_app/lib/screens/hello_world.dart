@@ -131,7 +131,7 @@ const kHtml = '''
 <h4>&lt;VIDEO&gt;</h4>
 <figure>
   <video controls width="250">
-    <source src="https://files.daohoangson.com/public/fwfh/flower.mp4" type="video/mp4">
+    <source src="https://flutter-widget-from-html.github.io/pages/flower.mp4" type="video/mp4">
     <code>VIDEO</code> support is not enabled.
   </video>
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
