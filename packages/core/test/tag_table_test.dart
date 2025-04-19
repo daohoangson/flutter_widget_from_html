@@ -418,57 +418,6 @@ Future<void> main() async {
     });
   });
 
-  group('width', () {
-    testWidgets('renders without width', (WidgetTester tester) async {
-      const html = '<table><tr><td>Foo</td></tr></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'));
-    });
-
-    testWidgets('renders width: 50px', (WidgetTester tester) async {
-      const html = '<table><tr><td style="width: 50px">Foo</td></tr></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
-      );
-      expect(
-        explained,
-        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 50.0)'),
-      );
-    });
-
-    testWidgets('renders width: 100%', (WidgetTester tester) async {
-      const html = '<table><tr><td style="width: 100%">Foo</td></tr></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
-      );
-      expect(
-        explained,
-        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
-      );
-    });
-
-    testWidgets('renders width: 100% within TABLE', (tester) async {
-      const html = '<table><tr><td>'
-          '<table><tr><td style="width: 100%">'
-          'Foo'
-          '</td></tr></table>'
-          '</td></tr></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'),
-      );
-      expect(
-        explained,
-        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
-      );
-    });
-  });
-
   group('combos', () {
     testWidgets('renders nested table', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
@@ -1093,12 +1042,29 @@ Future<void> main() async {
   <tr><td colspan="2">Lorem ipsum dolor sit amet.</td></tr>
   <tr><td>Foo</td><td>Bar</td></tr>
 </table>''',
-              'height_1px': 'Above<table border="1" style="height: 1px">'
-                  '<tr><td style="height: 1px">Foo</td></tr></table>Below',
               'rowspan': '''
 <table border="1">
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
   <tr><td>Bar</td></tr>
+</table>''',
+              // TODO: doesn't match browser output
+              'sizing_height_1px': '''
+Above
+
+<table border="1" style="height: 1px">
+  <tr>
+    <td style="height: 1px">Foo</td>
+  </tr>
+</table>
+
+Below''',
+              'sizing_width_100_percent': '''
+<table border="1" style="width: 100%">
+  <tr>
+    <td>One</td>
+    <td>Two</td>
+    <td>Three</td>
+  </tr>
 </table>''',
               'valign_baseline_1a': '''
 <table border="1">
@@ -1240,6 +1206,7 @@ Future<void> main() async {
     </tr>
   </table>
 </div>''',
+              // TODO: doesn't match browser output
               'width_in_percent': '''
 <table border="1">
   <tr>
@@ -1252,6 +1219,32 @@ Future<void> main() async {
   <tr>
     <td>
       <table border="1">
+        <tr>
+          <td style="width: 100%">Foo</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>''',
+              'width_in_percent_100_nested_with_gaps': '''
+<table border="1">
+  <tr><td>Foo foo foo</td></tr>
+  <tr>
+    <td>
+      <table border="1">
+        <tr>
+          <td style="width: 100%">Foo</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>''',
+              'width_in_percent_100_nested_stretch': '''
+<table border="1">
+  <tr><td>Foo foo foo</td></tr>
+  <tr>
+    <td>
+      <table border="1" style="width: 100%">
         <tr>
           <td style="width: 100%">Foo</td>
         </tr>

@@ -4,8 +4,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 
-import 'css_sizing.dart';
-
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -24,6 +22,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// If non-null, overwrites the incoming [BoxConstraints.maxWidth].
   final double? maxWidth;
 
+  /// If non-null, overwrites the incoming [BoxConstraints.minWidth].
+  final double? minWidth;
+
   /// Determines the order to lay children out horizontally.
   ///
   /// Default: [TextDirection.ltr].
@@ -36,6 +37,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderSpacing = 0.0,
     required super.children,
     this.maxWidth,
+    this.minWidth,
     this.textDirection = TextDirection.ltr,
     super.key,
   });
@@ -47,6 +49,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
         borderCollapse: borderCollapse,
         borderSpacing: borderSpacing,
         maxWidth: maxWidth,
+        minWidth: minWidth,
       );
 
   @override
@@ -63,7 +66,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
-    properties.add(DoubleProperty('maxWidth', maxWidth));
+    properties.add(DoubleProperty('maxWidth', maxWidth, defaultValue: null));
+    properties.add(DoubleProperty('minWidth', minWidth, defaultValue: null));
     properties.add(
       DiagnosticsProperty(
         'textDirection',
@@ -80,6 +84,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       ..setBorderCollapse(borderCollapse)
       ..setBorderSpacing(borderSpacing)
       ..setMaxWidth(maxWidth)
+      ..setMinWidth(minWidth)
       ..setTextDirection(textDirection);
   }
 }
@@ -116,9 +121,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// The row index this cell should start.
   final int rowStart;
 
-  /// The cell width.
-  final CssSizingValue? width;
-
   final bool _isCaption;
 
   /// Creates a TD (table cell) widget.
@@ -130,7 +132,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     Key? key,
     int rowSpan,
     required int rowStart,
-    CssSizingValue? width,
   }) = HtmlTableCell._;
 
   const HtmlTableCell._({
@@ -142,7 +143,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     super.key,
     this.rowSpan = 1,
     required this.rowStart,
-    this.width,
   })  : assert(columnSpan >= 1),
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
@@ -184,11 +184,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
       needsLayout = true;
     }
 
-    if (data.width != width) {
-      data.width = width;
-      needsLayout = true;
-    }
-
     if (needsLayout) {
       final parent = renderObject.parent;
       if (parent is RenderObject) {
@@ -205,7 +200,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
     properties.add(IntProperty('rowStart', rowStart));
-    properties.add(DiagnosticsProperty('width', width, defaultValue: null));
   }
 
   @override
@@ -263,7 +257,6 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   bool isCaption = false;
   int rowSpan = 1;
   int rowStart = 0;
-  CssSizingValue? width;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
     final gaps = tro._calculateRowGaps(this);
@@ -340,48 +333,44 @@ class _TableRenderLayouter {
       child = data.nextSibling;
     }
 
-    // calculate the available width if possible
-    // this may be null if table is inside a horizontal scroll view
-    double? availableWidth;
     final maxWidth = tro._maxWidth ?? constraints.maxWidth;
-    if (maxWidth.isFinite && maxWidth > 0) {
-      final columnGapsSum = (columnCount + 1) * tro.columnGap;
-      final gapsAndPaddings =
-          tro.paddingLeft + columnGapsSum + tro.paddingRight;
-      availableWidth = maxWidth - gapsAndPaddings;
+
+    var wc = const BoxConstraints();
+    final troMinWidth = tro._minWidth;
+    if (troMinWidth != null && troMinWidth > 0) {
+      // only apply width constrains if a specific min value has been set
+      // this will be used mostly in percentage calculations
+      wc = BoxConstraints(maxWidth: maxWidth, minWidth: troMinWidth);
     }
 
     return _TableDataStep1(
-      availableWidth: availableWidth,
       cells: cells,
       children: children,
       columnCount: columnCount,
-      maxWidth: maxWidth,
+      remainingMaxWidth:
+          _TableDataStep1._calculateRemainingWidth(tro, columnCount, maxWidth),
+      remainingMinWidth: _TableDataStep1._calculateRemainingWidth(
+          tro, columnCount, wc.minWidth),
       rowCount: rowCount,
+      widthConstraints: wc,
     );
   }
 
   _TableDataStep2 step2NaiveColumnWidths(_TableDataStep1 step1) {
     final cells = step1.cells;
-    final cellWidths = cells.map((cell) {
-      // use width from cell attribute if it is some sensible value
-      // otherwise, ignore and measure via layouter for real
-      final cellWidth = cell.width?.clamp(0, step1.maxWidth);
-      return cellWidth?.isFinite == true ? cellWidth : null;
-    }).toList(growable: false);
-
     final naiveColumnWidths = List.filled(step1.columnCount, .0);
-    for (var i = 0; i < cells.length; i++) {
-      final data = cells[i];
-      final cellWidth = cellWidths[i];
-      if (cellWidth != null) {
-        naiveColumnWidths.setMaxColumnWidths(tro, data, cellWidth);
+
+    final remainingMinWidth = step1.remainingMinWidth;
+    if (remainingMinWidth != null && step1.columnCount > 0) {
+      final cellMinWidth = remainingMinWidth / step1.columnCount;
+      for (var i = 0; i < cells.length; i++) {
+        final data = cells[i];
+        naiveColumnWidths.setMaxColumnWidths(tro, data, cellMinWidth);
       }
     }
 
     return _TableDataStep2(
       step1,
-      cellWidths: cellWidths,
       naiveColumnWidths: naiveColumnWidths
           .map<double?>((v) => !v.isZero ? v : null)
           .toList(growable: false),
@@ -390,12 +379,12 @@ class _TableRenderLayouter {
 
   _TableDataStep3 step3MinIntrinsicWidth(_TableDataStep2 step2) {
     final step1 = step2.step1;
-    final availableWidth = step1.availableWidth;
     final cells = step1.cells;
     final children = step1.children;
+    final remainingMaxWidth = step1.remainingMaxWidth;
 
-    final cellSizes = List<Size?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
+    final childSizes = List<Size?>.filled(children.length, null);
     final maxColumnWidths =
         step2.naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
@@ -404,9 +393,10 @@ class _TableRenderLayouter {
     // it only considers min value when the columns don't fit
     var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
-        (availableWidth == null || columnWidths.sum <= availableWidth)) {
+        (remainingMaxWidth == null || columnWidths.sum <= remainingMaxWidth)) {
       return _TableDataStep3(
         step2,
+        childSizes: childSizes,
         columnWidths: columnWidths,
       );
     }
@@ -419,14 +409,13 @@ class _TableRenderLayouter {
         final child = children[i];
         final data = cells[i];
 
-        if (step2.cellWidths[i] == null && cellSizes[i] == null) {
+        if (childSizes[i] == null) {
           // side effect
-          // no pre-configured width to use
-          // have to layout cells without constraints for the initial width
-          final layoutSize = layouter(child, const BoxConstraints());
-          cellSizes[i] = layoutSize;
+          // layout cells for the initial width
+          final layoutSize = layouter(child, step1.widthConstraints);
+          childSizes[i] = layoutSize;
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
-          logger.fine('Got child#$i size without contraints: $layoutSize');
+          logger.fine('Got child#$i $layoutSize@${step1.widthConstraints}');
           shouldLoop = true;
         }
 
@@ -458,9 +447,9 @@ class _TableRenderLayouter {
         }
       }
 
-      if (availableWidth != null) {
+      if (remainingMaxWidth != null) {
         columnWidths = redistributeValues(
-          available: availableWidth,
+          available: remainingMaxWidth,
           maxValues: maxColumnWidths,
           minValues: minColumnWidths,
         );
@@ -469,6 +458,7 @@ class _TableRenderLayouter {
 
     return _TableDataStep3(
       step2,
+      childSizes: childSizes,
       columnWidths: columnWidths,
     );
   }
@@ -482,7 +472,7 @@ class _TableRenderLayouter {
     required List<double> minColumnWidths,
   }) {
     final step1 = step2.step1;
-    final availableWidth = step1.availableWidth;
+    final remainingMaxWidth = step1.remainingMaxWidth;
 
     final widthSum = columnWidths.sumRange(data);
     final maxWidthSum = maxColumnWidths.sumRange(data);
@@ -490,12 +480,12 @@ class _TableRenderLayouter {
       // cell has been allocated more than its requested value
       // skip measuring if not absolutely needed because it's expensive
 
-      if (availableWidth == null) {
-        // unlimited available space
+      if (remainingMaxWidth == null) {
+        // unbounded width constraints
         return null;
       }
 
-      if (columnWidths.sum <= availableWidth) {
+      if (columnWidths.sum <= remainingMaxWidth) {
         // current widths are good enough
         return null;
       }
@@ -516,6 +506,7 @@ class _TableRenderLayouter {
     final step1 = step2.step1;
     final cells = step1.cells;
     final children = step1.children;
+    final existingChildSizes = step3.childSizes;
 
     final childSizes = List.filled(children.length, Size.zero);
     final rowHeights = List.filled(step1.rowCount, .0);
@@ -525,12 +516,18 @@ class _TableRenderLayouter {
       final data = cells[i];
 
       final childWidth = data.calculateWidth(tro, step3.columnWidths);
-      // layout with tight constraints to get the expected width
-      final cc1 = BoxConstraints.tightFor(width: childWidth);
-      // side effect
-      final childSize = layouter(child, cc1);
-      logger.fine('Got child#$i size with width=$childWidth: $childSize');
-      childSizes[i] = childSize;
+      var childSize = existingChildSizes[i];
+      if (childSize?.width == childWidth) {
+        // no need to re-layout if the width is the same
+        childSizes[i] = childSize!;
+      } else {
+        // side effect
+        // layout with tight constraints to get the expected width
+        final cc1 = BoxConstraints.tightFor(width: childWidth);
+        childSize = layouter(child, cc1);
+        logger.fine('Got child#$i $childSize@$cc1');
+        childSizes[i] = childSize;
+      }
 
       // distribute cell height across spanned rows
       final rowHeight =
@@ -670,33 +667,40 @@ class _TableRenderLayouter {
 
 @immutable
 class _TableDataStep1 {
-  final double? availableWidth;
   final List<_TableCellData> cells;
   final List<RenderBox> children;
   final int columnCount;
-  final double maxWidth;
+  final double? remainingMaxWidth;
+  final double? remainingMinWidth;
   final int rowCount;
+  final BoxConstraints widthConstraints;
 
   const _TableDataStep1({
-    this.availableWidth,
     required this.cells,
     required this.children,
     required this.columnCount,
-    required this.maxWidth,
+    required this.remainingMaxWidth,
+    required this.remainingMinWidth,
     required this.rowCount,
+    required this.widthConstraints,
   });
+
+  static double _calculateRemainingWidth(
+      _TableRenderObject tro, int columnCount, double width) {
+    final columnGapsSum = (columnCount + 1) * tro.columnGap;
+    final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
+    return width - gapsAndPaddings;
+  }
 }
 
 @immutable
 class _TableDataStep2 {
   final _TableDataStep1 step1;
 
-  final List<double?> cellWidths;
   final List<double?> naiveColumnWidths;
 
   const _TableDataStep2(
     this.step1, {
-    required this.cellWidths,
     required this.naiveColumnWidths,
   });
 }
@@ -705,10 +709,12 @@ class _TableDataStep2 {
 class _TableDataStep3 {
   final _TableDataStep2 step2;
 
+  final List<Size?> childSizes;
   final List<double> columnWidths;
 
   const _TableDataStep3(
     this.step2, {
+    required this.childSizes,
     required this.columnWidths,
   });
 }
@@ -740,10 +746,12 @@ class _TableRenderObject extends RenderBox
     required double borderSpacing,
     required bool borderCollapse,
     required double? maxWidth,
+    required double? minWidth,
   })  : logger = Logger('fwfh.HtmlTable${loggers++}'),
         _borderCollapse = borderCollapse,
         _borderSpacing = borderSpacing,
-        _maxWidth = maxWidth;
+        _maxWidth = maxWidth,
+        _minWidth = minWidth;
 
   Border? _border;
   void setBorder(Border? v) {
@@ -775,6 +783,14 @@ class _TableRenderObject extends RenderBox
   void setMaxWidth(double? v) {
     if (v != _maxWidth) {
       _maxWidth = v;
+      markNeedsLayout();
+    }
+  }
+
+  double? _minWidth;
+  void setMinWidth(double? v) {
+    if (v != _minWidth) {
+      _minWidth = v;
       markNeedsLayout();
     }
   }

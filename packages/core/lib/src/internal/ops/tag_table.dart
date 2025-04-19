@@ -97,6 +97,7 @@ class TagTable {
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
             maxWidth: maxWidth,
+            minWidth: bc.minWidth,
             textDirection: resolved.directionOrLtr,
             children: List.from(
               data.builders
@@ -203,7 +204,6 @@ class TagTable {
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
-            width: cell.width?.getSizing(resolved),
             child: child,
           );
         });
@@ -326,7 +326,6 @@ class TagTable {
 
   static BuildTree _onTableParsed(BuildTree tableTree) {
     StyleBorder.skip(tableTree);
-    StyleSizing.skip(tableTree);
     return tableTree;
   }
 }
@@ -379,9 +378,6 @@ class _TagTableRow {
   }
 
   void _onCellRenderedBlock(BuildTree cellTree, Widget block) {
-    final widthValue = cellTree.getStyle(kCssWidth)?.value;
-    final width = widthValue != null ? tryParseCssLength(widthValue) : null;
-
     final attributes = cellTree.element.attributes;
     cells.add(
       _TagTableDataCell(
@@ -389,7 +385,6 @@ class _TagTableRow {
         child: block,
         columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
         rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
-        width: width,
       ),
     );
   }
@@ -484,13 +479,11 @@ class _TagTableDataCell {
   final int columnSpan;
   final BuildTree tree;
   final int rowSpan;
-  final CssLength? width;
 
   const _TagTableDataCell(
     this.tree, {
     required this.child,
     required this.columnSpan,
     required this.rowSpan,
-    this.width,
   });
 }
