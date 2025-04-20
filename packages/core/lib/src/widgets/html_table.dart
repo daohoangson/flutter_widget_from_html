@@ -397,7 +397,6 @@ class _TableRenderLayouter {
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
-        cellSizes: cellSizes,
         columnWidths: columnWidths,
       );
     }
@@ -459,7 +458,6 @@ class _TableRenderLayouter {
 
     return _TableDataStep3(
       step2,
-      cellSizes: cellSizes,
       columnWidths: columnWidths,
     );
   }
@@ -506,27 +504,22 @@ class _TableRenderLayouter {
     final step2 = step3.step2;
     final step1 = step2.step1;
     final cells = step1.cells;
-    final cellSizes = step3.cellSizes;
     final children = step1.children;
 
     final childSizes = List.filled(children.length, Size.zero);
     final rowHeights = List.filled(step1.rowCount, .0);
 
     for (var i = 0; i < children.length; i++) {
-      final cellSize = cellSizes[i];
       final child = children[i];
       final data = cells[i];
 
+      // always re-layout because we cannot be sure whether
+      // children will render the same inside an unconstrained and a tight box
       final childWidth = data.calculateWidth(tro, step3.columnWidths);
-      Size childSize;
-      if (cellSize != null && cellSize.width == childWidth) {
-        childSize = cellSize;
-      } else {
-        final cc1 = BoxConstraints.tightFor(width: childWidth);
-        childSize = layouter(child, cc1);
-        logger.fine('[4] Got child#$i $childSize@$cc1');
-        childSizes[i] = childSize;
-      }
+      final cc1 = BoxConstraints.tightFor(width: childWidth);
+      final childSize = layouter(child, cc1);
+      logger.fine('[4] Got child#$i $childSize@$cc1');
+      childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
       final rowHeight =
@@ -699,12 +692,10 @@ class _TableDataStep2 {
 class _TableDataStep3 {
   final _TableDataStep2 step2;
 
-  final List<Size?> cellSizes;
   final List<double> columnWidths;
 
   const _TableDataStep3(
     this.step2, {
-    required this.cellSizes,
     required this.columnWidths,
   });
 }
