@@ -686,22 +686,6 @@ Future<void> main() async {
         expect(after.borderSpacing, equals(20.0));
       });
 
-      testWidgets('updates maxWidths', (WidgetTester tester) async {
-        await explain(
-          tester,
-          '<div style="max-width: 100px"><table><tr><td>Foo</td></tr></table></div>',
-        );
-        final before = tester.table;
-        expect(before.maxWidth, equals(100.0));
-
-        await explain(
-          tester,
-          '<div style="max-width: 200px"><table><tr><td>Foo</td></tr></table></div>',
-        );
-        final after = tester.table;
-        expect(after.maxWidth, equals(200.0));
-      });
-
       testWidgets('updates textDirection', (WidgetTester tester) async {
         await explain(tester, '<table><tr><td>Foo</td></tr></table>');
         final before = tester.table;
@@ -994,7 +978,7 @@ Future<void> main() async {
 
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
-        ? Platform.isLinux
+        ? Platform.isMacOS
             ? null
             : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';

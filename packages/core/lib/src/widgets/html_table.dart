@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 
+import 'css_sizing.dart' show CssSizingHint;
+
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -19,12 +21,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: `0.0`.
   final double borderSpacing;
 
-  /// If non-null, overwrites the incoming [BoxConstraints.maxWidth].
-  final double? maxWidth;
-
-  /// If non-null, overwrites the incoming [BoxConstraints.minWidth].
-  final double? minWidth;
-
   /// Determines the order to lay children out horizontally.
   ///
   /// Default: [TextDirection.ltr].
@@ -36,21 +32,22 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
     required super.children,
-    this.maxWidth,
-    this.minWidth,
     this.textDirection = TextDirection.ltr,
     super.key,
   });
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _TableRenderObject(
-        border,
-        textDirection,
-        borderCollapse: borderCollapse,
-        borderSpacing: borderSpacing,
-        maxWidth: maxWidth,
-        minWidth: minWidth,
-      );
+  RenderObject createRenderObject(BuildContext context) {
+    final hint = context.dependOnInheritedWidgetOfExactType<CssSizingHint>();
+    return _TableRenderObject(
+      border,
+      textDirection,
+      borderCollapse: borderCollapse,
+      borderSpacing: borderSpacing,
+      maxWidth: hint?.maxWidth,
+      minWidth: hint?.minWidth,
+    );
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -66,8 +63,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
-    properties.add(DoubleProperty('maxWidth', maxWidth, defaultValue: null));
-    properties.add(DoubleProperty('minWidth', minWidth, defaultValue: null));
     properties.add(
       DiagnosticsProperty(
         'textDirection',
@@ -79,12 +74,13 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    final hint = context.dependOnInheritedWidgetOfExactType<CssSizingHint>();
     (renderObject as _TableRenderObject)
       ..setBorder(border)
       ..setBorderCollapse(borderCollapse)
       ..setBorderSpacing(borderSpacing)
-      ..setMaxWidth(maxWidth)
-      ..setMinWidth(minWidth)
+      ..setMaxWidth(hint?.maxWidth)
+      ..setMinWidth(hint?.minWidth)
       ..setTextDirection(textDirection);
   }
 }
@@ -333,26 +329,28 @@ class _TableRenderLayouter {
       child = data.nextSibling;
     }
 
-    final maxWidth = tro._maxWidth ?? constraints.maxWidth;
+    final columnGapsSum = (columnCount + 1) * tro.columnGap;
+    final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
 
-    var wc = const BoxConstraints();
-    final troMinWidth = tro._minWidth;
-    if (troMinWidth != null && troMinWidth > 0) {
-      // only apply width constrains if a specific min value has been set
-      // this will be used mostly in percentage calculations
-      wc = BoxConstraints(maxWidth: maxWidth, minWidth: troMinWidth);
+    double? availableWidth;
+    final maxWidth = tro._maxWidth ?? constraints.maxWidth;
+    if (maxWidth.isFinite && maxWidth > 0) {
+      availableWidth = maxWidth - gapsAndPaddings;
+    }
+
+    double? requiredWidth;
+    final minWidth = tro._minWidth ?? constraints.minWidth;
+    if (minWidth.isFinite && minWidth > 0) {
+      requiredWidth = minWidth - gapsAndPaddings;
     }
 
     return _TableDataStep1(
+      availableWidth: availableWidth,
       cells: cells,
       children: children,
       columnCount: columnCount,
-      remainingMaxWidth:
-          _TableDataStep1._calculateRemainingWidth(tro, columnCount, maxWidth),
-      remainingMinWidth: _TableDataStep1._calculateRemainingWidth(
-          tro, columnCount, wc.minWidth),
+      requiredWidth: requiredWidth,
       rowCount: rowCount,
-      widthConstraints: wc,
     );
   }
 
@@ -360,9 +358,9 @@ class _TableRenderLayouter {
     final cells = step1.cells;
     final naiveColumnWidths = List.filled(step1.columnCount, .0);
 
-    final remainingMinWidth = step1.remainingMinWidth;
-    if (remainingMinWidth != null && step1.columnCount > 0) {
-      final cellMinWidth = remainingMinWidth / step1.columnCount;
+    final requiredWidth = step1.requiredWidth;
+    if (requiredWidth != null && step1.columnCount > 0) {
+      final cellMinWidth = requiredWidth / step1.columnCount;
       for (var i = 0; i < cells.length; i++) {
         final data = cells[i];
         naiveColumnWidths.setMaxColumnWidths(tro, data, cellMinWidth);
@@ -379,9 +377,9 @@ class _TableRenderLayouter {
 
   _TableDataStep3 step3MinIntrinsicWidth(_TableDataStep2 step2) {
     final step1 = step2.step1;
+    final availableWidth = step1.availableWidth;
     final cells = step1.cells;
     final children = step1.children;
-    final remainingMaxWidth = step1.remainingMaxWidth;
 
     final cellSizes = List<Size?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
@@ -393,7 +391,7 @@ class _TableRenderLayouter {
     // it only considers min value when the columns don't fit
     var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
-        (remainingMaxWidth == null || columnWidths.sum <= remainingMaxWidth)) {
+        (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
         columnWidths: columnWidths,
@@ -411,10 +409,10 @@ class _TableRenderLayouter {
         if (cellSizes[i] == null) {
           // side effect
           // layout cells for the initial width
-          final layoutSize = layouter(child, step1.widthConstraints);
+          final layoutSize = layouter(child, constraints);
           cellSizes[i] = layoutSize;
           maxColumnWidths.setMaxColumnWidths(tro, data, layoutSize.width);
-          logger.fine('[3] Got child#$i $layoutSize@${step1.widthConstraints}');
+          logger.fine('[3] Got child#$i $layoutSize@$constraints');
           shouldLoop = true;
         }
 
@@ -446,9 +444,9 @@ class _TableRenderLayouter {
         }
       }
 
-      if (remainingMaxWidth != null) {
+      if (availableWidth != null) {
         columnWidths = redistributeValues(
-          available: remainingMaxWidth,
+          available: availableWidth,
           maxValues: maxColumnWidths,
           minValues: minColumnWidths,
         );
@@ -470,7 +468,7 @@ class _TableRenderLayouter {
     required List<double> minColumnWidths,
   }) {
     final step1 = step2.step1;
-    final remainingMaxWidth = step1.remainingMaxWidth;
+    final availableWidth = step1.availableWidth;
 
     final widthSum = columnWidths.sumRange(data);
     final maxWidthSum = maxColumnWidths.sumRange(data);
@@ -478,12 +476,12 @@ class _TableRenderLayouter {
       // cell has been allocated more than its requested value
       // skip measuring if not absolutely needed because it's expensive
 
-      if (remainingMaxWidth == null) {
-        // unbounded width constraints
+      if (availableWidth == null) {
+        // unlimited available space
         return null;
       }
 
-      if (columnWidths.sum <= remainingMaxWidth) {
+      if (columnWidths.sum <= availableWidth) {
         // current widths are good enough
         return null;
       }
@@ -658,34 +656,21 @@ class _TableRenderLayouter {
 
 @immutable
 class _TableDataStep1 {
+  final double? availableWidth;
   final List<_TableCellData> cells;
   final List<RenderBox> children;
   final int columnCount;
-  final double? remainingMaxWidth;
-  final double? remainingMinWidth;
+  final double? requiredWidth;
   final int rowCount;
-  final BoxConstraints widthConstraints;
 
   const _TableDataStep1({
+    required this.availableWidth,
     required this.cells,
     required this.children,
     required this.columnCount,
-    required this.remainingMaxWidth,
-    required this.remainingMinWidth,
+    required this.requiredWidth,
     required this.rowCount,
-    required this.widthConstraints,
   });
-
-  static double _calculateRemainingWidth(
-      _TableRenderObject tro, int columnCount, double width) {
-    if (width.isZero) {
-      return 0;
-    }
-
-    final columnGapsSum = (columnCount + 1) * tro.columnGap;
-    final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
-    return width - gapsAndPaddings;
-  }
 }
 
 @immutable

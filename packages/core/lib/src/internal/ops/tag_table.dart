@@ -85,19 +85,12 @@ class TagTable {
 
     final layoutBuilder = LayoutBuilder(
       builder: (context, bc) {
-        // wrap the table in a builder to obtain the layout constraints early
-        // in order to calculate a conservative width
-        // the whole thing becomes scrollable when columns are too wide
-        final maxWidth = bc.maxWidth;
-
         final resolved = tableTree.inheritanceResolvers.resolve(context);
         Widget built = ValignBaselineContainer(
           child: HtmlTable(
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
-            maxWidth: maxWidth,
-            minWidth: bc.minWidth,
             textDirection: resolved.directionOrLtr,
             children: List.from(
               data.builders
@@ -108,7 +101,14 @@ class TagTable {
           ),
         );
 
-        if (maxWidth.isFinite) {
+        // provide hints to size the columns properly
+        built = CssSizingHint(
+          maxWidth: bc.maxWidth,
+          minWidth: bc.minWidth,
+          child: built,
+        );
+
+        if (bc.maxWidth.isFinite) {
           built = wf.buildHorizontalScrollView(tableTree, built) ?? built;
         }
 
