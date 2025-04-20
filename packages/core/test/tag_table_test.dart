@@ -978,7 +978,7 @@ Future<void> main() async {
 
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
-        ? Platform.isMacOS
+        ? Platform.isLinux
             ? null
             : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';
