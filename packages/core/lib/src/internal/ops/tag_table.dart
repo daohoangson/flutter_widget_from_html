@@ -85,18 +85,12 @@ class TagTable {
 
     final layoutBuilder = LayoutBuilder(
       builder: (context, bc) {
-        // wrap the table in a builder to obtain the layout constraints early
-        // in order to calculate a conservative width
-        // the whole thing becomes scrollable when columns are too wide
-        final maxWidth = bc.maxWidth;
-
         final resolved = tableTree.inheritanceResolvers.resolve(context);
         Widget built = ValignBaselineContainer(
           child: HtmlTable(
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
-            maxWidth: maxWidth,
             textDirection: resolved.directionOrLtr,
             children: List.from(
               data.builders
@@ -107,7 +101,14 @@ class TagTable {
           ),
         );
 
-        if (maxWidth.isFinite) {
+        // provide hints to size the columns properly
+        built = CssSizingHint(
+          maxWidth: bc.maxWidth,
+          minWidth: bc.minWidth,
+          child: built,
+        );
+
+        if (bc.maxWidth.isFinite) {
           built = wf.buildHorizontalScrollView(tableTree, built) ?? built;
         }
 
@@ -203,7 +204,6 @@ class TagTable {
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
-            width: cell.width?.getSizing(resolved),
             child: child,
           );
         });
@@ -326,7 +326,6 @@ class TagTable {
 
   static BuildTree _onTableParsed(BuildTree tableTree) {
     StyleBorder.skip(tableTree);
-    StyleSizing.skip(tableTree);
     return tableTree;
   }
 }
@@ -379,9 +378,6 @@ class _TagTableRow {
   }
 
   void _onCellRenderedBlock(BuildTree cellTree, Widget block) {
-    final widthValue = cellTree.getStyle(kCssWidth)?.value;
-    final width = widthValue != null ? tryParseCssLength(widthValue) : null;
-
     final attributes = cellTree.element.attributes;
     cells.add(
       _TagTableDataCell(
@@ -389,7 +385,6 @@ class _TagTableRow {
         child: block,
         columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
         rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
-        width: width,
       ),
     );
   }
@@ -407,7 +402,7 @@ class _TagTableRow {
 
     cellTree.register(_cellOp);
     StyleBorder.skip(cellTree);
-    StyleSizing.skip(cellTree);
+    StyleSizing.registerBlockOp(cellTree);
   }
 
   static StylesMap _cssVerticalAlignFromAttribute(dom.Element element) {
@@ -484,13 +479,11 @@ class _TagTableDataCell {
   final int columnSpan;
   final BuildTree tree;
   final int rowSpan;
-  final CssLength? width;
 
   const _TagTableDataCell(
     this.tree, {
     required this.child,
     required this.columnSpan,
     required this.rowSpan,
-    this.width,
   });
 }
