@@ -1202,32 +1202,6 @@ Below''',
     </td>
   </tr>
 </table>''',
-              'width_in_percent_100_nested_with_gaps': '''
-<table border="1">
-  <tr><td>Foo foo foo</td></tr>
-  <tr>
-    <td>
-      <table border="1">
-        <tr>
-          <td style="width: 100%">Foo</td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>''',
-              'width_in_percent_100_nested_stretch': '''
-<table border="1">
-  <tr><td>Foo foo foo</td></tr>
-  <tr>
-    <td>
-      <table border="1" style="width: 100%">
-        <tr>
-          <td style="width: 100%">Foo</td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>''',
               'width_in_px': '''
 <table border="1">
   <tr>

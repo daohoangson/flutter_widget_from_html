@@ -287,7 +287,7 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
     );
 
-    // after everything... if the incoming are tight then we must follow it
+    // after everything... if the incoming is tight then we must follow it
     cc = c.hasTightWidth ? cc.tighten(width: c.maxWidth) : cc;
     cc = c.hasTightHeight ? cc.tighten(height: c.maxHeight) : cc;
 

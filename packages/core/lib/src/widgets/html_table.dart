@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 
-import 'css_sizing.dart' show CssSizingHint;
+import 'css_sizing.dart';
 
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
@@ -332,12 +332,15 @@ class _TableRenderLayouter {
     final columnGapsSum = (columnCount + 1) * tro.columnGap;
     final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
 
+    // calculate the available width if possible
+    // this may be null if table is inside a horizontal scroll view
     double? availableWidth;
     final maxWidth = tro._maxWidth ?? constraints.maxWidth;
     if (maxWidth.isFinite && maxWidth > 0) {
       availableWidth = maxWidth - gapsAndPaddings;
     }
 
+    // calculate the required width if specified (null by default)
     double? requiredWidth;
     final minWidth = tro._minWidth ?? constraints.minWidth;
     if (minWidth.isFinite && minWidth > 0) {
