@@ -15,6 +15,7 @@ This repo contains the source code for everything `HtmlWidget`-related.
 | [fwfh_svg](./packages/fwfh_svg/)                                   | [![pub package](https://img.shields.io/pub/v/fwfh_svg.svg)](https://pub.dev/packages/fwfh_svg)                                           |
 | [fwfh_url_launcher](./packages/fwfh_url_launcher/)                 | [![pub package](https://img.shields.io/pub/v/fwfh_url_launcher.svg)](https://pub.dev/packages/fwfh_url_launcher)                         |
 | [fwfh_webview](./packages/fwfh_webview/)                           | [![pub package](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)                                   |
+| [fwfh_form](./packages/fwfh_form/)                             | [![pub package](https://img.shields.io/pub/v/fwfh_form.svg)](https://pub.dev/packages/fwfh_form)                                   |
 | [Demo app](./demo_app/)                                            | https://demo.fwfh.dev, [supported/tags.html](https://demo.fwfh.dev/supported/tags.html)                                                  |
 | Special [dartpad](https://dartpad.dev) with our packages           | https://try.fwfh.dev                                                                                                                     |
 
