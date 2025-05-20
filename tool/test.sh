@@ -53,6 +53,14 @@ if [ -z ${UPDATE_GOLDENS+x} ]; then
       echo 'packages/fwfh_webview OK'
   )
 
+  (
+    cd ./packages/fwfh_form &&
+      flutter analyze &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_form OK'
+  
+  )
+
   if [ ! -z ${CHROMEDRIVER_PORT_4444+x} ]; then
     (
       cd ./packages/fwfh_webview &&
