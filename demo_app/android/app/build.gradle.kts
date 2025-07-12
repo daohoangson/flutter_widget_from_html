@@ -37,20 +37,20 @@ android {
     }
 
     signingConfigs {
-        demo {
-            storeFile file("../keystore")
-            storePassword "storepass"
-            keyAlias "alias"
-            keyPassword "keypass"
+        create("demo") {
+            storeFile = file("../keystore")
+            storePassword = "storepass"
+            keyAlias = "alias"
+            keyPassword = "keypass"
         }
     }
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.demo
+            signingConfig = signingConfigs.getByName("demo")
         }
         release {
-            signingConfig = signingConfigs.demo
+            signingConfig = signingConfigs.getByName("demo")
         }
     }
 
@@ -66,5 +66,5 @@ flutter {
 
 dependencies {
     // https://patrol.leancode.co/getting-started
-    androidTestUtil "androidx.test:orchestrator:1.5.1"
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
 }
