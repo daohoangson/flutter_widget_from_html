@@ -20,14 +20,14 @@ class _FakeVideoPlayerPlatform extends Fake
   }
 
   @override
-  Widget buildView(int textureId) {
+  Widget buildViewWithOptions(VideoViewOptions options) {
     return const Placeholder();
   }
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> createWithOptions(VideoCreationOptions options) async {
     final textureId = _nextTextureId++;
-    uris[textureId] = dataSource.uri;
+    uris[textureId] = options.dataSource.uri;
     return textureId;
   }
 
