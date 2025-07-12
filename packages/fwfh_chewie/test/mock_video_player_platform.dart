@@ -20,14 +20,33 @@ class _FakeVideoPlayerPlatform extends Fake
   }
 
   @override
-  Widget buildViewWithOptions(VideoViewOptions options) {
+  Widget buildView(int textureId) {
+    // TODO: remove this method when we bump chewie minimum version
     return const Placeholder();
   }
 
   @override
-  Future<int?> createWithOptions(VideoCreationOptions options) async {
+  // TODO: remove lint ignore when we bump chewie minimum version
+  // ignore: type_annotate_public_apis
+  Widget buildViewWithOptions(options) {
+    return const Placeholder();
+  }
+
+  @override
+  Future<int?> create(DataSource dataSource) async {
     final textureId = _nextTextureId++;
-    uris[textureId] = options.dataSource.uri;
+    uris[textureId] = dataSource.uri;
+    return textureId;
+  }
+
+  @override
+  // TODO: remove lint ignore when we bump chewie minimum version
+  // ignore: type_annotate_public_apis
+  Future<int?> createWithOptions(options) async {
+    final textureId = _nextTextureId++;
+    // TODO: remove lint ignore when we bump chewie minimum version
+    // ignore: unnecessary_cast
+    uris[textureId] = options.dataSource.uri as String?;
     return textureId;
   }
 
