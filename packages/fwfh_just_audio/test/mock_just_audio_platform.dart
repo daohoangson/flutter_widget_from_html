@@ -111,13 +111,13 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
 
   @override
   Future<PlayResponse> play(PlayRequest request) async {
-    commands.add(Tuple2(CommandType.play, null));
+    commands.add(const Tuple2(CommandType.play, null));
     return PlayResponse();
   }
 
   @override
   Future<PauseResponse> pause(PauseRequest request) async {
-    commands.add(Tuple2(CommandType.pause, null));
+    commands.add(const Tuple2(CommandType.pause, null));
     return PauseResponse();
   }
 

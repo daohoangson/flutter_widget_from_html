@@ -43,12 +43,10 @@ Future<void> main() async {
         ),
       );
 
-      final playArrow = find.byIcon(Icons.play_arrow);
-      await tester.tap(playArrow);
-      await tester.runAsync(() => Future.delayed(Duration.zero));
+      await tester.tapWithAsyncDelay(find.byIcon(Icons.play_arrow));
       expect(
         commands,
-        equals([
+        equals(const [
           Tuple2(CommandType.setVolume, 1.0),
           Tuple2(CommandType.play, null),
           Tuple2(CommandType.load, src),
@@ -71,13 +69,11 @@ Future<void> main() async {
       );
       await tester.runAsync(() => Future.delayed(Duration.zero));
 
-      // force a widget tree disposal
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
+      await tester.cleanupWidget();
 
       expect(
         commands,
-        containsAll([
+        containsAll(const [
           Tuple2(CommandType.pause, null),
           Tuple2(CommandType.seek, Duration.zero),
         ]),
@@ -99,30 +95,9 @@ Future<void> main() async {
       );
       expect(find.text('-0:00'), findsOneWidget);
 
-      await tester.pumpAndSettle();
+      await tester.waitForTextUpdate('-12:34');
 
-      // Wait for the duration stream to update by polling
-      await tester.runAsync(() async {
-        for (int i = 0; i < 10; i++) {
-          await Future.delayed(const Duration(milliseconds: 50));
-          await tester.pumpAndSettle();
-
-          // Check if the duration text has updated
-          final textWidgets = find.byType(Text);
-          if (textWidgets.evaluate().isNotEmpty) {
-            final text = tester.widget<Text>(textWidgets.first);
-            if (text.data == '-12:34') {
-              return; // Success - duration has updated
-            }
-          }
-        }
-      });
-
-      expect(find.text('-12:34'), findsOneWidget);
-
-      // force a widget tree disposal
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
+      await tester.cleanupWidget();
     });
 
     testWidgets('shows position & duration (wide)', (tester) async {
@@ -137,26 +112,9 @@ Future<void> main() async {
       );
       expect(find.text('0:00 / 0:00'), findsOneWidget);
 
-      await tester.pumpAndSettle();
+      await tester.waitForTextUpdate('0:00 / 12:34');
 
-      // Wait for the duration stream to update by polling
-      await tester.runAsync(() async {
-        for (int i = 0; i < 10; i++) {
-          await Future.delayed(const Duration(milliseconds: 50));
-          await tester.pumpAndSettle();
-
-          // Check if the duration text has updated
-          if (find.text('0:00 / 12:34').evaluate().isNotEmpty) {
-            return; // Success - duration has updated
-          }
-        }
-      });
-
-      expect(find.text('0:00 / 12:34'), findsOneWidget);
-
-      // force a widget tree disposal
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
+      await tester.cleanupWidget();
     });
 
     testWidgets('seeks', (tester) async {
@@ -169,40 +127,23 @@ Future<void> main() async {
           ),
         ),
       );
-      await tester.pumpAndSettle();
 
-      // Wait for the duration stream to update by polling
-      await tester.runAsync(() async {
-        for (int i = 0; i < 10; i++) {
-          await Future.delayed(const Duration(milliseconds: 50));
-          await tester.pumpAndSettle();
-
-          // Check if the duration text has updated
-          if (find.text('0:00 / 1:40').evaluate().isNotEmpty) {
-            return; // Success - duration has updated
-          }
-        }
-      });
-
-      expect(find.text('0:00 / 1:40'), findsOneWidget);
+      await tester.waitForTextUpdate('0:00 / 1:40');
       expect(
         commands,
-        equals([
+        equals(const [
           Tuple2(CommandType.setVolume, 1.0),
           Tuple2(CommandType.load, src),
         ]),
       );
       commands.clear();
 
-      await tester.tap(find.byType(Slider));
-      await tester.runAsync(() => Future.delayed(Duration.zero));
+      await tester.tapWithAsyncDelay(find.byType(Slider));
       await tester.pumpAndSettle();
       expect(find.text('0:50 / 1:40'), findsOneWidget);
       expect(commands, equals([Tuple2(CommandType.seek, duration * .5)]));
 
-      // force a widget tree disposal
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
+      await tester.cleanupWidget();
     });
 
     group('mute', () {
@@ -221,16 +162,13 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         commands.clear();
 
-        await tester.tap(find.byIcon(iconOn));
-        await tester.runAsync(() => Future.delayed(Duration.zero));
+        await tester.tapWithAsyncDelay(find.byIcon(iconOn));
         await tester.pumpAndSettle();
 
-        expect(commands, equals([Tuple2(CommandType.setVolume, 0.0)]));
+        expect(commands, equals(const [Tuple2(CommandType.setVolume, 0.0)]));
         expect(find.byIcon(iconOff), findsOneWidget);
 
-        // force a widget tree disposal
-        await tester.pumpWidget(const SizedBox.shrink());
-        await tester.pumpAndSettle();
+        await tester.cleanupWidget();
       });
 
       testWidgets('shows muted and unmutes', (tester) async {
@@ -242,34 +180,16 @@ Future<void> main() async {
           ),
         );
 
-        await tester.runAsync(() => Future.delayed(Duration.zero));
-        await tester.pumpAndSettle();
-
-        // Wait for the loading to complete before clearing commands
-        await tester.runAsync(() async {
-          for (int i = 0; i < 10; i++) {
-            await Future.delayed(const Duration(milliseconds: 50));
-            await tester.pumpAndSettle();
-
-            // Check if loading has completed by looking for load command
-            if (commands.any((cmd) => cmd.item1 == CommandType.load)) {
-              break;
-            }
-          }
-        });
-
+        await tester.waitForCommandUpdate(CommandType.load);
         commands.clear();
 
-        await tester.tap(find.byIcon(iconOff));
-        await tester.runAsync(() => Future.delayed(Duration.zero));
+        await tester.tapWithAsyncDelay(find.byIcon(iconOff));
         await tester.pumpAndSettle();
 
-        expect(commands, equals([Tuple2(CommandType.setVolume, 1.0)]));
+        expect(commands, equals(const [Tuple2(CommandType.setVolume, 1.0)]));
         expect(find.byIcon(iconOn), findsOneWidget);
 
-        // force a widget tree disposal
-        await tester.pumpWidget(const SizedBox.shrink());
-        await tester.pumpAndSettle();
+        await tester.cleanupWidget();
       });
     });
 
@@ -308,4 +228,47 @@ Future<void> main() async {
       ),
     );
   });
+}
+
+extension on WidgetTester {
+  /// Wait for text to appear with simplified polling
+  Future<void> waitForTextUpdate(String expectedText) async {
+    await pumpAndSettle();
+    await runAsync(() async {
+      for (int i = 0; i < 10; i++) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        await pumpAndSettle();
+        if (find.text(expectedText).evaluate().isNotEmpty) {
+          return;
+        }
+      }
+    });
+  }
+
+  /// Wait for commands with simplified polling
+  Future<void> waitForCommandUpdate(CommandType commandType) async {
+    await runAsync(() => Future.delayed(Duration.zero));
+    await pumpAndSettle();
+    await runAsync(() async {
+      for (int i = 0; i < 10; i++) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        await pumpAndSettle();
+        if (commands.any((cmd) => cmd.item1 == commandType)) {
+          break;
+        }
+      }
+    });
+  }
+
+  /// Tap with async delay - for interactions that trigger async operations
+  Future<void> tapWithAsyncDelay(Finder finder) async {
+    await tap(finder);
+    await runAsync(() => Future.delayed(Duration.zero));
+  }
+
+  /// Standard cleanup
+  Future<void> cleanupWidget() async {
+    await pumpWidget(const SizedBox.shrink());
+    await pumpAndSettle();
+  }
 }
