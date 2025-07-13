@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -10,10 +9,7 @@ import 'package:just_audio_platform_interface/just_audio_platform_interface.dart
 import 'package:tuple/tuple.dart';
 
 import '../../core/test/_.dart' as core;
-
-final _commands = <Tuple2>[];
-late Duration _duration;
-late StreamController<PlaybackEventMessage> _playbackEvents;
+import 'mock_just_audio_platform.dart';
 
 Future<void> main() async {
   await loadAppFonts();
@@ -22,12 +18,10 @@ Future<void> main() async {
   const src = 'http://domain.com/audio.mp3';
 
   group('AudioPlayer', () {
-    JustAudioPlatform.instance = _JustAudioPlatform();
+    mockJustAudioPlatform();
 
     setUp(() {
-      _commands.clear();
-      _duration = const Duration(milliseconds: 10);
-      _playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
+      initializeMockPlatform();
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
@@ -37,7 +31,7 @@ Future<void> main() async {
     });
 
     tearDown(() {
-      _playbackEvents.close();
+      disposeMockPlatform();
     });
 
     testWidgets('plays then pauses on completion', (tester) async {
@@ -53,23 +47,23 @@ Future<void> main() async {
       await tester.tap(playArrow);
       await tester.runAsync(() => Future.delayed(Duration.zero));
       expect(
-        _commands,
-        equals(const [
-          Tuple2(_CommandType.setVolume, 1.0),
-          Tuple2(_CommandType.play, null),
-          Tuple2(_CommandType.load, src),
+        commands,
+        equals([
+          Tuple2(CommandType.setVolume, 1.0),
+          Tuple2(CommandType.play, null),
+          Tuple2(CommandType.load, src),
         ]),
       );
-      _commands.clear();
+      commands.clear();
 
       // simulate a completed event
-      _playbackEvents.add(
+      playbackEvents.add(
         PlaybackEventMessage(
           processingState: ProcessingStateMessage.completed,
           updateTime: DateTime.now(),
-          updatePosition: _duration,
-          bufferedPosition: _duration,
-          duration: _duration,
+          updatePosition: duration,
+          bufferedPosition: duration,
+          duration: duration,
           icyMetadata: null,
           currentIndex: 0,
           androidAudioSessionId: null,
@@ -82,19 +76,19 @@ Future<void> main() async {
       await tester.pumpAndSettle();
 
       expect(
-        _commands,
+        commands,
         containsAll([
-          Tuple2(_CommandType.pause, null),
-          Tuple2(_CommandType.seek, Duration.zero),
+          Tuple2(CommandType.pause, null),
+          Tuple2(CommandType.seek, Duration.zero),
         ]),
       );
-      expect(_commands.length, equals(2));
+      expect(commands.length, equals(2));
     });
 
     testWidgets('shows remaining (narrow)', (tester) async {
       tester.setWindowSize(const Size(320, 568));
 
-      _duration = const Duration(minutes: 12, seconds: 34);
+      duration = const Duration(minutes: 12, seconds: 34);
 
       await tester.pumpWidget(
         const MaterialApp(
@@ -132,7 +126,7 @@ Future<void> main() async {
     });
 
     testWidgets('shows position & duration (wide)', (tester) async {
-      _duration = const Duration(minutes: 12, seconds: 34);
+      duration = const Duration(minutes: 12, seconds: 34);
 
       await tester.pumpWidget(
         const MaterialApp(
@@ -166,7 +160,7 @@ Future<void> main() async {
     });
 
     testWidgets('seeks', (tester) async {
-      _duration = const Duration(seconds: 100);
+      duration = const Duration(seconds: 100);
 
       await tester.pumpWidget(
         const MaterialApp(
@@ -192,19 +186,19 @@ Future<void> main() async {
 
       expect(find.text('0:00 / 1:40'), findsOneWidget);
       expect(
-        _commands,
-        equals(const [
-          Tuple2(_CommandType.setVolume, 1.0),
-          Tuple2(_CommandType.load, src),
+        commands,
+        equals([
+          Tuple2(CommandType.setVolume, 1.0),
+          Tuple2(CommandType.load, src),
         ]),
       );
-      _commands.clear();
+      commands.clear();
 
       await tester.tap(find.byType(Slider));
       await tester.runAsync(() => Future.delayed(Duration.zero));
       await tester.pumpAndSettle();
       expect(find.text('0:50 / 1:40'), findsOneWidget);
-      expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
+      expect(commands, equals([Tuple2(CommandType.seek, duration * .5)]));
 
       // force a widget tree disposal
       await tester.pumpWidget(const SizedBox.shrink());
@@ -225,13 +219,13 @@ Future<void> main() async {
         );
 
         await tester.pumpAndSettle();
-        _commands.clear();
+        commands.clear();
 
         await tester.tap(find.byIcon(iconOn));
         await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
-        expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 0.0)]));
+        expect(commands, equals([Tuple2(CommandType.setVolume, 0.0)]));
         expect(find.byIcon(iconOff), findsOneWidget);
 
         // force a widget tree disposal
@@ -258,19 +252,19 @@ Future<void> main() async {
             await tester.pumpAndSettle();
 
             // Check if loading has completed by looking for load command
-            if (_commands.any((cmd) => cmd.item1 == _CommandType.load)) {
+            if (commands.any((cmd) => cmd.item1 == CommandType.load)) {
               break;
             }
           }
         });
 
-        _commands.clear();
+        commands.clear();
 
         await tester.tap(find.byIcon(iconOff));
         await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
-        expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 1.0)]));
+        expect(commands, equals([Tuple2(CommandType.setVolume, 1.0)]));
         expect(find.byIcon(iconOn), findsOneWidget);
 
         // force a widget tree disposal
@@ -314,192 +308,4 @@ Future<void> main() async {
       ),
     );
   });
-}
-
-class _JustAudioPlatform extends JustAudioPlatform {
-  @override
-  Future<AudioPlayerPlatform> init(InitRequest request) async =>
-      _AudioPlayerPlatform(request.id);
-
-  @override
-  Future<DisposePlayerResponse> disposePlayer(
-    DisposePlayerRequest request,
-  ) async =>
-      DisposePlayerResponse();
-}
-
-class _AudioPlayerPlatform extends AudioPlayerPlatform {
-  _AudioPlayerPlatform(super.id);
-
-  @override
-  Stream<PlaybackEventMessage> get playbackEventMessageStream =>
-      _playbackEvents.stream;
-
-  @override
-  Future<LoadResponse> load(LoadRequest request) async {
-    final map = request.audioSourceMessage.toMap();
-
-    // Extract the URI from the audio source message structure
-    String? uri;
-    if (map['type'] == 'concatenating') {
-      // For concatenating sources, extract URI from the first child
-      final children = map['children'] as List?;
-      if (children != null && children.isNotEmpty) {
-        final firstChild = children[0] as Map?;
-        uri = firstChild?['uri'] as String?;
-      }
-    } else {
-      // For single sources, extract URI directly
-      uri = map['uri'] as String?;
-    }
-
-    _commands.add(Tuple2(_CommandType.load, uri ?? map));
-
-    // Send multiple events to properly simulate the loading process
-    _playbackEvents.add(
-      PlaybackEventMessage(
-        processingState: ProcessingStateMessage.loading,
-        updateTime: DateTime.now(),
-        updatePosition: Duration.zero,
-        bufferedPosition: Duration.zero,
-        duration: null,
-        icyMetadata: null,
-        currentIndex: 0,
-        androidAudioSessionId: null,
-      ),
-    );
-
-    // Small delay to simulate loading
-    await Future.delayed(Duration.zero);
-
-    _playbackEvents.add(
-      PlaybackEventMessage(
-        processingState: ProcessingStateMessage.ready,
-        updateTime: DateTime.now(),
-        updatePosition: Duration.zero,
-        bufferedPosition: _duration,
-        duration: _duration,
-        icyMetadata: null,
-        currentIndex: 0,
-        androidAudioSessionId: null,
-      ),
-    );
-
-    return LoadResponse(duration: _duration);
-  }
-
-  @override
-  Future<PlayResponse> play(PlayRequest request) async {
-    _commands.add(const Tuple2(_CommandType.play, null));
-    return PlayResponse();
-  }
-
-  @override
-  Future<PauseResponse> pause(PauseRequest request) async {
-    _commands.add(const Tuple2(_CommandType.pause, null));
-    return PauseResponse();
-  }
-
-  @override
-  Future<SetVolumeResponse> setVolume(SetVolumeRequest request) async {
-    _commands.add(Tuple2(_CommandType.setVolume, request.volume));
-    return SetVolumeResponse();
-  }
-
-  @override
-  Future<SetSpeedResponse> setSpeed(SetSpeedRequest request) async =>
-      SetSpeedResponse();
-
-  @override
-  Future<SetPitchResponse> setPitch(SetPitchRequest request) async =>
-      SetPitchResponse();
-
-  @override
-  Future<SetSkipSilenceResponse> setSkipSilence(
-          SetSkipSilenceRequest request) async =>
-      SetSkipSilenceResponse();
-
-  @override
-  Future<SetLoopModeResponse> setLoopMode(SetLoopModeRequest request) async =>
-      SetLoopModeResponse();
-
-  @override
-  Future<SetShuffleModeResponse> setShuffleMode(
-    SetShuffleModeRequest request,
-  ) async =>
-      SetShuffleModeResponse();
-
-  @override
-  Future<SetShuffleOrderResponse> setShuffleOrder(
-    SetShuffleOrderRequest request,
-  ) async =>
-      SetShuffleOrderResponse();
-
-  @override
-  Future<SetAutomaticallyWaitsToMinimizeStallingResponse>
-      setAutomaticallyWaitsToMinimizeStalling(
-    SetAutomaticallyWaitsToMinimizeStallingRequest request,
-  ) async =>
-          SetAutomaticallyWaitsToMinimizeStallingResponse();
-
-  @override
-  Future<SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse>
-      setCanUseNetworkResourcesForLiveStreamingWhilePaused(
-    SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest request,
-  ) async =>
-          SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse();
-
-  @override
-  Future<SetPreferredPeakBitRateResponse> setPreferredPeakBitRate(
-    SetPreferredPeakBitRateRequest request,
-  ) async =>
-      SetPreferredPeakBitRateResponse();
-
-  @override
-  Future<SetAllowsExternalPlaybackResponse> setAllowsExternalPlayback(
-    SetAllowsExternalPlaybackRequest request,
-  ) async =>
-      SetAllowsExternalPlaybackResponse();
-
-  @override
-  Future<SeekResponse> seek(SeekRequest request) async {
-    _commands.add(Tuple2(_CommandType.seek, request.position));
-    return SeekResponse();
-  }
-
-  @override
-  Future<SetAndroidAudioAttributesResponse> setAndroidAudioAttributes(
-    SetAndroidAudioAttributesRequest request,
-  ) async =>
-      SetAndroidAudioAttributesResponse();
-
-  @override
-  Future<DisposeResponse> dispose(DisposeRequest request) async =>
-      DisposeResponse();
-
-  @override
-  Future<ConcatenatingInsertAllResponse> concatenatingInsertAll(
-    ConcatenatingInsertAllRequest request,
-  ) async =>
-      ConcatenatingInsertAllResponse();
-
-  @override
-  Future<ConcatenatingRemoveRangeResponse> concatenatingRemoveRange(
-    ConcatenatingRemoveRangeRequest request,
-  ) async =>
-      ConcatenatingRemoveRangeResponse();
-
-  @override
-  Future<ConcatenatingMoveResponse> concatenatingMove(
-    ConcatenatingMoveRequest request,
-  ) async =>
-      ConcatenatingMoveResponse();
-}
-
-enum _CommandType {
-  load,
-  pause,
-  play,
-  seek,
-  setVolume,
 }
