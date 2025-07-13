@@ -138,15 +138,6 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
       SetSpeedResponse();
 
   @override
-  Future<SetPitchResponse> setPitch(SetPitchRequest request) async =>
-      SetPitchResponse();
-
-  @override
-  Future<SetSkipSilenceResponse> setSkipSilence(
-          SetSkipSilenceRequest request) async =>
-      SetSkipSilenceResponse();
-
-  @override
   Future<SetLoopModeResponse> setLoopMode(SetLoopModeRequest request) async =>
       SetLoopModeResponse();
 
@@ -157,64 +148,8 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
       SetShuffleModeResponse();
 
   @override
-  Future<SetShuffleOrderResponse> setShuffleOrder(
-    SetShuffleOrderRequest request,
-  ) async =>
-      SetShuffleOrderResponse();
-
-  @override
-  Future<SetAutomaticallyWaitsToMinimizeStallingResponse>
-      setAutomaticallyWaitsToMinimizeStalling(
-    SetAutomaticallyWaitsToMinimizeStallingRequest request,
-  ) async =>
-          SetAutomaticallyWaitsToMinimizeStallingResponse();
-
-  @override
-  Future<SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse>
-      setCanUseNetworkResourcesForLiveStreamingWhilePaused(
-    SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest request,
-  ) async =>
-          SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse();
-
-  @override
-  Future<SetPreferredPeakBitRateResponse> setPreferredPeakBitRate(
-    SetPreferredPeakBitRateRequest request,
-  ) async =>
-      SetPreferredPeakBitRateResponse();
-
-  @override
-  Future<SetAllowsExternalPlaybackResponse> setAllowsExternalPlayback(
-    SetAllowsExternalPlaybackRequest request,
-  ) async =>
-      SetAllowsExternalPlaybackResponse();
-
-  @override
-  Future<SetAndroidAudioAttributesResponse> setAndroidAudioAttributes(
-    SetAndroidAudioAttributesRequest request,
-  ) async =>
-      SetAndroidAudioAttributesResponse();
-
-  @override
   Future<DisposeResponse> dispose(DisposeRequest request) async =>
       DisposeResponse();
-
-  @override
-  Future<ConcatenatingInsertAllResponse> concatenatingInsertAll(
-    ConcatenatingInsertAllRequest request,
-  ) async =>
-      ConcatenatingInsertAllResponse();
-
-  @override
-  Future<ConcatenatingRemoveRangeResponse> concatenatingRemoveRange(
-    ConcatenatingRemoveRangeRequest request,
-  ) async =>
-      ConcatenatingRemoveRangeResponse();
-
-  @override
-  Future<ConcatenatingMoveResponse> concatenatingMove(
-    ConcatenatingMoveRequest request,
-  ) async =>
-      ConcatenatingMoveResponse();
 }
 
 enum CommandType {
