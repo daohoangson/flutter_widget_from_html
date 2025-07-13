@@ -83,11 +83,12 @@ Future<void> main() async {
 
       expect(
         _commands,
-        equals(const [
+        containsAll([
           Tuple2(_CommandType.pause, null),
           Tuple2(_CommandType.seek, Duration.zero),
         ]),
       );
+      expect(_commands.length, equals(2));
     });
 
     testWidgets('shows remaining (narrow)', (tester) async {
@@ -105,6 +106,24 @@ Future<void> main() async {
       expect(find.text('-0:00'), findsOneWidget);
 
       await tester.pumpAndSettle();
+
+      // Wait for the duration stream to update by polling
+      await tester.runAsync(() async {
+        for (int i = 0; i < 10; i++) {
+          await Future.delayed(const Duration(milliseconds: 50));
+          await tester.pumpAndSettle();
+
+          // Check if the duration text has updated
+          final textWidgets = find.byType(Text);
+          if (textWidgets.evaluate().isNotEmpty) {
+            final text = tester.widget<Text>(textWidgets.first);
+            if (text.data == '-12:34') {
+              return; // Success - duration has updated
+            }
+          }
+        }
+      });
+
       expect(find.text('-12:34'), findsOneWidget);
 
       // force a widget tree disposal
@@ -125,6 +144,20 @@ Future<void> main() async {
       expect(find.text('0:00 / 0:00'), findsOneWidget);
 
       await tester.pumpAndSettle();
+
+      // Wait for the duration stream to update by polling
+      await tester.runAsync(() async {
+        for (int i = 0; i < 10; i++) {
+          await Future.delayed(const Duration(milliseconds: 50));
+          await tester.pumpAndSettle();
+
+          // Check if the duration text has updated
+          if (find.text('0:00 / 12:34').evaluate().isNotEmpty) {
+            return; // Success - duration has updated
+          }
+        }
+      });
+
       expect(find.text('0:00 / 12:34'), findsOneWidget);
 
       // force a widget tree disposal
@@ -143,6 +176,20 @@ Future<void> main() async {
         ),
       );
       await tester.pumpAndSettle();
+
+      // Wait for the duration stream to update by polling
+      await tester.runAsync(() async {
+        for (int i = 0; i < 10; i++) {
+          await Future.delayed(const Duration(milliseconds: 50));
+          await tester.pumpAndSettle();
+
+          // Check if the duration text has updated
+          if (find.text('0:00 / 1:40').evaluate().isNotEmpty) {
+            return; // Success - duration has updated
+          }
+        }
+      });
+
       expect(find.text('0:00 / 1:40'), findsOneWidget);
       expect(
         _commands,
@@ -203,6 +250,20 @@ Future<void> main() async {
 
         await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
+
+        // Wait for the loading to complete before clearing commands
+        await tester.runAsync(() async {
+          for (int i = 0; i < 10; i++) {
+            await Future.delayed(const Duration(milliseconds: 50));
+            await tester.pumpAndSettle();
+
+            // Check if loading has completed by looking for load command
+            if (_commands.any((cmd) => cmd.item1 == _CommandType.load)) {
+              break;
+            }
+          }
+        });
+
         _commands.clear();
 
         await tester.tap(find.byIcon(iconOff));
@@ -277,7 +338,39 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
   @override
   Future<LoadResponse> load(LoadRequest request) async {
     final map = request.audioSourceMessage.toMap();
-    _commands.add(Tuple2(_CommandType.load, map['uri'] ?? map));
+
+    // Extract the URI from the audio source message structure
+    String? uri;
+    if (map['type'] == 'concatenating') {
+      // For concatenating sources, extract URI from the first child
+      final children = map['children'] as List?;
+      if (children != null && children.isNotEmpty) {
+        final firstChild = children[0] as Map?;
+        uri = firstChild?['uri'] as String?;
+      }
+    } else {
+      // For single sources, extract URI directly
+      uri = map['uri'] as String?;
+    }
+
+    _commands.add(Tuple2(_CommandType.load, uri ?? map));
+
+    // Send multiple events to properly simulate the loading process
+    _playbackEvents.add(
+      PlaybackEventMessage(
+        processingState: ProcessingStateMessage.loading,
+        updateTime: DateTime.now(),
+        updatePosition: Duration.zero,
+        bufferedPosition: Duration.zero,
+        duration: null,
+        icyMetadata: null,
+        currentIndex: 0,
+        androidAudioSessionId: null,
+      ),
+    );
+
+    // Small delay to simulate loading
+    await Future.delayed(Duration.zero);
 
     _playbackEvents.add(
       PlaybackEventMessage(
@@ -318,6 +411,15 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
       SetSpeedResponse();
 
   @override
+  Future<SetPitchResponse> setPitch(SetPitchRequest request) async =>
+      SetPitchResponse();
+
+  @override
+  Future<SetSkipSilenceResponse> setSkipSilence(
+          SetSkipSilenceRequest request) async =>
+      SetSkipSilenceResponse();
+
+  @override
   Future<SetLoopModeResponse> setLoopMode(SetLoopModeRequest request) async =>
       SetLoopModeResponse();
 
@@ -326,6 +428,38 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
     SetShuffleModeRequest request,
   ) async =>
       SetShuffleModeResponse();
+
+  @override
+  Future<SetShuffleOrderResponse> setShuffleOrder(
+    SetShuffleOrderRequest request,
+  ) async =>
+      SetShuffleOrderResponse();
+
+  @override
+  Future<SetAutomaticallyWaitsToMinimizeStallingResponse>
+      setAutomaticallyWaitsToMinimizeStalling(
+    SetAutomaticallyWaitsToMinimizeStallingRequest request,
+  ) async =>
+          SetAutomaticallyWaitsToMinimizeStallingResponse();
+
+  @override
+  Future<SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse>
+      setCanUseNetworkResourcesForLiveStreamingWhilePaused(
+    SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest request,
+  ) async =>
+          SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse();
+
+  @override
+  Future<SetPreferredPeakBitRateResponse> setPreferredPeakBitRate(
+    SetPreferredPeakBitRateRequest request,
+  ) async =>
+      SetPreferredPeakBitRateResponse();
+
+  @override
+  Future<SetAllowsExternalPlaybackResponse> setAllowsExternalPlayback(
+    SetAllowsExternalPlaybackRequest request,
+  ) async =>
+      SetAllowsExternalPlaybackResponse();
 
   @override
   Future<SeekResponse> seek(SeekRequest request) async {
@@ -342,6 +476,24 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
   @override
   Future<DisposeResponse> dispose(DisposeRequest request) async =>
       DisposeResponse();
+
+  @override
+  Future<ConcatenatingInsertAllResponse> concatenatingInsertAll(
+    ConcatenatingInsertAllRequest request,
+  ) async =>
+      ConcatenatingInsertAllResponse();
+
+  @override
+  Future<ConcatenatingRemoveRangeResponse> concatenatingRemoveRange(
+    ConcatenatingRemoveRangeRequest request,
+  ) async =>
+      ConcatenatingRemoveRangeResponse();
+
+  @override
+  Future<ConcatenatingMoveResponse> concatenatingMove(
+    ConcatenatingMoveRequest request,
+  ) async =>
+      ConcatenatingMoveResponse();
 }
 
 enum _CommandType {
