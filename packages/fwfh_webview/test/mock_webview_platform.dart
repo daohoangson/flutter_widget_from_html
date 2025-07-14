@@ -214,6 +214,9 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   Future<void> setTextZoom(int textZoom) => throw UnimplementedError();
 
   @override
+  Future<void> setUseWideViewPort(bool use) => throw UnimplementedError();
+
+  @override
   int get webViewIdentifier => throw UnimplementedError();
 }
 

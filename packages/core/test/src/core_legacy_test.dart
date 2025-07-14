@@ -86,7 +86,6 @@ void main() {
         useExplainer: false,
       );
 
-      // TODO: use hard coded value when our minimum Flutter version > 3.24
       final abcdefString = abcdef.toString().replaceAll('ColorSpace.', '');
       expect(explained, contains(abcdefString));
     });

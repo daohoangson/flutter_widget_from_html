@@ -233,7 +233,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     TextBaseline textBaseline = TextBaseline.alphabetic,
     TextDirection textDirection = TextDirection.ltr,
   }) {
-    return LayoutBuilder(
+    return HtmlLayoutBuilder(
       builder: (_, bc) {
         Widget built = HtmlFlex(
           crossAxisAlignment: crossAxisAlignment,

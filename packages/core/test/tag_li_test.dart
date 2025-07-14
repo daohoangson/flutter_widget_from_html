@@ -1001,9 +1001,8 @@ Future<void> main() async {
         useExplainer: false,
       );
 
-      // TODO: use hard coded value when our minimum Flutter version > 3.24
-      const red = Color(0xffff0000);
-      expect(disc, contains(red.toString().replaceAll('ColorSpace.', '')));
+      expect(disc,
+          contains('alpha: 1.0000, red: 1.0000, green: 0.0000, blue: 0.0000'));
 
       final circle = await explain(
         tester,
@@ -1011,9 +1010,8 @@ Future<void> main() async {
         useExplainer: false,
       );
 
-      // TODO: use hard coded value when our minimum Flutter version > 3.24
-      const green = Color(0xff00ff00);
-      expect(circle, contains(green.toString().replaceAll('ColorSpace.', '')));
+      expect(circle,
+          contains('alpha: 1.0000, red: 0.0000, green: 1.0000, blue: 0.0000'));
     });
   });
 }
