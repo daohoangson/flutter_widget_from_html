@@ -91,10 +91,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
           final theme = Theme.of(context);
           final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
 
-          // TODO: remove lint ignore when our minimum Flutter version >= 3.16
-          // ignore: deprecated_member_use
-          final tsf = MediaQuery.textScaleFactorOf(context);
-          final iconSize = fontSize * tsf;
+          final tsf = MediaQuery.textScalerOf(context);
+          final iconSize = tsf.scale(fontSize);
 
           return DecoratedBox(
             decoration: BoxDecoration(
@@ -191,10 +189,7 @@ class _PositionText extends StatelessWidget {
             return Text(
               text,
               style: TextStyle(fontSize: size),
-
-              // TODO: remove lint ignore when our minimum Flutter version >= 3.16
-              // ignore: deprecated_member_use
-              textScaleFactor: 1,
+              textScaler: TextScaler.noScaling,
             );
           },
           stream: positionStream,
