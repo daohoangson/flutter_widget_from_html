@@ -1,3 +1,8 @@
+## 0.16.0
+
+- Requires Flutter 3.10 (#1396)
+- Add support for flutter_widget_from_html_core@0.16.0 (#1405)
+
 ## 0.8.3
 
 - Fix unnamed function parameters (#1309, authored by hassony105)

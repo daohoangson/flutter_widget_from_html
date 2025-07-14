@@ -16,9 +16,8 @@ class StyleSizing {
 
   static final _elementTree = Expando<BuildTree>();
   static final _treeIsBlock = Expando<bool>();
-  static final _skipBuilding = Expando<bool>();
 
-  static void maybeRegisterChildOp(WidgetFactory wf, BuildTree tree) {
+  static void maybeRegisterChildOp(BuildTree tree) {
     final parentElement = tree.element.parent;
     if (parentElement == null || _elementTree[parentElement] == null) {
       return;
@@ -27,7 +26,7 @@ class StyleSizing {
     tree.register(StyleSizing().childOp);
   }
 
-  static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
+  static void registerBlockOp(BuildTree tree) {
     _elementTree[tree.element] = tree;
     _treeIsBlock[tree] = true;
 
@@ -37,7 +36,7 @@ class StyleSizing {
       ..register(instance.sizingOp);
   }
 
-  static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
+  static void registerSizingOp(BuildTree tree) {
     _elementTree[tree.element] = tree;
     tree.register(StyleSizing().sizingOp);
   }
@@ -99,7 +98,7 @@ class StyleSizing {
   }
 
   static Widget _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
-    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+    if (placeholder.isEmpty) {
       return placeholder;
     }
 
@@ -115,10 +114,6 @@ class StyleSizing {
   }
 
   static void _sizingInline(BuildTree tree) {
-    if (_skipBuilding[tree] == true) {
-      return;
-    }
-
     final input = tree.sizingInput;
     if (input == null) {
       return;
@@ -143,11 +138,6 @@ class StyleSizing {
 
     placeholder
         .wrapWith((c, w) => _build(c, w, input, tree.inheritanceResolvers));
-  }
-
-  static void skip(BuildTree tree) {
-    assert(_skipBuilding[tree] != true, 'Built ${tree.element} already');
-    _skipBuilding[tree] = true;
   }
 
   static Widget _build(

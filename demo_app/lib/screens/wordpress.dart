@@ -42,7 +42,7 @@ class PostsScreen extends StatelessWidget {
   const PostsScreen(this.domain, {super.key, this.title});
 
   @override
-  Widget build(BuildContext _) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: Text(title ?? domain)),
         body: _PostsList('https://$domain/wp-json/wp/v2/posts?_embed'),
       );
@@ -160,7 +160,7 @@ class _PostsState extends State<_PostsList> {
     );
   }
 
-  List<_Post> _parseJson(json) {
+  List<_Post> _parseJson(dynamic json) {
     final posts = <_Post>[];
     if (json is List) {
       for (final postJson in json) {

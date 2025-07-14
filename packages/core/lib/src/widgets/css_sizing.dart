@@ -12,11 +12,11 @@ class CssBlock extends SingleChildRenderObjectWidget {
   const CssBlock({super.child, super.key});
 
   @override
-  RenderObject createRenderObject(BuildContext _) =>
+  RenderObject createRenderObject(BuildContext context) =>
       _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
 
   @override
-  void updateRenderObject(BuildContext _, RenderObject renderObject) =>
+  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
       (renderObject as _RenderCssSizing).setPreferredSize(
         null,
         const CssSizingValue.percentage(100),
@@ -73,8 +73,8 @@ class CssSizing extends SingleChildRenderObjectWidget {
     return _RenderCssSizing(
       maxHeight: maxHeight ?? hint?.maxHeight.cssSizingValue,
       maxWidth: maxWidth ?? hint?.maxWidth.cssSizingValue,
-      minHeight: minHeight,
-      minWidth: minWidth,
+      minHeight: minHeight ?? hint?.minHeight.cssSizingValue,
+      minWidth: minWidth ?? hint?.minWidth.cssSizingValue,
       preferredAxis: preferredAxis,
       preferredHeight: preferredHeight,
       preferredWidth: preferredWidth,
@@ -137,17 +137,24 @@ class CssSizing extends SingleChildRenderObjectWidget {
 class CssSizingHint extends InheritedWidget {
   final double? maxHeight;
   final double? maxWidth;
+  final double? minHeight;
+  final double? minWidth;
 
   const CssSizingHint({
     required super.child,
     super.key,
     this.maxHeight,
     this.maxWidth,
+    this.minHeight,
+    this.minWidth,
   });
 
   @override
   bool updateShouldNotify(CssSizingHint oldWidget) =>
-      maxHeight != oldWidget.maxHeight || maxWidth != oldWidget.maxWidth;
+      maxHeight != oldWidget.maxHeight ||
+      maxWidth != oldWidget.maxWidth ||
+      minHeight != oldWidget.minHeight ||
+      minWidth != oldWidget.minWidth;
 }
 
 class _RenderCssSizing extends RenderProxyBox {
@@ -273,12 +280,16 @@ class _RenderCssSizing extends RenderProxyBox {
           )
         : null;
 
-    final cc = BoxConstraints(
+    var cc = BoxConstraints(
       maxHeight: stableChildSize?.height ?? preferredHeight ?? maxHeight,
       maxWidth: stableChildSize?.width ?? preferredWidth ?? maxWidth,
       minHeight: stableChildSize?.height ?? preferredHeight ?? minHeight,
       minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
     );
+
+    // after everything... if the incoming is tight then we must follow it
+    cc = c.hasTightWidth ? cc.tighten(width: c.maxWidth) : cc;
+    cc = c.hasTightHeight ? cc.tighten(height: c.maxHeight) : cc;
 
     return cc;
   }

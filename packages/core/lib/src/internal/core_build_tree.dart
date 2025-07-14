@@ -154,7 +154,7 @@ class CoreBuildTree extends BuildTree {
   }
 
   @override
-  void flatten(Flattened _) {
+  void flatten(Flattened f) {
     final scopedBuildOps = _buildOps;
     if (scopedBuildOps != null) {
       for (final op in scopedBuildOps) {

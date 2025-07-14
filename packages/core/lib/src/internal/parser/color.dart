@@ -16,19 +16,31 @@ CssColor? tryParseColor(css.Expression? expression) {
         final params = expression.params;
         if (params.length >= 3) {
           final param0 = params[0];
-          final h = param0 is css.NumberTerm
-              ? _parseColorHue(param0.number)
-              : param0 is css.AngleTerm
-                  ? _parseColorHue(param0.angle, param0.unit)
-                  : null;
+          final double? h;
+          if (param0 is css.NumberTerm) {
+            h = _parseColorHue(param0.number);
+          } else if (param0 is css.AngleTerm) {
+            h = _parseColorHue(param0.angle, param0.unit);
+          } else {
+            h = null;
+          }
+
           final param1 = params[1];
-          final s = param1 is css.PercentageTerm
-              ? param1.valueAsDouble.clamp(0.0, 1.0)
-              : null;
+          final double? s;
+          if (param1 is css.PercentageTerm) {
+            s = param1.valueAsDouble.clamp(0.0, 1.0);
+          } else {
+            s = null;
+          }
+
           final param2 = params[2];
-          final l = param2 is css.PercentageTerm
-              ? param2.valueAsDouble.clamp(0.0, 1.0)
-              : null;
+          final double? l;
+          if (param2 is css.PercentageTerm) {
+            l = param2.valueAsDouble.clamp(0.0, 1.0);
+          } else {
+            l = null;
+          }
+
           final hslA = params.length >= 4 ? _parseColorAlpha(params[3]) : 1.0;
           if (h != null && s != null && l != null && hslA != null) {
             final hslValue = HSLColor.fromAHSL(hslA, h, s, l).toColor();
@@ -78,12 +90,17 @@ CssColor? tryParseColor(css.Expression? expression) {
   return null;
 }
 
-double? _parseColorAlpha(css.Expression v) => (v is css.NumberTerm
-        ? v.number.toDouble()
-        : v is css.PercentageTerm
-            ? v.valueAsDouble
-            : null)
-    ?.clamp(0.0, 1.0);
+double? _parseColorAlpha(css.Expression expression) {
+  final double? value;
+  if (expression is css.NumberTerm) {
+    value = expression.number.toDouble();
+  } else if (expression is css.PercentageTerm) {
+    value = expression.valueAsDouble;
+  } else {
+    value = null;
+  }
+  return value?.clamp(0, 1);
+}
 
 double _parseColorHue(num number, [int? unit]) {
   final v = number is double ? number : number.toDouble();
@@ -110,12 +127,17 @@ double _parseColorHue(num number, [int? unit]) {
   return deg % 360;
 }
 
-int? _parseColorRgbElement(css.Expression v) => (v is css.NumberTerm
-        ? v.number.ceil()
-        : v is css.PercentageTerm
-            ? (v.valueAsDouble * 255.0).ceil()
-            : null)
-    ?.clamp(0, 255);
+int? _parseColorRgbElement(css.Expression expression) {
+  final int? value;
+  if (expression is css.NumberTerm) {
+    value = expression.number.ceil();
+  } else if (expression is css.PercentageTerm) {
+    value = (expression.valueAsDouble * 255.0).ceil();
+  } else {
+    value = null;
+  }
+  return value?.clamp(0, 255);
+}
 
 String _x2(String value) {
   final sb = StringBuffer();

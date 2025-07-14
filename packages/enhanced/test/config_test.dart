@@ -508,7 +508,7 @@ void main() {
         tester,
         HtmlWidget(
           '<a href="$href">Tap me</a>',
-          onTapUrl: (url) async {
+          onTapUrl: (url) {
             urls.add(url);
             return false;
           },
@@ -529,7 +529,7 @@ void main() {
         tester,
         HtmlWidget(
           '<a href="$href">Tap me</a>',
-          onTapUrl: (url) async {
+          onTapUrl: (url) {
             urls.add(url);
             return true;
           },

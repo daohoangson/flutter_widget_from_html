@@ -1,8 +1,8 @@
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
+    id("com.android.application")
+    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
+    id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
@@ -14,12 +14,12 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
@@ -32,31 +32,31 @@ android {
         versionName = flutter.versionName
 
         // https://patrol.leancode.co/getting-started
-        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: "true"
+        testInstrumentationRunner = "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
     signingConfigs {
-        demo {
-            storeFile file("../keystore")
-            storePassword "storepass"
-            keyAlias "alias"
-            keyPassword "keypass"
+        create("demo") {
+            storeFile = file("../keystore")
+            storePassword = "storepass"
+            keyAlias = "alias"
+            keyPassword = "keypass"
         }
     }
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.demo
+            signingConfig = signingConfigs.getByName("demo")
         }
         release {
-            signingConfig = signingConfigs.demo
+            signingConfig = signingConfigs.getByName("demo")
         }
     }
 
     testOptions {
         // https://patrol.leancode.co/getting-started
-        execution "ANDROIDX_TEST_ORCHESTRATOR"
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 }
 
@@ -66,5 +66,5 @@ flutter {
 
 dependencies {
     // https://patrol.leancode.co/getting-started
-    androidTestUtil "androidx.test:orchestrator:1.5.1"
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
 }

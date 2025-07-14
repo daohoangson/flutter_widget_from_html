@@ -61,7 +61,7 @@ class _ImgFileState extends State<_ImgFileTab> {
   }
 
   @override
-  Widget build(BuildContext _) => AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
         animation: status,
         builder: (_, __) {
           switch (status.value) {

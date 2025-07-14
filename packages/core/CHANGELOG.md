@@ -1,3 +1,8 @@
+## 0.16.0
+
+- Requires Flutter 3.22 (#1403)
+- Add support for CSS `gap` (#1403)
+
 ## 0.15.2
 
 - Add support for Flutter 3.24 (#1308)
@@ -7,7 +12,7 @@
 
 ## 0.15.1
 
-- Drop support for Flutter 3.7 (#1250)
+- Requires Flutter 3.10 (#1250)
 - Add support for `currentcolor` (#1240)
 - Fix zero size image (#1266)
 

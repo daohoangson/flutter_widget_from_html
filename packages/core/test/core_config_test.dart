@@ -522,7 +522,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) async => false,
+          onTapUrl: (_) => false,
         ),
       );
       await tester.pumpAndSettle();
@@ -539,7 +539,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) async => true,
+          onTapUrl: (_) => true,
         ),
       );
       await tester.pumpAndSettle();
@@ -718,7 +718,7 @@ class _OnTapUrlApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext _) => MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
         home: Scaffold(
           body: HtmlWidget(
             '<a href="$href">Tap me</a>',

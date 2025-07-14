@@ -49,8 +49,8 @@ dev_dependencies:
   golden_toolkit: ^0.15.0
   lint: any
   measurer: ^2.1.1
-  patrol: ^3.14.0
-  patrol_finders: ^2.7.0
+  patrol: ^3.17.0
+  patrol_finders: ^2.8.2
   test: any
 
 flutter:

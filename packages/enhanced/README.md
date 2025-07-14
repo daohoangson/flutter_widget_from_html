@@ -1,7 +1,7 @@
 # Flutter Widget from HTML
 
 [![Flutter](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml)
-[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=daohoangson_flutter_widget_from_html&metric=coverage)](https://sonarcloud.io/summary/new_code?id=daohoangson_flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
 Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe
@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.15.3
+  flutter_widget_from_html: ^0.16.0
 ```
 
 ### Platform specific configuration
@@ -166,12 +166,13 @@ These tags and their contents will be ignored:
   - In `flex` mode:
     - flex-direction: column/row
     - align-items: flex-start/flex-end/center/baseline/stretch
+    - gap: value in `em`, `%`, `pt` and `px`
     - justify-content: flex-start/flex-end/center/space-between/space-around/space-evenly
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: `normal`, number or values in `em`, `%`, `pt` and `px`
+- line-height: `normal`, number or value in `em`, `%`, `pt` and `px`
 - margin: 4 values, 2 values or 1 value in `em`, `pt` and `px`
   - margin-top, margin-right, margin-bottom, margin-left
   - margin-block-start, margin-block-end

@@ -22,7 +22,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool useExplainer = true,
-}) async =>
+}) =>
     helper.explain(
       tester,
       null,

@@ -65,7 +65,7 @@ class _State extends State<VideoScreen> {
                 _html,
                 key: Key(_html),
                 baseUrl: Uri.parse(
-                  'https://files.daohoangson.com/public/fwfh/',
+                  'https://flutter-widget-from-html.github.io/pages/',
                 ),
               ),
             ),

@@ -217,15 +217,18 @@ class CssBorderSide {
   }
 
   static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) {
-    final copied = base == null || value == none
-        ? value
-        : value == null
-            ? base
-            : CssBorderSide(
-                color: value.color ?? base.color,
-                style: value.style ?? base.style,
-                width: value.width ?? base.width,
-              );
+    final CssBorderSide? copied;
+    if (base == null || value == none) {
+      copied = value;
+    } else if (value == null) {
+      copied = base;
+    } else {
+      copied = CssBorderSide(
+        color: value.color ?? base.color,
+        style: value.style ?? base.style,
+        width: value.width ?? base.width,
+      );
+    }
 
     if (copied?.isNoOp == true) {
       return none;

@@ -15,6 +15,7 @@ export 'widgets/css_sizing.dart';
 export 'widgets/horizontal_margin.dart';
 export 'widgets/html_details.dart';
 export 'widgets/html_flex.dart';
+export 'widgets/html_layout_builder.dart';
 export 'widgets/html_list_item.dart';
 export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
@@ -189,13 +190,17 @@ Uint8List? bytesFromDataUri(String dataUri) {
   final prefix = match[0]!;
   final encoding = match[1];
   final data = dataUri.substring(prefix.length);
-  final bytes = encoding == 'base64'
-      ? base64.decode(data)
-      : encoding == 'utf8'
-          ? Uint8List.fromList(data.codeUnits)
-          : null;
 
-  return bytes?.isNotEmpty == true ? bytes : null;
+  final Uint8List bytes;
+  if (encoding == 'base64') {
+    bytes = base64.decode(data);
+  } else if (encoding == 'utf8') {
+    bytes = Uint8List.fromList(data.codeUnits);
+  } else {
+    return null;
+  }
+
+  return bytes.isNotEmpty == true ? bytes : null;
 }
 
 /// Parses [key] from [map] as an double literal and return its value.

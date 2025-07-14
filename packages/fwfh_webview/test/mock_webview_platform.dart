@@ -74,7 +74,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   FutureOr<NavigationDecision?> onNavigationRequest({
     required String url,
     required bool isMainFrame,
-  }) async {
+  }) {
     final req = NavigationRequest(url: url, isMainFrame: isMainFrame);
     return _handler?._onNavigationRequest?.call(req);
   }
@@ -214,6 +214,9 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   Future<void> setTextZoom(int textZoom) => throw UnimplementedError();
 
   @override
+  Future<void> setUseWideViewPort(bool use) => throw UnimplementedError();
+
+  @override
   int get webViewIdentifier => throw UnimplementedError();
 }
 
@@ -224,6 +227,9 @@ class __FakeWebKitWebViewController extends FakeWebViewController
   @override
   Future<void> setAllowsBackForwardNavigationGestures(bool enabled) =>
       throw UnimplementedError();
+
+  @override
+  Future<void> setAllowsLinkPreview(bool allow) => throw UnimplementedError();
 
   @override
   Future<void> setOnCanGoBackChange(

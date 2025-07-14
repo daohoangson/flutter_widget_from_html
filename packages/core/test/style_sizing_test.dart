@@ -821,7 +821,7 @@ class _Golden extends StatelessWidget {
   const _Golden(this.html);
 
   @override
-  Widget build(BuildContext _) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: HtmlWidget(html),

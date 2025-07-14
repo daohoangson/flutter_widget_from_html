@@ -23,7 +23,7 @@ extension StyleTextAlign on WidgetFactory {
         priority: Early.cssTextAlign,
       );
 
-  static Widget _center(BuildContext _, Widget child) =>
+  static Widget _center(BuildContext context, Widget child) =>
       Center(heightFactor: 1.0, child: child);
 
   static BuildTree _onParsed(BuildTree tree) {
