@@ -83,7 +83,7 @@ class TagTable {
         ? tryParseCssLength(borderSpacingExpression)
         : null;
 
-    final layoutBuilder = LayoutBuilder(
+    final layoutBuilder = HtmlLayoutBuilder(
       builder: (context, bc) {
         final resolved = tableTree.inheritanceResolvers.resolve(context);
         Widget built = ValignBaselineContainer(
