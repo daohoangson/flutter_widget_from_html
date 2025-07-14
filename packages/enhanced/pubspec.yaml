@@ -4,7 +4,7 @@ description: Flutter package to render html as widgets that supports hyperlink, 
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=3.22.0"
+  flutter: ">=3.32.0"
   sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
