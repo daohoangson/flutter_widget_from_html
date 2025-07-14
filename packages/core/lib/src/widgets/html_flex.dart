@@ -327,26 +327,6 @@ extension on MainAxisAlignment {
   }
 }
 
-double? _getChildBaseline(
-  RenderBox child,
-  BoxConstraints constraints,
-  TextBaseline baseline,
-) {
-  // TODO: use ChildLayoutHelper.getBaseline when minimum Flutter version >= 3.24
-  assert(!child.debugNeedsLayout);
-  assert(child.constraints == constraints);
-  return child.getDistanceToBaseline(baseline, onlyReal: true);
-}
-
-double? _getChildBaselineDry(
-  RenderBox child,
-  BoxConstraints constraints,
-  TextBaseline baseline,
-) {
-  // TODO: use ChildLayoutHelper.getDryBaseline when minimum Flutter version >= 3.24
-  return child.getDryBaseline(constraints, baseline);
-}
-
 class RenderHtmlFlex extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, FlexParentData>,
@@ -564,7 +544,7 @@ class RenderHtmlFlex extends RenderBox
             ? BoxConstraints(maxWidth: extent)
             : BoxConstraints(maxHeight: extent),
         layoutChild: layoutChild,
-        getBaseline: _getChildBaselineDry,
+        getBaseline: ChildLayoutHelper.getDryBaseline,
       ).axisSize.crossAxisExtent;
     }
   }
@@ -748,7 +728,7 @@ class RenderHtmlFlex extends RenderBox
     final _LayoutSizes sizes = _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.dryLayoutChild,
-      getBaseline: _getChildBaselineDry,
+      getBaseline: ChildLayoutHelper.getDryBaseline,
     );
 
     if (_isBaselineAligned) {
@@ -836,7 +816,7 @@ class RenderHtmlFlex extends RenderBox
     return _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.dryLayoutChild,
-      getBaseline: _getChildBaselineDry,
+      getBaseline: ChildLayoutHelper.getDryBaseline,
     ).axisSize.toSize(direction);
   }
 
@@ -1101,7 +1081,7 @@ class RenderHtmlFlex extends RenderBox
     final _LayoutSizes sizes = _computeSizes(
       constraints: constraints,
       layoutChild: ChildLayoutHelper.layoutChild,
-      getBaseline: _getChildBaseline,
+      getBaseline: ChildLayoutHelper.getBaseline,
     );
 
     final double crossAxisExtent = sizes.axisSize.crossAxisExtent;
