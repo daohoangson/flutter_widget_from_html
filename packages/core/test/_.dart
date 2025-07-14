@@ -306,11 +306,20 @@ class Explainer {
     return attr;
   }
 
-  String _color(Color c) =>
-      '#${_colorHex(c.a)}${_colorHex(c.r)}${_colorHex(c.g)}${_colorHex(c.b)}';
+  // TODO: remove lint ignore when our minimum Flutter version >= 3.24
+  // ignore: deprecated_member_use
+  String _color(Color c) => '#${_colorHex(c.alpha)}'
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.24
+      // ignore: deprecated_member_use
+      '${_colorHex(c.red)}'
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.24
+      // ignore: deprecated_member_use
+      '${_colorHex(c.green)}'
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.24
+      // ignore: deprecated_member_use
+      '${_colorHex(c.blue)}';
 
-  String _colorHex(double d) {
-    final i = (d * 255.0).round() & 0xff;
+  String _colorHex(int i) {
     final h = i.toRadixString(16).toUpperCase();
     return h.length == 1 ? '0$h' : h;
   }
