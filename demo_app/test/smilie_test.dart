@@ -8,8 +8,8 @@ void main() {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
-          ? null
-          : 'Linux only'
+            ? null
+            : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
   testGoldens(

@@ -41,22 +41,22 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Demo app'),
-          actions: const [PopupMenu()],
-        ),
-        body: ListView(
-          children: _screens.keys
-              .map(
-                (title) => ListTile(
-                  title: Text(title),
-                  onTap: () =>
-                      Navigator.pushNamed(context, _routeNameFromTitle(title)),
-                ),
-              )
-              .toList(growable: false),
-        ),
-      );
+    appBar: AppBar(
+      title: const Text('Demo app'),
+      actions: const [PopupMenu()],
+    ),
+    body: ListView(
+      children: _screens.keys
+          .map(
+            (title) => ListTile(
+              title: Text(title),
+              onTap: () =>
+                  Navigator.pushNamed(context, _routeNameFromTitle(title)),
+            ),
+          )
+          .toList(growable: false),
+    ),
+  );
 
   static Route onGenerateRoute(RouteSettings route) {
     for (final title in _screens.keys) {
@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
     }
 
     return PageRouteBuilder(
-      pageBuilder: (_, __, ___) => const HomeScreen(),
+      pageBuilder: (_, _, _) => const HomeScreen(),
       settings: const RouteSettings(name: '/'),
     );
   }

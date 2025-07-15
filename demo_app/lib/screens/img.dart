@@ -14,38 +14,38 @@ class _State extends State<ImgScreen> {
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Network'),
-                Tab(text: 'Asset'),
-                Tab(text: 'Data URI'),
-                Tab(text: 'SVG'),
-              ],
-            ),
-            title: const Text('ImgScreen'),
-          ),
-          body: TabBarView(
-            children: <Widget>[
-              _buildHtmlWidget(_htmlNetwork()),
-              _buildHtmlWidget(_htmlAsset()),
-              _buildHtmlWidget(_htmlDataUri()),
-              _buildHtmlWidget(_htmlSvg()),
-            ],
-          ),
+    length: 4,
+    child: Scaffold(
+      appBar: AppBar(
+        bottom: const TabBar(
+          tabs: [
+            Tab(text: 'Network'),
+            Tab(text: 'Asset'),
+            Tab(text: 'Data URI'),
+            Tab(text: 'SVG'),
+          ],
         ),
-      );
+        title: const Text('ImgScreen'),
+      ),
+      body: TabBarView(
+        children: <Widget>[
+          _buildHtmlWidget(_htmlNetwork()),
+          _buildHtmlWidget(_htmlAsset()),
+          _buildHtmlWidget(_htmlDataUri()),
+          _buildHtmlWidget(_htmlSvg()),
+        ],
+      ),
+    ),
+  );
 
   Widget _buildHtmlWidget(String html) => SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            '$html<hr /><pre>${const HtmlEscape().convert(html)}</pre>',
-          ),
-        ),
-      );
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: HtmlWidget(
+        '$html<hr /><pre>${const HtmlEscape().convert(html)}</pre>',
+      ),
+    ),
+  );
 
   String _htmlAsset() {
     const icon = 'asset:logos/icon.png';
@@ -68,7 +68,8 @@ class _State extends State<ImgScreen> {
 ''';
   }
 
-  String _htmlNetwork() => '''
+  String _htmlNetwork() =>
+      '''
 <p>
   Inline:
   <img alt="alt" />

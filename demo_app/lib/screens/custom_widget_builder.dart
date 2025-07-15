@@ -29,45 +29,44 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('CustomWidgetBuilderScreen'),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              customWidgetBuilder: (e) {
-                if (!e.classes.contains('carousel')) {
-                  return null;
-                }
+    appBar: AppBar(
+      title: const Text('CustomWidgetBuilderScreen'),
+    ),
+    body: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: HtmlWidget(
+          kHtml,
+          customWidgetBuilder: (e) {
+            if (!e.classes.contains('carousel')) {
+              return null;
+            }
 
-                final srcs = <String>[];
-                for (final child in e.children) {
-                  for (final grandChild in child.children) {
-                    if (grandChild.attributes case {'src': final String src}) {
-                      srcs.add(src);
-                    }
-                  }
+            final srcs = <String>[];
+            for (final child in e.children) {
+              for (final grandChild in child.children) {
+                if (grandChild.attributes case {'src': final String src}) {
+                  srcs.add(src);
                 }
+              }
+            }
 
-                return CarouselSlider(
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 500),
-                    autoPlayInterval: const Duration(seconds: 2),
-                    enlargeCenterPage: true,
-                  ),
-                  items: srcs.map(_toItem).toList(growable: false),
-                );
-              },
-            ),
-          ),
+            return CarouselSlider(
+              options: CarouselOptions(
+                autoPlay: true,
+                autoPlayAnimationDuration: const Duration(milliseconds: 500),
+                autoPlayInterval: const Duration(seconds: 2),
+                enlargeCenterPage: true,
+              ),
+              items: srcs.map(_toItem).toList(growable: false),
+            );
+          },
         ),
-      );
+      ),
+    ),
+  );
 
   static Widget _toItem(String src) => Center(
-        child: Image.network(src, fit: BoxFit.cover, width: 1000),
-      );
+    child: Image.network(src, fit: BoxFit.cover, width: 1000),
+  );
 }

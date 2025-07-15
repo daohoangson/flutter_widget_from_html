@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: analyzer
-      sha256: de617bfdc64f3d8b00835ec2957441ceca0a29cdf7881f7ab231bc14f71159c0
+      sha256: "754aed101003afceca3e6637fe88150dbe9739068e0135788a62645a131867bb"
       url: "https://pub.dev"
     source: hosted
-    version: "7.5.6"
+    version: "7.5.9"
   archive:
     dependency: transitive
     description:
@@ -45,10 +45,10 @@ packages:
     dependency: transitive
     description:
       name: audio_session
-      sha256: "2b7fff16a552486d078bfc09a8cde19f426dc6d6329262b684182597bec5b1ac"
+      sha256: "8f96a7fecbb718cb093070f868b4cdcb8a9b1053dce342ff8ab2fde10eb9afb7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.25"
+    version: "0.2.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -302,14 +302,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.17.0"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.17.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -324,42 +324,42 @@ packages:
       path: "../packages/fwfh_cached_network_image"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   fwfh_chewie:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_chewie"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   fwfh_just_audio:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_just_audio"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.17.0"
   fwfh_svg:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_svg"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_url_launcher"
       relative: true
     source: path
-    version: "0.16.0"
+    version: "0.16.1"
   fwfh_webview:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_webview"
       relative: true
     source: path
-    version: "0.15.4"
+    version: "0.15.5"
   glob:
     dependency: transitive
     description:
@@ -444,10 +444,10 @@ packages:
     dependency: transitive
     description:
       name: just_audio
-      sha256: f978d5b4ccea08f267dae0232ec5405c1b05d3f3cd63f82097ea46c015d5c09e
+      sha256: "679637a3ec5b6e00f36472f5a3663667df00ee4822cbf5dafca0f568c710960a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.46"
+    version: "0.10.4"
   just_audio_platform_interface:
     dependency: transitive
     description:
