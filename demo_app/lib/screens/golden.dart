@@ -107,19 +107,21 @@ class _GoldensState extends State<GoldensScreen> {
     _filter.addListener(_onFilter);
 
     _goldens = rootBundle.loadStructuredData<List<MapEntry<String, String>>>(
-        'test/goldens.json', (value) async {
-      final map = jsonDecode(value) as Map;
-      final typed = <MapEntry<String, String>>[];
-      for (final entry in map.entries) {
-        final key = entry.key;
-        final value = entry.value;
-        if (key is String && value is String) {
-          typed.add(MapEntry(key, value));
+      'test/goldens.json',
+      (value) async {
+        final map = jsonDecode(value) as Map;
+        final typed = <MapEntry<String, String>>[];
+        for (final entry in map.entries) {
+          final key = entry.key;
+          final value = entry.value;
+          if (key is String && value is String) {
+            typed.add(MapEntry(key, value));
+          }
         }
-      }
 
-      return typed;
-    });
+        return typed;
+      },
+    );
   }
 
   @override
@@ -130,16 +132,16 @@ class _GoldensState extends State<GoldensScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('GoldensScreen')),
-        body: FutureBuilder<List<MapEntry<String, String>>>(
-          builder: (context, snapshot) => snapshot.hasData
-              ? _onData(_filtered ?? snapshot.requireData)
-              : snapshot.hasError
-                  ? _onError(snapshot.error!)
-                  : _onLoading(),
-          future: _goldens,
-        ),
-      );
+    appBar: AppBar(title: const Text('GoldensScreen')),
+    body: FutureBuilder<List<MapEntry<String, String>>>(
+      builder: (context, snapshot) => snapshot.hasData
+          ? _onData(_filtered ?? snapshot.requireData)
+          : snapshot.hasError
+          ? _onError(snapshot.error!)
+          : _onLoading(),
+      future: _goldens,
+    ),
+  );
 
   Widget _buildItem(BuildContext context, MapEntry<String, String> golden) =>
       ListTile(
@@ -157,31 +159,30 @@ class _GoldensState extends State<GoldensScreen> {
       );
 
   Widget _onData(List<MapEntry<String, String>> goldens) => Column(
-        children: [
-          ListTile(
-            title: TextField(
-              controller: _filter,
-              autocorrect: false,
-              decoration: InputDecoration(
-                hintText: 'Filter',
-                suffixIcon: _filtered != null
-                    ? InkWell(
-                        onTap: () => _filter.clear(),
-                        child: const Icon(Icons.cancel),
-                      )
-                    : null,
-              ),
-            ),
+    children: [
+      ListTile(
+        title: TextField(
+          controller: _filter,
+          autocorrect: false,
+          decoration: InputDecoration(
+            hintText: 'Filter',
+            suffixIcon: _filtered != null
+                ? InkWell(
+                    onTap: () => _filter.clear(),
+                    child: const Icon(Icons.cancel),
+                  )
+                : null,
           ),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) =>
-                  _buildItem(context, goldens[index]),
-              itemCount: goldens.length,
-            ),
-          ),
-        ],
-      );
+        ),
+      ),
+      Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) => _buildItem(context, goldens[index]),
+          itemCount: goldens.length,
+        ),
+      ),
+    ],
+  );
 
   Widget _onError(Object error) => Center(child: Text('$error'));
 

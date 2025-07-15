@@ -13,7 +13,7 @@ void main() {
       child: VideoPlayer(
         'https://flutter-widget-from-html.github.io/pages/flower.mp4',
         aspectRatio: 1,
-        loadingBuilder: (_, __, ___) =>
+        loadingBuilder: (_, _, _) =>
             const Center(child: CircularProgressIndicator()),
       ),
     );
@@ -36,10 +36,11 @@ void main() {
       final testCase = webViewTestCases.currentValue!;
       final test = await testCase.run($);
 
-      for (var i = 0;; i++) {
+      for (var i = 0; ; i++) {
         await $.pump();
-        await $.tester
-            .runAsync(() => Future.delayed(const Duration(seconds: 3)));
+        await $.tester.runAsync(
+          () => Future.delayed(const Duration(seconds: 3)),
+        );
         await $.pump();
 
         try {
@@ -70,7 +71,8 @@ class WebViewTestCase {
   });
 
   Future<_AspectRatioTest> run(PatrolIntegrationTester $) async {
-    final html = '''
+    final html =
+        '''
 <!doctype html>
 <head>
   <meta charset="utf-8">

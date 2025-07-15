@@ -31,43 +31,43 @@ class _State extends State<IframeScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('IframeScreen'),
+    appBar: AppBar(
+      title: const Text('IframeScreen'),
+    ),
+    body: ListView(
+      children: <Widget>[
+        CheckboxListTile(
+          value: webView,
+          onChanged: (v) => setState(() => webView = v == true),
+          title: const HtmlWidget('<var>.webView</var>'),
+          subtitle: const Text('Renders web view, default ❌'),
         ),
-        body: ListView(
-          children: <Widget>[
-            CheckboxListTile(
-              value: webView,
-              onChanged: (v) => setState(() => webView = v == true),
-              title: const HtmlWidget('<var>.webView</var>'),
-              subtitle: const Text('Renders web view, default ❌'),
-            ),
-            CheckboxListTile(
-              value: webViewJs,
-              onChanged: (v0) => setState(() {
-                final v = v0 == true;
-                if (v) {
-                  webView = true;
-                }
-                webViewJs = v;
-              }),
-              title: const HtmlWidget('<var>.webViewJs</var>'),
-              subtitle: const Text('Allows JavaScript execution, default ✅'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: HtmlWidget(
-                html,
-                factoryBuilder: () => _WidgetFactory(
-                  webView: webView,
-                  webViewJs: webViewJs,
-                ),
-                rebuildTriggers: [webView, webViewJs],
-              ),
-            ),
-          ],
+        CheckboxListTile(
+          value: webViewJs,
+          onChanged: (v0) => setState(() {
+            final v = v0 == true;
+            if (v) {
+              webView = true;
+            }
+            webViewJs = v;
+          }),
+          title: const HtmlWidget('<var>.webViewJs</var>'),
+          subtitle: const Text('Allows JavaScript execution, default ✅'),
         ),
-      );
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            html,
+            factoryBuilder: () => _WidgetFactory(
+              webView: webView,
+              webViewJs: webViewJs,
+            ),
+            rebuildTriggers: [webView, webViewJs],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _WidgetFactory extends WidgetFactory {

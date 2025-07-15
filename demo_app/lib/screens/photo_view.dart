@@ -9,42 +9,42 @@ class PhotoViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Inline'),
-                Tab(text: 'Popup'),
-              ],
-            ),
-            title: const Text('PhotoViewScreen'),
-          ),
-          body: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: HtmlWidget(
-                    custom_widget_builder.kHtml,
-                    factoryBuilder: () => _InlinePhotoViewWidgetFactory(),
-                  ),
-                ),
-              ),
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: HtmlWidget(
-                    custom_widget_builder.kHtml,
-                    factoryBuilder: () => _PopupPhotoViewWidgetFactory(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    length: 2,
+    child: Scaffold(
+      appBar: AppBar(
+        bottom: const TabBar(
+          tabs: [
+            Tab(text: 'Inline'),
+            Tab(text: 'Popup'),
+          ],
         ),
-      );
+        title: const Text('PhotoViewScreen'),
+      ),
+      body: TabBarView(
+        physics: const NeverScrollableScrollPhysics(),
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: HtmlWidget(
+                custom_widget_builder.kHtml,
+                factoryBuilder: () => _InlinePhotoViewWidgetFactory(),
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: HtmlWidget(
+                custom_widget_builder.kHtml,
+                factoryBuilder: () => _PopupPhotoViewWidgetFactory(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _InlinePhotoViewWidgetFactory extends WidgetFactory {

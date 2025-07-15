@@ -12,7 +12,8 @@ void main() {
 }
 
 void _onLogRecord(LogRecord record) {
-  final prefix = '${record.time.toIso8601String().substring(11)} '
+  final prefix =
+      '${record.time.toIso8601String().substring(11)} '
       '${record.loggerName}@${record.level.name} ';
   debugPrint('$prefix${record.message}');
 
@@ -28,15 +29,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PopupMenuStateProvider(
-        builder: (context) => MaterialApp(
-          title: 'Flutter Widget from HTML',
-          theme: FlexThemeData.light(scheme: FlexScheme.blueM3),
-          darkTheme: FlexThemeData.dark(scheme: FlexScheme.blueM3),
-          showPerformanceOverlay: context.showPerformanceOverlay,
+    builder: (context) => MaterialApp(
+      title: 'Flutter Widget from HTML',
+      theme: FlexThemeData.light(scheme: FlexScheme.blueM3),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.blueM3),
+      showPerformanceOverlay: context.showPerformanceOverlay,
 
-          // let HomeScreen handle all the routings
-          initialRoute: '/',
-          onGenerateRoute: HomeScreen.onGenerateRoute,
-        ),
-      );
+      // let HomeScreen handle all the routings
+      initialRoute: '/',
+      onGenerateRoute: HomeScreen.onGenerateRoute,
+    ),
+  );
 }
