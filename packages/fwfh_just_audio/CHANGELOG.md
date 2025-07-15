@@ -2,7 +2,7 @@
 
 - Requires Flutter 3.27 (#1448)
 - Requires just_audio@0.10.4 (#1448)
-- Add support for flutter_widget_from_html_core@0.17.0 (#1405)
+- Add support for flutter_widget_from_html_core@0.17.0 (#1475)
 
 ## 0.16.0
 
