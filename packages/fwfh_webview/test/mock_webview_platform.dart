@@ -204,8 +204,7 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   }
 
   @override
-  Future<void> setMixedContentMode(MixedContentMode mode) =>
-      throw UnimplementedError();
+  Future<void> setMixedContentMode(dynamic mode) => throw UnimplementedError();
 
   @override
   Future<void> setOnShowFileSelector(
