@@ -23,6 +23,7 @@ jobs:
         uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046 # v2.19.0
         with:
           cache: true
+          flutter-version: 3.29.0
       - uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4.3.1
         with:
           # only update gradle cache from demo_app.yml jobs
@@ -33,7 +34,7 @@ jobs:
         run: |
           set -e
 
-          dart pub global activate patrol_cli
+          dart pub global activate patrol_cli 3.6.0
 
           cd demo_app
           flutter build apk --config-only
@@ -70,6 +71,7 @@ jobs:
         uses: subosito/flutter-action@e938fdf56512cc96ef2f93601a5a40bde3801046 # v2.19.0
         with:
           cache: true
+          flutter-version: 3.29.0
 
       - name: Unlock Fastlane secrets
         env:
@@ -84,7 +86,7 @@ jobs:
         run: |
           set -e
 
-          dart pub global activate patrol_cli
+          dart pub global activate patrol_cli 3.6.0
 
           cd demo_app/ios
           fastlane patrol_build
