@@ -1,3 +1,7 @@
+## 0.16.1
+
+- Fix `text-align: center` inside tables (#1451)
+
 ## 0.16.0
 
 - Requires Flutter 3.22 (#1403)
