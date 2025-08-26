@@ -172,7 +172,7 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   __FakeAndroidWebViewController(super.params);
 
   @override
-  Future<bool> isWebViewFeatureSupported(WebViewFeatureType featureType) =>
+  Future<bool> isWebViewFeatureSupported(dynamic featureType) =>
       throw UnimplementedError();
 
   @override
