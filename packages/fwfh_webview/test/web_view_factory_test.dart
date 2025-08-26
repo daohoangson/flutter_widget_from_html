@@ -318,6 +318,61 @@ void main() {
     });
   });
 
+  group('data-src attribute', () {
+    testWidgets('renders with data-src', (tester) async {
+      const html = '<iframe data-src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=$defaultAspectRatio,js=true,gestureRecognizers={}]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('data-src takes priority over src', (tester) async {
+      const dataSrcUrl = 'http://data-src.com';
+      const html = '<iframe data-src="$dataSrcUrl" src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$dataSrcUrl,aspectRatio=$defaultAspectRatio,js=true,gestureRecognizers={}]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('falls back to src when data-src is empty', (tester) async {
+      const html = '<iframe data-src="" src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=$defaultAspectRatio,js=true,gestureRecognizers={}]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('falls back to src when data-src is missing', (tester) async {
+      const html = '<iframe src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[WebView:url=$src,aspectRatio=$defaultAspectRatio,js=true,gestureRecognizers={}]'
+          ']',
+        ),
+      );
+    });
+  });
+
   group('errors', () {
     testWidgets('no src', (tester) async {
       const html = '<iframe></iframe>';
@@ -327,6 +382,12 @@ void main() {
 
     testWidgets('bad src (cannot build full url)', (tester) async {
       const html = '<iframe src="bad"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('bad data-src (cannot build full url)', (tester) async {
+      const html = '<iframe data-src="bad"></iframe>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
