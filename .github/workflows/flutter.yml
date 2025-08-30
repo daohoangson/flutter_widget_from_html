@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0 # for SonarCloud
 
-      - uses: actions/dependency-review-action@bc41886e18ea39df68b1b1245f4184881938e050 # v4.7.2
+      - uses: actions/dependency-review-action@595b5aeba73380359d98a5e087f648dbb0edce1b # v4.7.3
         if: github.base_ref
 
       - name: Setup Flutter
@@ -48,6 +48,6 @@ jobs:
           name: failures
           path: "**/failures/"
 
-      - uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9 # v5.3.0
+      - uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25 # v5.3.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
