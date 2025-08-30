@@ -318,6 +318,32 @@ void main() {
     });
   });
 
+  group('data-src attribute', () {
+    testWidgets('renders with data-src', (tester) async {
+      const html = '<iframe data-src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('url=$src,'));
+    });
+
+    testWidgets('src takes priority over data-src', (tester) async {
+      const html = '<iframe data-src="$src/1" src="$src/2"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('url=$src/2,'));
+    });
+
+    testWidgets('falls back to data-src when src is empty', (tester) async {
+      const html = '<iframe data-src="$src" src=""></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('url=$src,'));
+    });
+
+    testWidgets('uses src when data-src is missing', (tester) async {
+      const html = '<iframe src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('url=$src,'));
+    });
+  });
+
   group('errors', () {
     testWidgets('no src', (tester) async {
       const html = '<iframe></iframe>';
@@ -327,6 +353,12 @@ void main() {
 
     testWidgets('bad src (cannot build full url)', (tester) async {
       const html = '<iframe src="bad"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('bad data-src (cannot build full url)', (tester) async {
+      const html = '<iframe data-src="bad"></iframe>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
