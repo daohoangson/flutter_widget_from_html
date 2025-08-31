@@ -602,6 +602,48 @@ Future<void> main() async {
           );
         });
       });
+
+      group('string literals', () {
+        testWidgets('renders double quoted string', (WidgetTester tester) async {
+          const html = '<ul style="list-style-type: &quot;① &quot;"><li>Foo</li></ul>';
+          final explained = await explain(tester, html);
+          expect(explained, equals(padding(item('① ', 'Foo'))));
+        });
+
+        testWidgets('renders single quoted string', (WidgetTester tester) async {
+          const html = "<ul style=\"list-style-type: '② '\"><li>Bar</li></ul>";
+          final explained = await explain(tester, html);
+          expect(explained, equals(padding(item('② ', 'Bar'))));
+        });
+
+        testWidgets('renders complex string with symbols', (WidgetTester tester) async {
+          const html = '<ul style="list-style-type: &quot;★ &quot;"><li>Special</li></ul>';
+          final explained = await explain(tester, html);
+          expect(explained, equals(padding(item('★ ', 'Special'))));
+        });
+
+        testWidgets('renders empty string', (WidgetTester tester) async {
+          const html = '<ul style="list-style-type: &quot;&quot;"><li>Empty</li></ul>';
+          final explained = await explain(tester, html);
+          expect(explained, equals(padding('[RichText:(:Empty)]')));
+        });
+
+        testWidgets('renders string on ordered list', (WidgetTester tester) async {
+          const html = '<ol style="list-style-type: &quot;Step &quot;"><li>One</li><li>Two</li></ol>';
+          final explained = await explain(tester, html);
+          expect(
+            explained,
+            equals(
+              padding(
+                list([
+                  item('Step ', 'One'),
+                  item('Step ', 'Two'),
+                ]),
+              ),
+            ),
+          );
+        });
+      });
     });
 
     group('padding-inline-start', () {
