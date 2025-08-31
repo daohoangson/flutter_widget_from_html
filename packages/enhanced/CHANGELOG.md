@@ -1,3 +1,9 @@
+## 0.17.1
+
+- Add support for Flutter 3.35 (#1498)
+- Add support for webview_flutter_android@4.8 (#1498)
+- Add support for `data-src` attribute in IFRAME (#1497)
+
 ## 0.17.0
 
 - Requires Flutter 3.32 (#1475)
