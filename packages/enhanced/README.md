@@ -84,14 +84,23 @@ HtmlWidget(
       // render a custom widget inline with surrounding text
       return InlineCustomWidget(
         child: FizzBuzzWidget(),
-      )
+      );
     }
 
     return null;
   },
 
   // this callback will be triggered when user taps a link
-  onTapUrl: (url) => print('tapped $url'),
+  // return true to indicate the tap has been handled
+  onTapUrl: (url) {
+    debugPrint('tapped $url');
+    return true;
+  },
+
+  // this callback will be triggered when user taps an image
+  onTapImage: (image) {
+    debugPrint('image tapped: \'${image.sources.first.url}\'');
+  },
 
   // select the render mode for HTML body
   // by default, a simple `Column` is rendered
@@ -102,6 +111,13 @@ HtmlWidget(
   textStyle: TextStyle(fontSize: 14),
 ),
 ```
+
+## Callbacks
+
+- onTapUrl: return `true` to indicate the URL tap was handled; when not handled and the URL is an in-page anchor (e.g. `#id` or `${baseUrl}#id`), it scrolls to the anchor automatically.
+- onTapImage: receives `ImageMetadata`; access the first source via `image.sources.first.url`.
+- onLoadingBuilder: shown while the widget/image is loading; receives `loadingProgress` (0.0–1.0 or null).
+- onErrorBuilder: shown when a complex element fails to render; receives the thrown `error`.
 
 ## Features
 
@@ -203,6 +219,6 @@ These tags and their contents will be ignored:
 
 The [core](https://pub.dev/packages/flutter_widget_from_html_core) package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize.
 
-See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/v0.14.2/docs/extensibility.md) for detailed information.
+See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
 
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
