@@ -484,7 +484,7 @@ Future<void> main() async {
         equals(
           '[RichText:(:Foo '
           '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           '])]',
         ),
       );
@@ -501,7 +501,7 @@ Future<void> main() async {
           '[CssBlock:child=[RichText:align=center,'
           '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child='
           '[AspectRatio:aspectRatio=1.0,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]'
           '@middle]]',
         ),

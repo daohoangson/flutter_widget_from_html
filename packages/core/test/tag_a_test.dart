@@ -271,7 +271,7 @@ void main() {
         equals(
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]]',
         ),
       );
@@ -287,7 +287,7 @@ void main() {
           '(#FF123456+u+onTap:Foo )'
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]])]',
         ),
       );
@@ -302,7 +302,7 @@ void main() {
           '[RichText:(:Foo '
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]])]',
         ),
       );
@@ -317,7 +317,7 @@ void main() {
           '[RichText:(:'
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]]'
           '(#FF123456+u+onTap: foo)'
           ')]',
@@ -334,7 +334,7 @@ void main() {
           '[RichText:(:'
           '[MouseRegion:child=[GestureDetector:child='
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
           ']]]'
           '(: foo))]',
         ),

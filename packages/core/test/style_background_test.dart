@@ -116,7 +116,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[Container:image=NetworkImage("$src", scale: 1.0),child='
+          '[Container:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null),child='
           '[CssBlock:child=[RichText:(:Foo)]]'
           ']',
         ),
