@@ -169,17 +169,17 @@ class BuildOp {
         (onWidgets != null
             ? (tree, placeholder) {
                 final children = onWidgets(tree, [placeholder]);
-                switch (children?.length) {
-                  case null:
-                    return placeholder;
-                  case 0:
-                    return widget0;
-                  case 1:
-                    return children?.first ?? widget0;
-                  default:
-                    throw UnsupportedError(
-                      'onWidgets must return exactly 1 widget, got ${children?.length}',
-                    );
+                final length = children?.length;
+                if (length == null) {
+                  return placeholder;
+                } else if (length == 0) {
+                  return widget0;
+                } else if (length == 1) {
+                  return children!.first;
+                } else {
+                  throw UnsupportedError(
+                    'onWidgets must return exactly 1 widget, got $length',
+                  );
                 }
               }
             : null);
