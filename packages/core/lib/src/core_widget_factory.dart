@@ -383,6 +383,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       return buildText(tree, resolved, TextSpan(style: textStyle, text: text));
     }
 
+    // If text is empty and listStyleType is not a predefined type,
+    // treat it as an empty string literal (no marker)
+    if (!_isPredefinedListStyleType(listStyleType)) {
+      return null;
+    }
+
     switch (listStyleType) {
       case kCssListStyleTypeCircle:
         return HtmlListMarker.circle(textStyle);
@@ -394,6 +400,23 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       default:
         return HtmlListMarker.disc(textStyle);
     }
+  }
+
+  /// Checks if the given list style type is a predefined CSS keyword.
+  bool _isPredefinedListStyleType(String type) {
+    return const {
+      kCssListStyleTypeAlphaLower,
+      kCssListStyleTypeAlphaLatinLower,
+      kCssListStyleTypeAlphaUpper,
+      kCssListStyleTypeAlphaLatinUpper,
+      kCssListStyleTypeCircle,
+      kCssListStyleTypeDecimal,
+      kCssListStyleTypeDisc,
+      kCssListStyleTypeNone,
+      kCssListStyleTypeRomanLower,
+      kCssListStyleTypeRomanUpper,
+      kCssListStyleTypeSquare,
+    }.contains(type);
   }
 
   /// Builds [Padding].
@@ -550,10 +573,19 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final roman = intToRomanNumerals(i);
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeNone:
-      default:
+      case kCssListStyleTypeCircle:
+      case kCssListStyleTypeDisc:
+      case kCssListStyleTypeSquare:
+        // These are handled by geometric markers in buildListMarker
         return '';
+      default:
+        // For any unrecognized type, treat it as a string literal
+        // CSS parser has already extracted the content if it was quoted
+        return type;
     }
   }
+
+
 
   /// Returns an [AssetImage].
   ImageProvider? imageProviderFromAsset(String url) {

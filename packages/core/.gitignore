@@ -1,6 +1,9 @@
 coverage/
 pubspec.lock
 
+# Test failures
+test/failures/
+
 # Miscellaneous
 *.class
 *.log
