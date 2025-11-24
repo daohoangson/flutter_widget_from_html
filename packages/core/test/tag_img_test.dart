@@ -23,7 +23,7 @@ void main() {
         explained,
         equals(
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
           ']',
         ),
       );
@@ -37,7 +37,7 @@ void main() {
         equals(
           '[CssSizing:$sizingConstraints,child='
           '[Image:'
-          'image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null),'
+          'image=NetworkImage("$src", scale: 1.0),'
           'semanticLabel=Foo'
           ']]',
         ),
@@ -54,7 +54,7 @@ void main() {
           '[Tooltip:'
           'message=Bar,'
           'child=[Image:'
-          'image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null),'
+          'image=NetworkImage("$src", scale: 1.0),'
           'semanticLabel=Bar'
           ']]]',
         ),
@@ -71,7 +71,7 @@ void main() {
           '[Tooltip:'
           'message=Bar,'
           'child=[Image:'
-          'image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null),'
+          'image=NetworkImage("$src", scale: 1.0),'
           'semanticLabel=Foo'
           ']]]',
         ),
@@ -86,10 +86,10 @@ void main() {
         equals(
           '[RichText:(:'
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: )'
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           ')]',
         ),
       );
@@ -115,7 +115,7 @@ void main() {
         equals(
           '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
           '[AspectRatio:aspectRatio=1.3,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
           ']]',
         ),
       );
@@ -130,7 +130,7 @@ void main() {
           '[RichText:(:'
           'Before text. '
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: After text.)'
           ')]',
         ),
@@ -144,7 +144,7 @@ void main() {
         explained,
         equals(
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]]',
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]',
         ),
       );
     });
@@ -284,7 +284,7 @@ void main() {
         explained,
         equals(
           '[CssSizing:$sizingConstraints,child='
-          '[Image:image=NetworkImage("$fullUrl", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+          '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
           ']',
         ),
       );

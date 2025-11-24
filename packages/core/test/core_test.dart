@@ -141,7 +141,7 @@ void main() {
           '[RichText:(:'
           '1\n'
           '[CssSizing:$imgSizingConstraints,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
           '])]',
         ),
       );
@@ -303,7 +303,7 @@ void main() {
           equals(
             '[SizedBox:0.0x10.0],'
             '[HorizontalMargin:left=40,right=40,child=[CssBlock:child=[Column:children='
-            '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0, webHtmlElementStrategy: never, headers: null)]],'
+            '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
             '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
             ']]],'
             '[SizedBox:0.0x10.0]',
@@ -930,7 +930,7 @@ void main() {
             equals(
               '[RichText:(:Foo '
               '[CssSizing:$imgSizingConstraints,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               '])]',
             ),
           );
@@ -948,7 +948,7 @@ void main() {
               '[Column:children='
               '[RichText:(:Foo)],'
               '[CssSizing:$imgSizingConstraints,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               ']]',
             ),
           );
@@ -965,7 +965,7 @@ void main() {
             equals(
               '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
               '[AspectRatio:aspectRatio=1.0,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               ']]',
             ),
           );
@@ -983,7 +983,7 @@ void main() {
             equals(
               '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
               '[AspectRatio:aspectRatio=1.0,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               ']]',
             ),
           );

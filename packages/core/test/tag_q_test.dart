@@ -33,7 +33,7 @@ void main() {
         equals(
           '[RichText:(:“'
           '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
-          '[Image:image=NetworkImage("$src", scale: 1.0, webHtmlElementStrategy: never, headers: null)]]'
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(:”))]',
         ),
       );
