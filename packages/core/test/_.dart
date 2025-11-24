@@ -162,7 +162,13 @@ Future<String> explainWithoutPumping({
   ).explain(built);
 
   str = str.replaceAll(RegExp('String#[^,]+,'), 'String,');
-  return str.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+  str = str.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+
+  // images
+  str = str.replaceAll(', headers: null', '');
+  str = str.replaceAll(', webHtmlElementStrategy: never', '');
+
+  return str;
 }
 
 final _explainMarginRegExp = RegExp(
