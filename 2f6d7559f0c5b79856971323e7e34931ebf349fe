@@ -1,0 +1,25 @@
+demo_app/pubspec.yaml
+  5362136563d9dddc 52-53
+.github/workflows/integration_test.yml
+  5362136563d9dddc 36,87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "2f6d7559f0c5b79856971323e7e34931ebf349fe",
+  "prompts": {
+    "5362136563d9dddc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8d60836-533d-4297-9f45-760c52177ed3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
