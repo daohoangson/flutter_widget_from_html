@@ -135,8 +135,7 @@ mixin WebViewFactory on WidgetFactory {
               final dataSrc = a[kAttributeIframeDataSrc];
               final srcAttr = a[kAttributeIframeSrc];
               final src = urlFull(
-                (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? '')
-              );
+                  (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? ''));
               if (src == null) {
                 return widgets;
               }

@@ -31,7 +31,6 @@ jobs:
         uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
         with:
           cache: true
-      - run: dart --version && dart format --set-exit-if-changed --output none .
       - name: Run chromedriver
         run: |
           set -e
@@ -39,6 +38,7 @@ jobs:
           chromedriver --port=4444 &
           echo CHROMEDRIVER_PORT_4444=yes >$GITHUB_ENV
       - run: ./tool/test.sh --coverage
+      - run: dart --version && dart format --set-exit-if-changed --output none .
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         if: failure()
         with:
