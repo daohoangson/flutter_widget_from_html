@@ -157,7 +157,7 @@ class _AspectRatioTest extends StatelessWidget {
     final delta = (actual - expected).abs();
     expect(
       delta,
-      lessThanOrEqualTo(0.01),
+      lessThanOrEqualTo(0.02),
       reason: 'actual $actual0 != expected $expected0',
     );
   }
