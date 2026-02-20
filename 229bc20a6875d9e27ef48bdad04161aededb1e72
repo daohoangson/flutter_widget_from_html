@@ -1,0 +1,23 @@
+packages/core/lib/src/internal/ops/style_text_decoration.dart
+  8e2b4b8065b86d75 15-16,22-25,59-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "229bc20a6875d9e27ef48bdad04161aededb1e72",
+  "prompts": {
+    "8e2b4b8065b86d75": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f99b9e1a-f215-4e87-9321-5a8b83690329",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 18,
+      "total_deletions": 1,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
