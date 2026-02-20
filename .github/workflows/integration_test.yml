@@ -33,7 +33,7 @@ jobs:
         run: |
           set -e
 
-          dart pub global activate patrol_cli
+          dart pub global activate patrol_cli 4.1.0
 
           cd demo_app
           flutter build apk --config-only
@@ -84,7 +84,7 @@ jobs:
         run: |
           set -e
 
-          dart pub global activate patrol_cli
+          dart pub global activate patrol_cli 4.1.0
 
           cd demo_app/ios
           fastlane patrol_build
