@@ -47,11 +47,11 @@ jobs:
         run: |
           set -e
 
-          cd demo_app
-          export ANDROID_DEVICE_MODEL=redfin
-          export ANDROID_DEVICE_VERSION=30
+          # https://github.com/leancodepl/patrol/blob/1e24994/.github/workflows/test-android-device.yaml#L28
+          export ANDROID_DEVICE_MODEL=shiba
+          export ANDROID_DEVICE_VERSION=34
 
-          # https://github.com/leancodepl/patrol/blob/master/dev/e2e_app/run_android_testlab
+          cd demo_app
           gcloud firebase test android run \
             --app build/app/outputs/apk/debug/app-debug.apk \
             --client-details matrixLabel="GitHub #${{ github.run_id }}" \
@@ -97,10 +97,10 @@ jobs:
         run: |
           set -e
 
-          export IOS_DEVICE_MODEL=iphone13pro
+          # https://github.com/leancodepl/patrol/blob/1e24994/.github/workflows/test-ios-device.yaml#L24
+          export IOS_DEVICE_MODEL=iphone14pro
           export IOS_DEVICE_VERSION=16.6
 
-          # https://github.com/leancodepl/patrol/blob/master/dev/e2e_app/run_ios_testlab
           cd demo_app/build/ios_integ/Build/Products
           zip -r ios_tests.zip Release-iphoneos/*.app *.xctestrun
 
