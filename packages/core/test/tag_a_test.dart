@@ -381,7 +381,8 @@ void main() {
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/1547
   group('#1547: customStylesBuilder text-decoration on A tag', () {
-    testWidgets('line-through should override default underline', (tester) async {
+    testWidgets('line-through should override default underline',
+        (tester) async {
       const html = '<a href="$kHref">Foo</a>';
       final explained = await explain(
         tester,
