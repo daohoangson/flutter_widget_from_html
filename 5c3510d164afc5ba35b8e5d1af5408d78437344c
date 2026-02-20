@@ -1,0 +1,25 @@
+demo_app/ios/fastlane/Fastfile
+  5362136563d9dddc 37
+.github/workflows/integration_test.yml
+  5362136563d9dddc 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "5c3510d164afc5ba35b8e5d1af5408d78437344c",
+  "prompts": {
+    "5362136563d9dddc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8d60836-533d-4297-9f45-760c52177ed3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
