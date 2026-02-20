@@ -135,12 +135,11 @@ class _PopupMenuState {
   _PopupMenuState copyWith({
     bool? isSelectable,
     bool? showPerformanceOverlay,
-  }) =>
-      _PopupMenuState(
-        isSelectable: isSelectable ?? this.isSelectable,
-        showPerformanceOverlay:
-            showPerformanceOverlay ?? this.showPerformanceOverlay,
-      );
+  }) => _PopupMenuState(
+    isSelectable: isSelectable ?? this.isSelectable,
+    showPerformanceOverlay:
+        showPerformanceOverlay ?? this.showPerformanceOverlay,
+  );
 }
 
 enum _PopupMenuValue {

@@ -8,16 +8,16 @@ class CustomStylesBuilderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('CustomStylesBuilderScreen'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            kHtml,
-            customStylesBuilder: (e) =>
-                e.classes.contains('name') ? {'color': 'red'} : null,
-          ),
-        ),
-      );
+    appBar: AppBar(
+      title: const Text('CustomStylesBuilderScreen'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: HtmlWidget(
+        kHtml,
+        customStylesBuilder: (e) =>
+            e.classes.contains('name') ? {'color': 'red'} : null,
+      ),
+    ),
+  );
 }

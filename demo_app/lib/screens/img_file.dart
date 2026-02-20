@@ -10,31 +10,31 @@ class ImgFileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'PNG'),
-                Tab(text: 'SVG'),
-              ],
-            ),
-            title: const Text('ImgFileScreen'),
-          ),
-          body: const TabBarView(
-            children: <Widget>[
-              _ImgFileTab(
-                assetKey: 'logos/icon.png',
-                fileExtension: 'png',
-              ),
-              _ImgFileTab(
-                assetKey: 'packages/fwfh_svg/test/images/icon.svg',
-                fileExtension: 'svg',
-              ),
-            ],
-          ),
+    length: 2,
+    child: Scaffold(
+      appBar: AppBar(
+        bottom: const TabBar(
+          tabs: [
+            Tab(text: 'PNG'),
+            Tab(text: 'SVG'),
+          ],
         ),
-      );
+        title: const Text('ImgFileScreen'),
+      ),
+      body: const TabBarView(
+        children: <Widget>[
+          _ImgFileTab(
+            assetKey: 'logos/icon.png',
+            fileExtension: 'png',
+          ),
+          _ImgFileTab(
+            assetKey: 'packages/fwfh_svg/test/images/icon.svg',
+            fileExtension: 'svg',
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _ImgFileTab extends StatefulWidget {
@@ -62,61 +62,61 @@ class _ImgFileState extends State<_ImgFileTab> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: status,
-        builder: (_, __) {
-          switch (status.value) {
-            case _ImgFileStatus.idle:
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'This test will write a ${widget.fileExtension} into '
-                      'the file system then try to render with an IMG tag. '
-                      'The actual file path is semi-random and it should be '
-                      'unique across tests (switch tab to re-test).',
-                    ),
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: _writeFile,
-                      child: const Text('Write file'),
-                    ),
-                  ),
-                ],
-              );
-            case _ImgFileStatus.writeFileWriting:
-              return const Center(child: CircularProgressIndicator());
-            case _ImgFileStatus.writeFileSuccess:
-              return FutureBuilder<File>(
-                builder: (_, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+    animation: status,
+    builder: (_, _) {
+      switch (status.value) {
+        case _ImgFileStatus.idle:
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'This test will write a ${widget.fileExtension} into '
+                  'the file system then try to render with an IMG tag. '
+                  'The actual file path is semi-random and it should be '
+                  'unique across tests (switch tab to re-test).',
+                ),
+              ),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _writeFile,
+                  child: const Text('Write file'),
+                ),
+              ),
+            ],
+          );
+        case _ImgFileStatus.writeFileWriting:
+          return const Center(child: CircularProgressIndicator());
+        case _ImgFileStatus.writeFileSuccess:
+          return FutureBuilder<File>(
+            builder: (_, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final file = snapshot.requireData;
-                  final html =
-                      '<img src="file://${file.path}" width="48" height="48" />';
+              final file = snapshot.requireData;
+              final html =
+                  '<img src="file://${file.path}" width="48" height="48" />';
 
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(html),
-                        HtmlWidget(html),
-                      ],
-                    ),
-                  );
-                },
-                future: file,
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(html),
+                    HtmlWidget(html),
+                  ],
+                ),
               );
-            case _ImgFileStatus.writeFileError:
-              return const Center(child: Text('Unable to write file'));
-          }
-        },
-      );
+            },
+            future: file,
+          );
+        case _ImgFileStatus.writeFileError:
+          return const Center(child: Text('Unable to write file'));
+      }
+    },
+  );
 
   Future<void> _writeFile() async {
     assert(status.value == _ImgFileStatus.idle);

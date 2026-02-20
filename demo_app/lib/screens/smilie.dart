@@ -13,17 +13,17 @@ class SmilieScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('SmilieScreen'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            kHtml,
-            factoryBuilder: () => _SmiliesWidgetFactory(),
-          ),
-        ),
-      );
+    appBar: AppBar(
+      title: const Text('SmilieScreen'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: HtmlWidget(
+        kHtml,
+        factoryBuilder: () => _SmiliesWidgetFactory(),
+      ),
+    ),
+  );
 }
 
 class _SmiliesWidgetFactory extends WidgetFactory {

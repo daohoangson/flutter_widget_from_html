@@ -172,6 +172,10 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   __FakeAndroidWebViewController(super.params);
 
   @override
+  Future<bool> isWebViewFeatureSupported(dynamic featureType) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> setAllowContentAccess(bool enabled) =>
       throw UnimplementedError();
 
@@ -204,10 +208,17 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   }
 
   @override
+  Future<void> setMixedContentMode(dynamic mode) => throw UnimplementedError();
+
+  @override
   Future<void> setOnShowFileSelector(
     Future<List<String>> Function(FileSelectorParams params)?
         onShowFileSelector,
   ) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setPaymentRequestEnabled(bool enabled) =>
       throw UnimplementedError();
 
   @override

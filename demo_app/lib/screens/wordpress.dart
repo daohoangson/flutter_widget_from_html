@@ -18,21 +18,21 @@ class WordpressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('WordPressScreen'),
-        ),
-        body: ListView(
-          children: sites.entries
-              .map(
-                (e) => ListTile(
-                  onTap: () => PostsScreen.pushRoute(context, e.key, e.value),
-                  subtitle: Text(e.value),
-                  title: Text(e.key),
-                ),
-              )
-              .toList(growable: false),
-        ),
-      );
+    appBar: AppBar(
+      title: const Text('WordPressScreen'),
+    ),
+    body: ListView(
+      children: sites.entries
+          .map(
+            (e) => ListTile(
+              onTap: () => PostsScreen.pushRoute(context, e.key, e.value),
+              subtitle: Text(e.value),
+              title: Text(e.key),
+            ),
+          )
+          .toList(growable: false),
+    ),
+  );
 }
 
 class PostsScreen extends StatelessWidget {
@@ -43,9 +43,9 @@ class PostsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(title ?? domain)),
-        body: _PostsList('https://$domain/wp-json/wp/v2/posts?_embed'),
-      );
+    appBar: AppBar(title: Text(title ?? domain)),
+    body: _PostsList('https://$domain/wp-json/wp/v2/posts?_embed'),
+  );
 
   static void pushRoute(BuildContext context, String title, String domain) =>
       Navigator.of(context).push(
@@ -96,9 +96,9 @@ class _PostScreen extends StatelessWidget {
     );
   }
 
-  static void pushRoute(BuildContext context, _Post post) =>
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => _PostScreen(post)));
+  static void pushRoute(BuildContext context, _Post post) => Navigator.of(
+    context,
+  ).push(MaterialPageRoute(builder: (_) => _PostScreen(post)));
 }
 
 class _PostsList extends StatefulWidget {
@@ -124,18 +124,18 @@ class _PostsState extends State<_PostsList> {
 
   @override
   Widget build(BuildContext context) => FutureBuilder<List<_Post>>(
-        builder: (context, snapshot) => snapshot.hasData
-            ? _build(snapshot.requireData)
-            : snapshot.hasError
-                ? Text(snapshot.error.toString())
-                : const Center(child: CircularProgressIndicator()),
-        future: posts,
-      );
+    builder: (context, snapshot) => snapshot.hasData
+        ? _build(snapshot.requireData)
+        : snapshot.hasError
+        ? Text(snapshot.error.toString())
+        : const Center(child: CircularProgressIndicator()),
+    future: posts,
+  );
 
   Widget _build(List<_Post> posts) => ListView.builder(
-        itemBuilder: (context, index) => _buildItem(posts[index]),
-        itemCount: posts.length,
-      );
+    itemBuilder: (context, index) => _buildItem(posts[index]),
+    itemCount: posts.length,
+  );
 
   Widget _buildItem(_Post post) {
     final featuredMedia = post.featuredMedia;
@@ -195,21 +195,20 @@ class _Post {
   });
 
   static _Post? fromJson(Map json) {
-    if (json
-        case {
-          'content': {
-            'rendered': final String content,
-          },
-          'excerpt': {
-            'rendered': final String excerpt,
-          },
-          'id': final int id,
-          'link': final String link,
-          'title': {
-            'rendered': final String title,
-          },
-          '_embedded': final Map embedded,
-        }) {
+    if (json case {
+      'content': {
+        'rendered': final String content,
+      },
+      'excerpt': {
+        'rendered': final String excerpt,
+      },
+      'id': final int id,
+      'link': final String link,
+      'title': {
+        'rendered': final String title,
+      },
+      '_embedded': final Map embedded,
+    }) {
       _Media? featuredMedia;
       if (embedded case {'wp:featuredmedia': [final Map featuredMediaJson]}) {
         featuredMedia = _Media.fromJson(featuredMediaJson);
@@ -244,19 +243,18 @@ class _Media {
   });
 
   static _Media? fromJson(Map json) {
-    if (json
-        case {
-          'media_details': {
-            'height': final int height,
-            'width': final int width,
-            'sizes': {
-              'thumbnail': {
-                'source_url': final String thumbnail,
-              },
-            },
+    if (json case {
+      'media_details': {
+        'height': final int height,
+        'width': final int width,
+        'sizes': {
+          'thumbnail': {
+            'source_url': final String thumbnail,
           },
-          'source_url': final String sourceUrl,
-        }) {
+        },
+      },
+      'source_url': final String sourceUrl,
+    }) {
       return _Media(
         height: height,
         sourceUrl: sourceUrl,

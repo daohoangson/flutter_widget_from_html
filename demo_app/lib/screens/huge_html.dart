@@ -5189,80 +5189,80 @@ class HugeHtmlScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('HugeHtmlScreen'),
-          actions: const [PopupMenu()],
+    appBar: AppBar(
+      title: const Text('HugeHtmlScreen'),
+      actions: const [PopupMenu()],
+    ),
+    body: ListView(
+      children: [
+        ListTile(
+          title: const Text('renderMode: Column'),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => _ColumnScreen()),
+          ),
         ),
-        body: ListView(
-          children: [
-            ListTile(
-              title: const Text('renderMode: Column'),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => _ColumnScreen()),
-              ),
-            ),
-            ListTile(
-              title: const Text('renderMode: ListView'),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => _ListViewScreen()),
-              ),
-            ),
-            ListTile(
-              title: const Text('renderMode: SliverList'),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => _SliverListScreen()),
-              ),
-            ),
-          ],
+        ListTile(
+          title: const Text('renderMode: ListView'),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => _ListViewScreen()),
+          ),
         ),
-      );
+        ListTile(
+          title: const Text('renderMode: SliverList'),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => _SliverListScreen()),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ColumnScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('renderMode: Column')),
-        body: const SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: RepaintBoundary(
-              child: HtmlWidget(kHtml),
-            ),
-          ),
+    appBar: AppBar(title: const Text('renderMode: Column')),
+    body: const SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: RepaintBoundary(
+          child: HtmlWidget(kHtml),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _ListViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('renderMode: ListView')),
-        body: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: HtmlWidget(kHtml, renderMode: RenderMode.listView),
-        ),
-      );
+    appBar: AppBar(title: const Text('renderMode: ListView')),
+    body: const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: HtmlWidget(kHtml, renderMode: RenderMode.listView),
+    ),
+  );
 }
 
 class _SliverListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              title: Text('renderMode: SliverList'),
-              floating: true,
-              expandedHeight: 200,
-              flexibleSpace: Placeholder(),
-            ),
-            SliverPadding(
-              padding: EdgeInsets.all(8.0),
-              sliver: HtmlWidget(kHtml, renderMode: RenderMode.sliverList),
-            ),
-          ],
+    body: CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          title: Text('renderMode: SliverList'),
+          floating: true,
+          expandedHeight: 200,
+          flexibleSpace: Placeholder(),
         ),
-      );
+        SliverPadding(
+          padding: EdgeInsets.all(8.0),
+          sliver: HtmlWidget(kHtml, renderMode: RenderMode.sliverList),
+        ),
+      ],
+    ),
+  );
 }

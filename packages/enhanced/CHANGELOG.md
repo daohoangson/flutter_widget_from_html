@@ -1,3 +1,18 @@
+## 0.17.1
+
+- Add support for Flutter 3.35 (#1498)
+- Add support for webview_flutter_android@4.8 (#1498)
+- Add support for `data-src` attribute in IFRAME (#1497)
+
+## 0.17.0
+
+- Requires Flutter 3.32 (#1475)
+- Requires just_audio@0.10.4 (#1448)
+- Add support for video_player_platform_interface@6.3.0 (#1475)
+- Add support for webview_flutter_android@4.6.0 (#1475)
+- Add support for webview_flutter_wkwebview@3.20.0 (#1452)
+- Fix `text-align: center` inside tables (#1451)
+
 ## 0.16.0
 
 - Requires Flutter 3.22 (#1403)

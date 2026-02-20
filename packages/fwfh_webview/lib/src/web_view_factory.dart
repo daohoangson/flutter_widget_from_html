@@ -132,7 +132,11 @@ mixin WebViewFactory on WidgetFactory {
               }
 
               final a = meta.element.attributes;
-              final src = urlFull(a[kAttributeIframeSrc] ?? '');
+              final dataSrc = a[kAttributeIframeDataSrc];
+              final srcAttr = a[kAttributeIframeSrc];
+              final src = urlFull(
+                (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? '')
+              );
               if (src == null) {
                 return widgets;
               }
