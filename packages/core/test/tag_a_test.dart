@@ -378,4 +378,45 @@ void main() {
       });
     });
   });
+
+  // https://github.com/daohoangson/flutter_widget_from_html/issues/1547
+  group('#1547: customStylesBuilder text-decoration on A tag', () {
+    testWidgets('line-through should override default underline',
+        (tester) async {
+      const html = '<a href="$kHref">Foo</a>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          customStylesBuilder: (element) => switch (element.localName) {
+            'a' => {'text-decoration': 'line-through'},
+            _ => null,
+          },
+          key: hwKey,
+        ),
+      );
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1547
+      // customStylesBuilder should override the default underline
+      expect(explained, equals('[RichText:(#FF123456+l+onTap:Foo)]'));
+    });
+
+    testWidgets('none removes default underline', (tester) async {
+      const html = '<a href="$kHref">Foo</a>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          customStylesBuilder: (element) => switch (element.localName) {
+            'a' => {'text-decoration': 'none'},
+            _ => null,
+          },
+          key: hwKey,
+        ),
+      );
+      // text-decoration: none correctly removes the default underline
+      expect(explained, equals('[RichText:(#FF123456+onTap:Foo)]'));
+    });
+  });
 }
