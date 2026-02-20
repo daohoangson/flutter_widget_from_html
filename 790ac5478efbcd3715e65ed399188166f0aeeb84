@@ -1,0 +1,23 @@
+demo_app/patrol_test/auto_resize_test.dart
+  5362136563d9dddc 160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "790ac5478efbcd3715e65ed399188166f0aeeb84",
+  "prompts": {
+    "5362136563d9dddc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8d60836-533d-4297-9f45-760c52177ed3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
