@@ -1,0 +1,23 @@
+.github/workflows/flutter.yml
+  a77cf0287b524233 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "7df0985408b356f0d01bde73cc4c7d6adf903fef",
+  "prompts": {
+    "a77cf0287b524233": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2eed76c5-dc9b-45ff-b364-19b8699ff4f3",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
