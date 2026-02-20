@@ -12,12 +12,18 @@ const kCssTextDecorationOverline = 'overline';
 const kCssTextDecorationUnderline = 'underline';
 
 void textDecorationApply(BuildTree tree, css.Declaration style) {
+  TextDecorationLine? mergedLine;
+
   for (final value in style.values) {
     if (style.property == kCssTextDecoration ||
         style.property == kCssTextDecorationLine) {
       final line = TextDecorationLine.tryParse(value);
       if (line != null) {
-        tree.inherit(textDecorationLine, line);
+        mergedLine = TextDecorationLine(
+          over: line.over ?? mergedLine?.over,
+          strike: line.strike ?? mergedLine?.strike,
+          under: line.under ?? mergedLine?.under,
+        );
         continue;
       }
     }
@@ -49,6 +55,17 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         continue;
       }
     }
+  }
+
+  if (mergedLine != null) {
+    tree.inherit(
+      textDecorationLine,
+      TextDecorationLine(
+        over: mergedLine.over ?? false,
+        strike: mergedLine.strike ?? false,
+        under: mergedLine.under ?? false,
+      ),
+    );
   }
 }
 
