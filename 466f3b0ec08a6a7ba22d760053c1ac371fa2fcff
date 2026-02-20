@@ -1,0 +1,23 @@
+demo_app/android/app/build.gradle.kts
+  69441c5c8f520ba0 21-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "466f3b0ec08a6a7ba22d760053c1ac371fa2fcff",
+  "prompts": {
+    "69441c5c8f520ba0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f64869f-74a9-43c0-8483-62e5919e5018",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 2,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
