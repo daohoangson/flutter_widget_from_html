@@ -22,6 +22,7 @@ const kCssTextDecorationStyleDotted = 'dotted';
 const kCssTextDecorationStyleDashed = 'dashed';
 const kCssTextDecorationStyleDouble = 'double';
 const kCssTextDecorationStyleSolid = 'solid';
+const kCssTextDecorationStyleWavy = 'wavy';
 
 const kCssTextOverflow = 'text-overflow';
 const kCssTextOverflowClip = 'clip';
@@ -62,6 +63,8 @@ TextDecorationStyle? tryParseTextDecorationStyle(css.Expression expression) {
       return TextDecorationStyle.double;
     case kCssTextDecorationStyleSolid:
       return TextDecorationStyle.solid;
+    case kCssTextDecorationStyleWavy:
+      return TextDecorationStyle.wavy;
   }
 
   return null;

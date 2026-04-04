@@ -214,6 +214,13 @@ foo</span></span></span>
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(+l/dotted:foo )(+l:bar))]'));
     });
+
+    testWidgets('renders wavy', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: underline; '
+          'text-decoration-style: wavy">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/wavy:foo)]'));
+    });
   });
 
   group('text-decoration-thickness', () {

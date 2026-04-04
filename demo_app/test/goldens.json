@@ -208,6 +208,7 @@
   "inline/text-decoration/style/dotted": "<span style=\"text-decoration: underline dotted\">foo</span>",
   "inline/text-decoration/style/dashed": "<span style=\"text-decoration: underline dashed\">foo</span>",
   "inline/text-decoration/style/double": "<span style=\"text-decoration: underline double\">foo</span>",
+  "inline/text-decoration/style/wavy": "<span style=\"text-decoration: underline wavy red\">foo</span>",
   "inline/text-decoration/thickness/thick": "<span style=\"text-decoration: underline 200%\">foo</span>",
   "inline/text-decoration/thickness/thin": "<span style=\"text-decoration: underline 50%\">foo</span>",
   "inline/text-decoration/underline": "<span style=\"text-decoration: underline\">under</span>",
