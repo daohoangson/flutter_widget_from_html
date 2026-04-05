@@ -8,7 +8,7 @@ const html = '''
 
 <p>Flutter is Google's mobile UI framework for crafting high-quality native interfaces on iOS and Android in record time. Flutter works with existing code, is used by developers and organizations around the world, and is free and open source.</p>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/fq4N0hgOWzU"></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fq4N0hgOWzU" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <h1>Filler text below</h1>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent neque nibh, interdum bibendum enim ut, varius pretium lacus. Sed ut hendrerit eros, blandit lacinia risus. Maecenas sit amet ullamcorper arcu, vitae bibendum eros. Morbi ipsum urna, elementum non dui eu, tristique hendrerit ipsum. Donec ullamcorper neque libero, eu fermentum purus ultrices ac. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam dictum justo vel urna viverra maximus.</p>
