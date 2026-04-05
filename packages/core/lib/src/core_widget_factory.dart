@@ -167,7 +167,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       image: image,
     );
 
-    var clipBehavior = Clip.none;
+    var clipBehavior = container?.clipBehavior ?? Clip.none;
     if (borderRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {

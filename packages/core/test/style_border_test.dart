@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -1207,6 +1208,47 @@ void main() {
           ']]',
         ),
       );
+    });
+
+    testWidgets('border-radius with background-color', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1090
+      const html =
+          '<section style="border-radius: 4px; background-color: red;">'
+          'Foo</section>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:color=#FFFF0000,'
+          'radius=[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0],child='
+          '[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
+      );
+
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
+          .firstWhere((c) => (c.decoration as BoxDecoration?)?.borderRadius != null);
+      expect(container.clipBehavior, equals(Clip.hardEdge));
+    });
+
+    testWidgets('border + border-radius with background-color', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1090
+      const html = '<section style="border: solid 2px red; '
+          'border-radius: 4px; background-color: blue;">Foo</section>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:border=2.0@solid#FFFF0000,color=#FF0000FF,'
+          'radius=[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0],child='
+          '[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
+      );
+
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
+          .firstWhere((c) => (c.decoration as BoxDecoration?)?.borderRadius != null);
+      expect(container.clipBehavior, equals(Clip.hardEdge));
     });
   });
 
