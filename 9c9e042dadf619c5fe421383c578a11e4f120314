@@ -1,0 +1,23 @@
+packages/core/test/src/utils/css_counter_style_test.dart
+  d5d663b2bffe657e 128-399,425
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "9c9e042dadf619c5fe421383c578a11e4f120314",
+  "prompts": {
+    "d5d663b2bffe657e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "873a340e-b37c-423f-8d9b-b72d20466c81",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 273,
+      "total_deletions": 13,
+      "accepted_lines": 273,
+      "overriden_lines": 0
+    }
+  }
+}
