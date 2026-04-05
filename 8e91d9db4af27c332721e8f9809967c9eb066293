@@ -1,0 +1,23 @@
+packages/core/lib/src/internal/ops/style_text_emphasis.dart
+  6a46d68edafb5811 209-211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "8e91d9db4af27c332721e8f9809967c9eb066293",
+  "prompts": {
+    "6a46d68edafb5811": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2204867-bf5f-48b0-be45-0a873feae733",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
