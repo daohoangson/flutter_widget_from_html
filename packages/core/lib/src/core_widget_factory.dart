@@ -1056,6 +1056,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         textDecorationApply(tree, style);
 
       case kCssTextEmphasis:
+      case kCssTextEmphasisColor:
       case kCssTextEmphasisStyle:
         textEmphasisApply(tree, style);
 

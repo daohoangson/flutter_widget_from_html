@@ -116,6 +116,33 @@ Future<void> main() async {
     });
   });
 
+  group('text-emphasis-color longhand', () {
+    testWidgets('standalone color with separate style', (tester) async {
+      const html = '<span style="text-emphasis-style: dot; '
+          'text-emphasis-color: crimson">Hi</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:${_em('H')}${_em('i')})]'));
+    });
+
+    testWidgets('color only without style produces no marks', (tester) async {
+      const html = '<span style="text-emphasis-color: red">Hi</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:Hi)]'));
+    });
+
+    testWidgets('inherited color from parent', (tester) async {
+      const html = '<div style="text-emphasis-color: blue">'
+          '<span style="text-emphasis-style: dot">Hi</span></div>';
+      final e = await explain(tester, html);
+      expect(
+        e,
+        equals(
+          '[CssBlock:child=[RichText:(:${_em('H')}${_em('i')})]]',
+        ),
+      );
+    });
+  });
+
   group('whitespace handling', () {
     testWidgets('skips space between words', (tester) async {
       const html = '<span style="text-emphasis: dot">a b</span>';

@@ -205,6 +205,7 @@ These tags and their contents will be ignored:
   - text-decoration-style: dotted/dashed/double/solid/wavy
   - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-emphasis: shorthand for style and color
+  - text-emphasis-color: `currentcolor`, hex values, `rgb()`, `hsl()` or named colors
   - text-emphasis-style: filled/open with dot/circle/double-circle/triangle/sesame, or custom string marks
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
 - text-shadow:

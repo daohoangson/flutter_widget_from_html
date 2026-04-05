@@ -1,6 +1,7 @@
 part of '../core_ops.dart';
 
 const kCssTextEmphasis = 'text-emphasis';
+const kCssTextEmphasisColor = 'text-emphasis-color';
 const kCssTextEmphasisStyle = 'text-emphasis-style';
 
 // Shape keywords.
@@ -27,18 +28,44 @@ const kCssTextEmphasisFillOpen = 'open';
 /// embedded before the ruby op reconstructs the tree). This is an acceptable
 /// degradation given Flutter has no concept of opposed-side annotation tracks.
 void textEmphasisApply(BuildTree tree, css.Declaration style) {
+  if (style.property == kCssTextEmphasisColor) {
+    for (final expr in style.values) {
+      final color = tryParseColor(expr)?.rawValue;
+      if (color != null) {
+        tree.inherit(_emphasisColorResolver, color);
+        return;
+      }
+    }
+    return;
+  }
+
   final emphasis = _parseEmphasis(style);
   if (emphasis == null) {
     return;
   }
 
   final (emphasisChar, markColor) = emphasis;
+  if (markColor != null) {
+    tree.inherit(_emphasisColorResolver, markColor);
+  }
   tree.register(
     BuildOp.v2(
       debugLabel: kCssTextEmphasis,
-      onParsed: (t) => _applyEmphasis(t, emphasisChar, markColor),
+      onParsed: (t) => _applyEmphasis(t, emphasisChar),
     ),
   );
+}
+
+InheritedProperties _emphasisColorResolver(
+  InheritedProperties resolving,
+  Color value,
+) =>
+    resolving.copyWith(value: _TextEmphasisColor(value));
+
+@immutable
+class _TextEmphasisColor {
+  final Color color;
+  const _TextEmphasisColor(this.color);
 }
 
 /// Returns `(glyphChar, optionalColor)` or `null` if the style carries no
@@ -124,7 +151,6 @@ String? _emphasisChar(String shape, bool open) {
 BuildTree _applyEmphasis(
   BuildTree tree,
   String emphasisChar,
-  Color? markColor,
 ) {
   // Preserve the original element so that structural checks like isRtTree
   // (which tests element.localName == 'rt') still pass after the replacement.
@@ -148,9 +174,7 @@ BuildTree _applyEmphasis(
           // inherit underlines, overlines, strikethroughs, or drop shadows
           // from the base text.
           rtTree.inherit(_clearEmphasisMarkStyle, true);
-          if (markColor != null) {
-            rtTree.inherit(text_ops.color, markColor);
-          }
+          rtTree.inherit(_applyEmphasisMarkColor, null);
           rtTree.addText(emphasisChar);
 
           replacement.append(
@@ -177,6 +201,21 @@ BuildTree _applyEmphasis(
   }
 
   return replacement;
+}
+
+/// Reads [_TextEmphasisColor] from inherited properties and applies it as the
+/// text color for the emphasis glyph.
+InheritedProperties _applyEmphasisMarkColor(
+  InheritedProperties resolving,
+  Null _,
+) {
+  final emphColor = resolving.get<_TextEmphasisColor>();
+  if (emphColor != null) {
+    return resolving.copyWith(
+      style: TextStyle(color: emphColor.color),
+    );
+  }
+  return resolving;
 }
 
 /// Clears [TextDecoration] and [TextStyleShadows] so they are not inherited by
