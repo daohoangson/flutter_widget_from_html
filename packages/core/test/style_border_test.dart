@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -767,6 +768,27 @@ void main() {
           'child=[RichText:(:Foo)]]',
         ),
       );
+    });
+
+    testWidgets('#1560: keeps clipping with background-color', (tester) async {
+      const html = '<span style="border-radius: 1px; '
+          'background-color: #f00;">Foo</span>';
+      await tester.pumpWidget(
+        explained(
+          HtmlWidget(
+            html,
+            key: hwKey,
+          ),
+        ),
+      );
+
+      final container = tester.widget<Container>(
+        find.byType(Container).first,
+      );
+      final decoration = container.decoration as BoxDecoration?;
+      expect(container.clipBehavior, equals(Clip.hardEdge));
+      expect(decoration?.borderRadius, isNotNull);
+      expect(decoration?.color, equals(const Color(0xFFFF0000)));
     });
 
     testWidgets('ignore radius if border is not uniform', (t) async {

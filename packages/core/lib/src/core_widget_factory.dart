@@ -162,19 +162,20 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     var decoration = baseDeco.copyWith(
-      border: border,
-      color: color,
-      image: image,
+      border: border ?? baseDeco.border,
+      color: color ?? baseDeco.color,
+      image: image ?? baseDeco.image,
     );
 
+    final resolvedBorderRadius = borderRadius ?? baseDeco.borderRadius;
     var clipBehavior = Clip.none;
-    if (borderRadius != null) {
+    if (resolvedBorderRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
         // TODO: add support for non-uniform border
         // https://github.com/flutter/flutter/commit/5054b6e
         // https://pub.dev/packages/non_uniform_border
-        decoration = decoration.copyWith(borderRadius: borderRadius);
+        decoration = decoration.copyWith(borderRadius: resolvedBorderRadius);
         clipBehavior = Clip.hardEdge;
       }
     }
