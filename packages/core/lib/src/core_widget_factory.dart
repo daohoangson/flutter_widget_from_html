@@ -168,13 +168,17 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     );
 
     var clipBehavior = Clip.none;
-    if (borderRadius != null) {
+    final effectiveRadius = borderRadius ??
+        (baseDeco.borderRadius is BorderRadius
+            ? baseDeco.borderRadius as BorderRadius
+            : null);
+    if (effectiveRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
         // TODO: add support for non-uniform border
         // https://github.com/flutter/flutter/commit/5054b6e
         // https://pub.dev/packages/non_uniform_border
-        decoration = decoration.copyWith(borderRadius: borderRadius);
+        decoration = decoration.copyWith(borderRadius: effectiveRadius);
         clipBehavior = Clip.hardEdge;
       }
     }
