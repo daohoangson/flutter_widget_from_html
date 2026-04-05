@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -783,6 +784,21 @@ void main() {
           'child=[RichText:(:Foo)]]]',
         ),
       );
+    });
+
+    testWidgets('#1560: block border-radius with background-color clips',
+        (tester) async {
+      const html =
+          '<section style="border-radius: 1px; background-color: red;">'
+          'Foo</section>';
+      await explain(tester, html);
+
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
+          .firstWhere(
+            (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
+          );
+      expect(container.clipBehavior, equals(Clip.hardEdge));
     });
 
     testWidgets('ignore radius if border is not uniform', (t) async {
