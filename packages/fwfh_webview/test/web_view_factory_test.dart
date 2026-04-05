@@ -344,6 +344,44 @@ void main() {
     });
   });
 
+  group('allow attribute', () {
+    testWidgets('renders with allow', (tester) async {
+      const html =
+          '<iframe src="$src" allow="accelerometer; autoplay; fullscreen"></iframe>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        contains('allow=accelerometer; autoplay; fullscreen'),
+      );
+    });
+
+    testWidgets('renders without allow', (tester) async {
+      const html = '<iframe src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, isNot(contains('allow=')));
+    });
+  });
+
+  group('allowfullscreen attribute', () {
+    testWidgets('renders with allowfullscreen', (tester) async {
+      const html = '<iframe src="$src" allowfullscreen></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('allowFullscreen=true'));
+    });
+
+    testWidgets('renders with allowfullscreen="true"', (tester) async {
+      const html = '<iframe src="$src" allowfullscreen="true"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('allowFullscreen=true'));
+    });
+
+    testWidgets('renders without allowfullscreen', (tester) async {
+      const html = '<iframe src="$src"></iframe>';
+      final explained = await explain(tester, html);
+      expect(explained, isNot(contains('allowFullscreen')));
+    });
+  });
+
   group('errors', () {
     testWidgets('no src', (tester) async {
       const html = '<iframe></iframe>';

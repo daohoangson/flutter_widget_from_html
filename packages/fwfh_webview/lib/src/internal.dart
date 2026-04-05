@@ -1,4 +1,6 @@
 const kTagIframe = 'iframe';
+const kAttributeIframeAllow = 'allow';
+const kAttributeIframeAllowFullscreen = 'allowfullscreen';
 const kAttributeIframeDataSrc = 'data-src';
 const kAttributeIframeHeight = 'height';
 const kAttributeIframeSandbox = 'sandbox';

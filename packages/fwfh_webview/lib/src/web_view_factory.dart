@@ -51,6 +51,8 @@ mixin WebViewFactory on WidgetFactory {
   Widget? buildWebView(
     BuildMetadata meta,
     String url, {
+    String? allow,
+    bool allowFullscreen = false,
     double? height,
     Iterable<String>? sandbox,
     double? width,
@@ -65,6 +67,8 @@ mixin WebViewFactory on WidgetFactory {
             sandbox.contains(kAttributeIframeSandboxAllowScripts));
     return WebView(
       url,
+      allow: allow,
+      allowFullscreen: allowFullscreen,
       aspectRatio: dimensOk ? width / height : 16 / 9,
       autoResize: !dimensOk && js,
       debuggingEnabled: webViewDebuggingEnabled,
@@ -140,12 +144,17 @@ mixin WebViewFactory on WidgetFactory {
                 return widgets;
               }
 
+              final allow = a[kAttributeIframeAllow];
+              final allowFullscreen =
+                  a.containsKey(kAttributeIframeAllowFullscreen);
               final height = tryParseDoubleFromMap(a, kAttributeIframeHeight);
               final width = tryParseDoubleFromMap(a, kAttributeIframeWidth);
               final sandbox = a[kAttributeIframeSandbox]?.split(RegExp(r'\s+'));
               final built = buildWebView(
                 meta,
                 src,
+                allow: allow,
+                allowFullscreen: allowFullscreen,
                 height: height,
                 sandbox: sandbox,
                 width: width,
