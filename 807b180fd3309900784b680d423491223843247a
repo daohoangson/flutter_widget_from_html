@@ -1,0 +1,25 @@
+packages/enhanced/README.md
+  6a46d68edafb5811 138,205,207-208
+packages/core/README.md
+  6a46d68edafb5811 113,185,187-188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "807b180fd3309900784b680d423491223843247a",
+  "prompts": {
+    "6a46d68edafb5811": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2204867-bf5f-48b0-be45-0a873feae733",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 8,
+      "total_deletions": 4,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    }
+  }
+}
