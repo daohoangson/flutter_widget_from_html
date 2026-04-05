@@ -1,0 +1,23 @@
+demo_app/lib/screens/iframe.dart
+  9d6420f22109b269 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "5e81e9bc18b2354c795840accd83b0dfa0c66288",
+  "prompts": {
+    "9d6420f22109b269": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3e0f86e-fa1e-4d3a-a05a-40c4f5422c60",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
