@@ -174,7 +174,7 @@ BuildTree _applyEmphasis(
           // inherit underlines, overlines, strikethroughs, or drop shadows
           // from the base text.
           rtTree.inherit(_clearEmphasisMarkStyle, true);
-          rtTree.inherit(_applyEmphasisMarkColor, null);
+          rtTree.inherit(_applyEmphasisMarkColor);
           rtTree.addText(emphasisChar);
 
           replacement.append(
@@ -206,9 +206,9 @@ BuildTree _applyEmphasis(
 /// Reads [_TextEmphasisColor] from inherited properties and applies it as the
 /// text color for the emphasis glyph.
 InheritedProperties _applyEmphasisMarkColor(
-  InheritedProperties resolving,
-  Null _,
-) {
+  InheritedProperties resolving, [
+  void _,
+]) {
   final emphColor = resolving.get<_TextEmphasisColor>();
   if (emphColor != null) {
     return resolving.copyWith(
