@@ -1,0 +1,23 @@
+AGENTS.md
+  6a46d68edafb5811 31-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "c347572c4822d71a4d1dcd653d15c4d2bd944bb9",
+  "prompts": {
+    "6a46d68edafb5811": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2204867-bf5f-48b0-be45-0a873feae733",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 23,
+      "total_deletions": 0,
+      "accepted_lines": 23,
+      "overriden_lines": 0
+    }
+  }
+}
