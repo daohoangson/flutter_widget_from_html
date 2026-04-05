@@ -28,3 +28,26 @@
 - Location: place tests next to code in `package/test/*.dart` with `_test.dart` suffix.
 - Goldens: store expected images under `test/images/`; regenerate with `--update-goldens` and review diffs.
 - Web interop (when applicable): see `packages/fwfh_webview` integration tests; ensure Chrome/driver available if running locally.
+- Golden images must be generated on Linux, not macOS (font rendering differs). Use Docker or CI with `--update-goldens`.
+- Always run `dart format .` before committing. The tall style formatter can cause large reformats.
+
+## Release Workflow
+
+- CHANGELOGs are updated at tagging time, not at merge time. Do not add changelog entries during feature work.
+- Core and enhanced READMEs share the same feature list structure. When adding a feature to core, update both `packages/core/README.md` and `packages/enhanced/README.md`.
+- Sub‑package README version pins (e.g., `^0.16.0` not `^0.16.1`) are intentional. Do not bump these to patch versions.
+- Verify Flutter stable compatibility before adopting new Android toolchain versions (e.g., AGP 9 required Flutter APIs not yet in stable).
+
+## Community PR Workflow
+
+- Push fixes to the contributor's fork remote, not origin. Add the fork as a remote first.
+- SonarQube failures on fork PRs are expected because secrets are unavailable to external contributors.
+- Clean up unrelated changes (example app modifications, `.gitignore` additions) before merging.
+- PRs are squash‑merged with a clean single commit message.
+
+## Code Patterns
+
+- CSS property implementations go in `packages/core/lib/src/internal/ops/style_*.dart`.
+- Tests mirror at `packages/core/test/style_*_test.dart` or `tag_*_test.dart`.
+- If code is unused, delete it. Do not keep commented‑out references or re‑export stubs.
+- `list-style-type` intentionally falls through to canvas‑drawn shapes (disc/circle/square) when a value is not in the `CssCounterStyle` registry.
