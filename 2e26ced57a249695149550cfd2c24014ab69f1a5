@@ -1,0 +1,23 @@
+packages/core/lib/src/core_widget_factory.dart
+  ac9fc03a4fb00ab8 171-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "2e26ced57a249695149550cfd2c24014ab69f1a5",
+  "prompts": {
+    "ac9fc03a4fb00ab8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a036ba26-f472-4772-a1cc-07f318944952",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 122,
+      "total_deletions": 36,
+      "accepted_lines": 90,
+      "overriden_lines": 0
+    }
+  }
+}
