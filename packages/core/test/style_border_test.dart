@@ -793,11 +793,10 @@ void main() {
           'Foo</section>';
       await explain(tester, html);
 
-      final container = tester
-          .widgetList<Container>(find.byType(Container))
-          .firstWhere(
-            (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
-          );
+      final container =
+          tester.widgetList<Container>(find.byType(Container)).firstWhere(
+                (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
+              );
       expect(container.clipBehavior, equals(Clip.hardEdge));
     });
 
