@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         ),
         body: Center(
           child: HtmlWidget(
-            '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw"></iframe>',
+            '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
             factoryBuilder: () => MyWidgetFactory(),
           ),
         ),

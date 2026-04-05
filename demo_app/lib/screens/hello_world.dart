@@ -100,7 +100,7 @@ const kHtml = '''
 </figure>
 
 <h4>&lt;IFRAME&gt; of YouTube:</h4>
-<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315">
+<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
   IFRAME support is not enabled.
 </iframe>
 
