@@ -769,6 +769,22 @@ void main() {
       );
     });
 
+    testWidgets('#1560: border-radius with background-color and margin',
+        (tester) async {
+      const html = '<span style="border-radius: 1px; '
+          'background-color: red; margin-right: 1px;">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HorizontalMargin:left=0,right=1,child='
+          '[Container:color=#FFFF0000,'
+          'radius=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],'
+          'child=[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
     testWidgets('ignore radius if border is not uniform', (t) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/909
       const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '

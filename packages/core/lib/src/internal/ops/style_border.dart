@@ -21,16 +21,14 @@ class StyleBorder {
             return tree;
           }
 
-          skip(tree);
+          // Don't skip onRenderBlock — let it handle border decoration
+          // during tree.build() so it can be merged with background color
+          // by buildDecoration's Container merge logic.
           return parent.sub()
             ..append(
               WidgetBit.inline(
                 tree,
                 WidgetPlaceholder(
-                  builder: (context, child) {
-                    final built = _buildBorder(tree, context, child, border);
-                    return built ?? child;
-                  },
                   debugLabel: '${tree.element.localName}--$kCssBorder',
                   child: tree.build(),
                 ),
