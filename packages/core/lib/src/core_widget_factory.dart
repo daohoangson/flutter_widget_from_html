@@ -168,10 +168,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     );
 
     var clipBehavior = Clip.none;
-    final effectiveRadius = borderRadius ??
-        (baseDeco.borderRadius is BorderRadius
-            ? baseDeco.borderRadius as BorderRadius
-            : null);
+    final baseRadius = baseDeco.borderRadius;
+    final effectiveRadius =
+        borderRadius ?? (baseRadius is BorderRadius ? baseRadius : null);
     if (effectiveRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
