@@ -109,8 +109,9 @@ class WebView extends StatefulWidget {
   /// {@template web_view.allowFullscreen}
   /// Controls whether fullscreen is allowed.
   ///
-  /// When `true`, the `allowfullscreen` attribute is set on the iframe
-  /// (Flutter Web) and fullscreen support is enabled on native platforms.
+  /// When `true`, the `allowfullscreen` attribute is set on the iframe.
+  ///
+  /// Only used on Flutter Web.
   ///
   /// Default: `false`.
   /// {@endtemplate}
