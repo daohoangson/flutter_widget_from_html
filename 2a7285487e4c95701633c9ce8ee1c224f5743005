@@ -1,0 +1,25 @@
+packages/core/lib/src/internal/ops/style_border.dart
+  ac9fc03a4fb00ab8 24-26
+packages/core/test/style_border_test.dart
+  ac9fc03a4fb00ab8 772-787
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "2a7285487e4c95701633c9ce8ee1c224f5743005",
+  "prompts": {
+    "ac9fc03a4fb00ab8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a036ba26-f472-4772-a1cc-07f318944952",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 19,
+      "total_deletions": 5,
+      "accepted_lines": 19,
+      "overriden_lines": 0
+    }
+  }
+}
