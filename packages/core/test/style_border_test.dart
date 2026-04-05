@@ -1225,10 +1225,7 @@ void main() {
         ),
       );
 
-      final container = tester
-          .widgetList<Container>(find.byType(Container))
-          .firstWhere((c) => (c.decoration as BoxDecoration?)?.borderRadius != null);
-      expect(container.clipBehavior, equals(Clip.hardEdge));
+      _expectContainerWithRadiusClips(tester);
     });
 
     testWidgets('border + border-radius with background-color', (tester) async {
@@ -1245,10 +1242,7 @@ void main() {
         ),
       );
 
-      final container = tester
-          .widgetList<Container>(find.byType(Container))
-          .firstWhere((c) => (c.decoration as BoxDecoration?)?.borderRadius != null);
-      expect(container.clipBehavior, equals(Clip.hardEdge));
+      _expectContainerWithRadiusClips(tester);
     });
   });
 
@@ -1284,4 +1278,13 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
+}
+
+void _expectContainerWithRadiusClips(WidgetTester tester) {
+  final container = tester
+      .widgetList<Container>(find.byType(Container))
+      .firstWhere(
+        (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
+      );
+  expect(container.clipBehavior, equals(Clip.hardEdge));
 }
