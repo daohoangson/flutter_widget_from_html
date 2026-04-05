@@ -21,6 +21,8 @@ void main() {
 
       final iframe = element! as web.HTMLIFrameElement;
       expect(iframe.src, 'https://www.youtube.com/embed/jNQXAC9IVRw');
+      expect(iframe.allow, contains('fullscreen'));
+      expect(iframe.allowFullscreen, isTrue);
     }
   });
 }
@@ -34,7 +36,9 @@ class IframeApp extends StatelessWidget {
       home: Scaffold(
         body: Center(
           child: HtmlWidget(
-            '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw"></iframe>',
+            '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw"'
+            ' allow="accelerometer; autoplay; fullscreen"'
+            ' allowfullscreen></iframe>',
             factoryBuilder: () => MyWidgetFactory(),
           ),
         ),
