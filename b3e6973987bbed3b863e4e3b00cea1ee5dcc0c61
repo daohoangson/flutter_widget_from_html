@@ -1,0 +1,33 @@
+packages/fwfh_webview/test/_.dart
+  9d6420f22109b269 10-15,36-37
+packages/fwfh_webview/lib/src/internal.dart
+  9d6420f22109b269 2-3
+packages/fwfh_webview/lib/src/web_view/web_view.dart
+  9d6420f22109b269 100-118,122-123
+packages/fwfh_webview/lib/src/web_view/js_interop.dart
+  9d6420f22109b269 19,21-32
+packages/fwfh_webview/test/web_view_factory_test.dart
+  9d6420f22109b269 347-384
+packages/fwfh_webview/lib/src/web_view_factory.dart
+  9d6420f22109b269 54-55,70-71,147-149,156-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "b3e6973987bbed3b863e4e3b00cea1ee5dcc0c61",
+  "prompts": {
+    "9d6420f22109b269": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3e0f86e-fa1e-4d3a-a05a-40c4f5422c60",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 93,
+      "total_deletions": 3,
+      "accepted_lines": 92,
+      "overriden_lines": 0
+    }
+  }
+}
