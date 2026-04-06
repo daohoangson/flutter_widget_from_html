@@ -47,6 +47,13 @@ extension StyleTextAlign on WidgetFactory {
       return placeholder.wrapWith(_center);
     }
 
+    // Only wrap block-level elements with CssBlock to force full width,
+    // skip inline-block which should keep its own sizing
+    final display = tree.getStyle(kCssDisplay)?.term;
+    if (display == kCssDisplayInlineBlock) {
+      return placeholder;
+    }
+
     switch (term) {
       case kCssTextAlignCenter:
       case kCssTextAlignEnd:
