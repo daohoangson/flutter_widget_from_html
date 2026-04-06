@@ -45,6 +45,14 @@ CssLengthBox? _parseCssLengthBoxAll(List<css.Expression> expressions) {
         bottom: tryParseCssLength(expressions[2]),
         inlineStart: tryParseCssLength(expressions[3]),
       );
+    case 3:
+      final inlineEnd = tryParseCssLength(expressions[1]);
+      return CssLengthBox(
+        top: tryParseCssLength(expressions[0]),
+        inlineEnd: inlineEnd,
+        bottom: tryParseCssLength(expressions[2]),
+        inlineStart: inlineEnd,
+      );
     case 2:
       final topBottom = tryParseCssLength(expressions[0]);
       final leftRight = tryParseCssLength(expressions[1]);

@@ -117,6 +117,49 @@ void main() {
     });
   });
 
+  group('3 values', () {
+    testWidgets('parses all', (WidgetTester tester) async {
+      const html = '<div style="margin: 1px 2px 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x1.0],'
+          '[HorizontalMargin:left=2,right=2,child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[SizedBox:0.0x3.0]',
+        ),
+      );
+    });
+
+    testWidgets('parses all (rtl)', (WidgetTester tester) async {
+      const html = '<div style="margin: 1px 2px 3px">Foo</div>';
+      final explained = await explain(tester, html, rtl: true);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x1.0],'
+          '[HorizontalMargin:left=2,right=2,child='
+          '[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'
+          '],'
+          '[SizedBox:0.0x3.0]',
+        ),
+      );
+    });
+
+    testWidgets('parses top and bottom only', (WidgetTester tester) async {
+      const html = '<div style="margin: 1px 0 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SizedBox:0.0x1.0],'
+          '[CssBlock:child=[RichText:(:Foo)]],'
+          '[SizedBox:0.0x3.0]',
+        ),
+      );
+    });
+  });
+
   group('2 values', () {
     testWidgets('parses both', (WidgetTester tester) async {
       const html = '<div style="margin: 5px 10px">Foo</div>';

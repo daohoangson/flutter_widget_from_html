@@ -121,6 +121,47 @@ void main() {
     });
   });
 
+  group('3 values', () {
+    testWidgets('parses all', (WidgetTester tester) async {
+      const html = '<div style="padding: 1px 2px 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Padding:(1,2,3,2),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('parses all (rtl)', (WidgetTester tester) async {
+      const html = '<div style="padding: 1px 2px 3px">Foo</div>';
+      final explained = await explain(tester, html, rtl: true);
+      expect(
+        explained,
+        equals(
+          '[Padding:(1,2,3,2),child='
+          '[CssBlock:child='
+          '[RichText:dir=rtl,(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('parses top and bottom only', (WidgetTester tester) async {
+      const html = '<div style="padding: 1px 0 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Padding:(1,0,3,0),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+  });
+
   group('2 values', () {
     testWidgets('parses both', (WidgetTester tester) async {
       const html = '<div style="padding: 5px 10px">Foo</div>';
