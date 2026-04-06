@@ -1,0 +1,23 @@
+docs/runbook/release.md
+  1b53bfa412bfa71b 1-49,51-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "983e943faed4ee58e633790d58076e4d19ab8c51",
+  "prompts": {
+    "1b53bfa412bfa71b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f3a38be-d46c-4944-b1e7-3b0996468720",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 143,
+      "total_deletions": 9,
+      "accepted_lines": 134,
+      "overriden_lines": 0
+    }
+  }
+}
