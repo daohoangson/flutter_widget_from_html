@@ -1,0 +1,29 @@
+packages/enhanced/pubspec.yaml
+  1b53bfa412bfa71b 13
+packages/core/pubspec.yaml
+  1b53bfa412bfa71b 2
+packages/core/README.md
+  1b53bfa412bfa71b 20
+packages/core/CHANGELOG.md
+  1b53bfa412bfa71b 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "9c2d7b3dda2da76726fa55c73b2f484c29fd9f39",
+  "prompts": {
+    "1b53bfa412bfa71b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f3a38be-d46c-4944-b1e7-3b0996468720",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 16,
+      "total_deletions": 7,
+      "accepted_lines": 12,
+      "overriden_lines": 0
+    }
+  }
+}
