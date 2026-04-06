@@ -1,3 +1,13 @@
+## 0.17.2
+
+- Add `text-emphasis` / `text-emphasis-style` support (#1561, authored by @CaptainDario)
+- Add CSS `text-decoration-style: wavy` support (#1559, authored by @CaptainDario)
+- Enhanced CSS `list-style-type` (#1558, authored by @CaptainDario)
+- Forward `allowfullscreen` and `allow` iframe attributes to WebView (#1566)
+- Fix dart2wasm compilation error in Flutter 3.38+ (#1529, authored by @lemz90)
+- Fix `customStylesBuilder` text-decoration not overriding anchor underline (#1548)
+- Fix border-radius with background-color for inline elements (#1569)
+
 ## 0.17.1
 
 - Add support for Flutter 3.35 (#1498)
