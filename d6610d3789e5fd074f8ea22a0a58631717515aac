@@ -1,0 +1,31 @@
+packages/enhanced/README.md
+  d0e57439924d3c06 192,196
+packages/core/README.md
+  d0e57439924d3c06 172,176
+packages/core/lib/src/internal/parser/length.dart
+  d0e57439924d3c06 48-55
+packages/core/test/style_margin_test.dart
+  d0e57439924d3c06 120-162
+packages/core/test/style_padding_test.dart
+  d0e57439924d3c06 124-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "d6610d3789e5fd074f8ea22a0a58631717515aac",
+  "prompts": {
+    "d0e57439924d3c06": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21b70faa-9828-4866-8bec-8e095637e27b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 96,
+      "total_deletions": 4,
+      "accepted_lines": 96,
+      "overriden_lines": 0
+    }
+  }
+}
