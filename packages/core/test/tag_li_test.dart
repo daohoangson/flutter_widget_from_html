@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -87,9 +88,11 @@ Future<void> main() async {
     await tester.pumpAndSettle();
 
     final itemRect = tester.getRect(find.byType(HtmlListItem));
+    final paragraph = tester.renderObject<RenderParagraph>(findText('data 1'));
     final textRect = tester.getRect(findText('data 1'));
 
-    expect(itemRect.width, greaterThan(textRect.width));
+    expect(itemRect.width, greaterThan(100));
+    expect(paragraph.textAlign, equals(TextAlign.center));
     expect(textRect.center.dx, closeTo(itemRect.center.dx, .1));
   });
 

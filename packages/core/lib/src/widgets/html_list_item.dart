@@ -136,17 +136,17 @@ class _ListItemRenderObject extends RenderBox
     }
 
     final childData = child.parentData! as _ListItemData;
-    final childSize = fn(child, bc);
+    final childConstraints = bc.maxWidth.isFinite && textAlign != null
+        ? bc.tighten(width: bc.maxWidth)
+        : bc;
+    final childSize = fn(child, childConstraints);
     final marker = childData.nextSibling;
     final markerSize = marker != null ? fn(marker, bc.loosen()) : Size.zero;
     final height = childSize.height > 0 ? childSize.height : markerSize.height;
-    final width = bc.maxWidth.isFinite && textAlign != null
-        ? bc.maxWidth
-        : childSize.width;
-    final size = bc.constrain(Size(width, height));
+    final size = bc.constrain(Size(childSize.width, height));
 
     if (identical(fn, ChildLayoutHelper.layoutChild)) {
-      childData.offset = Offset(_getChildDx(size.width, childSize.width), 0);
+      childData.offset = Offset.zero;
 
       if (marker != null) {
         const baseline = TextBaseline.alphabetic;
@@ -161,34 +161,12 @@ class _ListItemRenderObject extends RenderBox
         markerData.offset = Offset(
           textDirection == TextDirection.ltr
               ? -markerSize.width - _kGapVsMarker
-              : size.width + _kGapVsMarker,
+              : childSize.width + _kGapVsMarker,
           childDistance - markerDistance,
         );
       }
     }
 
     return size;
-  }
-
-  double _getChildDx(double width, double childWidth) {
-    if (width <= childWidth) {
-      return 0;
-    }
-
-    switch (textAlign) {
-      case TextAlign.center:
-        return (width - childWidth) / 2;
-      case TextAlign.end:
-        return textDirection == TextDirection.rtl ? 0 : width - childWidth;
-      case TextAlign.justify:
-      case null:
-        return 0;
-      case TextAlign.left:
-        return textDirection == TextDirection.rtl ? width - childWidth : 0;
-      case TextAlign.right:
-        return textDirection == TextDirection.rtl ? 0 : width - childWidth;
-      case TextAlign.start:
-        return textDirection == TextDirection.rtl ? width - childWidth : 0;
-    }
   }
 }
