@@ -1,0 +1,23 @@
+packages/core/lib/src/internal/ops/style_text_align.dart
+  839f3e9a83449f1f 50-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "4357250a8022c5b7bb6b80acd85bd60cb5eeeb5d",
+  "prompts": {
+    "839f3e9a83449f1f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fb3e5f6-0979-4a63-b4be-4df21054beaf",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 0,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
