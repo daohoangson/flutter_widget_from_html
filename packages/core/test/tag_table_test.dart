@@ -27,7 +27,7 @@ Future<void> main() async {
         explained,
         equals(
           '[SingleChildScrollView:child=[HtmlTable:children='
-          '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
+          '[HtmlTableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
@@ -620,7 +620,7 @@ Future<void> main() async {
       explained,
       equals(
         '[SingleChildScrollView:child=[HtmlTable:children='
-        '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
+        '[HtmlTableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
         '[HtmlTableCell:child=[CssBlock:child=[RichText:(+b:Header 1)]]],'
         '[HtmlTableCell:child=[CssBlock:child=[RichText:(+b:Header 2)]]],'
         '[HtmlTableCell:child=[CssBlock:child=[RichText:(:Value 1)]]],'

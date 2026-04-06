@@ -23,6 +23,9 @@ extension StyleTextAlign on WidgetFactory {
         priority: Early.cssTextAlign,
       );
 
+  static Widget _block(BuildContext context, Widget child) =>
+      CssBlock(child: child);
+
   static Widget _center(BuildContext context, Widget child) =>
       Center(heightFactor: 1.0, child: child);
 
@@ -35,12 +38,25 @@ extension StyleTextAlign on WidgetFactory {
   }
 
   static Widget _onRenderBlock(BuildTree tree, WidgetPlaceholder placeholder) {
-    if (placeholder.isEmpty ||
-        tree.textAlignData.term != kCssTextAlignWebkitCenter) {
+    if (placeholder.isEmpty) {
       return placeholder;
     }
 
-    return placeholder.wrapWith(_center);
+    final term = tree.textAlignData.term;
+    if (term == kCssTextAlignWebkitCenter) {
+      return placeholder.wrapWith(_center);
+    }
+
+    switch (term) {
+      case kCssTextAlignCenter:
+      case kCssTextAlignEnd:
+      case kCssTextAlignJustify:
+      case kCssTextAlignMozCenter:
+      case kCssTextAlignRight:
+        return placeholder.wrapWith(_block);
+      default:
+        return placeholder;
+    }
   }
 
   static InheritedProperties _textAlign(

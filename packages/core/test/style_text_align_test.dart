@@ -129,19 +129,34 @@ void main() {
     testWidgets('renders center', (WidgetTester tester) async {
       const html = '<div style="text-align: center"><div>_X_</div></div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
+      expect(
+        e,
+        equals(
+          '[CssBlock:child=[CssBlock:child=[RichText:align=center,(:_X_)]]]',
+        ),
+      );
     });
 
     testWidgets('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end"><div>__X</div></div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=end,(:__X)]]'));
+      expect(
+        e,
+        equals(
+          '[CssBlock:child=[CssBlock:child=[RichText:align=end,(:__X)]]]',
+        ),
+      );
     });
 
     testWidgets('renders justify', (WidgetTester tester) async {
       const html = '<div style="text-align: justify"><div>X_X_X</div></div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
+      expect(
+        e,
+        equals(
+          '[CssBlock:child=[CssBlock:child=[RichText:align=justify,(:X_X_X)]]]',
+        ),
+      );
     });
 
     testWidgets('renders left', (WidgetTester tester) async {
@@ -153,7 +168,12 @@ void main() {
     testWidgets('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right"><div>__X</div></div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__X)]]'));
+      expect(
+        e,
+        equals(
+          '[CssBlock:child=[CssBlock:child=[RichText:align=right,(:__X)]]]',
+        ),
+      );
     });
 
     testWidgets('renders start', (WidgetTester tester) async {

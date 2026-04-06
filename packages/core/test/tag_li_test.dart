@@ -677,6 +677,24 @@ Future<void> main() async {
         expect(explained, contains('[Padding:(0,0,0,99),child='));
       });
     });
+
+    group('text-align', () {
+      testWidgets('renders center on li', (WidgetTester tester) async {
+        const html = '<ol>'
+            '<li style="text-align: center;">Foo</li>'
+            '</ol>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('[RichText:align=center,(:Foo)]'));
+      });
+
+      testWidgets('renders center on ol', (WidgetTester tester) async {
+        const html = '<ol style="text-align: center;">'
+            '<li>Foo</li>'
+            '</ol>';
+        final explained = await explain(tester, html);
+        expect(explained, contains('[RichText:align=center,(:Foo)]'));
+      });
+    });
   });
 
   group('error handling', () {
@@ -972,6 +990,7 @@ Future<void> main() async {
           list: urls,
         ),
       );
+
       expect(await tapText(tester, 'Tap me'), equals(1));
 
       await tester.pumpAndSettle();
