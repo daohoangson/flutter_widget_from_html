@@ -4,6 +4,7 @@ import 'package:demo_app/screens/custom_widget_builder.dart';
 import 'package:demo_app/screens/font_size.dart';
 import 'package:demo_app/screens/golden.dart';
 import 'package:demo_app/screens/hello_world.dart';
+import 'package:demo_app/screens/html_playground.dart';
 import 'package:demo_app/screens/hello_world_core.dart';
 import 'package:demo_app/screens/huge_html.dart';
 import 'package:demo_app/screens/iframe.dart';
@@ -21,6 +22,7 @@ class HomeScreen extends StatelessWidget {
   static final _screens = <String, Widget Function()>{
     'Hello World': () => const HelloWorldScreen(),
     'Hello World (core)': () => const HelloWorldCoreScreen(),
+    'HTML Playground': () => const HtmlPlaygroundScreen(),
     'Audio': () => const AudioScreen(),
     'Iframe': () => const IframeScreen(),
     'Images': () => const ImgScreen(),
