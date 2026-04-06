@@ -1,0 +1,27 @@
+packages/enhanced/pubspec.yaml
+  1b53bfa412bfa71b 19
+packages/fwfh_webview/pubspec.yaml
+  1b53bfa412bfa71b 2
+packages/fwfh_webview/CHANGELOG.md
+  1b53bfa412bfa71b 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "31b05444f510e54ddb10f07fef71d9298e9da4f2",
+  "prompts": {
+    "1b53bfa412bfa71b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f3a38be-d46c-4944-b1e7-3b0996468720",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 2,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
