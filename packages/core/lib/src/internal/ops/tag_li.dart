@@ -107,6 +107,7 @@ class TagLi {
 
     return HtmlListItem(
       marker: marker,
+      textAlign: resolved.get<TextAlign>(),
       textDirection: resolved.directionOrLtr,
       child: child,
     );

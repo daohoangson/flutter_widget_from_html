@@ -5,6 +5,9 @@ const _kGapVsMarker = 5.0;
 
 /// A list item widget.
 class HtmlListItem extends MultiChildRenderObjectWidget {
+  /// The alignment of the item contents.
+  final TextAlign? textAlign;
+
   /// The directionality of the item.
   final TextDirection textDirection;
 
@@ -13,6 +16,7 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
     Widget? child,
     super.key,
     Widget? marker,
+    this.textAlign,
     required this.textDirection,
   }) : super(
           children: child != null
@@ -25,17 +29,24 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _ListItemRenderObject(textDirection: textDirection);
+      _ListItemRenderObject(
+        textAlign: textAlign,
+        textDirection: textDirection,
+      );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
+    properties.add(EnumProperty('textAlign', textAlign, defaultValue: null));
     properties.add(DiagnosticsProperty('textDirection', textDirection));
   }
 
   @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
-      (renderObject as _ListItemRenderObject).textDirection = textDirection;
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    renderObject as _ListItemRenderObject
+      ..textAlign = textAlign
+      ..textDirection = textDirection;
+  }
 }
 
 class _ListItemData extends ContainerBoxParentData<RenderBox> {}
@@ -45,8 +56,21 @@ class _ListItemRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _ListItemData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
   _ListItemRenderObject({
+    TextAlign? textAlign,
     required TextDirection textDirection,
-  }) : _textDirection = textDirection;
+  })  : _textAlign = textAlign,
+        _textDirection = textDirection;
+
+  TextAlign? get textAlign => _textAlign;
+  TextAlign? _textAlign;
+  set textAlign(TextAlign? value) {
+    if (_textAlign == value) {
+      return;
+    }
+
+    _textAlign = value;
+    markNeedsLayout();
+  }
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
@@ -116,26 +140,55 @@ class _ListItemRenderObject extends RenderBox
     final marker = childData.nextSibling;
     final markerSize = marker != null ? fn(marker, bc.loosen()) : Size.zero;
     final height = childSize.height > 0 ? childSize.height : markerSize.height;
-    final size = bc.constrain(Size(childSize.width, height));
+    final width = bc.maxWidth.isFinite && textAlign != null
+        ? bc.maxWidth
+        : childSize.width;
+    final size = bc.constrain(Size(width, height));
 
-    if (identical(fn, ChildLayoutHelper.layoutChild) && marker != null) {
-      const baseline = TextBaseline.alphabetic;
-      final markerDistance =
-          marker.getDistanceToBaseline(baseline, onlyReal: true) ??
-              markerSize.height;
-      final childDistance =
-          child.getDistanceToBaseline(baseline, onlyReal: true) ??
-              markerDistance;
+    if (identical(fn, ChildLayoutHelper.layoutChild)) {
+      childData.offset = Offset(_getChildDx(size.width, childSize.width), 0);
 
-      final markerData = marker.parentData! as _ListItemData;
-      markerData.offset = Offset(
-        textDirection == TextDirection.ltr
-            ? -markerSize.width - _kGapVsMarker
-            : childSize.width + _kGapVsMarker,
-        childDistance - markerDistance,
-      );
+      if (marker != null) {
+        const baseline = TextBaseline.alphabetic;
+        final markerDistance =
+            marker.getDistanceToBaseline(baseline, onlyReal: true) ??
+                markerSize.height;
+        final childDistance =
+            child.getDistanceToBaseline(baseline, onlyReal: true) ??
+                markerDistance;
+
+        final markerData = marker.parentData! as _ListItemData;
+        markerData.offset = Offset(
+          textDirection == TextDirection.ltr
+              ? -markerSize.width - _kGapVsMarker
+              : size.width + _kGapVsMarker,
+          childDistance - markerDistance,
+        );
+      }
     }
 
     return size;
+  }
+
+  double _getChildDx(double width, double childWidth) {
+    if (width <= childWidth) {
+      return 0;
+    }
+
+    switch (textAlign) {
+      case TextAlign.center:
+        return (width - childWidth) / 2;
+      case TextAlign.end:
+        return textDirection == TextDirection.rtl ? 0 : width - childWidth;
+      case TextAlign.justify:
+      case null:
+        return 0;
+      case TextAlign.left:
+        return textDirection == TextDirection.rtl ? width - childWidth : 0;
+      case TextAlign.right:
+        return textDirection == TextDirection.rtl ? 0 : width - childWidth;
+      case TextAlign.start:
+        return textDirection == TextDirection.rtl ? width - childWidth : 0;
+    }
   }
 }

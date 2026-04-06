@@ -71,6 +71,28 @@ Future<void> main() async {
     );
   });
 
+  testWidgets('renders centered text within list item', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 200,
+            child: HtmlWidget(
+              '<ol><li style="text-align: center">data 1</li></ol>',
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final itemRect = tester.getRect(find.byType(HtmlListItem));
+    final textRect = tester.getRect(findText('data 1'));
+
+    expect(itemRect.width, greaterThan(textRect.width));
+    expect(textRect.center.dx, closeTo(itemRect.center.dx, .1));
+  });
+
   testWidgets('renders nested list', (WidgetTester tester) async {
     const html = '''
 <ul>
@@ -873,6 +895,31 @@ Future<void> main() async {
       expect(
         key.renderBox.getDryLayout(const BoxConstraints()),
         equals(const Size(50, 5)),
+      );
+    });
+
+    testWidgets('computeDryLayout with textAlign', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              child: HtmlListItem(
+                key: key,
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
+                child: const SizedBox(width: 50, height: 5),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints(maxWidth: 100)),
+        equals(const Size(100, 5)),
       );
     });
 
