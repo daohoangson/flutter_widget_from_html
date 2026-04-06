@@ -1,0 +1,25 @@
+packages/core/test/tag_li_test.dart
+  839f3e9a83449f1f 680-697,993-999
+packages/core/lib/src/widgets/html_list_item.dart
+  839f3e9a83449f1f 117-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "6272776fd568b2905bfcd376a375d964c7673b44",
+  "prompts": {
+    "839f3e9a83449f1f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fb3e5f6-0979-4a63-b4be-4df21054beaf",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 58,
+      "total_deletions": 11,
+      "accepted_lines": 46,
+      "overriden_lines": 0
+    }
+  }
+}
