@@ -1,3 +1,7 @@
+## 0.15.7
+
+- Forward `allowfullscreen` and `allow` iframe attributes to WebView (#1566)
+
 ## 0.15.6
 
 - Add support for webview_flutter_android@4.8 (#1498)
