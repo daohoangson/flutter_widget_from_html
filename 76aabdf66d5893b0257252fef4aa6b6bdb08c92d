@@ -1,0 +1,23 @@
+packages/core/test/compute_dry_baseline_test.dart
+  4b5de8f014565f9c 1-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "76aabdf66d5893b0257252fef4aa6b6bdb08c92d",
+  "prompts": {
+    "4b5de8f014565f9c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ac28805-d4cc-4f7d-a12b-e0c7de103b22",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 332,
+      "total_deletions": 13,
+      "accepted_lines": 319,
+      "overriden_lines": 0
+    }
+  }
+}
