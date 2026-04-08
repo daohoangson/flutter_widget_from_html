@@ -829,15 +829,18 @@ Future<void> main() async {
     testWidgets('computeDryBaseline', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlTable(
-          key: key,
-          children: const [
-            HtmlTableCell(
-              columnStart: 0,
-              rowStart: 0,
-              child: Text('Cell'),
-            ),
-          ],
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: HtmlTable(
+            key: key,
+            children: const [
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text('Cell'),
+              ),
+            ],
+          ),
         ),
       );
       await tester.pumpAndSettle();

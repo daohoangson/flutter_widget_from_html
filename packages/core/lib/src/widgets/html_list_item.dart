@@ -88,6 +88,23 @@ class _ListItemRenderObject extends RenderBox
       defaultComputeDistanceToFirstActualBaseline(baseline);
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final child = firstChild;
+    if (child == null) {
+      return null;
+    }
+
+    final childConstraints = constraints.maxWidth.isFinite && textAlign != null
+        ? constraints.tighten(width: constraints.maxWidth)
+        : constraints;
+    // The first child's offset is always Offset.zero in _compute
+    return child.getDryBaseline(childConstraints, baseline);
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _compute(firstChild, constraints, ChildLayoutHelper.dryLayoutChild);
 
