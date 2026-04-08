@@ -1,0 +1,33 @@
+packages/core/test/style_margin_test.dart
+  4b5de8f014565f9c 802-828
+packages/core/test/style_sizing_test.dart
+  4b5de8f014565f9c 594-615
+packages/core/test/style_vertical_align_test.dart
+  4b5de8f014565f9c 1,3,283-307
+packages/core/test/tag_li_test.dart
+  4b5de8f014565f9c 980-1003,1156-1182
+packages/core/test/tag_table_test.dart
+  4b5de8f014565f9c 829-852
+packages/core/test/tag_ruby_test.dart
+  4b5de8f014565f9c 250-272
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "e2459166314979cb70d92b4bee64e2136ac9d720",
+  "prompts": {
+    "4b5de8f014565f9c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ac28805-d4cc-4f7d-a12b-e0c7de103b22",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 174,
+      "total_deletions": 0,
+      "accepted_lines": 174,
+      "overriden_lines": 0
+    }
+  }
+}
