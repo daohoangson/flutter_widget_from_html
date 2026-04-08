@@ -247,6 +247,29 @@ void main() {
       );
     });
 
+    testWidgets('computeDryBaseline', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlRuby(
+              key: key,
+              ruby: const Text('漢'),
+              rt: const Text('かん'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      final baseline = renderBox.getDryBaseline(
+        renderBox.constraints,
+        TextBaseline.alphabetic,
+      );
+      expect(baseline, isNotNull);
+    });
+
     testWidgets('computeIntrinsic', (tester) async {
       final rt = GlobalKey();
       final ruby = GlobalKey();

@@ -826,6 +826,30 @@ Future<void> main() async {
       );
     });
 
+    testWidgets('computeDryBaseline', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [
+            HtmlTableCell(
+              columnStart: 0,
+              rowStart: 0,
+              child: Text('Cell'),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      final baseline = renderBox.getDryBaseline(
+        const BoxConstraints(maxWidth: 100, maxHeight: 100),
+        TextBaseline.alphabetic,
+      );
+      expect(baseline, isNotNull);
+    });
+
     testWidgets('performs hit test', (tester) async {
       const href = 'href';
       final urls = <String>[];
