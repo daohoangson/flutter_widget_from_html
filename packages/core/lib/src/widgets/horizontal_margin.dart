@@ -56,6 +56,21 @@ class _HorizontalMarginRenderObject extends RenderShiftedBox {
   double get marginsOrZero => _left.or(0) + _right.or(0);
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final scopedChild = child;
+    if (scopedChild == null) {
+      return null;
+    }
+
+    final edges = EdgeInsets.only(left: _left.or(0), right: _right.or(0));
+    final cc = constraints.deflate(edges);
+    return scopedChild.getDryBaseline(cc, baseline);
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _compute(child, constraints, ChildLayoutHelper.dryLayoutChild);
 
