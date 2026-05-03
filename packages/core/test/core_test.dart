@@ -1131,6 +1131,12 @@ void main() {
       expect(explained, equals('[RichText:(@8.3:Foo)]'));
     });
 
+    testWidgets('renders xxx-large', (WidgetTester tester) async {
+      const html = '<span style="font-size: xxx-large">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@30.0:Foo)]'));
+    });
+
     testWidgets('renders xx-large', (WidgetTester tester) async {
       const html = '<span style="font-size: xx-large">Foo</span>';
       final explained = await explain(tester, html);
