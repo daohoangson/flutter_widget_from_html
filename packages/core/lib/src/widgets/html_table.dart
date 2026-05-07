@@ -26,6 +26,11 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: [TextDirection.ltr].
   final TextDirection textDirection;
 
+  /// Whether to use [CssSizingHint] for table layout.
+  ///
+  /// Default: `false`.
+  final bool useSizingHint;
+
   /// Creates a TABLE widget.
   const HtmlTable({
     this.border,
@@ -33,12 +38,15 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderSpacing = 0.0,
     required super.children,
     this.textDirection = TextDirection.ltr,
+    this.useSizingHint = false,
     super.key,
   });
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    final hint = context.dependOnInheritedWidgetOfExactType<CssSizingHint>();
+    final hint = useSizingHint
+        ? context.dependOnInheritedWidgetOfExactType<CssSizingHint>()
+        : null;
     return _TableRenderObject(
       border,
       textDirection,
@@ -74,7 +82,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    final hint = context.dependOnInheritedWidgetOfExactType<CssSizingHint>();
+    final hint = useSizingHint
+        ? context.dependOnInheritedWidgetOfExactType<CssSizingHint>()
+        : null;
     (renderObject as _TableRenderObject)
       ..setBorder(border)
       ..setBorderCollapse(borderCollapse)

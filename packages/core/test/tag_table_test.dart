@@ -65,6 +65,43 @@ Future<void> main() async {
       // `HtmlTable` should not be put inside another one
       expect(explained, isNot(contains('SingleChildScrollView')));
     });
+
+    testWidgets('scrolls in ListView render mode', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              child: HtmlWidget(
+                '<table><tr>'
+                '<th>Header 1</th>'
+                '<th>Header 2</th>'
+                '<th>Header 3</th>'
+                '<th>Header 4</th>'
+                '<th>Header 5</th>'
+                '<th>Header 6</th>'
+                '<th>Header 7</th>'
+                '<th>Header 8</th>'
+                '<th>Header 9</th>'
+                '<th>Header 10</th>'
+                '<th>Header 11</th>'
+                '<th>Header 12</th>'
+                '</tr></table>',
+                renderMode: RenderMode.listView,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final horizontalScrollable = find.byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable && widget.axisDirection == AxisDirection.right,
+      );
+      final scrollable = tester.state<ScrollableState>(horizontalScrollable);
+
+      expect(scrollable.position.maxScrollExtent, greaterThan(0));
+    });
   });
 
   group('rtl', () {

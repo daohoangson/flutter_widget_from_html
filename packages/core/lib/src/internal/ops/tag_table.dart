@@ -92,6 +92,7 @@ class TagTable {
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
             textDirection: resolved.directionOrLtr,
+            useSizingHint: tableTree.sizingInput != null,
             children: List.from(
               data.builders
                   .map((builder) => builder(context))
