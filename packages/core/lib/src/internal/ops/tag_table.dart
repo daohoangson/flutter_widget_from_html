@@ -86,6 +86,7 @@ class TagTable {
     final layoutBuilder = HtmlLayoutBuilder(
       builder: (context, bc) {
         final resolved = tableTree.inheritanceResolvers.resolve(context);
+        final minWidth = _getMinWidthHint(tableTree, resolved, bc);
         Widget built = ValignBaselineContainer(
           child: HtmlTable(
             border: border.getBorder(resolved),
@@ -104,7 +105,7 @@ class TagTable {
         // provide hints to size the columns properly
         built = CssSizingHint(
           maxWidth: bc.maxWidth,
-          minWidth: bc.minWidth,
+          minWidth: minWidth,
           child: built,
         );
 
@@ -117,6 +118,27 @@ class TagTable {
     );
 
     return WidgetPlaceholder(debugLabel: kTagTable, child: layoutBuilder);
+  }
+
+  double _getMinWidthHint(
+    BuildTree tableTree,
+    InheritedProperties resolved,
+    BoxConstraints bc,
+  ) {
+    final input = tableTree.sizingInput;
+    final widths = [
+      input?.preferredWidth,
+      input?.minWidth,
+    ].map((v) => v?.getSizing(resolved)?.clamp(0.0, bc.maxWidth));
+
+    var minWidth = .0;
+    for (final width in widths) {
+      if (width != null && width.isFinite) {
+        minWidth = max(minWidth, width);
+      }
+    }
+
+    return minWidth;
   }
 
   void _prepareHtmlTableCaptionBuilders(_TagTableData data) {
