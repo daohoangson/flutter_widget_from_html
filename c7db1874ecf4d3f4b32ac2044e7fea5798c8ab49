@@ -1,0 +1,23 @@
+packages/fwfh_webview/test/mock_webview_platform.dart
+  f65febeea2d7b4f5 206
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "c7db1874ecf4d3f4b32ac2044e7fea5798c8ab49",
+  "prompts": {
+    "f65febeea2d7b4f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2b473dd7-9047-48cd-abc9-de94a2565783",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 3,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
