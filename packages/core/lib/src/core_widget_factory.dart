@@ -34,6 +34,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   BuildOp? _styleBackground;
   BuildOp? _styleBorder;
+  BuildOp? _styleClipPath;
   BuildOp? _styleDisplayFlex;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
@@ -168,26 +169,69 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     );
 
     var clipBehavior = Clip.none;
+    Border? nonUniformBorder;
+
     final baseRadius = baseDeco.borderRadius;
     final effectiveRadius =
         borderRadius ?? (baseRadius is BorderRadius ? baseRadius : null);
     if (effectiveRadius != null) {
-      final borderIsUniform = decoration.border?.isUniform ?? true;
+      final effectiveBorder = decoration.border;
+      final borderIsUniform = effectiveBorder?.isUniform ?? true;
       if (borderIsUniform) {
-        // TODO: add support for non-uniform border
-        // https://github.com/flutter/flutter/commit/5054b6e
-        // https://pub.dev/packages/non_uniform_border
         decoration = decoration.copyWith(borderRadius: effectiveRadius);
+        clipBehavior = Clip.hardEdge;
+      } else if (effectiveBorder is Border && effectiveRadius != BorderRadius.zero) {
+        // Non-uniform border + radius: paint each border side along the
+        // rounded-rect outline using a CustomPainter (the same canvas/Paint
+        // mechanism used in html_list_marker.dart). The border is removed
+        // from the BoxDecoration to avoid Flutter's isUniform assertion;
+        // borderRadius is kept so the Container clips content correctly.
+        nonUniformBorder = effectiveBorder;
+        decoration = BoxDecoration(
+          color: decoration.color,
+          image: decoration.image,
+          boxShadow: decoration.boxShadow,
+          gradient: decoration.gradient,
+          backgroundBlendMode: decoration.backgroundBlendMode,
+          shape: decoration.shape,
+          borderRadius: effectiveRadius,
+        );
         clipBehavior = Clip.hardEdge;
       }
     }
 
-    return Container(
+    Widget built = Container(
       decoration: decoration,
       clipBehavior: clipBehavior,
       child: grandChild ?? child,
     );
+
+    if (nonUniformBorder != null) {
+      built = CustomPaint(
+        foregroundPainter: _NonUniformBorderPainter(
+          border: nonUniformBorder,
+          borderRadius: effectiveRadius!,
+        ),
+        child: built,
+      );
+    }
+
+    return built;
   }
+
+  /// Builds [ClipPath].
+  Widget? buildClipPath(
+    BuildTree tree,
+    Widget child,
+    CustomClipper<Path> clipper,
+  ) =>
+      ClipPath(clipper: clipper, child: child);
+
+  /// Parses an SVG path data string (e.g. from `clip-path: path("...")`) into
+  /// a Flutter [Path], or returns `null` if not supported.
+  ///
+  /// Override in a mixin (e.g. `SvgFactory`) to provide support.
+  Path? buildClipPathFromSvgData(String pathData) => null;
 
   /// Builds decoration image from [url]
   DecorationImage? buildDecorationImage(
@@ -1092,6 +1136,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       tree.register(_styleBorder ??= StyleBorder(this).buildOp);
     }
 
+    if (key == kCssClipPath) {
+      tree.register(_styleClipPath ??= StyleClipPath(this).buildOp);
+    }
+
     if (key.startsWith(kCssMargin)) {
       tree.register(_styleMargin ??= StyleMargin(this).buildOp);
     }
@@ -1306,6 +1354,28 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         kCssFontWeight: kCssFontWeightBold,
         kCssVerticalAlign: kCssVerticalAlignMiddle,
       };
+}
+
+// Paints a non-uniform [Border] along a rounded-rect outline by delegating to
+// [Border.paint] with a [borderRadius] argument — the same method used by
+// the table cell render object in [HtmlTableCell].
+class _NonUniformBorderPainter extends CustomPainter {
+  final Border border;
+  final BorderRadius borderRadius;
+
+  _NonUniformBorderPainter({
+    required this.border,
+    required this.borderRadius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    border.paint(canvas, Offset.zero & size, borderRadius: borderRadius);
+  }
+
+  @override
+  bool shouldRepaint(_NonUniformBorderPainter old) =>
+      old.border != border || old.borderRadius != borderRadius;
 }
 
 /// A factory to build widgets.

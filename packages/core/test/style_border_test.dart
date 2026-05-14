@@ -800,8 +800,11 @@ void main() {
       expect(container.clipBehavior, equals(Clip.hardEdge));
     });
 
-    testWidgets('ignore radius if border is not uniform', (t) async {
+    testWidgets('ignore radius if border is not uniform and radius is zero',
+        (t) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/909
+      // border-bottom-right-radius: 0px is non-zero in object identity but
+      // effectively zero — no CustomPaint overhead should be added.
       const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
           'border-bottom-right-radius: 0px;">Foo</section>';
       final explained = await explain(t, html);
@@ -810,6 +813,20 @@ void main() {
         equals(
           '[Container:border=(none,none,1.0@solid#FF3E3E3E,none),child='
           '[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('applies radius when border is not uniform', (t) async {
+      const html = '<section style="border-bottom: 1px solid red; '
+          'border-radius: 10px;">Foo</section>';
+      final explained = await explain(t, html);
+      expect(
+        explained,
+        equals(
+          '[CustomPaint:child='
+          '[Container:radius=[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0],child='
+          '[CssBlock:child=[RichText:(:Foo)]]]]',
         ),
       );
     });
