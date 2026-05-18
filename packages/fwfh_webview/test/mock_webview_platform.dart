@@ -203,6 +203,10 @@ class __FakeAndroidWebViewController extends FakeWebViewController
       throw UnimplementedError();
 
   @override
+  Future<void> setInsetsForWebContentToIgnore(dynamic insets) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> setMediaPlaybackRequiresUserGesture(bool require) async {
     androidMediaPlaybackRequiresUserGesture = require;
   }

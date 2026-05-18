@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0 # for SonarCloud
 
-      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         if: github.base_ref
 
       - name: Setup Flutter
@@ -39,13 +39,13 @@ jobs:
           echo CHROMEDRIVER_PORT_4444=yes >$GITHUB_ENV
       - run: ./tool/test.sh --coverage
       - run: dart --version && dart format --set-exit-if-changed --output none .
-      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: failures
           path: "**/failures/"
 
-      - uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7.1.0
+      - uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432 # v8.0.0
         if: env.SONAR_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
