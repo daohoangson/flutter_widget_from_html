@@ -231,6 +231,12 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   @override
   Future<void> setUseWideViewPort(bool use) => throw UnimplementedError();
 
+  // TODO: Use WebAuthenticationSupport when webview_flutter_android >= 4.14.0.
+  @override
+  // ignore: override_on_non_overriding_member
+  Future<void> setWebAuthenticationSupport(dynamic support) =>
+      throw UnimplementedError();
+
   @override
   int get webViewIdentifier => throw UnimplementedError();
 }
