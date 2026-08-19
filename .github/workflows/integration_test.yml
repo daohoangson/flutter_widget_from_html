@@ -87,9 +87,18 @@ jobs:
         run: |
           set -e
 
-          xcodebuild -version
-          actual_version="$(xcodebuild -version | awk 'NR == 1 { print $2 }')"
-          test "$actual_version" = "$FTL_XCODE_VERSION"
+          if [[ ! -d "$DEVELOPER_DIR" ]]; then
+            echo "::error::Xcode developer directory does not exist: $DEVELOPER_DIR"
+            exit 1
+          fi
+
+          xcode_version_output="$(xcodebuild -version)"
+          echo "$xcode_version_output"
+          actual_version="$(printf '%s\n' "$xcode_version_output" | awk 'NR == 1 { print $2 }')"
+          if [[ "$actual_version" != "$FTL_XCODE_VERSION" ]]; then
+            echo "::error::Xcode version mismatch: expected $FTL_XCODE_VERSION, got $actual_version"
+            exit 1
+          fi
       - name: Run patrol build
         run: |
           set -e
