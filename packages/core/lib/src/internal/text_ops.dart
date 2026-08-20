@@ -75,6 +75,8 @@ double? _fontSizeTryParseCssLength(InheritedProperties resolved, CssLength v) =>
 
 double? _fontSizeTryParseTerm(InheritedProperties resolved, String value) {
   switch (value) {
+    case kCssFontSizeXxxLarge:
+      return _fontSizeMultiplyRootWith(resolved, 3.0);
     case kCssFontSizeXxLarge:
       return _fontSizeMultiplyRootWith(resolved, 2.0);
     case kCssFontSizeXLarge:

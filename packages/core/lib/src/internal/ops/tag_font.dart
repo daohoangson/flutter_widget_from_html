@@ -9,6 +9,7 @@ const kCssFontFamily = 'font-family';
 
 const kCssFontSize = 'font-size';
 const kCssFontSizeXxLarge = 'xx-large';
+const kCssFontSizeXxxLarge = 'xxx-large';
 const kCssFontSizeXLarge = 'x-large';
 const kCssFontSizeLarge = 'large';
 const kCssFontSizeMedium = 'medium';
