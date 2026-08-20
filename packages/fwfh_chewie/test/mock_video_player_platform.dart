@@ -2,15 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 void mockVideoPlayerPlatform() => _FakeVideoPlayerPlatform();
 
-class _FakeVideoPlayerPlatform extends Fake
-    with MockPlatformInterfaceMixin
-    implements VideoPlayerPlatform {
+class _FakeVideoPlayerPlatform extends VideoPlayerPlatform
+    with MockPlatformInterfaceMixin {
   var _nextTextureId = 0;
 
   final uris = <int, String?>{};

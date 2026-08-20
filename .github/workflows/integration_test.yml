@@ -64,6 +64,9 @@ jobs:
 
   ios:
     runs-on: macos-latest
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+      FTL_XCODE_VERSION: "26.2"
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup Flutter
@@ -80,6 +83,22 @@ jobs:
           brew install git-crypt
           echo "${GIT_CRYPT_KEY}" | base64 -d >/tmp/git-crypt-key
           git-crypt unlock /tmp/git-crypt-key
+      - name: Verify Xcode
+        run: |
+          set -e
+
+          if [[ ! -d "$DEVELOPER_DIR" ]]; then
+            echo "::error::Xcode developer directory does not exist: $DEVELOPER_DIR"
+            exit 1
+          fi
+
+          xcode_version_output="$(xcodebuild -version)"
+          echo "$xcode_version_output"
+          actual_version="$(printf '%s\n' "$xcode_version_output" | awk 'NR == 1 { print $2 }')"
+          if [[ "$actual_version" != "$FTL_XCODE_VERSION" ]]; then
+            echo "::error::Xcode version mismatch: expected $FTL_XCODE_VERSION, got $actual_version"
+            exit 1
+          fi
       - name: Run patrol build
         run: |
           set -e
@@ -110,4 +129,5 @@ jobs:
             --results-bucket=fwfh-dev-patrol-public \
             --test ios_tests.zip \
             --timeout 10m \
-            --type xctest
+            --type xctest \
+            --xcode-version="$FTL_XCODE_VERSION"
