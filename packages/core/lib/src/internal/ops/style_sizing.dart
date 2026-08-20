@@ -98,12 +98,25 @@ class StyleSizing {
   }
 
   static Widget _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
-    if (placeholder.isEmpty) {
+    final input = tree.sizingInput;
+    if (input == null) {
       return placeholder;
     }
 
-    final input = tree.sizingInput;
-    if (input == null) {
+    // Allow empty elements through when they have an explicit preferred
+    // width (non-100%, non-auto) or height (non-auto), so that e.g.:
+    //   <div style="width:100px;height:100px;background:red;"></div>
+    // still gets a CssSizing wrapper and renders at the correct size.
+    // `auto` (e.g. from <img> default styles) and pure 100%-width block
+    // behaviour do not count as explicit sizes.
+    final pw = input.preferredWidth;
+    final ph = input.preferredHeight;
+    final hasExplicitPreferredSize =
+        (pw != null &&
+            pw != k100percent &&
+            pw.unit != CssLengthUnit.auto) ||
+        (ph != null && ph.unit != CssLengthUnit.auto);
+    if (placeholder.isEmpty && !hasExplicitPreferredSize) {
       return placeholder;
     }
 

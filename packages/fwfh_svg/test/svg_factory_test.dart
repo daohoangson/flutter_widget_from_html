@@ -364,6 +364,31 @@ Bar.''';
       fileNameFactory: (name) => '${core.kGoldenFilePrefix}/svg/$name.png',
     ),
   );
+
+  group('clip-path: path()', () {
+    testWidgets('clips when SvgFactory is loaded', (WidgetTester tester) async {
+      const pathData = 'M 0 0 L 200 0 L 100 100 Z';
+      const html =
+          '<div style="width:200px;height:100px;clip-path:path(\'$pathData\')">Foo</div>';
+      await core.explain(
+        tester,
+        null,
+        hw: HtmlWidget(html, factoryBuilder: () => _ClipPathSvgFactory()),
+      );
+
+      final clipPath = tester.widget<ClipPath>(find.byType(ClipPath));
+      expect(clipPath.clipper, isNotNull);
+    });
+
+    testWidgets('does nothing without SvgFactory', (WidgetTester tester) async {
+      const pathData = 'M 0 0 L 200 0 L 100 100 Z';
+      const html =
+          '<div style="width:200px;height:100px;clip-path:path(\'$pathData\')">Foo</div>';
+      await core.explain(tester, html);
+
+      expect(find.byType(ClipPath), findsNothing);
+    });
+  });
 }
 
 class _Golden extends StatelessWidget {
@@ -485,3 +510,5 @@ class _NullLoadingFactory extends WidgetFactory with SvgFactory {
   ]) =>
       null;
 }
+
+class _ClipPathSvgFactory extends WidgetFactory with SvgFactory {}
