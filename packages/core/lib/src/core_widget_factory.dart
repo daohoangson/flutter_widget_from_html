@@ -147,11 +147,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
+    Gradient? gradient,
     DecorationImage? image,
   }) {
+    // BoxDecoration asserts that color and gradient cannot both be non-null.
+    final effectiveColor = gradient != null ? null : color;
     if (border == null &&
         borderRadius == null &&
-        color == null &&
+        effectiveColor == null &&
+        gradient == null &&
         image == null) {
       return child;
     }
@@ -163,7 +167,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     var decoration = baseDeco.copyWith(
       border: border,
-      color: color,
+      color: effectiveColor,
+      gradient: gradient,
       image: image,
     );
 
