@@ -18,12 +18,12 @@ jobs:
   android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           cache: true
-      - uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
         with:
           # only update gradle cache from demo_app.yml jobs
           cache-read-only: true
@@ -64,8 +64,11 @@ jobs:
 
   ios:
     runs-on: macos-latest
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+      FTL_XCODE_VERSION: "26.2"
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
@@ -80,6 +83,22 @@ jobs:
           brew install git-crypt
           echo "${GIT_CRYPT_KEY}" | base64 -d >/tmp/git-crypt-key
           git-crypt unlock /tmp/git-crypt-key
+      - name: Verify Xcode
+        run: |
+          set -e
+
+          if [[ ! -d "$DEVELOPER_DIR" ]]; then
+            echo "::error::Xcode developer directory does not exist: $DEVELOPER_DIR"
+            exit 1
+          fi
+
+          xcode_version_output="$(xcodebuild -version)"
+          echo "$xcode_version_output"
+          actual_version="$(printf '%s\n' "$xcode_version_output" | awk 'NR == 1 { print $2 }')"
+          if [[ "$actual_version" != "$FTL_XCODE_VERSION" ]]; then
+            echo "::error::Xcode version mismatch: expected $FTL_XCODE_VERSION, got $actual_version"
+            exit 1
+          fi
       - name: Run patrol build
         run: |
           set -e
@@ -110,4 +129,5 @@ jobs:
             --results-bucket=fwfh-dev-patrol-public \
             --test ios_tests.zip \
             --timeout 10m \
-            --type xctest
+            --type xctest \
+            --xcode-version="$FTL_XCODE_VERSION"
