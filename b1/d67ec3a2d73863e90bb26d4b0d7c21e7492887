@@ -1,0 +1,25 @@
+packages/fwfh_cached_network_image/CHANGELOG.md
+  b723a30d34b72d1b 1-5
+packages/fwfh_cached_network_image/pubspec.yaml
+  b723a30d34b72d1b 2,15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "b1d67ec3a2d73863e90bb26d4b0d7c21e7492887",
+  "prompts": {
+    "b723a30d34b72d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e641390e-778a-40ba-9302-362ee8ad1e13",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 2,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
