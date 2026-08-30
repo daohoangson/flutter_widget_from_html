@@ -252,18 +252,23 @@ that need it, then `enhanced` last).
 
 ### PR title
 
-The established convention, confirmed across ~20+ real "Prepare" PRs from `v0.6.0` through
-`v0.17.1`, is literally:
+Two title formats are both established, real convention — either is fine, pick one:
 
 ```
 Prepare vX.Y.Z releases
 ```
 
-where `X.Y.Z` is **`enhanced`'s new version** (verified: every single historical example uses
-enhanced's version number here, never core's or any add-on's). The most recent real release
-(`f73b7152`, `v0.17.2`) deviated from this and used `chore: Release v0.17.2` instead — that's a
-one-off inconsistency, not a convention change. Stick to `Prepare vX.Y.Z releases` going forward
-unless the maintainer explicitly decides to change it.
+Confirmed across ~20+ real "Prepare" PRs from `v0.6.0` through `v0.17.1`, where `X.Y.Z` is
+**`enhanced`'s new version** (verified: every single historical example uses enhanced's version
+number here, never core's or any add-on's).
+
+```
+chore: Release vX.Y.Z
+```
+
+Used for `v0.17.2` (`f73b7152`) and again for `v0.17.3` (the release this runbook itself shipped
+in, PR #1622) — two independent real instances is a real, established pattern going forward, not
+a one-off to avoid. Same `X.Y.Z` = `enhanced`'s new version rule applies.
 
 An optional trailing "Update files" style commit for regenerated lockfiles is sometimes present
 (e.g. a refreshed `demo_app/pubspec.lock` after running `./tool/pub-get.sh` locally to sanity
@@ -333,5 +338,5 @@ one release at a time.
       self-pin alike) only when that package's bump crosses into a new minor; leave alone on a
       patch-only bump.
 - [ ] One commit per bumped package, `[pkg] vX.Y.Z`, in dependency order.
-- [ ] Open PR titled `Prepare vX.Y.Z releases` (X.Y.Z = enhanced's new version).
+- [ ] Open PR titled `Prepare vX.Y.Z releases` or `chore: Release vX.Y.Z` (X.Y.Z = enhanced's new version) — both are established convention.
 - [ ] After merge, the repo owner runs `tool/pub-publish.sh` manually — this runbook stops here.
