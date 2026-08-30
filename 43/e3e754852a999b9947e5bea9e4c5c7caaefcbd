@@ -1,0 +1,27 @@
+packages/core/pubspec.yaml
+  c5158b2416c3c521 2
+packages/core/CHANGELOG.md
+  c5158b2416c3c521 1-8
+packages/core/README.md
+  c5158b2416c3c521 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "43e3e754852a999b9947e5bea9e4c5c7caaefcbd",
+  "prompts": {
+    "c5158b2416c3c521": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c7fd1af4-3b32-40fd-8f74-7ebb89da950d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 2,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
