@@ -1,3 +1,7 @@
+## 0.16.2
+
+- Add support for cached_network_image@4.0.0 (#1621)
+
 ## 0.16.1
 
 - Add support for flutter_widget_from_html_core@0.17.0 (#1475)

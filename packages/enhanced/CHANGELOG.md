@@ -1,3 +1,12 @@
+## 0.17.3
+
+- Add support for standalone CSS `border-*` properties (#1570, authored by @CaptainDario)
+- Add support for 3-value CSS shorthand for `margin` and `padding` (#1577)
+- Add support for cached_network_image@4.0.0 (#1621)
+- Fix `text-align` handling for `<li>` content layout (#1578)
+- Fix incorrect Hebrew characters in the `list-style-type: hebrew` counter (#1612)
+- Fix missing `computeDryBaseline` override breaking custom `RenderBox` subclasses on Flutter 3.32+ (#1584)
+
 ## 0.17.2
 
 - Add `text-emphasis` / `text-emphasis-style` support (#1561, authored by @CaptainDario)
