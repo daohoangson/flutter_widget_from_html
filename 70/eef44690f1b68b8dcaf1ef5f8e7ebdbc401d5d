@@ -1,0 +1,25 @@
+docs/runbook/release.md
+  b723a30d34b72d1b 3-5,7-10,12-17,19,28,30-31,33,35-36,38-40,43,46,49,52-53,55-60,62-64,66,68-69,71-72,75-155,158-161,163-171,173-174,176,178-179,182,185-187,189,192,195-249
+AGENTS.md
+  b723a30d34b72d1b 36-40,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "70eef44690f1b68b8dcaf1ef5f8e7ebdbc401d5d",
+  "prompts": {
+    "b723a30d34b72d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e641390e-778a-40ba-9302-362ee8ad1e13",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 211,
+      "total_deletions": 93,
+      "accepted_lines": 211,
+      "overriden_lines": 0
+    }
+  }
+}
