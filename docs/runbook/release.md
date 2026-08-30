@@ -117,33 +117,62 @@ the most recent precedent).
 
 ## Step 2: Decide the version bump
 
-There is **no clean, deterministic "feature = minor, fix = patch" rule** in this project's real
-history — verify this yourself before assuming otherwise. Concrete counter-examples:
+This project's `0.x` packages follow a real, **deterministic rule** — verified with zero
+exceptions across every mainline core release from `v0.14.2` through `v0.17.3` by diffing the
+actual `environment.flutter` (and `environment.sdk`) constraint in that package's own
+`pubspec.yaml`, not just by reading changelog prose (changelog wording can mention a Flutter
+version for other reasons — see the caution below):
 
-- `core` `v0.17.2` (patch-tier: `0.17.0 → 0.17.2`) shipped **three new CSS feature additions**
-  (`text-emphasis`/`text-emphasis-style`, `text-decoration-style: wavy`, enhanced
-  `list-style-type`) alongside bug fixes — all as a patch, not a minor.
-- `core` `v0.14.5` shipped multiple lines explicitly marked `BREAKING:` in its own changelog, as
-  a patch-tier bump (`0.14.4+1 → 0.14.5`), not a minor.
+**Minor bump ⟺ this release changes the package's own `environment.flutter` / `environment.sdk`
+floor in its `pubspec.yaml`, compared to its previous release. Patch otherwise, no matter what
+else the release contains.**
 
-The closest thing to an actual pattern, observed across `v0.15.0`, `v0.16.0`, and `v0.17.0`: **a
-middle/minor version bump is reserved almost exclusively for raising the package's minimum
-required Flutter/Dart SDK floor** ("Requires Flutter 3.16", "Requires Flutter 3.22", "Requires
-Flutter 3.32" — each coincides exactly with that package's minor bump). Everything else —
-new features, bug fixes, and even breaking API changes — ships as a patch-tier bump, because
-every package in this repo is still pre-1.0 (`0.x.y`), and pub's caret operator treats the
-*middle* number as the real compatibility boundary for `0.x` versions (`^0.14.4` resolves to
-`>=0.14.4 <0.15.0`), not the third number.
+Confirmed transitions for `core` (`packages/core/pubspec.yaml`, `environment.flutter`):
+
+| Release | Bump | Floor before → after |
+| --- | --- | --- |
+| `0.14.12 → 0.15.1` | **minor** | `>=3.7.0` → `>=3.10.0` |
+| `0.15.2 → 0.16.0` | **minor** | `>=3.10.0` → `>=3.22.0` |
+| `0.16.0 → 0.17.0` | **minor** | `>=3.22.0` → `>=3.32.0` |
+| `0.14.2` through `0.14.12` (many patch releases) | patch | `>=3.7.0` unchanged throughout |
+| `0.15.1 → 0.15.2` | patch | `>=3.10.0` unchanged |
+| `0.17.0 → 0.17.2` | patch | `>=3.32.0` unchanged |
+
+Every one of those patch-tier releases still shipped real user-facing changes — including brand
+new CSS features (`text-emphasis`/`text-emphasis-style`, `text-decoration-style: wavy`, roman
+numerals past 3999, `text-shadow`, flex improvements) and even lines a changelog marks
+`BREAKING:` (`v0.14.5`) — none of that mattered to the bump size. Only the `environment.flutter`/
+`environment.sdk` floor changing did. This holds because every package here is pre-1.0, and pub's
+caret operator treats the *middle* number as the real compatibility boundary for `0.x` versions
+(`^0.14.4` resolves to `>=0.14.4 <0.15.0`), which is exactly the boundary a Flutter/SDK floor raise
+is meant to signal — a minor bump exists here for exactly one reason, not as a generic "notable
+change" signal.
+
+**Caution — check the constraint itself, not the prose:** a package's *own* changelog can mention
+a Flutter version for reasons unrelated to its own floor, e.g. citing a bundled dependency's
+requirement (`enhanced`'s `v0.16.1`, itself a patch, notes "requires Flutter 3.27" only because
+the `just_audio` version it picked up needs that — `enhanced`'s own `environment.flutter` did not
+change that release). Always diff `environment.flutter`/`environment.sdk` directly; don't infer
+the bump size from whether "Flutter" appears in the changelog text.
 
 Practical guidance:
 
-- If the change set includes a "requires Flutter/SDK vX.Y" floor raise → minor bump.
-- Otherwise (new features, fixes, dependency-compat widening, even breaking changes) → patch
-  bump. Use judgment for something that feels large enough to warrant a minor anyway — this is a
-  strong default derived from real history, not a hard law.
-- A pure dependency-compat widen with "no source changes needed" (e.g. widening an external
-  plugin's version range) is always a patch, going by the many `"Add support for X@Y.Z"`
-  precedents in every package's changelog.
+- **Minor**: only when *this* release raises the package's own `environment.flutter` and/or
+  `environment.sdk` floor in its `pubspec.yaml`. Diff that file's `environment:` block against its
+  previous release to check — don't guess from the changelog.
+- **Patch**: everything else — new backwards-compatible capabilities, any number of bundled
+  fixes, dependency-constraint widens (`"Add support for X@Y.Z"`), even a breaking API change (has
+  happened; `major` below is the theoretically-correct answer for that, but real history has
+  always shipped it as patch instead — flag it explicitly rather than silently following either
+  precedent).
+- **Major**: reserved for an actual breaking change. Real history has never used it (breaking
+  changes have shipped as patch instead, pre-1.0 norms notwithstanding) — treat this as a decision
+  to flag for the maintainer, not one to make unilaterally.
+- `enhanced` still needs a release whenever any dependency it exact-pins bumps (see the
+  propagation rule above) — bump it to at least the same tier as the highest-tier dependency bump
+  it's picking up this cycle. Since `enhanced` has no add-on code of its own with a Flutter floor
+  to raise independently, this is in practice almost always patch, escalating to minor only when
+  one of the dependencies it bundles took a minor (floor-raising) bump this cycle.
 
 ## Step 3: Write the CHANGELOG entry
 

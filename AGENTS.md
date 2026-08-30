@@ -34,16 +34,16 @@
 ## Release Workflow
 
 Full procedure: see [`docs/runbook/release.md`](docs/runbook/release.md) — how to determine
-which packages need a release, real semver reasoning (no clean deterministic rule; verify from
-history), CHANGELOG conventions, exact commit/PR shape, and where `tool/pub-publish.sh` fits.
-Publishing to pub.dev itself is a manual, owner-only step taken after the prep PR merges — it is
-not automated or scripted here.
+which packages need a release, real semver reasoning, CHANGELOG conventions, exact commit/PR
+shape, and where `tool/pub-publish.sh` fits. Publishing to pub.dev itself is a manual, owner-only
+step taken after the prep PR merges — it is not automated or scripted here.
 
 Most load-bearing points:
 
 - CHANGELOGs are updated at release-prep time, not at merge time. Do not add changelog entries during feature work.
 - Core and enhanced READMEs share the same feature list structure. When adding a feature to core, update both `packages/core/README.md` and `packages/enhanced/README.md`.
 - Sub‑package README version pins (e.g., `^0.16.0` not `^0.16.1`) are intentional floor versions — only bump them on a minor release of that package, never on a patch. (`fwfh_webview`'s pin was incorrectly bumped every patch for a while; see the runbook's pitfalls section before repeating that.)
+- Minor vs. patch is deterministic, not discretionary: a package takes a **minor** bump only when that release changes its own `environment.flutter`/`environment.sdk` floor in its `pubspec.yaml` — verified with zero exceptions across every mainline `core` release from `v0.14.2` through `v0.17.3`. Everything else (new features, any number of fixes, dependency-compat widens) is **patch**, no matter how significant it reads. See the runbook's Step 2 for the full evidence table.
 - A minor version bump of `core` forces a patch release of every `fwfh_*` add-on (their `core` dependency is an explicit `">=floor <nextMinor>"` range that must widen); any package release forces `enhanced` to release too, since its `pubspec.yaml` pins everything with an exact-synced caret.
 - There is no live git tagging in this process — `pubspec.yaml` is the versioning source of truth. Don't add a tagging step on your own initiative.
 - Verify Flutter stable compatibility before adopting new Android toolchain versions (e.g., AGP 9 required Flutter APIs not yet in stable).
