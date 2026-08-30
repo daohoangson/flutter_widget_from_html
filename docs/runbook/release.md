@@ -107,13 +107,23 @@ correctly left it alone. When bumping any `fwfh_*` add-on's patch version, doubl
 **not** touching its own README pin unless the bump is a minor.
 
 `core` and `enhanced`'s own self-referential README install snippets (`flutter_widget_from_html_core: ^0.17.2`,
-`flutter_widget_from_html: ^0.17.2`) are a *different* thing from the above — they show "how to
-install me," not "the floor of a dependency I need." Real history here is inconsistent: some
-patch-only cycles left it stale (`fc6e7497`, core `0.16.0→0.16.1`, README pin never touched), and
-the most recent cycle (`f73b7152`) updated it to the exact new version. There is no clean rule;
-treat it as maintainer discretion. This runbook's recommendation going forward: keep it in exact
-sync with the current version every release (simplest, least confusing for new users, matches
-the most recent precedent).
+`flutter_widget_from_html: ^0.17.2`) show "how to install me," not "the floor of a dependency I
+need" — but **they follow the exact same floor-pin rule as every other pin in this repo, no
+exception**: update it only when the release crosses into a new minor; leave it alone on a
+patch-only bump. The reasoning is identical to Step 2's caret-semantics point — `^0.17.2` already
+resolves to `0.17.3` automatically for anyone installing it, so bumping the exact pin on a patch
+release changes nothing functionally and is just diff noise.
+
+The two real data points support this as one rule, not two different philosophies:
+
+- `fc6e7497` (core `0.16.0→0.16.1`, patch, same minor) correctly left the README pin untouched.
+- `f73b7152` (core `0.17.0→0.17.2`, patch, same minor) updated both `core` and `enhanced`'s pins to
+  the exact new version anyway — but this is best read as an accidental blanket-update while
+  bumping several packages in one pass (that commit touched three packages' files together), not
+  a deliberate policy call. There's no other evidence anywhere in this repo's history of "keep the
+  self-pin in exact sync" ever being applied on purpose, it directly contradicts the floor-pin
+  logic every other pin in this repo follows, and it's the only such instance across the entire
+  history checked. Treat it as the one outlier to avoid repeating, not as precedent.
 
 ## Step 2: Decide the version bump
 
@@ -319,8 +329,9 @@ one release at a time.
 - [ ] Pick version bumps: minor only for an SDK/Flutter floor raise; patch otherwise.
 - [ ] Write CHANGELOG entries (features before fixes where practical; credit humans only;
       `enhanced` aggregates everything it bundles).
-- [ ] Update sub-package README floor pins only on a minor bump for that package; keep
-      core/enhanced's own self-pin in sync with their exact new version.
+- [ ] Update every README floor pin (sub-package dependency pins, and core/enhanced's own
+      self-pin alike) only when that package's bump crosses into a new minor; leave alone on a
+      patch-only bump.
 - [ ] One commit per bumped package, `[pkg] vX.Y.Z`, in dependency order.
 - [ ] Open PR titled `Prepare vX.Y.Z releases` (X.Y.Z = enhanced's new version).
 - [ ] After merge, the repo owner runs `tool/pub-publish.sh` manually — this runbook stops here.
