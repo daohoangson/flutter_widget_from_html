@@ -33,9 +33,10 @@ class StyleBackground {
         onRenderBlock: (tree, placeholder) {
           final data = tree.backgroundData;
           final color = data.color;
+          final gradient = data.gradient;
           final imageUrl = data.imageUrl;
 
-          if (color == null && imageUrl == null) {
+          if (color == null && gradient == null && imageUrl == null) {
             return placeholder;
           }
 
@@ -50,11 +51,17 @@ class StyleBackground {
           return placeholder.wrapWith(
             (context, child) {
               final resolved = tree.inheritanceResolvers.resolve(context);
-              final resolvedColor = color?.getValue(resolved);
+              // gradient takes precedence over background-color (BoxDecoration
+              // disallows both simultaneously; gradient renders on top anyway).
+              final resolvedColor =
+                  gradient == null ? color?.getValue(resolved) : null;
               return wf.buildDecoration(
                 tree,
                 child,
                 color: resolvedColor,
+                gradient: gradient != null
+                    ? _cssGradientToFlutter(gradient)
+                    : null,
                 image: image,
               );
             },
@@ -154,12 +161,14 @@ extension on css.Expression {
 class _StyleBackgroundData {
   final AlignmentGeometry alignment;
   final CssColor? color;
+  final CssGradient? gradient;
   final String? imageUrl;
   final ImageRepeat repeat;
   final BoxFit size;
   const _StyleBackgroundData({
     this.alignment = Alignment.topLeft,
     this.color,
+    this.gradient,
     this.imageUrl,
     this.repeat = ImageRepeat.noRepeat,
     this.size = BoxFit.scaleDown,
@@ -168,6 +177,7 @@ class _StyleBackgroundData {
   _StyleBackgroundData copyWith({
     AlignmentGeometry? alignment,
     CssColor? color,
+    CssGradient? gradient,
     String? imageUrl,
     ImageRepeat? repeat,
     BoxFit? size,
@@ -175,6 +185,7 @@ class _StyleBackgroundData {
       _StyleBackgroundData(
         alignment: alignment ?? this.alignment,
         color: color ?? this.color,
+        gradient: gradient ?? this.gradient,
         imageUrl: imageUrl ?? this.imageUrl,
         repeat: repeat ?? this.repeat,
         size: size ?? this.size,
@@ -192,6 +203,15 @@ class _StyleBackgroundData {
 
   _StyleBackgroundData copyWithImageUrl(_StyleBackgroundDeclaration style) {
     final value = style.value;
+
+    // Gradient functions (linear-gradient, radial-gradient, conic-gradient…)
+    // are parsed first; they shadow background-color per the CSS spec.
+    final cssGradient = tryParseGradient(value);
+    if (cssGradient != null) {
+      style.increaseIndex();
+      return copyWith(gradient: cssGradient);
+    }
+
     final imageUrl = value is css.UriTerm ? value.text : null;
     if (imageUrl == null) {
       return this;
@@ -350,4 +370,157 @@ enum _StyleBackgroundPosition {
   left,
   right,
   top,
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// CSS gradient → Flutter Gradient conversion
+// ──────────────────────────────────────────────────────────────────────────────
+
+Gradient _cssGradientToFlutter(CssGradient g) {
+  final colors = g.stops.map((s) => s.color).toList(growable: false);
+  final allHavePositions = g.stops.every((s) => s.position != null);
+  final rawStops = allHavePositions
+      ? g.stops.map((s) => s.position!).toList(growable: false)
+      : null;
+
+  // Flutter's TileMode.repeated tiles outside the [begin,end] vector but not
+  // within it, so it has no effect when the vector spans the whole box.
+  // Manually expand the stop pattern to cover [0,1] instead.
+  final (effectiveColors, effectiveStops) =
+      g.repeating ? _expandRepeatingStops(colors, rawStops) : (colors, rawStops);
+
+  return switch (g) {
+    CssLinearGradient(:final begin, :final end) => LinearGradient(
+        begin: begin,
+        end: end,
+        colors: effectiveColors,
+        stops: effectiveStops,
+        tileMode: TileMode.clamp,
+      ),
+    CssRadialGradient(:final center, :final isCircle) => RadialGradient(
+        center: center,
+        colors: effectiveColors,
+        stops: effectiveStops,
+        tileMode: TileMode.clamp,
+        transform: _RadialFarthestCornerTransform(center, isCircle: isCircle),
+      ),
+    CssConicGradient(:final center, :final startAngle) => SweepGradient(
+        center: center,
+        // Always sweep the full 0→2π so stop positions map correctly and
+        // TileMode.clamp doesn't produce a clamped wedge before startAngle.
+        startAngle: 0,
+        endAngle: 2 * pi,
+        colors: effectiveColors,
+        stops: effectiveStops,
+        tileMode: TileMode.clamp,
+        // Rotate around the gradient's own center:
+        //   • -π/2 maps CSS 12 o'clock → Flutter 3 o'clock origin
+        //   • + startAngle applies the CSS `from <angle>` offset
+        transform: _ConicAlignTransform(center, startAngle),
+      ),
+  };
+}
+
+/// Expands a repeating gradient's stop pattern to cover [0, 1].
+///
+/// Flutter's [TileMode.repeated] tiles outside the gradient vector but not
+/// within [0, 1], so it produces no visible repetition when the vector spans
+/// the full bounding box.  Manually repeating the tile fixes this.
+(List<Color>, List<double>?) _expandRepeatingStops(
+  List<Color> colors,
+  List<double>? stops,
+) {
+  if (stops == null || stops.length < 2) return (colors, stops);
+  final period = stops.last - stops.first;
+  if (period <= 0 || stops.last >= 1.0) return (colors, stops);
+
+  final outColors = <Color>[];
+  final outStops = <double>[];
+
+  var offset = 0.0;
+  outer:
+  while (true) {
+    for (var i = 0; i < stops.length; i++) {
+      final s = offset + (stops[i] - stops.first);
+      if (s >= 1.0) {
+        outStops.add(1.0);
+        outColors.add(colors[i]);
+        break outer;
+      }
+      outStops.add(s);
+      outColors.add(colors[i]);
+    }
+    offset += period;
+  }
+
+  return (outColors, outStops);
+}
+
+/// Applies CSS [farthest-corner] sizing to a Flutter [RadialGradient].
+///
+/// Flutter's [RadialGradient] defaults to `radius: 0.5` (half the shortest
+/// side). CSS defaults to farthest-corner, meaning the last stop should reach
+/// the furthest corner of the bounding box from the gradient centre.
+///
+/// * **Circle** – radius = Euclidean distance from centre to farthest corner.
+/// * **Ellipse** – each axis scaled independently (CSS spec §4.2.1).
+class _RadialFarthestCornerTransform implements GradientTransform {
+  final Alignment center;
+  final bool isCircle;
+
+  const _RadialFarthestCornerTransform(this.center, {required this.isCircle});
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    final baseR = bounds.shortestSide / 2.0;
+    if (baseR == 0) return null;
+
+    final cx = bounds.left + bounds.width * (center.x + 1) / 2;
+    final cy = bounds.top + bounds.height * (center.y + 1) / 2;
+
+    final maxDx = max(cx - bounds.left, bounds.right - cx);
+    final maxDy = max(cy - bounds.top, bounds.bottom - cy);
+
+    final double scaleX;
+    final double scaleY;
+    if (isCircle) {
+      final farDist = sqrt(maxDx * maxDx + maxDy * maxDy);
+      if (farDist == 0) return null;
+      scaleX = farDist / baseR;
+      scaleY = scaleX;
+    } else {
+      if (maxDx == 0 || maxDy == 0) return null;
+      scaleX = maxDx / baseR;
+      scaleY = maxDy / baseR;
+    }
+
+    return Matrix4.identity()
+      ..translate(cx, cy)
+      ..scale(scaleX, scaleY, 1.0)
+      ..translate(-cx, -cy);
+  }
+}
+
+/// Rotates a conic gradient around [center] (not necessarily Alignment.center)
+/// by [startAngle] − π/2.
+///
+/// Flutter's SweepGradient starts at 3 o'clock; CSS starts at 12 o'clock.
+/// The extra -π/2 corrects that, and [startAngle] adds the CSS `from <angle>`
+/// offset on top.
+class _ConicAlignTransform implements GradientTransform {
+  final Alignment center;
+  final double startAngle;
+
+  const _ConicAlignTransform(this.center, this.startAngle);
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    final cx = bounds.left + bounds.width * (center.x + 1) / 2;
+    final cy = bounds.top + bounds.height * (center.y + 1) / 2;
+    final angle = startAngle - pi / 2;
+    return Matrix4.identity()
+      ..translate(cx, cy)
+      ..rotateZ(angle)
+      ..translate(-cx, -cy);
+  }
 }
