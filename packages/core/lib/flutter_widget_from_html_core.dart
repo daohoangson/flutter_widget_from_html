@@ -1,3 +1,5 @@
+export 'package:html/dom.dart' show NodeList;
+
 export 'src/core_data.dart';
 export 'src/core_helpers.dart';
 export 'src/core_html_widget.dart';

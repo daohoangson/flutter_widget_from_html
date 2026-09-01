@@ -40,6 +40,17 @@ class HtmlWidget extends StatefulWidget {
   /// The input string.
   final String html;
 
+  /// Pre-parsed DOM nodes, produced by [parseHtmlToNodes].
+  ///
+  /// When provided, [html] is ignored entirely — the widget uses these nodes
+  /// directly and skips HTML-string-to-DOM parsing. You may pass an empty
+  /// string for [html]:
+  ///
+  /// ```dart
+  /// HtmlWidget('', parsedNodes: nodes)
+  /// ```
+  final dom.NodeList? parsedNodes;
+
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
 
@@ -66,6 +77,7 @@ class HtmlWidget extends StatefulWidget {
   /// - [buildAsync]
   /// - [enableCaching]
   /// - [html]
+  /// - [parsedNodes]
   /// - [renderMode]
   /// - [textStyle]
   List<dynamic> get rebuildTriggers => [
@@ -73,6 +85,7 @@ class HtmlWidget extends StatefulWidget {
         buildAsync,
         enableCaching,
         html,
+        parsedNodes,
         renderMode,
         textStyle,
         ..._rebuildTriggers ?? const [],
@@ -106,6 +119,7 @@ class HtmlWidget extends StatefulWidget {
     this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
+    this.parsedNodes,
     List<dynamic>? rebuildTriggers,
     this.renderMode = RenderMode.column,
     this.textStyle,
@@ -124,8 +138,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Future<Widget>? _future;
   InheritedProperties? _rootProperties;
 
-  bool get buildAsync =>
-      widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
+  bool get buildAsync => widget.parsedNodes != null
+      ? widget.buildAsync ?? false
+      : widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
@@ -224,11 +239,12 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Future<bool> scrollToAnchor(String id) => _wf.onTapUrl('#$id');
 
   Future<Widget> _buildAsync() async {
-    if (widget.html.isEmpty) {
+    if (widget.html.isEmpty && widget.parsedNodes == null) {
       return Future.sync(() => _sliverOrWidget0);
     }
 
-    final domNodes = await compute(_parseHtml, widget.html);
+    final dom.NodeList domNodes =
+        widget.parsedNodes ?? await compute(parseHtmlToNodes, widget.html);
     if (!mounted) {
       return _sliverOrWidget0;
     }
@@ -241,7 +257,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   }
 
   Widget _buildSync() {
-    if (widget.html.isEmpty) {
+    if (widget.html.isEmpty && widget.parsedNodes == null) {
       return _sliverOrWidget0;
     }
 
@@ -249,7 +265,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
     Widget built;
     try {
-      final domNodes = _parseHtml(widget.html);
+      final domNodes = widget.parsedNodes ?? parseHtmlToNodes(widget.html);
       built = _buildBody(this, domNodes);
     } catch (error, stackTrace) {
       built =
@@ -325,5 +341,14 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   return built;
 }
 
-dom.NodeList _parseHtml(String html) =>
+/// Parses an HTML string into a DOM node list.
+///
+/// This is a pure-Dart function with no Flutter dependencies, so it can be
+/// called inside a [compute] callback or a custom isolate:
+///
+/// ```dart
+/// final nodes = await Isolate.run(() => parseHtmlToNodes(myHtml));
+/// HtmlWidget(myHtml, parsedNodes: nodes);
+/// ```
+dom.NodeList parseHtmlToNodes(String html) =>
     parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;
