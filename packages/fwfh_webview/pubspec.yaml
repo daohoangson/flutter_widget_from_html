@@ -26,7 +26,8 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
-  lint: any
+  # Upgrade the lint preset deliberately; newer releases enable new rules.
+  lint: "<2.9.0"
   measurer: ^2.1.1
   plugin_platform_interface: any
   webview_flutter_platform_interface: ^2.4.0
