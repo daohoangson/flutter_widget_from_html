@@ -302,9 +302,11 @@ dependency order above, it:
 5. Runs `flutter pub publish` for real.
 6. Reverts all local changes (`git checkout .`) and removes the generated `.pubignore`.
 
-`tool/pub-get.sh` is a different, sibling script — it just does a clean cross-package
-`flutter pub get` (deleting all `pubspec.lock` files first, across every package and
-`demo_app`). It's useful for sanity-checking that a bump resolves correctly before committing,
+`tool/pub-get.sh` is a different, sibling script — it just runs `flutter pub get` across every
+package and `demo_app`, preserving existing `pubspec.lock` resolutions where they're still
+compatible with the manifests. (`tool/pub-upgrade.sh` is the sibling that instead runs
+`flutter pub upgrade` everywhere, refreshing resolutions within the declared constraints.)
+`pub-get.sh` is useful for sanity-checking that a bump resolves correctly before committing,
 but **it is not itself a release step** and doesn't touch versions, changelogs, or publish
 anything.
 
