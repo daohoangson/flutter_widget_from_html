@@ -47,7 +47,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
-  lint: any
+  # Upgrade the lint preset deliberately; newer releases enable new rules.
+  lint: "<2.9.0"
   measurer: ^2.1.1
   patrol: ^4.1.1
   patrol_finders: ^3.1.0

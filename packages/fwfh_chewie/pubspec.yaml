@@ -21,7 +21,8 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: any
+  # Upgrade the lint preset deliberately; newer releases enable new rules.
+  lint: "<2.9.0"
   plugin_platform_interface: any
   video_player_platform_interface: ">=5.0.0 <7.0.0"
 
