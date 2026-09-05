@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+
 import '../lib/fixtures.dart';
 import '../lib/main.dart';
 

@@ -4,7 +4,8 @@
 
 - `packages/`: Dart/Flutter packages. Core at `packages/core`, public wrapper at `packages/enhanced`, and feature add‑ons under `packages/fwfh_*`.
 - `demo_app/`: Example Flutter app for manual testing and screenshots.
-- `tool/`: Helper scripts (notably `tool/test.sh`).
+- `benchmark/`: Standalone, unpublished (`publish_to: none`) rendering benchmark harness against `packages/core`; see [`benchmark/README.md`](benchmark/README.md) for protocol, reproduction, and caveats. Not part of `tool/test.sh`/`tool/pub-get.sh` or the release workflow.
+- `tool/`: Helper scripts (notably `tool/test.sh`, `tool/benchmark.sh`).
 - `docs/`, `.github/`: Documentation and CI.
   - Use `context7CompatibleLibraryID=/flutter/website` with `context7.get-library-docs` tool for latest Flutter documentation.
 - Tests live in each package’s `test/` and in `demo_app/test/`. Golden assets are under `test/images/`.

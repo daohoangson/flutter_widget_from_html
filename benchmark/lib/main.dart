@@ -1,18 +1,22 @@
 import 'dart:async';
 import 'dart:ui' show FramePhase;
 import 'dart:developer' as developer;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+
 import 'fixtures.dart';
 
-void main() => runApp(const MaterialApp(
-        home: Scaffold(
-            body: Text(
-      'Run via tool/benchmark.sh; see benchmark/README.md.',
-    ))));
+void main() => runApp(
+  const MaterialApp(
+    home: Scaffold(
+      body: Text('Run via tool/benchmark.sh; see benchmark/README.md.'),
+    ),
+  ),
+);
 
 Map<String, Object?> distribution(List<int> values) {
   if (values.isEmpty)
@@ -25,7 +29,7 @@ Map<String, Object?> distribution(List<int> values) {
     'p50_us': percentile(.5),
     'p90_us': percentile(.9),
     'p99_us': percentile(.99),
-    'max_us': sorted.last
+    'max_us': sorted.last,
   };
 }
 
@@ -37,13 +41,19 @@ class PaintFactory extends WidgetFactory {
   Widget buildBodyWidget(BuildContext context, Widget child) {
     final body = super.buildBodyWidget(context, child);
     return _PaintProbe(
-        onPaint: onPaint, sliver: body is SliverList, child: body);
+      onPaint: onPaint,
+      sliver: body is SliverList,
+      child: body,
+    );
   }
 }
 
 class _PaintProbe extends SingleChildRenderObjectWidget {
-  const _PaintProbe(
-      {required this.onPaint, required this.sliver, required super.child});
+  const _PaintProbe({
+    required this.onPaint,
+    required this.sliver,
+    required super.child,
+  });
   final VoidCallback onPaint;
   final bool sliver;
   @override
@@ -73,8 +83,10 @@ class _SliverProbe extends RenderProxySliver {
   }
 }
 
-Future<Map<String, Object?>> runSuite(
-    {int repetitions = 3, bool smoke = false}) async {
+Future<Map<String, Object?>> runSuite({
+  int repetitions = 3,
+  bool smoke = false,
+}) async {
   if (!kProfileMode && !smoke)
     throw StateError('Measurements require profile mode');
   final results = <Map<String, Object?>>[];
@@ -99,21 +111,21 @@ Future<Map<String, Object?>> runSuite(
             renderMode: mode == 'column'
                 ? RenderMode.column
                 : mode == 'listView'
-                    ? ListViewMode(
-                        controller: controller, padding: EdgeInsets.zero)
-                    : RenderMode.sliverList,
+                ? ListViewMode(controller: controller, padding: EdgeInsets.zero)
+                : RenderMode.sliverList,
           );
           final body = mode == 'column'
               ? SingleChildScrollView(controller: controller, child: html)
               : mode == 'sliverList'
-                  ? CustomScrollView(controller: controller, slivers: [html])
-                  : html;
+              ? CustomScrollView(controller: controller, slivers: [html])
+              : html;
           PaintingBinding.instance.imageCache.clear();
           PaintingBinding.instance.imageCache.clearLiveImages();
           watch.start();
           runApp(MaterialApp(home: Scaffold(body: body)));
-          final firstPaint =
-              await painted.future.timeout(const Duration(seconds: 90));
+          final firstPaint = await painted.future.timeout(
+            const Duration(seconds: 90),
+          );
           await Future<void>.delayed(const Duration(milliseconds: 500));
           final frames = <FrameTiming>[];
           void collect(List<FrameTiming> batch) => frames.addAll(batch);
@@ -123,21 +135,27 @@ Future<Map<String, Object?>> runSuite(
           try {
             // Six viewport-sized steps; re-evaluate lazy scroll extent each time.
             for (var step = 0; step < (smoke ? 1 : 6); step++) {
-              final target = (controller.offset +
-                      controller.position.viewportDimension * .8)
-                  .clamp(0.0, controller.position.maxScrollExtent);
+              final target =
+                  (controller.offset +
+                          controller.position.viewportDimension * .8)
+                      .clamp(0.0, controller.position.maxScrollExtent);
               distance += target - controller.offset;
-              await controller.animateTo(target,
-                  duration: Duration(milliseconds: smoke ? 100 : 500),
-                  curve: Curves.linear);
+              await controller.animateTo(
+                target,
+                duration: Duration(milliseconds: smoke ? 100 : 500),
+                curve: Curves.linear,
+              );
             }
             final end = TimelineClock.now();
             // Native timing callbacks may be delivered in batches after animation.
             await Future<void>.delayed(const Duration(milliseconds: 1000));
             final selected = frames
-                .where((f) =>
-                    f.timestampInMicroseconds(FramePhase.vsyncStart) >= start &&
-                    f.timestampInMicroseconds(FramePhase.vsyncStart) <= end)
+                .where(
+                  (f) =>
+                      f.timestampInMicroseconds(FramePhase.vsyncStart) >=
+                          start &&
+                      f.timestampInMicroseconds(FramePhase.vsyncStart) <= end,
+                )
                 .toList();
             if (trial >= 0)
               results.add({
@@ -149,20 +167,23 @@ Future<Map<String, Object?>> runSuite(
                 'first_body_paint_us': firstPaint,
                 'scroll_distance_logical_px': distance,
                 'scroll_window_us': end - start,
-                'build': distribution(selected
-                    .map((f) => f.buildDuration.inMicroseconds)
-                    .toList()),
-                'raster': distribution(selected
-                    .map((f) => f.rasterDuration.inMicroseconds)
-                    .toList()),
+                'build': distribution(
+                  selected.map((f) => f.buildDuration.inMicroseconds).toList(),
+                ),
+                'raster': distribution(
+                  selected.map((f) => f.rasterDuration.inMicroseconds).toList(),
+                ),
                 'total_span': distribution(
-                    selected.map((f) => f.totalSpan.inMicroseconds).toList()),
+                  selected.map((f) => f.totalSpan.inMicroseconds).toList(),
+                ),
                 'frames': selected
-                    .map((f) => {
-                          'build_us': f.buildDuration.inMicroseconds,
-                          'raster_us': f.rasterDuration.inMicroseconds,
-                          'total_span_us': f.totalSpan.inMicroseconds
-                        })
+                    .map(
+                      (f) => {
+                        'build_us': f.buildDuration.inMicroseconds,
+                        'raster_us': f.rasterDuration.inMicroseconds,
+                        'total_span_us': f.totalSpan.inMicroseconds,
+                      },
+                    )
                     .toList(),
                 'frame_status': selected.isEmpty ? 'unavailable' : 'measured',
               });
@@ -195,9 +216,9 @@ Future<Map<String, Object?>> runSuite(
     'unmeasured': {
       'parsing': 'No isolated public timing hook',
       'widget_construction': 'No isolated public timing hook',
-      'memory': 'No portable reliable per-case allocation instrumentation'
+      'memory': 'No portable reliable per-case allocation instrumentation',
     },
-    'results': results
+    'results': results,
   };
 }
 
