@@ -6,13 +6,6 @@ analyzer:
   exclude:
     # TODO: investigate `include_file_not_found` warning
     - example
-    - build/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
 
 linter:
   rules:
