@@ -1,0 +1,25 @@
+packages/core/pubspec.yaml
+  b723a30d34b72d1b 2
+packages/core/CHANGELOG.md
+  b723a30d34b72d1b 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "ba30486ac4a3a090bae5dc185ad28f039f9a59b1",
+  "prompts": {
+    "b723a30d34b72d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e641390e-778a-40ba-9302-362ee8ad1e13",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    }
+  }
+}

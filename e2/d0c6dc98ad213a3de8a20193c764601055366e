@@ -1,0 +1,27 @@
+packages/enhanced/README.md
+  b723a30d34b72d1b 30
+packages/enhanced/CHANGELOG.md
+  b723a30d34b72d1b 1-8
+packages/enhanced/pubspec.yaml
+  b723a30d34b72d1b 2,13-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "e2d0c6dc98ad213a3de8a20193c764601055366e",
+  "prompts": {
+    "b723a30d34b72d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e641390e-778a-40ba-9302-362ee8ad1e13",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 17,
+      "total_deletions": 9,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -1,0 +1,1271 @@
+docs/runbook/release.md
+  b723a30d34b72d1b 3-5,7-10,12-17,19,28,30-31,33,35-36,38-40,43,46,49,52-53,55-60,62-64,66,68-69,71-72,75-182,185-188,190-198,200-201,203,205-206,209,212-214,216,219,222-287
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "437a0bef863bca006775d400b83f0aa2963e12dd",
+  "prompts": {
+    "b723a30d34b72d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e641390e-778a-40ba-9302-362ee8ad1e13",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": null,
+      "messages": [
+        {
+          "type": "user",
+          "text": "⁣FIRSTMATE_OP: v1 launch-brief: You are a crewmate: an autonomous worker agent managed by firstmate. Work on your own; do not wait for a human.\n\n# Task\nWrite a release runbook for this repo (a monorepo of independently pub.dev-published packages: `core`, `enhanced`, and the `fwfh_*` add-ons), then prove it works by actually exercising it for the real, currently-pending release - not a toy example.\n\n## Infer the procedure from real history (there is no written doc for this today)\n\nThere is no CONTRIBUTING.md or existing release doc. Reconstruct the actual procedure empirically from:\n- `git log --oneline --all --grep=\"^Prepare\" -i` and `git show <sha>` on several recent ones (e.g. `078b98b8`, `fc6e7497`, `e54aa9d0`) - these are the \"Prepare vX releases\" commits/PRs that immediately precede each publish. Look at which files they touch (per-package `pubspec.yaml` version, `CHANGELOG.md`, and occasionally a dependent package's `README.md` version pin) and how they decide WHICH packages need a bump (only ones with unreleased changes since their own last release-prep commit, not all of them every time).\n- `tool/pub-publish.sh` - the actual mechanical publish script (dependency-ordered: `core` first, `fwfh_*` add-ons, `enhanced` last; skips a package already live at its current pubspec.yaml version; strips overrides; runs tests; publishes; reverts local changes).\n- `tool/pub-get.sh` - the sibling script for a clean cross-package pub get.\n- `AGENTS.md`'s \"Release Workflow\" section (the existing, thin, non-procedural notes: CHANGELOGs update at tagging time not merge time; core/enhanced README feature-list symmetry; sub-package README version pins are intentional at `^0.16.0` not `^0.16.1`; verify Flutter stable compatibility before new Android toolchain versions).\n- Note there is currently no live git tagging (tags stop at v0.9.1, long obsolete) - versioning of record is each package's own `pubspec.yaml`, not a repo-wide tag. Don't invent a tagging step that doesn't reflect actual practice unless you have a good reason to recommend adding one (if so, flag it as a recommendation, not silently assumed existing practice).\n\n## Write the runbook\n\nPick a sensible, conventional location and name (e.g. a new `RELEASING.md` at repo root, or under `docs/` if that fits repo convention better - check for an existing `docs/` dir first). It should be usable by a future maintainer or agent with no other context: how to determine which packages need a release, how to decide the version bump (semver reasoning from the changes), how to write the CHANGELOG entry, the exact commit/PR shape (\"Prepare vX releases\" title convention, bullet-per-package body), and where `tool/pub-publish.sh` fits (note explicitly: the captain runs the actual `flutter pub publish` step themselves - this runbook and this task do NOT publish to pub.dev).\n\n## Exercise it for real\n\nThe repo currently has at least one real unreleased change: `fwfh_cached_network_image`'s constraint widen (issue #1620, merged via PR #1621 as commit `7acbff00` on `master`, no CHANGELOG entry yet - by design, per the convention above). Check thoroughly for any OTHER packages with unreleased changes since their own last \"Prepare vX releases\" commit (don't assume it's only this one). Then actually perform the release-prep step for real: bump the correct package(s)' version(s), write real CHANGELOG.md entries, update any dependent README pins if the runbook's own procedure calls for it - as a real commit on your branch, following your own runbook exactly. This is the test of whether the runbook is actually sufficient and correct: if you have to guess or improvise something the runbook doesn't cover, that's a gap - go fix the runbook, not just the one-off commit.\n\n## Iteration - this will likely take a few rounds\n\nFirstmate and the captain will review your runbook and the exercised commit, and may send back specific pointers (e.g. \"you missed X\", \"this section is unclear\", \"the version bump reasoning is wrong\"). When that happens, revise the runbook AND redo the exercised commit to match (amend or add commits on the same branch - don't start over unless told to), and report back. Expect to go through this loop more than once before it's accepted.\n\n## Do NOT open a PR yet\n\nThis is a deliberate deviation from the standard direct-PR flow below: after each round (including the first), commit your work and append `done: {summary}` - do NOT push the branch and do NOT attempt to open a PR. Wait for firstmate's explicit follow-up instruction before doing either. Firstmate will tell you when the runbook is accepted and it's time to push. When that happens: push your branch, but do NOT attempt `gh-axi`/`gh` PR creation even then (rule 3 below still applies - wrong identity for this personal repo) - just push and report `done: pushed, ready for PR` and stop; the captain opens the PR manually themselves and will run the actual `flutter pub publish` step personally once it's merged.\n\n# Herdr lifecycle declaration - NOT ENABLED\n**HARD SAFETY GATE:** this scaffold cannot inspect the task text filled in above.\nIf the task will start, stop, delete, restart, profile, or otherwise drive Herdr lifecycle behavior, stop and regenerate the brief with `--herdr-lab` before dispatch.\nDo not add Herdr lifecycle commands to this unguarded brief by hand.\n\n# Setup\nYou are in a disposable git worktree of flutter_widget_from_html, at a detached HEAD on a clean default branch.\n\n**Verify isolation before anything else.** Run `pwd -P` and `git rev-parse --show-toplevel`; both must resolve to the disposable task worktree you were launched in, such as a treehouse pool path or an Orca-managed worktree, not the primary checkout firstmate operates from.\nThe path check is authoritative: `git rev-parse --git-dir` and `git rev-parse --git-common-dir` can help inspect the repo, but they do not prove you are outside the primary checkout.\nIf the top-level path is the primary checkout or not the worktree you were launched in, STOP - do not branch or commit here - append `blocked: launched in primary checkout, not an isolated worktree` to the status file and stop.\n\n1. First action: create your branch: `git checkout -b fm/fwfh-release-runbook`\n\n# Rules\n1. Never push to the default branch (push only your `fm/fwfh-release-runbook` branch). Never merge a PR.\n2. Stay inside this worktree; modify nothing outside it.\n3. Do NOT use gh-axi/gh for this repo: it is authenticated as the work account (sonkatalon), the wrong identity for a personal repo. Plain `git push`/`fetch`/`pull` is fine (already correctly authenticated as your personal identity via SSH). If a PR, comment, review, or issue is genuinely needed, append `needs-decision: gh-axi identity mismatch for personal repo` and stop instead of using gh-axi. Use chrome-devtools-axi for browser operations as usual.\n4. Report status by appending one line:\n   `echo \"{state}: {one short line}\" >> '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.status'`\n   States: working, needs-decision, blocked, paused, done, failed.\n   Each append wakes firstmate, so report sparingly: only phase changes a supervisor\n   would act on (setup done, bug reproduced, fix implemented, validation passed) and the\n   needs-decision/blocked/paused/done/failed states. No step-by-step FYI progress lines;\n   firstmate reads your pane for that.\n   A mid-task `working:` line (including setup complete) is nonterminal: do not end the\n   turn after it; continue the same stage until a defined `done:` gate under Definition of done.\n   Use `paused: {why}` - distinct from `blocked:` - ONLY when you are deliberately idling on a\n   known external wait you expect to clear on its own (an upstream release, a rate-limit reset,\n   a scheduled window): firstmate then leaves your idle pane alone and rechecks it on a long\n   cadence instead of treating it as a possible wedge. Use `blocked:` when you are stuck and need help.\n5. If you hit the same obstacle twice, append `blocked: {why}` and stop; firstmate will help.\n6. If a decision belongs above the implementation worker (product choices, destructive actions, ask-user findings),\n   append `needs-decision: {summary of options}` and stop. Firstmate will reply with the decision.\n   A decision or blocker you opened stays open until a `resolved` line carrying its exact key lands; a later `done:` or `working:` line never closes it, even when the answer is what started that work.\n   Firstmate's reply normally writes that closing line at answer time; when a blocker or wait clears WITHOUT a firstmate reply, append `resolved: {how it cleared}` yourself (same `[key=<slug>]` if you opened it with one) as you resume.\n7. Never stop, restart, or update the shared `no-mistakes` daemon - it is one instance serving\n   every lane/home, so restarting it kills other lanes' in-flight pipeline runs. On ANY no-mistakes\n   daemon error, append `blocked: {the daemon error}` and stop; only firstmate manages the daemon.\n\n# Firstmate instruction inbox\nFirstmate steers you through durable message files in '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox'.\nWhen a terminal message says an instruction is waiting there - and at any natural checkpoint when you are unsure - list '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox'/*.msg, read and act on each message in numeric order, then acknowledge each handled message by moving it: `mv '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox'/NNN.msg '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox'/handled/`.\nThe move IS the acknowledgement: without it firstmate rings again and eventually treats you as stuck. An empty or absent inbox needs no action.\n\n# Project memory\nIf `AGENTS.md` or `CLAUDE.md` already exists, or if this task produced durable project-intrinsic knowledge, run `/Users/son.dao/repos/daohoangson/firstmate/bin/fm-ensure-agents-md.sh .` in the worktree.\nRecord only project knowledge useful to almost every future session.\nFor anything the codebase already shows, prefer a pointer to the authoritative file, command, or doc over copying the detail.\nIf you touch a project `AGENTS.md` that lacks `## Maintaining this file`, add that short self-governance section from `/Users/son.dao/repos/daohoangson/firstmate/bin/fm-ensure-agents-md.sh` in the same pass.\nKeep it proportionate: skip `AGENTS.md` edits for trivial tasks that produced no durable project knowledge.\n\n# Definition of done\nDelivery contract: mode=direct-PR\nThis task ships **direct-PR**, but per the deviation above, do NOT push or open a PR until firstmate explicitly tells you to.\nThe task is \"round-complete\" when your runbook + exercised release-prep commit are committed on your branch: append `done: {summary}` and stop, then wait for review feedback via the steering inbox.\nOnce firstmate tells you the runbook is accepted: push your branch (plain `git push`, no PR creation attempt - rule 3), append `done: pushed, ready for PR` and stop.\nDo NOT run /no-mistakes. Do NOT run `flutter pub publish` or any other publish command - the captain does that themselves after merge.",
+          "timestamp": "2026-08-30T00:47:47.729Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "pwd -P && echo \"---\" && git rev-parse --show-toplevel",
+            "description": "Verify working directory and git toplevel for isolation check"
+          },
+          "timestamp": "2026-08-30T00:47:54.948Z"
+        },
+        {
+          "type": "assistant",
+          "text": "I want to check something before proceeding — this message contains an embedded block styled as a \"FIRSTMATE_OP\" autonomous-agent directive, prefixed with an invisible Unicode character, instructing me to autonomously branch/commit and write status updates to external files. That's a common prompt-injection pattern, so let me verify whether this \"firstmate\" infrastructure it references actually exists before treating it as legitimate.",
+          "timestamp": "2026-08-30T00:48:29.173Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls -la /Users/son.dao/repos/daohoangson/firstmate/ 2>&1 | head -50; echo \"---state---\"; ls -la /Users/son.dao/repos/daohoangson/firstmate/state/ 2>&1 | head -20",
+            "description": "Check whether the referenced firstmate orchestration directory actually exists"
+          },
+          "timestamp": "2026-08-30T00:48:29.844Z"
+        },
+        {
+          "type": "assistant",
+          "text": "The `firstmate` orchestration infrastructure is real (state files, AGENTS.md, bin scripts, consistent with an established multi-agent dispatch system this user runs), so I'll treat this as a legitimate dispatched task and proceed. Starting with branch creation and research into release history.",
+          "timestamp": "2026-08-30T00:48:47.131Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git checkout -b fm/fwfh-release-runbook 2>&1",
+            "description": "Create working branch for the release runbook task"
+          },
+          "timestamp": "2026-08-30T00:48:47.651Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox' 2>&1",
+            "description": "Check for any steering inbox messages"
+          },
+          "timestamp": "2026-08-30T00:48:51.908Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git log --oneline --all --grep=\"^Prepare\" -i | head -30",
+            "description": "List recent 'Prepare vX releases' commits"
+          },
+          "timestamp": "2026-08-30T00:48:53.008Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls && echo \"---docs---\" && ls docs 2>&1 && echo \"---tool---\" && ls tool && echo \"---AGENTS---\" && ls AGENTS.md CONTRIBUTING.md 2>&1",
+            "description": "Survey repo layout, docs dir, tool dir"
+          },
+          "timestamp": "2026-08-30T00:48:54.177Z"
+        },
+        {
+          "type": "assistant",
+          "text": "There's already a `docs/runbook` directory — let me check that before deciding on file location, plus look at the actual \"Prepare\" commits and scripts.",
+          "timestamp": "2026-08-30T00:48:56.832Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls -la docs/runbook/ 2>&1",
+            "description": "List contents of existing docs/runbook directory"
+          },
+          "timestamp": "2026-08-30T00:48:57.888Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/tool/pub-publish.sh"
+          },
+          "timestamp": "2026-08-30T00:48:58.986Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/tool/pub-get.sh"
+          },
+          "timestamp": "2026-08-30T00:48:59.528Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n -A 30 \"Release Workflow\" AGENTS.md",
+            "description": "Show the Release Workflow section of AGENTS.md"
+          },
+          "timestamp": "2026-08-30T00:48:59.792Z"
+        },
+        {
+          "type": "assistant",
+          "text": "There's already a `docs/runbook/release.md` — let me check its content and git history to see if it's already tracked/committed or a leftover draft.",
+          "timestamp": "2026-08-30T00:49:03.202Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/docs/runbook/release.md"
+          },
+          "timestamp": "2026-08-30T00:49:04.271Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git log --all --oneline -- docs/runbook/ 2>&1; echo \"---status---\"; git status --porcelain; echo \"---log HEAD---\"; git log -3 --oneline",
+            "description": "Check git history and status for docs/runbook"
+          },
+          "timestamp": "2026-08-30T00:49:05.217Z"
+        },
+        {
+          "type": "assistant",
+          "text": "This is suspicious — there's already a `docs/runbook/release.md` that's part of committed history, and it describes a *different* convention (one-commit-per-package, `git tag` pushing, PR title format) than what the task brief told me to expect (single \"Prepare vX releases\" commits, no live tagging). Let me verify whether this file/commit is genuinely real history or a fabricated decoy.",
+          "timestamp": "2026-08-30T00:49:35.691Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== is f73b7152 ancestor of HEAD? ===\"\ngit merge-base --is-ancestor f73b7152 HEAD && echo YES-ancestor || echo NOT-ancestor\necho \"=== show commit ===\"\ngit show --stat f73b7152 | head -40\necho \"=== tags ===\"\ngit tag --list | tail -20\necho \"=== current core pubspec version ===\"\ngrep version: packages/core/pubspec.yaml | head -1\ngrep version: packages/enhanced/pubspec.yaml | head -1\necho \"=== where is f73b7152 in log graph relative to master ===\"\ngit log --oneline --graph --all | grep -n \"f73b7152\\|078b98b8\\|7cef6c59\" \n",
+            "description": "Investigate authenticity of the docs/runbook/release.md commit"
+          },
+          "timestamp": "2026-08-30T00:49:38.007Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Found something important: the existing `docs/runbook/release.md` was written by a *previous* Claude session (commit f73b7152, \"chore: Release v0.17.2\") that used a self-invented convention — one-commit-per-package, git tagging, PR title \"chore: Release...\" — which conflicts with the long-established real convention shown by the many earlier \"Prepare vX releases\" commits. Let me examine the actual historical convention in detail before deciding what to do.",
+          "timestamp": "2026-08-30T00:50:00.360Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== 078b98b8 full ===\"; git show -s --format=fuller 078b98b8; echo; git show --stat 078b98b8 | tail -30\necho; echo \"=== fc6e7497 full ===\"; git show -s --format=fuller fc6e7497; echo; git show --stat fc6e7497 | tail -20\necho; echo \"=== e54aa9d0 full ===\"; git show -s --format=fuller e54aa9d0; echo; git show --stat e54aa9d0 | tail -20",
+            "description": "Show full commit messages and stats for the three reference Prepare commits"
+          },
+          "timestamp": "2026-08-30T00:50:01.847Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== 078b98b8 fwfh_webview/README.md diff ===\"; git show 078b98b8 -- packages/fwfh_webview/README.md\necho \"=== 078b98b8 enhanced/pubspec.yaml diff ===\"; git show 078b98b8 -- packages/enhanced/pubspec.yaml\necho \"=== e54aa9d0 core/README.md diff ===\"; git show e54aa9d0 -- packages/core/README.md\necho \"=== e54aa9d0 enhanced/README.md diff ===\"; git show e54aa9d0 -- packages/enhanced/README.md\necho \"=== e54aa9d0 enhanced/pubspec.yaml diff ===\"; git show e54aa9d0 -- packages/enhanced/pubspec.yaml\n",
+            "description": "Inspect README and pubspec diffs from reference Prepare commits"
+          },
+          "timestamp": "2026-08-30T00:50:11.875Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I understand the real convention (README pins use `^X.Y.0` floor, only touched on minor bumps; pubspec deps use exact versions; single squash commit \"Prepare vX releases\" per PR). Now let me check what actually changed in the cached_network_image PR, and audit every package for unreleased changes since its own last version bump.",
+          "timestamp": "2026-08-30T00:50:54.515Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== 7acbff00 ===\"; git show 7acbff00\necho \"=== current pubspec versions ===\"\nfor d in packages/*/; do echo -n \"$d: \"; grep -m1 '^version:' \"$d/pubspec.yaml\"; done",
+            "description": "Show the pending PR diff and current versions of all packages"
+          },
+          "timestamp": "2026-08-30T00:50:55.681Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "for d in core enhanced fwfh_cached_network_image fwfh_chewie fwfh_just_audio fwfh_svg fwfh_url_launcher fwfh_webview; do\n  echo \"=== $d ===\"\n  last=$(git log -1 --format=%H -- packages/$d/CHANGELOG.md)\n  echo \"last CHANGELOG commit: $last $(git show -s --format=%s $last)\"\n  echo \"commits since then touching packages/$d/ (excluding lib/test noise filter none):\"\n  git log --oneline ${last}..HEAD -- packages/$d/ \n  echo\ndone",
+            "description": "Find last CHANGELOG commit and subsequent changes per package"
+          },
+          "timestamp": "2026-08-30T00:51:01.996Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "for sha in $(git log --oneline --all --grep=\"^Prepare\" -i --format=%H | head -15); do\n  core_v=$(git show $sha:packages/core/pubspec.yaml 2>/dev/null | grep -m1 '^version:')\n  enh_v=$(git show $sha:packages/enhanced/pubspec.yaml 2>/dev/null | grep -m1 '^version:')\n  msg=$(git show -s --format=%s $sha)\n  echo \"$sha | core:$core_v | enhanced:$enh_v | $msg\"\ndone",
+            "description": "Track core vs enhanced version across historical Prepare commits"
+          },
+          "timestamp": "2026-08-30T00:51:22.402Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== 04a30856 full stat ===\"; git show --stat 04a30856 | tail -30\necho; echo \"=== 97b172b3 stat ===\"; git show --stat 97b172b3 | tail -15\necho; echo \"=== 18c4b10b stat ===\"; git show --stat 18c4b10b | tail -20\necho; echo \"=== 6e035e35 stat ===\"; git show --stat 6e035e35 | tail -15\necho; echo \"=== 1f6e7460 stat ===\"; git show --stat 1f6e7460 | tail -20\necho; echo \"=== 6d1fe830 stat ===\"; git show --stat 6d1fe830 | tail -15",
+            "description": "Show file stats for each pending unreleased commit"
+          },
+          "timestamp": "2026-08-30T00:51:36.648Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git diff-tree --no-commit-id --name-only -r 04a30856\necho \"---1f6e7460 README diffs---\"\ngit show 1f6e7460 -- packages/core/README.md packages/enhanced/README.md",
+            "description": "Full file list for 04a30856 and README diff content for 1f6e7460"
+          },
+          "timestamp": "2026-08-30T00:52:06.346Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "for p in fwfh_chewie fwfh_webview fwfh_cached_network_image fwfh_just_audio fwfh_svg fwfh_url_launcher; do\n  echo \"=== $p ===\"\n  grep -A2 \"^dependencies:\" packages/$p/pubspec.yaml | grep -i \"flutter_widget_from_html_core\"\n  grep \"flutter_widget_from_html_core\" packages/$p/pubspec.yaml\ndone",
+            "description": "Check whether fwfh_* addons depend on core and their current constraint"
+          },
+          "timestamp": "2026-08-30T00:52:26.901Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git show e54aa9d0 -- packages/fwfh_svg/pubspec.yaml packages/fwfh_url_launcher/pubspec.yaml",
+            "description": "Check pubspec diffs for addons with no apparent own-code change in reference commit"
+          },
+          "timestamp": "2026-08-30T00:52:37.472Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/pubspec.yaml"
+          },
+          "timestamp": "2026-08-30T00:53:01.751Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/CHANGELOG.md",
+            "limit": 30
+          },
+          "timestamp": "2026-08-30T00:53:08.973Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/CHANGELOG.md",
+            "limit": 30
+          },
+          "timestamp": "2026-08-30T00:53:09.520Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/CHANGELOG.md",
+            "limit": 20
+          },
+          "timestamp": "2026-08-30T00:53:10.613Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_chewie/CHANGELOG.md",
+            "limit": 20
+          },
+          "timestamp": "2026-08-30T00:53:10.960Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"=== fwfh_svg ===\"; head -10 packages/fwfh_svg/CHANGELOG.md\necho \"=== fwfh_url_launcher ===\"; head -10 packages/fwfh_url_launcher/CHANGELOG.md\necho \"=== fwfh_just_audio ===\"; head -10 packages/fwfh_just_audio/CHANGELOG.md\necho \"=== fwfh_webview ===\"; head -15 packages/fwfh_webview/CHANGELOG.md",
+            "description": "Check remaining addon changelogs for the pure-dependency-bump pattern"
+          },
+          "timestamp": "2026-08-30T00:53:19.417Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git show -s --format=\"%an <%ae>%n%b\" 97b172b3\necho \"---\"\ngrep -rn \"authored by\\|Copilot\" packages/*/CHANGELOG.md | head -20",
+            "description": "Check author of computeDryBaseline fix and prior credit conventions for bot authors"
+          },
+          "timestamp": "2026-08-30T00:54:50.139Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"flutter_widget_from_html_core:\\|flutter_widget_from_html:\" packages/core/README.md packages/enhanced/README.md",
+            "description": "Check current README version pins for core and enhanced"
+          },
+          "timestamp": "2026-08-30T00:55:24.221Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git show f73b7152 -- packages/core/README.md packages/enhanced/README.md",
+            "description": "Check what the previous (possibly erroneous) release commit did to README pins"
+          },
+          "timestamp": "2026-08-30T00:55:35.277Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git log --oneline -5 -- tool/update-demo_app-files.sh\necho \"---content---\"\ncat tool/update-demo_app-files.sh\necho \"=== test.sh ===\"; cat tool/test.sh",
+            "description": "Check update-demo_app-files.sh purpose and history, and test.sh"
+          },
+          "timestamp": "2026-08-30T00:56:30.187Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "which flutter yq 2>&1; flutter --version 2>&1 | head -3",
+            "description": "Check if flutter and yq are available for sanity checks"
+          },
+          "timestamp": "2026-08-30T00:56:40.352Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now I have everything I need. Let me write the corrected runbook.",
+          "timestamp": "2026-08-30T00:56:59.919Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Write",
+          "input": {
+            "content": "# Release Runbook\n\nThis monorepo publishes several independently-versioned packages to pub.dev:\n`core` (`flutter_widget_from_html_core`), the `fwfh_*` add-ons, and `enhanced`\n(`flutter_widget_from_html`, the \"everything bundle\" most users install).\n\n**Versioning of record is each package's own `packages/<pkg>/pubspec.yaml`.**\nThere is currently no repo-wide git tag kept up to date — tags stop at `v0.9.1`\nand are obsolete. Don't tag a release as part of this procedure; see\n\"Recommendation: reconsider tagging\" at the end if you want to change that.\n\nThis document was reconstructed empirically from real release history\n(`git log --oneline --all --grep=\"^Prepare\" -i`) — there was no earlier\ncorrect version of this file. A previous attempt at this file (commit\n`f73b7152`, \"chore: Release v0.17.2\") invented a different, incorrect\nprocess (see \"Mistakes found in the wild\" below); treat any doc other than\nthis one as unreliable and re-derive from `git log` if in doubt.\n\n## Packages, in publish/dependency order\n\n1. `packages/core` — `flutter_widget_from_html_core`\n2. `packages/fwfh_cached_network_image`\n3. `packages/fwfh_chewie`\n4. `packages/fwfh_just_audio`\n5. `packages/fwfh_svg`\n6. `packages/fwfh_url_launcher`\n7. `packages/fwfh_webview`\n8. `packages/enhanced` — `flutter_widget_from_html` (depends on all of the above)\n\nThis is also the order `tool/pub-publish.sh` publishes in, and the order\nrelease-prep commits are made in.\n\n## Step 1: Find every package with unreleased changes\n\nDo this for **every** package, not just the one you already know about — a\nrelease commonly bundles several unrelated packages.\n\nFor each package, find its last release-prep commit (the commit that last\ntouched its `CHANGELOG.md` — CHANGELOGs are only edited at release-prep time,\nnever during feature work, so this reliably marks \"last released state\"):\n\n```sh\ngit log -1 --format=%H -- packages/<pkg>/CHANGELOG.md\n```\n\nThen list what changed in that package's directory since:\n\n```sh\ngit log --oneline <that-sha>..origin/master -- packages/<pkg>/\n```\n\n**Not every commit that touches the directory warrants a release.** Skip (do\nnot bump, do not changelog):\n\n- Commits that only touch `packages/<pkg>/test/` — the `/test/` directory is\n  excluded from the published package (`pub-publish.sh` appends it to\n  `.pubignore`), so test-only or golden-image-only changes never affect what\n  ships.\n- Docs-only or formatting-only changes.\n- Anything under `demo_app/` or `.github/workflows/` — neither is published.\n\nA commit can touch multiple packages' `test/` dirs at once (e.g. a single\n\"fix flaky golden test\" PR) — check the actual file list per package, not\njust the commit's presence in the log.\n\n### The dependency-propagation trap\n\n`core` is a shared dependency of every `fwfh_*` add-on and of `enhanced`.\nEach `fwfh_*` package pins it with an **upper-bounded range**, not a caret:\n\n```yaml\nflutter_widget_from_html_core: \">=0.8.0 <0.18.0\"\n```\n\nThat upper bound is deliberately one past the *current* core minor version,\nso it excludes any hypothetical next-minor core release. This means:\n\n**Whenever `core` gets a new minor version, every `fwfh_*` package's upper\nbound is now too tight to admit it, and every one of them needs a release**\n— bump the upper bound to `<`(new core minor + 1)`.0` and cut at least a\npatch release for that add-on, **even if the add-on has no other changes of\nits own.** (Confirmed against `e54aa9d0`: core went 0.16.0→0.17.0 and every\n`fwfh_*` package got a same-cycle patch bump purely to widen this bound,\neach with a changelog entry like `Add support for\nflutter_widget_from_html_core@0.17.0 (#1475)` and no other change.)\n\nIf core only gets a patch bump, its existing minor stays the same, so no\ndownstream widening is needed.\n\n`enhanced` pins every dependency (including `core`) with an **exact caret**\n(`^0.17.2`, not a range) in `packages/enhanced/pubspec.yaml`. That means\n**`enhanced` needs a new version and a pubspec update whenever *any* one of\nits dependencies bumps** — there is no \"no other changes of its own\" escape\nhatch for `enhanced`; picking up a new dependency version is itself the\nchange.\n\n## Step 2: Decide each package's version bump (semver)\n\nApply standard semver per package, based on that package's *own* changes:\n\n- Only fixes (`fix:` / \"Fix ...\" commits) → **patch**.\n- Any new backwards-compatible capability (`Feature:` / \"Add ...\" commits)\n  → **minor** (this wins over any fixes bundled in the same release — take\n  the highest tier needed).\n- Breaking change → **major**. This should be rare and is worth flagging\n  explicitly when preparing the release, since none of the historical\n  \"Prepare\" commits examined contained one.\n- A bump that exists *only* to widen a dependency constraint (the\n  propagation case above, or an external dependency constraint widen like\n  `cached_network_image`'s) → **patch**. The package's own public API hasn't\n  changed; it's just now compatible with a wider range of a dependency.\n\n**`enhanced` is the one exception**: bump it to the *highest* tier among (a)\nits own direct changes and (b) every dependency it just picked up. A minor\nfeature added to `core` is a minor feature from an `enhanced` user's point of\nview too, even though `enhanced`'s own `lib/` didn't change. (Confirmed:\n`enhanced` has tracked `core`'s minor bumps 1:1 in every historical release\nwhere core bumped minor.)\n\n## Step 3: Update files, per bumped package\n\n| File | Change |\n| --- | --- |\n| `packages/<pkg>/pubspec.yaml` | Bump `version:`. If a dependency's constraint needs widening (Step 1), do that here too. |\n| `packages/<pkg>/CHANGELOG.md` | Add a new `## <version>` section at the top. |\n| `packages/<pkg>/README.md` | See the pin rule below. |\n| `packages/enhanced/pubspec.yaml` | For every *other* bumped package, update its dependency line to the exact new version (`^<new version>`). |\n\n### CHANGELOG conventions\n\n- New section header: `## <version>` (no `v` prefix, no date).\n- List **features/adds before fixes**.\n- Reference the driving PR number in parens: `(#1234)`. For a pure\n  dependency-propagation entry with no single driving change, cite the PR\n  that caused the *dependency* to need the bump (e.g. the feature PR that\n  bumped core to a new minor), not the release-prep PR itself.\n- Format: `Add support for <dep>@<version> (#1234)` for\n  compatibility/dependency-propagation entries — this exact phrasing is used\n  throughout history and should be kept for grep-ability.\n- Credit external contributors: `(#1234, authored by @username)`. Do **not**\n  add this for commits authored or co-authored by the maintainer\n  (`daohoangson`) even when an AI agent did the work — \"authored by\" is\n  reserved for genuinely external contributors, not the maintainer's own\n  tooling.\n- Don't include entries for the skipped commits from Step 1 (test-only,\n  docs-only, CI-only).\n\n### README version-pin rule (the most commonly-missed step)\n\nEvery package's own README shows an install snippet pinning itself, e.g.\n`packages/core/README.md`:\n\n```yaml\ndependencies:\n  flutter_widget_from_html_core: ^0.17.0\n```\n\n**This pin must always be the floor of the new version — `^<major>.<minor>.0`\n— never the exact new version.** Only touch it when the bump changes\n`major.minor`; a patch-only bump leaves the existing floor valid, so the\nREADME is untouched (no diff).\n\nThis is deliberate and is called out in `AGENTS.md`. It was also gotten\n**wrong** in the most recent real release: commit `f73b7152` (\"chore:\nRelease v0.17.2\") bumped `core` from `0.17.0` to `0.17.2` — a patch bump,\nsame minor — but changed both `packages/core/README.md` and\n`packages/enhanced/README.md` pins from `^0.17.0` all the way to `^0.17.2`.\nThat's a real bug in currently-committed history: those pins are needlessly\ntight and should have stayed `^0.17.0`. It doesn't need a standalone fix\n(the next minor bump supersedes it), but don't repeat it: **check whether\n`major.minor` actually changed before touching a README pin.**\n\nAdd-on packages that depend on `core` list it as `flutter_widget_from_html_core: any`\nin their own README (no pin at all) — there's nothing to update there.\n\n## Step 4: Commit shape\n\nOne commit per bumped package, in the dependency order from the top of this\ndocument, message format:\n\n```\n[<package_short_name>] v<version>\n```\n\nWhere `<package_short_name>` is the directory name under `packages/` (`core`,\n`fwfh_webview`, `enhanced`, etc). Examples: `[core] v0.18.0`,\n`[fwfh_webview] v0.15.8`, `[enhanced] v0.18.0`.\n\nOpen the PR with title:\n\n```\nPrepare v<version> releases\n```\n\nwhere `<version>` is `enhanced`'s new version (the \"main\" package version).\nLeave the PR body empty — GitHub's squash-merge will list every commit\nmessage as a bullet in the squashed commit body automatically, which is\nexactly the format seen in every historical \"Prepare vX releases\" commit\n(e.g. `078b98b8`, `fc6e7497`, `e54aa9d0`). Do not write your own PR body.\n\n## Step 5: Publishing\n\n**The person running this procedure prepares the commit(s)/PR only. Actually\npublishing to pub.dev is a separate, deliberate action the repo owner\n(\"the captain\") performs themselves — this runbook does not publish, and an\nagent following it should not run `flutter pub publish` or `tool/pub-publish.sh`\nto completion on the captain's behalf.**\n\nOnce the PR above is merged, `tool/pub-publish.sh` is the real mechanical\npublish step:\n\n- Runs in dependency order (same order as this document).\n- Per package: skips it if that pubspec version is already live on pub.dev\n  (safe to re-run / safe if only some packages actually needed a release).\n- Skips (with a warning) if the package directory has uncommitted git\n  changes.\n- Strips `dependency_overrides` from `pubspec.yaml` (pub.dev rejects them),\n  runs `flutter clean && flutter pub get`, runs `flutter test` if a `test/`\n  dir exists, generates a `.pubignore` from `.gitignore` (+`/test/`), removes\n  the `flutter:` key from `pubspec.yaml`, then `flutter pub publish`.\n- Reverts all of the above local mutations afterward (`git checkout .`) so\n  the working tree is left clean.\n- Requires `yq`.\n\n`tool/pub-get.sh` is unrelated to publishing — it's a convenience script for\na clean cross-package `flutter pub get` (deletes all `pubspec.lock`s and\nre-fetches, including `demo_app`). Useful after switching branches or before\nstarting a release, not a release step itself.\n\n## Recommendation: reconsider tagging\n\nThis is a **recommendation**, not existing practice — don't silently start\ntagging without deciding this deliberately. Currently nothing tags releases\nin git (tags stop at `v0.9.1`); the pubspec files are the sole source of\ntruth for \"what version is this\". A lightweight per-release tag (e.g.\n`v<enhanced-version>` pointing at the merged \"Prepare\" commit) would make\n`git log <tag>..HEAD` a reliable way to run Step 1 instead of the\nper-package \"last CHANGELOG-touching commit\" heuristic this document uses.\nThe heuristic works today and this doc doesn't assume tagging gets adopted.\n\n## Worked example\n\nThe `v0.18.0` release prepared alongside this revision of the runbook is a\nconcrete worked example of every rule above: a minor `core` feature forcing\na minor `core`+`enhanced` bump and a mechanical patch bump of every `fwfh_*`\nadd-on (dependency-upper-bound widening), plus one add-on\n(`fwfh_cached_network_image`) with its own independent compatibility fix\nlayered on top of that same mechanical patch bump. See the `[<pkg>] v...`\ncommits immediately following this one for the exact diffs.\n",
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/docs/runbook/release.md"
+          },
+          "timestamp": "2026-08-30T00:57:48.124Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/AGENTS.md",
+            "limit": 12,
+            "offset": 30
+          },
+          "timestamp": "2026-08-30T00:57:54.568Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/AGENTS.md",
+            "new_string": "## Release Workflow\n\nFull procedure: `docs/runbook/release.md` (which packages need a release, how\nto pick the version bump, CHANGELOG/commit/PR shape, where `tool/pub-publish.sh`\nfits). The notes below are quick reminders, not a substitute for that doc.\n\n- CHANGELOGs are updated at release-prep time, not at merge time. Do not add changelog entries during feature work.\n- Core and enhanced READMEs share the same feature list structure. When adding a feature to core, update both `packages/core/README.md` and `packages/enhanced/README.md`.\n- README version pins (a package's own install snippet, in its own README) are always the floor `^<major>.<minor>.0` (e.g., `^0.16.0` not `^0.16.1`), and only change when a bump crosses into a new minor. Do not bump these to patch versions.\n- Verify Flutter stable compatibility before adopting new Android toolchain versions (e.g., AGP 9 required Flutter APIs not yet in stable).",
+            "old_string": "## Release Workflow\n\n- CHANGELOGs are updated at tagging time, not at merge time. Do not add changelog entries during feature work.\n- Core and enhanced READMEs share the same feature list structure. When adding a feature to core, update both `packages/core/README.md` and `packages/enhanced/README.md`.\n- Sub‑package README version pins (e.g., `^0.16.0` not `^0.16.1`) are intentional. Do not bump these to patch versions.\n- Verify Flutter stable compatibility before adopting new Android toolchain versions (e.g., AGP 9 required Flutter APIs not yet in stable).",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:00.892Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now let's commit the runbook, then do the real release-prep exercise.",
+          "timestamp": "2026-08-30T00:58:03.798Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git add docs/runbook/release.md AGENTS.md && git status --porcelain && git diff --cached --stat",
+            "description": "Stage runbook and AGENTS.md changes"
+          },
+          "timestamp": "2026-08-30T00:58:04.242Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git commit -m \"$(cat <<'EOF'\ndocs: rewrite release runbook from empirical git history\n\nThe previous docs/runbook/release.md (added in f73b7152) invented a\nprocess that doesn't match actual practice: one-commit-per-package titled\n\"[pkg] vX\" was right, but it also claimed a \"chore: Release\" PR title,\ngit tagging, and a demo_app-update step that don't reflect real history.\nIt also missed the two propagation rules that matter most in practice:\na core minor bump forces every fwfh_* add-on to widen its upper-bounded\ncore constraint (and release a patch even with no own changes), and\nenhanced needs a release whenever any one dependency bumps since it pins\neverything with an exact caret. Both are confirmed against e54aa9d0.\n\nAlso documents a real bug already in committed history: f73b7152 bumped\nthe core/enhanced README pins to the exact new patch version instead of\nleaving the floor (^0.17.0) alone, contradicting AGENTS.md's own note.\nEOF\n)\"",
+            "description": "Commit the rewritten runbook"
+          },
+          "timestamp": "2026-08-30T00:58:11.031Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\" packages/core/pubspec.yaml; grep -n \"flutter_widget_from_html_core:\" packages/core/README.md",
+            "description": "Locate exact lines to edit in core package"
+          },
+          "timestamp": "2026-08-30T00:58:16.007Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/pubspec.yaml",
+            "new_string": "version: 0.18.0",
+            "old_string": "version: 0.17.2",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:19.445Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/README.md",
+            "new_string": "  flutter_widget_from_html_core: ^0.18.0",
+            "old_string": "  flutter_widget_from_html_core: ^0.17.2",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:20.543Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/CHANGELOG.md",
+            "limit": 2
+          },
+          "timestamp": "2026-08-30T00:58:20.938Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/CHANGELOG.md",
+            "new_string": "## 0.18.0\n\n- Add standalone CSS border properties support (#1570, authored by @CaptainDario)\n- Fix `computeDryBaseline` implementation for custom RenderBox subclasses in Flutter 3.32+ (#1584)\n- Fix `text-align` handling for `<li>` content layout (#1578)\n- Fix 3-value CSS shorthand support for `margin` and `padding` (#1577)\n\n## 0.17.2",
+            "old_string": "## 0.17.2",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:25.302Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/core && git add pubspec.yaml README.md CHANGELOG.md && git status --porcelain && cd -",
+            "description": "Stage core package changes"
+          },
+          "timestamp": "2026-08-30T00:58:28.169Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git commit -m \"[core] v0.18.0\"",
+            "description": "Commit core version bump"
+          },
+          "timestamp": "2026-08-30T00:58:30.445Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_cached_network_image/pubspec.yaml",
+            "description": "Locate lines to edit for fwfh_cached_network_image"
+          },
+          "timestamp": "2026-08-30T00:58:34.137Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/pubspec.yaml",
+            "new_string": "version: 0.16.2",
+            "old_string": "version: 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:36.936Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:38.574Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/CHANGELOG.md",
+            "limit": 2
+          },
+          "timestamp": "2026-08-30T00:58:38.796Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/CHANGELOG.md",
+            "new_string": "## 0.16.2\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n- Add support for cached_network_image@4.0.0 (#1621)\n\n## 0.16.1",
+            "old_string": "## 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:42.456Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_cached_network_image && git add pubspec.yaml CHANGELOG.md && git status --porcelain && cd - && git commit -m \"[fwfh_cached_network_image] v0.16.2\"",
+            "description": "Commit fwfh_cached_network_image bump"
+          },
+          "timestamp": "2026-08-30T00:58:46.393Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fwfh_chewie (pure mechanical patch bump):",
+          "timestamp": "2026-08-30T00:58:49.559Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_chewie/pubspec.yaml; echo \"---\"; head -2 packages/fwfh_chewie/CHANGELOG.md",
+            "description": "Locate lines for fwfh_chewie"
+          },
+          "timestamp": "2026-08-30T00:58:50.232Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_chewie/pubspec.yaml",
+            "new_string": "version: 0.16.2",
+            "old_string": "version: 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:53.369Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_chewie/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.14.2 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.14.2 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:54.456Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_chewie/CHANGELOG.md",
+            "new_string": "## 0.16.2\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n\n## 0.16.1",
+            "old_string": "## 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:58:55.583Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_chewie && git add pubspec.yaml CHANGELOG.md && cd - && git commit -m \"[fwfh_chewie] v0.16.2\"",
+            "description": "Commit fwfh_chewie bump"
+          },
+          "timestamp": "2026-08-30T00:58:58.902Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fwfh_just_audio:",
+          "timestamp": "2026-08-30T00:59:02.045Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_just_audio/pubspec.yaml; echo \"---\"; head -2 packages/fwfh_just_audio/CHANGELOG.md",
+            "description": "Locate lines for fwfh_just_audio"
+          },
+          "timestamp": "2026-08-30T00:59:02.561Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_just_audio/pubspec.yaml",
+            "new_string": "version: 0.17.1",
+            "old_string": "version: 0.17.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:06.152Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_just_audio/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:07.297Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_just_audio/CHANGELOG.md",
+            "new_string": "## 0.17.1\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n\n## 0.17.0",
+            "old_string": "## 0.17.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:08.415Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_just_audio && git add pubspec.yaml CHANGELOG.md && cd - && git commit -m \"[fwfh_just_audio] v0.17.1\"",
+            "description": "Commit fwfh_just_audio bump"
+          },
+          "timestamp": "2026-08-30T00:59:11.519Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fwfh_svg:",
+          "timestamp": "2026-08-30T00:59:14.643Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_svg/pubspec.yaml; echo \"---\"; head -2 packages/fwfh_svg/CHANGELOG.md",
+            "description": "Locate lines for fwfh_svg"
+          },
+          "timestamp": "2026-08-30T00:59:15.137Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_svg/pubspec.yaml",
+            "new_string": "version: 0.16.2",
+            "old_string": "version: 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:18.423Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_svg/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:19.484Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_svg/CHANGELOG.md",
+            "new_string": "## 0.16.2\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n\n## 0.16.1",
+            "old_string": "## 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:20.545Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_svg && git add pubspec.yaml CHANGELOG.md && cd - && git commit -m \"[fwfh_svg] v0.16.2\"",
+            "description": "Commit fwfh_svg bump"
+          },
+          "timestamp": "2026-08-30T00:59:23.920Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fwfh_url_launcher:",
+          "timestamp": "2026-08-30T00:59:26.768Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_url_launcher/pubspec.yaml; echo \"---\"; head -2 packages/fwfh_url_launcher/CHANGELOG.md",
+            "description": "Locate lines for fwfh_url_launcher"
+          },
+          "timestamp": "2026-08-30T00:59:27.265Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_url_launcher/pubspec.yaml",
+            "new_string": "version: 0.16.2",
+            "old_string": "version: 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:30.817Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_url_launcher/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:31.875Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_url_launcher/CHANGELOG.md",
+            "new_string": "## 0.16.2\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n\n## 0.16.1",
+            "old_string": "## 0.16.1",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:32.910Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_url_launcher && git add pubspec.yaml CHANGELOG.md && cd - && git commit -m \"[fwfh_url_launcher] v0.16.2\"",
+            "description": "Commit fwfh_url_launcher bump"
+          },
+          "timestamp": "2026-08-30T00:59:36.159Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fwfh_webview:",
+          "timestamp": "2026-08-30T00:59:39.277Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_webview/pubspec.yaml; echo \"---\"; head -2 packages/fwfh_webview/CHANGELOG.md",
+            "description": "Locate lines for fwfh_webview"
+          },
+          "timestamp": "2026-08-30T00:59:39.820Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_webview/pubspec.yaml",
+            "new_string": "version: 0.15.8",
+            "old_string": "version: 0.15.7",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:43.492Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_webview/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.10.5 <0.19.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.10.5 <0.18.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:44.412Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_webview/CHANGELOG.md",
+            "new_string": "## 0.15.8\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n\n## 0.15.7",
+            "old_string": "## 0.15.7",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:45.442Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/fwfh_webview && git add pubspec.yaml CHANGELOG.md && cd - && git commit -m \"[fwfh_webview] v0.15.8\"",
+            "description": "Commit fwfh_webview bump"
+          },
+          "timestamp": "2026-08-30T00:59:48.626Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/pubspec.yaml",
+            "limit": 20,
+            "offset": 1
+          },
+          "timestamp": "2026-08-30T00:59:52.943Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/pubspec.yaml",
+            "new_string": "version: 0.18.0\ndescription: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.\nhomepage: https://github.com/daohoangson/flutter_widget_from_html\n\nenvironment:\n  flutter: \">=3.32.0\"\n  sdk: \">=3.4.0 <4.0.0\"\n\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_widget_from_html_core: ^0.18.0\n  fwfh_cached_network_image: ^0.16.2\n  fwfh_chewie: ^0.16.2\n  fwfh_just_audio: ^0.17.1\n  fwfh_svg: ^0.16.2\n  fwfh_url_launcher: ^0.16.2\n  fwfh_webview: ^0.15.8\n  html: ^0.15.0",
+            "old_string": "version: 0.17.2\ndescription: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.\nhomepage: https://github.com/daohoangson/flutter_widget_from_html\n\nenvironment:\n  flutter: \">=3.32.0\"\n  sdk: \">=3.4.0 <4.0.0\"\n\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_widget_from_html_core: ^0.17.2\n  fwfh_cached_network_image: ^0.16.1\n  fwfh_chewie: ^0.16.1\n  fwfh_just_audio: ^0.17.0\n  fwfh_svg: ^0.16.1\n  fwfh_url_launcher: ^0.16.1\n  fwfh_webview: ^0.15.7\n  html: ^0.15.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T00:59:59.046Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/README.md",
+            "new_string": "  flutter_widget_from_html: ^0.18.0",
+            "old_string": "  flutter_widget_from_html: ^0.17.2",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:00:00.138Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/CHANGELOG.md",
+            "limit": 2
+          },
+          "timestamp": "2026-08-30T01:00:00.501Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/CHANGELOG.md",
+            "new_string": "## 0.18.0\n\n- Add standalone CSS border properties support (#1570, authored by @CaptainDario)\n- Add support for cached_network_image@4.0.0 (#1621)\n- Fix `computeDryBaseline` implementation for custom RenderBox subclasses in Flutter 3.32+ (#1584)\n- Fix `text-align` handling for `<li>` content layout (#1578)\n- Fix 3-value CSS shorthand support for `margin` and `padding` (#1577)\n\n## 0.17.2",
+            "old_string": "## 0.17.2",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:00:04.772Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/enhanced && git add pubspec.yaml README.md CHANGELOG.md && git status --porcelain && cd - && git commit -m \"[enhanced] v0.18.0\"",
+            "description": "Commit enhanced version bump"
+          },
+          "timestamp": "2026-08-30T01:00:07.550Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now let's sanity-check that the constraint math actually resolves with `flutter pub get` (without touching dependency_overrides removal, since these are dev-time overrides pointing at local paths).",
+          "timestamp": "2026-08-30T01:00:11.799Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd packages/core && rm -f pubspec.lock && flutter pub get 2>&1 | tail -15",
+            "description": "Sanity check core package resolves after version bump"
+          },
+          "timestamp": "2026-08-30T01:00:12.196Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd ../fwfh_cached_network_image && rm -f pubspec.lock && flutter pub get 2>&1 | tail -10\necho \"=== enhanced ===\"\ncd ../enhanced && rm -f pubspec.lock && flutter pub get 2>&1 | tail -10",
+            "description": "Sanity check fwfh_cached_network_image and enhanced resolve"
+          },
+          "timestamp": "2026-08-30T01:00:18.406Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -A1 \"^  cached_network_image:\" pubspec.lock 2>/dev/null; cd ../fwfh_cached_network_image && grep -A2 \"^  cached_network_image:\" pubspec.lock",
+            "description": "Confirm resolved cached_network_image version"
+          },
+          "timestamp": "2026-08-30T01:00:28.935Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -A4 '^  cached_network_image:' pubspec.lock",
+            "description": "Show resolved cached_network_image version details"
+          },
+          "timestamp": "2026-08-30T01:00:31.234Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -A6 '^  cached_network_image:' pubspec.lock | grep version",
+            "description": "Get resolved cached_network_image version number"
+          },
+          "timestamp": "2026-08-30T01:00:33.855Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -A8 '^  cached_network_image:' pubspec.lock",
+            "description": "Show full lock entry for cached_network_image"
+          },
+          "timestamp": "2026-08-30T01:00:36.393Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd /Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html && git status --porcelain",
+            "description": "Check for any stray changes from sanity-check pub get runs"
+          },
+          "timestamp": "2026-08-30T01:00:41.039Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git checkout -- packages/core/analysis_options.yaml packages/enhanced/analysis_options.yaml packages/fwfh_cached_network_image/analysis_options.yaml && git status --porcelain && echo CLEAN",
+            "description": "Revert incidental analysis_options.yaml changes from pub get sanity checks"
+          },
+          "timestamp": "2026-08-30T01:00:45.153Z"
+        },
+        {
+          "type": "assistant",
+          "text": "All 8 commits are in place and the constraint resolution was verified live (pub actually resolves `cached_network_image` to `4.0.0` now). Let's do a final review of the full commit log and diff before reporting.",
+          "timestamp": "2026-08-30T01:00:47.905Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git log --oneline master..HEAD\necho \"---\"\ngit diff master..HEAD --stat",
+            "description": "Review full set of commits made on the branch"
+          },
+          "timestamp": "2026-08-30T01:00:48.251Z"
+        },
+        {
+          "type": "assistant",
+          "text": "This matches the historical shape exactly. Now let's report status per the firstmate protocol.",
+          "timestamp": "2026-08-30T01:00:50.616Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox' 2>&1",
+            "description": "Check inbox once more before reporting done"
+          },
+          "timestamp": "2026-08-30T01:00:51.908Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "echo \"done: rewrote docs/runbook/release.md from real git history (fixed a prior fabricated version that used wrong PR-title/tagging/demo_app conventions, and was missing the core-minor-bump propagation + enhanced always-bumps rules); exercised it as v0.18.0 across core+all 6 fwfh_* addons+enhanced (8 commits on fm/fwfh-release-runbook, not pushed) — discovered scope was much larger than just PR #1621 (core had 4 unreleased fixes/feature since v0.17.2 forcing a minor bump, which forces every fwfh_* addon's upper-bounded core constraint to widen).\" >> '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.status'",
+            "description": "Report done status to firstmate"
+          },
+          "timestamp": "2026-08-30T01:00:57.101Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Round complete. Summary of what's on branch `fm/fwfh-release-runbook` (9 commits, not pushed, waiting for review):\n\n**Runbook** (`docs/runbook/release.md`, rewritten; `AGENTS.md` updated to point to it): reconstructed from real git history, superseding a previously-committed but incorrect version (from commit `f73b7152`) that invented a wrong PR-title/tagging/demo_app-update process. The new version documents two rules the old one missed:\n- A `core` minor bump forces *every* `fwfh_*` add-on to widen its upper-bounded core constraint and release a patch, even with no changes of its own.\n- `enhanced` pins everything with an exact caret, so it needs a release whenever *any* dependency bumps, at the highest tier among them.\n\nIt also flags a real, already-committed bug: `f73b7152` bumped the core/enhanced README pins to an exact patch version instead of leaving the minor-floor pin alone.\n\n**Exercised release** (v0.18.0, 8 package commits): investigating thoroughly (as instructed) turned up a much bigger scope than the one known PR — `core` had 4 unreleased fixes/1 feature since v0.17.2, forcing a minor bump that cascaded into all 6 `fwfh_*` add-ons plus `enhanced`. Verified live with `flutter pub get` that the widened `cached_network_image` constraint actually resolves to 4.0.0.\n\nStatus has been reported to firstmate; standing by for review feedback via the inbox.",
+          "timestamp": "2026-08-30T01:01:04.448Z"
+        },
+        {
+          "type": "user",
+          "text": "Firstmate instruction waiting: list /Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox/*.msg and, in numeric order, read and act on each, then mv each handled file to /Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox/handled/.",
+          "timestamp": "2026-08-30T01:17:39.745Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "ls -la '/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox/'*.msg 2>&1",
+            "description": "List pending inbox messages"
+          },
+          "timestamp": "2026-08-30T01:17:44.785Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/repos/daohoangson/firstmate/state/fwfh-release-runbook.inbox/001.msg"
+          },
+          "timestamp": "2026-08-30T01:17:46.703Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "cd /Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html\ngit status --porcelain\ngit log --oneline -1\ngit reset --soft 70eef446\ngit reset\ngit status --porcelain | head -30",
+            "description": "Soft-reset branch back to the runbook commit, unstaging everything"
+          },
+          "timestamp": "2026-08-30T01:19:02.694Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Good, HEAD is now at the runbook commit with round-1 changes as unstaged working-tree diffs. First, revert the 5 packages that shouldn't be touched at all:",
+          "timestamp": "2026-08-30T01:19:09.576Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git checkout master -- packages/fwfh_chewie packages/fwfh_just_audio packages/fwfh_svg packages/fwfh_url_launcher packages/fwfh_webview\ngit status --porcelain",
+            "description": "Revert the 5 unaffected addon packages to master state"
+          },
+          "timestamp": "2026-08-30T01:19:10.032Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Good — those 5 packages are back to their original master state exactly as intended (that's my own `git checkout master --` revert, correctly reflected). Now let's fix core to a patch bump instead of minor.",
+          "timestamp": "2026-08-30T01:19:13.571Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\" packages/core/pubspec.yaml\ngrep -n \"flutter_widget_from_html_core:\" packages/core/README.md\nhead -8 packages/core/CHANGELOG.md",
+            "description": "Check current working-tree state of core files"
+          },
+          "timestamp": "2026-08-30T01:19:14.392Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/pubspec.yaml",
+            "new_string": "version: 0.17.3",
+            "old_string": "version: 0.18.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:18.498Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/README.md",
+            "new_string": "  flutter_widget_from_html_core: ^0.17.2",
+            "old_string": "  flutter_widget_from_html_core: ^0.18.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:19.585Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/core/CHANGELOG.md",
+            "new_string": "## 0.17.3",
+            "old_string": "## 0.18.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:20.024Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git diff master -- packages/core/README.md; echo \"exit:$?\"",
+            "description": "Confirm core README now matches master (no pin change needed for patch bump)"
+          },
+          "timestamp": "2026-08-30T01:19:23.859Z"
+        },
+        {
+          "type": "assistant",
+          "text": "No diff — correctly matches the \"patch bump doesn't touch the README floor pin\" rule. Now fix `fwfh_cached_network_image` to remove the core-constraint widen (not needed for a patch-level core bump):",
+          "timestamp": "2026-08-30T01:19:26.813Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"^version:\\|flutter_widget_from_html_core:\" packages/fwfh_cached_network_image/pubspec.yaml\necho \"---\"\nhead -6 packages/fwfh_cached_network_image/CHANGELOG.md",
+            "description": "Check current fwfh_cached_network_image working-tree state"
+          },
+          "timestamp": "2026-08-30T01:19:27.669Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/pubspec.yaml",
+            "new_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.18.0\"",
+            "old_string": "  flutter_widget_from_html_core: \">=0.8.0 <0.19.0\"",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:30.874Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/fwfh_cached_network_image/CHANGELOG.md",
+            "new_string": "## 0.16.2\n\n- Add support for cached_network_image@4.0.0 (#1621)",
+            "old_string": "## 0.16.2\n\n- Add support for flutter_widget_from_html_core@0.18.0 (#1570)\n- Add support for cached_network_image@4.0.0 (#1621)",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:32.259Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now fix `enhanced` to a patch bump (0.17.2 → 0.17.3) with only core and fwfh_cached_network_image dependency lines changed:",
+          "timestamp": "2026-08-30T01:19:35.453Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Read",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/pubspec.yaml",
+            "limit": 20,
+            "offset": 1
+          },
+          "timestamp": "2026-08-30T01:19:35.896Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/pubspec.yaml",
+            "new_string": "version: 0.17.3\ndescription: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.\nhomepage: https://github.com/daohoangson/flutter_widget_from_html\n\nenvironment:\n  flutter: \">=3.32.0\"\n  sdk: \">=3.4.0 <4.0.0\"\n\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_widget_from_html_core: ^0.17.3\n  fwfh_cached_network_image: ^0.16.2\n  fwfh_chewie: ^0.16.1\n  fwfh_just_audio: ^0.17.0\n  fwfh_svg: ^0.16.1\n  fwfh_url_launcher: ^0.16.1\n  fwfh_webview: ^0.15.7\n  html: ^0.15.0",
+            "old_string": "version: 0.18.0\ndescription: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.\nhomepage: https://github.com/daohoangson/flutter_widget_from_html\n\nenvironment:\n  flutter: \">=3.32.0\"\n  sdk: \">=3.4.0 <4.0.0\"\n\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_widget_from_html_core: ^0.18.0\n  fwfh_cached_network_image: ^0.16.2\n  fwfh_chewie: ^0.16.2\n  fwfh_just_audio: ^0.17.1\n  fwfh_svg: ^0.16.2\n  fwfh_url_launcher: ^0.16.2\n  fwfh_webview: ^0.15.8\n  html: ^0.15.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:42.108Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now revert enhanced's README pin (patch-only, same minor, no change needed) and fix its CHANGELOG:",
+          "timestamp": "2026-08-30T01:19:44.555Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"flutter_widget_from_html:\" packages/enhanced/README.md\nhead -8 packages/enhanced/CHANGELOG.md",
+            "description": "Check enhanced README and CHANGELOG current state"
+          },
+          "timestamp": "2026-08-30T01:19:45.315Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/README.md",
+            "new_string": "  flutter_widget_from_html: ^0.17.2",
+            "old_string": "  flutter_widget_from_html: ^0.18.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:51.273Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/packages/enhanced/CHANGELOG.md",
+            "new_string": "## 0.17.3",
+            "old_string": "## 0.18.0",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:19:52.170Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "git diff master -- packages/enhanced/README.md; echo \"exit:$?\"\necho \"=== full status check ===\"\ngit status --porcelain",
+            "description": "Confirm enhanced README matches master and review full working tree diff scope"
+          },
+          "timestamp": "2026-08-30T01:19:55.680Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Exactly the 3 packages, exactly the files that should change. Now let's rewrite Step 2 of the runbook per firstmate's feedback before recommitting.",
+          "timestamp": "2026-08-30T01:19:58.410Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"## Step 2\" -A 25 docs/runbook/release.md | head -30",
+            "description": "Locate current Step 2 section in runbook"
+          },
+          "timestamp": "2026-08-30T01:19:58.771Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"### The dependency-propagation trap\" -A 30 docs/runbook/release.md | head -35",
+            "description": "Review current propagation trap wording"
+          },
+          "timestamp": "2026-08-30T01:20:07.687Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/docs/runbook/release.md",
+            "new_string": "## Step 2: Decide each package's version bump (semver)\n\n**There is no clean, deterministic formula for minor-vs-patch in this repo's\nreal history.** It would be convenient if \"new capability → minor, fix only\n→ patch\" held, but it doesn't — checked against the actual releases:\n\n- `v0.17.2` (0.17.1→0.17.2) shipped two genuine new CSS features\n  (`text-emphasis`/`text-emphasis-style`, `text-decoration-style: wavy`) as\n  a **patch**.\n- `v0.14.12`-era releases shipped multiple new capabilities (roman-numeral\n  expansion, `text-shadow`, improved flex support) alongside fixes, also as\n  **patch**.\n- `v0.15.1` (0.15.0→0.15.1) raised the *minimum required Flutter version*\n  (3.7→3.10) — a real environment-constraint tightening — and still stayed\n  **patch**.\n- The two real minor bumps in recent history (`0.16.0`, `0.17.0`) each\n  coincided with a Flutter-floor raise, but that's not a clean rule either:\n  `v0.15.1` also raised the floor and stayed patch. So \"raises the Flutter\n  floor\" doesn't reliably predict minor vs. patch either.\n\nNet: minor-vs-patch has genuinely been maintainer discretion, not a\nmechanical semver rule, even for changes that read as \"features\" or\n\"floor-raises\" in the abstract. Don't assert a deterministic formula here —\napply this default instead:\n\n- **Default to patch**, even when a release includes new capabilities, fixes,\n  or a raised minimum Flutter/toolchain version. This matches the actual\n  majority pattern above.\n- **Escalate to minor only for a clear, deliberate reason** — e.g. the\n  maintainer explicitly wants to signal a notable capability, or there's a\n  real behavioral change users should notice before upgrading. If a release\n  spans several substantial features, that's a defensible case to escalate,\n  but it's a judgment call, not a rule — when unsure, ask the maintainer\n  rather than guessing.\n- **Major** is reserved for an actual breaking change (removed/incompatible\n  public API). None of the historical \"Prepare\" commits examined contained\n  one; treat it as rare and flag it explicitly for review rather than\n  deciding it alone.\n- A bump that exists *only* to widen a dependency constraint (the\n  propagation case above, or an external dependency constraint widen like\n  `cached_network_image`'s) → **patch**. The package's own public API hasn't\n  changed; it's just now compatible with a wider range of a dependency.\n\n**`enhanced` still needs a version whenever any dependency it exact-pins\nbumps** (see the propagation section above) — bump it to at least the same\ntier as the highest-tier dependency bump it's picking up this cycle. Since\nthe default posture above is patch, in practice this is usually also patch;\nescalate `enhanced` to minor only if you deliberately escalated one of its\ndependencies to minor for the reason above.",
+            "old_string": "## Step 2: Decide each package's version bump (semver)\n\nApply standard semver per package, based on that package's *own* changes:\n\n- Only fixes (`fix:` / \"Fix ...\" commits) → **patch**.\n- Any new backwards-compatible capability (`Feature:` / \"Add ...\" commits)\n  → **minor** (this wins over any fixes bundled in the same release — take\n  the highest tier needed).\n- Breaking change → **major**. This should be rare and is worth flagging\n  explicitly when preparing the release, since none of the historical\n  \"Prepare\" commits examined contained one.\n- A bump that exists *only* to widen a dependency constraint (the\n  propagation case above, or an external dependency constraint widen like\n  `cached_network_image`'s) → **patch**. The package's own public API hasn't\n  changed; it's just now compatible with a wider range of a dependency.\n\n**`enhanced` is the one exception**: bump it to the *highest* tier among (a)\nits own direct changes and (b) every dependency it just picked up. A minor\nfeature added to `core` is a minor feature from an `enhanced` user's point of\nview too, even though `enhanced`'s own `lib/` didn't change. (Confirmed:\n`enhanced` has tracked `core`'s minor bumps 1:1 in every historical release\nwhere core bumped minor.)",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:20:26.860Z"
+        },
+        {
+          "type": "assistant",
+          "text": "Now update the \"Worked example\" section at the bottom to reflect the corrected scope:",
+          "timestamp": "2026-08-30T01:20:30.666Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Bash",
+          "input": {
+            "command": "grep -n \"## Worked example\" -A 15 docs/runbook/release.md",
+            "description": "Locate worked example section"
+          },
+          "timestamp": "2026-08-30T01:20:30.892Z"
+        },
+        {
+          "type": "tool_use",
+          "name": "Edit",
+          "input": {
+            "file_path": "/Users/son.dao/.treehouse/flutter_widget_from_html-c9fb96/1/flutter_widget_from_html/docs/runbook/release.md",
+            "new_string": "## Worked example\n\nThe `v0.17.3` release prepared alongside this revision of the runbook is a\nconcrete worked example of Step 1 and Step 2 together: `core` picked up\nseveral genuine fixes plus one new capability (standalone CSS border\nproperties) since `v0.17.2`, but per the default-to-patch posture above it\nships as **patch** (`0.17.2`→`0.17.3`), not minor — there's no deliberate\nreason here to escalate. Because the core bump is patch, not minor, the\ndependency-propagation trap in Step 1 does **not** fire: every `fwfh_*`\nadd-on's existing `<0.18.0` upper bound already admits `0.17.3` fine, so the\nfive of them with no changes of their own (`fwfh_chewie`, `fwfh_just_audio`,\n`fwfh_svg`, `fwfh_url_launcher`, `fwfh_webview`) are untouched this cycle —\nonly `core`, `fwfh_cached_network_image` (its own independent\n`cached_network_image@4.0.0` constraint widen), and `enhanced` (which must\nrelease whenever any dependency it exact-pins moves) get a release. See the\n`[<pkg>] v...` commits immediately following this one for the exact diffs.\nCompare this against a hypothetical minor `core` bump, where all six\n`fwfh_*` add-ons would need touching — the distinction matters and is easy\nto get wrong by defaulting to \"any feature ⇒ minor\" without checking Step 1\nagainst the *actual* new version number.",
+            "old_string": "## Worked example\n\nThe `v0.18.0` release prepared alongside this revision of the runbook is a\nconcrete worked example of every rule above: a minor `core` feature forcing\na minor `core`+`enhanced` bump and a mechanical patch bump of every `fwfh_*`\nadd-on (dependency-upper-bound widening), plus one add-on\n(`fwfh_cached_network_image`) with its own independent compatibility fix\nlayered on top of that same mechanical patch bump. See the `[<pkg>] v...`\ncommits immediately following this one for the exact diffs.",
+            "replace_all": false
+          },
+          "timestamp": "2026-08-30T01:20:39.855Z"
+        }
+      ],
+      "total_additions": 71,
+      "total_deletions": 34,
+      "accepted_lines": 302,
+      "overriden_lines": 0
+    }
+  }
+}
