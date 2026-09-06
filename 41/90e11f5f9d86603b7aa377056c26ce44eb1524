@@ -1,0 +1,11 @@
+docs/runbook/release.md
+  c861e76b2d174ec5 305-309
+AGENTS.md
+  c861e76b2d174ec5 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "4190e11f5f9d86603b7aa377056c26ce44eb1524",
+  "prompts": {}
+}
