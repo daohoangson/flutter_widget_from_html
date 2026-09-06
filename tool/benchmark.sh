@@ -15,8 +15,8 @@ flutter pub get
 mkdir -p results
 rm -f results/measurements.json
 cp pubspec.lock results/pubspec.lock
-flutter --version --machine > results/flutter.json
-flutter devices --machine > results/devices.json
+flutter --version --machine | dart run tool/metadata.dart flutter > results/flutter.json
+flutter devices --machine | dart run tool/metadata.dart device "$device" > results/devices.json
 git rev-parse HEAD > results/revision.txt
 printf '%s\n' "$device" > results/selected-device.txt
 flutter drive --profile -d "$device" \

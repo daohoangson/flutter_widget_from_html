@@ -74,11 +74,13 @@ per-case distributions.
 
 `results/measurements.json` contains versioned JSON, per-trial raw samples,
 platform/web/compute execution, viewport, pixel ratio, mode and protocol metadata.
-Sibling `pubspec.lock` (resolved dependencies), `flutter.json`, `devices.json`, `selected-device.txt`, and `revision.txt`
-record SDK/engine/Dart versions, discovered devices, selected target and source
-revision. Archive the whole directory together; device inventory is not the
-selected-device identity. Record any local diff alongside the revision when
-benchmarking uncommitted changes.
+Sibling `pubspec.lock` (resolved dependencies), `flutter.json`, `devices.json`,
+`selected-device.txt`, and `revision.txt` record resolved dependencies, an
+allowlisted SDK/engine/Dart version record, the selected target's platform/OS/
+architecture (plus browser version for web), the generic target selector, and
+the source revision. Machine-local SDK paths, repository URLs, device names,
+device IDs, and unrelated devices are excluded. Record any local diff alongside
+the revision when benchmarking uncommitted changes.
 
 ## Validate
 
