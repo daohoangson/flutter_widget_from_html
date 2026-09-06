@@ -58,6 +58,58 @@ void main() {
         });
       },
     );
+
+    testWidgets(
+        'held link gesture survives obsolete parse after newer '
+        '${async ? 'async' : 'sync'} render', (tester) async {
+      await tester.runAsync(() async {
+        final oldParse = _ParseGate();
+        final newParse = _ParseGate();
+        final taps = <String>[];
+        Widget content(
+          String text,
+          _ParseGate gate, {
+          bool buildAsync = true,
+        }) =>
+            MaterialApp(
+              home: _HtmlWidget(
+                '<a href="https://example.com/$text">$text</a>',
+                gate: gate,
+                buildAsync: buildAsync,
+                onTapUrl: (url) {
+                  taps.add(url);
+                  return true;
+                },
+              ),
+            );
+        await tester.pumpWidget(content('old', oldParse));
+        await oldParse.ready.future;
+        await tester.pumpWidget(
+          content('current', newParse, buildAsync: async),
+        );
+        if (async) {
+          await newParse.ready.future;
+          newParse.release();
+          await tester.pump();
+        }
+        final current = find.text('current', findRichText: true);
+        expect(current, findsOneWidget);
+        await tester.tapAt(tester.getTopLeft(current) + const Offset(10, 8));
+        expect(taps, ['https://example.com/current']);
+
+        final held = await tester.startGesture(
+          tester.getTopLeft(current) + const Offset(10, 8),
+        );
+        oldParse.release();
+        await tester.pump();
+        await held.up();
+
+        expect(taps, List.filled(2, 'https://example.com/current'));
+        expect(current, findsOneWidget);
+        expect(find.text('old', findRichText: true), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+    });
   }
   testWidgets('disposal during parsing does not reset factory', (tester) async {
     await tester.runAsync(() async {
