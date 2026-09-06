@@ -45,9 +45,10 @@ the committed benchmark lock before benchmarking, from the repository root:
 All 24 combinations run in deterministic fixture → render mode → sync/async
 order, with one discarded warmup per case and three measured trials by default.
 HTML caching is explicitly disabled for both sync and async. The Flutter image
-cache is cleared between trials; process, shaders, fonts, and OS caches remain
-warm. This is a warm-process benchmark, not app startup. Fixed ordering can bias
-thermal results; repeat whole runs and compare per-case distributions.
+cache is cleared before every warmup and measured trial; process, shaders,
+fonts, and OS caches remain warm. This is a warm-process benchmark, not app
+startup. Fixed ordering can bias thermal results; repeat whole runs and compare
+per-case distributions.
 
 * `first_body_paint_us`: monotonic elapsed time from immediately before `runApp`
   until the HTML body's first paint returns, detected with a benchmark-only

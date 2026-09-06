@@ -11,12 +11,12 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'fixtures.dart';
 
 void main() => runApp(
-      const MaterialApp(
-        home: Scaffold(
-          body: Text('Run via tool/benchmark.sh; see benchmark/README.md.'),
-        ),
-      ),
-    );
+  const MaterialApp(
+    home: Scaffold(
+      body: Text('Run via tool/benchmark.sh; see benchmark/README.md.'),
+    ),
+  ),
+);
 
 Map<String, Object?> distribution(List<int> values) {
   if (values.isEmpty)
@@ -25,7 +25,7 @@ Map<String, Object?> distribution(List<int> values) {
       'p50_us': null,
       'p90_us': null,
       'p99_us': null,
-      'max_us': null
+      'max_us': null,
     };
   final sorted = [...values]..sort();
   int percentile(double p) =>
@@ -117,15 +117,14 @@ Future<Map<String, Object?>> runSuite({
             renderMode: mode == 'column'
                 ? RenderMode.column
                 : mode == 'listView'
-                    ? ListViewMode(
-                        controller: controller, padding: EdgeInsets.zero)
-                    : RenderMode.sliverList,
+                ? ListViewMode(controller: controller, padding: EdgeInsets.zero)
+                : RenderMode.sliverList,
           );
           final body = mode == 'column'
               ? SingleChildScrollView(controller: controller, child: html)
               : mode == 'sliverList'
-                  ? CustomScrollView(controller: controller, slivers: [html])
-                  : html;
+              ? CustomScrollView(controller: controller, slivers: [html])
+              : html;
           PaintingBinding.instance.imageCache.clear();
           PaintingBinding.instance.imageCache.clearLiveImages();
           watch.start();
@@ -142,9 +141,10 @@ Future<Map<String, Object?>> runSuite({
           try {
             // Six viewport-sized steps; re-evaluate lazy scroll extent each time.
             for (var step = 0; step < (smoke ? 1 : 6); step++) {
-              final target = (controller.offset +
-                      controller.position.viewportDimension * .8)
-                  .clamp(0.0, controller.position.maxScrollExtent);
+              final target =
+                  (controller.offset +
+                          controller.position.viewportDimension * .8)
+                      .clamp(0.0, controller.position.maxScrollExtent);
               distance += target - controller.offset;
               await controller.animateTo(
                 target,
