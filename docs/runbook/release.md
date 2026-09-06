@@ -307,7 +307,7 @@ dependency order above, it:
 package and `demo_app`, preserving existing `pubspec.lock` resolutions where they're still
 compatible with the manifests. (`tool/pub-upgrade.sh` is the sibling that instead runs
 `flutter pub upgrade` everywhere, refreshing resolutions within the declared constraints.)
-`pub-get.sh` is useful for sanity-checking that a bump resolves correctly before committing,
+`tool/pub-get.sh` is useful for sanity-checking that a bump resolves correctly before committing,
 but **it is not itself a release step** and doesn't touch versions, changelogs, or publish
 anything.
 
