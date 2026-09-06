@@ -21,7 +21,7 @@ class TagDetails {
           Widget? summaryOrNull;
           final rest = <WidgetPlaceholder>[];
           for (final child in children) {
-            if (summaryOrNull == null && child.isSummary == true) {
+            if (summaryOrNull == null && child.summaryTree != null) {
               summaryOrNull = child;
             } else {
               rest.add(child);
@@ -60,7 +60,13 @@ class TagDetails {
                 child: wf.buildColumnWidget(
                   context,
                   [
-                    HtmlSummary(style: textStyle, child: summary),
+                    HtmlSummary(
+                      style: summaryOrNull?.summaryTree?.inheritanceResolvers
+                              .resolve(context)
+                              .prepareTextStyle() ??
+                          textStyle,
+                      child: summary,
+                    ),
                     HtmlDetailsContents(child: child),
                   ],
                   dir: resolved.directionOrLtr,
@@ -110,14 +116,14 @@ class TagDetails {
     return summaryTree..prepend(marker);
   }
 
-  static void _markBlockIsSummary(BuildTree _, Widget block) =>
-      block.isSummary = true;
+  static void _markBlockIsSummary(BuildTree tree, Widget block) =>
+      block.summaryTree = tree;
 }
 
 extension on Widget {
-  static final _isSummary = Expando<bool>();
+  static final _summaryTree = Expando<BuildTree>();
 
-  bool get isSummary => _isSummary[this] ?? false;
+  BuildTree? get summaryTree => _summaryTree[this];
 
-  set isSummary(bool value) => _isSummary[this] = value;
+  set summaryTree(BuildTree? value) => _summaryTree[this] = value;
 }
