@@ -126,7 +126,7 @@ class _FocusableSummary extends StatefulWidget {
 
 class _FocusableSummaryState extends State<_FocusableSummary> {
   var _showFocus = false;
-  late final _focusNode = FocusNode(onKeyEvent: _handleKeyEvent);
+  late final _focusNode = FocusNode();
 
   @override
   void dispose() {
@@ -134,25 +134,18 @@ class _FocusableSummaryState extends State<_FocusableSummary> {
     super.dispose();
   }
 
-  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-    final activates = const SingleActivator(
-          LogicalKeyboardKey.enter,
-        ).accepts(event, HardwareKeyboard.instance) ||
-        const SingleActivator(
-          LogicalKeyboardKey.space,
-        ).accepts(event, HardwareKeyboard.instance);
-    if (!node.hasPrimaryFocus || !activates) {
-      return KeyEventResult.ignored;
-    }
-
-    widget.onActivate();
-    return KeyEventResult.handled;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final activateAction = _SummaryActivateAction(
+      focusNode: _focusNode,
+      onActivate: widget.onActivate,
+    );
     return FocusableActionDetector(
       focusNode: _focusNode,
+      actions: {
+        ActivateIntent: activateAction,
+        ButtonActivateIntent: activateAction,
+      },
       onShowFocusHighlight: (value) => setState(() => _showFocus = value),
       child: Semantics(
         button: true,
@@ -177,6 +170,31 @@ class _FocusableSummaryState extends State<_FocusableSummary> {
         ),
       ),
     );
+  }
+}
+
+// Use the enclosing app's platform shortcuts, including numpad Enter and
+// Apple's ButtonActivateIntent, without activating for a focused descendant.
+class _SummaryActivateAction extends Action<Intent> {
+  final FocusNode focusNode;
+  final VoidCallback onActivate;
+
+  _SummaryActivateAction({required this.focusNode, required this.onActivate});
+
+  @override
+  bool isEnabled(Intent intent) {
+    final keyboard = HardwareKeyboard.instance;
+    return focusNode.hasPrimaryFocus &&
+        !keyboard.isAltPressed &&
+        !keyboard.isControlPressed &&
+        !keyboard.isMetaPressed &&
+        !keyboard.isShiftPressed;
+  }
+
+  @override
+  Object? invoke(Intent intent) {
+    onActivate();
+    return null;
   }
 }
 

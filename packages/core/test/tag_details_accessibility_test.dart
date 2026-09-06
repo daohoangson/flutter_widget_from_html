@@ -1,6 +1,7 @@
 // Keep semantics inspection compatible with the minimum Flutter 3.32 SDK.
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -77,6 +78,96 @@ void main() {
     }
   });
 
+  for (final color in ['#123456', '#ffffff']) {
+    testWidgets('focus outline uses summary color $color', (tester) async {
+      await pumpHtml(
+        tester,
+        '<details style="color: #000000">'
+        '<summary style="color: $color; background-color: #000000">'
+        'More information</summary>Hidden content</details>',
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      final outline = find.descendant(
+        of: find.byType(FocusableActionDetector),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is DecoratedBox &&
+              widget.position == DecorationPosition.foreground &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).border != null,
+        ),
+      );
+      final decoration =
+          tester.widget<DecoratedBox>(outline).decoration as BoxDecoration;
+      expect(
+        decoration.border,
+        Border.all(
+          color: color == '#ffffff'
+              ? const Color(0xFFFFFFFF)
+              : const Color(0xFF123456),
+          width: 2,
+        ),
+      );
+      expect(decoration.shape, BoxShape.rectangle);
+    });
+  }
+
+  for (final platform in TargetPlatform.values) {
+    for (final key in [
+      LogicalKeyboardKey.enter,
+      LogicalKeyboardKey.space,
+      LogicalKeyboardKey.numpadEnter,
+    ]) {
+      testWidgets('$platform ${key.keyLabel} activates on keydown and repeat',
+          (tester) async {
+        final semantics = tester.ensureSemantics();
+        debugDefaultTargetPlatformOverride = platform;
+        try {
+          await pumpHtml(
+            tester,
+            '<details><summary>More information</summary>Hidden content</details>',
+          );
+          final summary = find.bySemanticsLabel(RegExp('More information'));
+          // Keep raw event encoding consistent; the target platform still
+          // selects Flutter's platform-specific shortcuts.
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab,
+              platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isFocused),
+              isTrue);
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isFalse);
+
+          await tester.sendKeyDownEvent(key, platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isTrue);
+          await tester.sendKeyUpEvent(key, platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isTrue);
+          await tester.sendKeyDownEvent(key, platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isFalse);
+          await tester.sendKeyRepeatEvent(key, platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isTrue);
+          await tester.sendKeyUpEvent(key, platform: 'android');
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isTrue);
+        } finally {
+          semantics.dispose();
+          debugDefaultTargetPlatformOverride = null;
+        }
+      });
+    }
+  }
+
   testWidgets('default summary exposes initial open state and semantic tap', (
     tester,
   ) async {
@@ -128,27 +219,70 @@ void main() {
     expect(controller.text, ' ');
   });
 
-  testWidgets('summary ignores modified activation keys', (tester) async {
-    await pumpHtml(
-      tester,
-      '<details><summary>More information</summary>Hidden content</details>',
-    );
+  for (final key in [
+    LogicalKeyboardKey.enter,
+    LogicalKeyboardKey.space,
+    LogicalKeyboardKey.numpadEnter,
+  ]) {
+    testWidgets('summary ignores modified ${key.keyLabel}', (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await pumpHtml(
+          tester,
+          '<details><summary>More information</summary>Hidden content</details>',
+        );
+        final summary = find.bySemanticsLabel(RegExp('More information'));
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isFocused),
+            isTrue);
+        for (final modifier in <LogicalKeyboardKey>[
+          LogicalKeyboardKey.shiftLeft,
+          LogicalKeyboardKey.controlLeft,
+          LogicalKeyboardKey.altLeft,
+          LogicalKeyboardKey.metaLeft,
+        ]) {
+          await tester.sendKeyDownEvent(modifier);
+          await tester.sendKeyEvent(key);
+          await tester.sendKeyUpEvent(modifier);
+          await tester.pumpAndSettle();
+          expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+              isFalse);
+        }
+      } finally {
+        semantics.dispose();
+      }
+    });
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    for (final modifier in <LogicalKeyboardKey>[
-      LogicalKeyboardKey.shiftLeft,
-      LogicalKeyboardKey.controlLeft,
-      LogicalKeyboardKey.altLeft,
-      LogicalKeyboardKey.metaLeft,
-    ]) {
-      await tester.sendKeyDownEvent(modifier);
-      await tester.sendKeyEvent(LogicalKeyboardKey.space);
-      await tester.sendKeyUpEvent(modifier);
-    }
-    await tester.pumpAndSettle();
-
-    expect(find.bySemanticsLabel('Hidden content'), findsNothing);
-  });
+    testWidgets('summary ignores ${key.keyLabel} from a focused child',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      final childFocus = FocusNode();
+      try {
+        await pumpHtml(
+          tester,
+          '<details><summary>More information<custom-focus></custom-focus>'
+          '</summary>Hidden content</details>',
+          customWidgetBuilder: (element) => element.localName == 'custom-focus'
+              ? Focus(focusNode: childFocus, child: const Text('Child'))
+              : null,
+        );
+        childFocus.requestFocus();
+        await tester.pumpAndSettle();
+        expect(childFocus.hasPrimaryFocus, isTrue);
+        // The child deliberately ignores the event: it must not activate its
+        // summary ancestor or have its key consumed by that ancestor.
+        expect(await tester.sendKeyEvent(key), isFalse);
+        await tester.pumpAndSettle();
+        final summary = find.bySemanticsLabel(RegExp('More information'));
+        expect(tester.getSemantics(summary).hasFlag(SemanticsFlag.isExpanded),
+            isFalse);
+      } finally {
+        semantics.dispose();
+        childFocus.dispose();
+      }
+    });
+  }
 
   testWidgets('baseline link, heading text, and image description are exposed',
       (
