@@ -20,7 +20,6 @@
 
 - Dart style with 2‑space indentation; keep lines focused and readable.
 - Lints: `package:lint` plus repo rules (see each `analysis_options.yaml`). Prefer relative imports, avoid relative `lib/` imports.
-- `dev_dependencies: lint` is pinned to `"<2.9.0"` in every package/demo `pubspec.yaml`, not `any` — newer presets add rules unreviewed by this repo. Bump it deliberately (review new rules first), don't widen it back to `any`.
 - Names: classes `PascalCase`, members `camelCase`, constants `SCREAMING_SNAKE_CASE`, private with leading `_`.
 
 ## Testing Guidelines

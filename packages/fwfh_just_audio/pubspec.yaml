@@ -22,8 +22,7 @@ dev_dependencies:
     sdk: flutter
   golden_toolkit: ^0.15.0
   just_audio_platform_interface: ^4.5.0
-  # Upgrade the lint preset deliberately; newer releases enable new rules.
-  lint: "<2.9.0"
+  lint: any
   plugin_platform_interface: any
   tuple: any
 
