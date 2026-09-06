@@ -185,7 +185,7 @@ These tags and their contents will be ignored:
     - gap: value in `em`, `%`, `pt` and `px`
     - justify-content: flex-start/flex-end/center/space-between/space-around/space-evenly
 - font-family
-- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
+- font-size: absolute (`xx-small` through `xxx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - line-height: `normal`, number or value in `em`, `%`, `pt` and `px`
