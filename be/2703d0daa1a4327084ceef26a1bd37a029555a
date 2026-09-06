@@ -1,0 +1,23 @@
+AGENTS.md
+  41e8dafdb70456a2 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "be2703d0daa1a4327084ceef26a1bd37a029555a",
+  "prompts": {
+    "41e8dafdb70456a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77f06f6c-2c18-44a9-9378-bff50cfd492c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}

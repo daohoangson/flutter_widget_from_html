@@ -1,0 +1,36 @@
+packages/core/lib/src/core_html_widget.dart
+  2d630e19fa0e40c0 230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "57d7119d8ea61bea43bd3fd31f13180cb7f1ea7c",
+  "prompts": {
+    "2d630e19fa0e40c0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31d91747-06e7-4c9e-86f7-b243955d0712",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 2,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    },
+    "64a5d7e5d42e91ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2cb5512-5725-44a2-9419-05f847a52a5d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 3,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
