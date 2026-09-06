@@ -11,7 +11,7 @@
 
 ## Build, Test, and Development Commands
 
-- Install latest deps: `./tool/pub-get.sh`.
+- Install deps, preserving compatible lockfile resolutions: `./tool/pub-get.sh`. To refresh resolutions within declared constraints, use `./tool/pub-upgrade.sh`.
 - Analyze all + run tests: `./tool/test.sh` (accepts extra flags like `--coverage` or `--update-goldens`).
 - Format code: `dart format .`.
 - Per‑package checks: `flutter analyze` and `flutter test` from each package dir.

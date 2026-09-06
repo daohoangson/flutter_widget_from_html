@@ -271,9 +271,10 @@ in, PR #1622) — two independent real instances is a real, established pattern 
 a one-off to avoid. Same `X.Y.Z` = `enhanced`'s new version rule applies.
 
 An optional trailing "Update files" style commit for regenerated lockfiles is sometimes present
-(e.g. a refreshed `demo_app/pubspec.lock` after running `./tool/pub-get.sh` locally to sanity
-check the bump) but is **not scripted anywhere and not required** — some real Prepare cycles
-include it, several don't. Do not confuse this with `tool/update-demo_app-files.sh`, which is a
+(e.g. a `demo_app/pubspec.lock` re-resolved by `./tool/pub-get.sh` for the bumped packages only,
+or fully refreshed by `./tool/pub-upgrade.sh` when a broader dependency update is intended) but
+is **not scripted anywhere and not required** — some real Prepare cycles include it, several
+don't. Do not confuse this with `tool/update-demo_app-files.sh`, which is a
 completely unrelated script that regenerates `demo_app`'s native platform scaffolding
 (`android/ios/macos/web`) — it has nothing to do with versioning and is not part of this
 workflow.
@@ -302,9 +303,11 @@ dependency order above, it:
 5. Runs `flutter pub publish` for real.
 6. Reverts all local changes (`git checkout .`) and removes the generated `.pubignore`.
 
-`tool/pub-get.sh` is a different, sibling script — it just does a clean cross-package
-`flutter pub get` (deleting all `pubspec.lock` files first, across every package and
-`demo_app`). It's useful for sanity-checking that a bump resolves correctly before committing,
+`tool/pub-get.sh` is a different, sibling script — it just runs `flutter pub get` across every
+package and `demo_app`, preserving existing `pubspec.lock` resolutions where they're still
+compatible with the manifests. (`tool/pub-upgrade.sh` is the sibling that instead runs
+`flutter pub upgrade` everywhere, refreshing resolutions within the declared constraints.)
+`tool/pub-get.sh` is useful for sanity-checking that a bump resolves correctly before committing,
 but **it is not itself a release step** and doesn't touch versions, changelogs, or publish
 anything.
 
