@@ -42,7 +42,7 @@ Future<String> explain(
   await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
   await tester.pump();
 
-  return helper.explainWithoutPumping(
+  return await helper.explainWithoutPumping(
     explainer: cachedNetworkImageExplainer,
     useExplainer: useExplainer,
   );

@@ -225,7 +225,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     if (widget.html.isEmpty) {
-      return Future.sync(() => _sliverOrWidget0);
+      return await Future.sync(() => _sliverOrWidget0);
     }
 
     final domNodes = await compute(_parseHtml, widget.html);

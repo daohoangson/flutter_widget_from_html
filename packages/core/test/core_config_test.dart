@@ -384,7 +384,7 @@ void main() {
         (_, __) {},
       );
 
-      return helper.explainWithoutPumping(useExplainer: false);
+      return await helper.explainWithoutPumping(useExplainer: false);
     }
 
     testWidgets('[sync] renders default', (tester) async {
@@ -522,7 +522,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) => false,
+          onTapUrl: (_) => Future.value(false),
         ),
       );
       await tester.pumpAndSettle();
@@ -539,7 +539,7 @@ void main() {
         _OnTapUrlApp(
           href: href,
           onTapCallbackResults: onTapCallbackResults,
-          onTapUrl: (_) => true,
+          onTapUrl: (_) => Future.value(true),
         ),
       );
       await tester.pumpAndSettle();
