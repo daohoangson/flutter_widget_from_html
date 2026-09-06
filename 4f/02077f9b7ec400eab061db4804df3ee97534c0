@@ -1,0 +1,25 @@
+docs/runbook/release.md
+  c861e76b2d174ec5 305-309
+AGENTS.md
+  c861e76b2d174ec5 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.32",
+  "base_commit_sha": "4f02077f9b7ec400eab061db4804df3ee97534c0",
+  "prompts": {
+    "c861e76b2d174ec5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a06fff5-1a3e-4b3d-96b8-9fe27c8f8eda",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Dao Hoang Son <daohoangson@gmail.com>",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 4,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
