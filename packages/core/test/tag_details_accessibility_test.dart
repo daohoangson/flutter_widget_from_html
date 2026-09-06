@@ -8,8 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 // Deliberately independent of _.dart, whose harness excludes semantics.
-Future<void> pumpHtml(WidgetTester tester, String html) async {
-  await tester.pumpWidget(MaterialApp(home: Scaffold(body: HtmlWidget(html))));
+Future<void> pumpHtml(
+  WidgetTester tester,
+  String html, {
+  CustomWidgetBuilder? customWidgetBuilder,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: HtmlWidget(html, customWidgetBuilder: customWidgetBuilder),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -87,6 +97,35 @@ void main() {
     } finally {
       semantics.dispose();
     }
+  });
+
+  testWidgets('summary does not handle Space from a focused child',
+      (tester) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await pumpHtml(
+      tester,
+      '<details><summary><custom-text-field></custom-text-field></summary>'
+      'Hidden content</details>',
+      customWidgetBuilder: (element) => element.localName == 'custom-text-field'
+          ? TextField(controller: controller)
+          : null,
+    );
+
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Hidden content'), findsNothing);
+    expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .focusNode
+            .hasFocus,
+        isTrue);
+    await tester.enterText(find.byType(EditableText), ' ');
+    expect(controller.text, ' ');
   });
 
   testWidgets('baseline link, heading text, and image description are exposed',

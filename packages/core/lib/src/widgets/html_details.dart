@@ -126,22 +126,32 @@ class _FocusableSummary extends StatefulWidget {
 
 class _FocusableSummaryState extends State<_FocusableSummary> {
   var _showFocus = false;
+  late final _focusNode = FocusNode(onKeyEvent: _handleKeyEvent);
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (!node.hasPrimaryFocus || event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    switch (event.logicalKey) {
+      case LogicalKeyboardKey.enter:
+      case LogicalKeyboardKey.space:
+        widget.onActivate();
+        return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
 
   @override
   Widget build(BuildContext context) {
     return FocusableActionDetector(
-      shortcuts: const {
-        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-      },
-      actions: {
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (_) {
-            widget.onActivate();
-            return null;
-          },
-        ),
-      },
+      focusNode: _focusNode,
       onShowFocusHighlight: (value) => setState(() => _showFocus = value),
       child: Semantics(
         button: true,
