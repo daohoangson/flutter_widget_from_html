@@ -135,17 +135,18 @@ class _FocusableSummaryState extends State<_FocusableSummary> {
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-    if (!node.hasPrimaryFocus || event is! KeyDownEvent) {
+    final activates = const SingleActivator(
+          LogicalKeyboardKey.enter,
+        ).accepts(event, HardwareKeyboard.instance) ||
+        const SingleActivator(
+          LogicalKeyboardKey.space,
+        ).accepts(event, HardwareKeyboard.instance);
+    if (!node.hasPrimaryFocus || !activates) {
       return KeyEventResult.ignored;
     }
 
-    switch (event.logicalKey) {
-      case LogicalKeyboardKey.enter:
-      case LogicalKeyboardKey.space:
-        widget.onActivate();
-        return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
+    widget.onActivate();
+    return KeyEventResult.handled;
   }
 
   @override

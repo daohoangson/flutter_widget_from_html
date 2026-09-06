@@ -128,6 +128,28 @@ void main() {
     expect(controller.text, ' ');
   });
 
+  testWidgets('summary ignores modified activation keys', (tester) async {
+    await pumpHtml(
+      tester,
+      '<details><summary>More information</summary>Hidden content</details>',
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    for (final modifier in <LogicalKeyboardKey>[
+      LogicalKeyboardKey.shiftLeft,
+      LogicalKeyboardKey.controlLeft,
+      LogicalKeyboardKey.altLeft,
+      LogicalKeyboardKey.metaLeft,
+    ]) {
+      await tester.sendKeyDownEvent(modifier);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.sendKeyUpEvent(modifier);
+    }
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Hidden content'), findsNothing);
+  });
+
   testWidgets('baseline link, heading text, and image description are exposed',
       (
     tester,
