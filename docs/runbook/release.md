@@ -271,9 +271,10 @@ in, PR #1622) — two independent real instances is a real, established pattern 
 a one-off to avoid. Same `X.Y.Z` = `enhanced`'s new version rule applies.
 
 An optional trailing "Update files" style commit for regenerated lockfiles is sometimes present
-(e.g. a refreshed `demo_app/pubspec.lock` after running `./tool/pub-get.sh` locally to sanity
-check the bump) but is **not scripted anywhere and not required** — some real Prepare cycles
-include it, several don't. Do not confuse this with `tool/update-demo_app-files.sh`, which is a
+(e.g. a `demo_app/pubspec.lock` re-resolved by `./tool/pub-get.sh` for the bumped packages only,
+or fully refreshed by `./tool/pub-upgrade.sh` when a broader dependency update is intended) but
+is **not scripted anywhere and not required** — some real Prepare cycles include it, several
+don't. Do not confuse this with `tool/update-demo_app-files.sh`, which is a
 completely unrelated script that regenerates `demo_app`'s native platform scaffolding
 (`android/ios/macos/web`) — it has nothing to do with versioning and is not part of this
 workflow.

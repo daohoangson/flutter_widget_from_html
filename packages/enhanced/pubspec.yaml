@@ -40,8 +40,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
-  # Upgrade the lint preset deliberately; newer releases enable new rules.
-  lint: "<2.9.0"
+  lint: any
   mocktail: ^1.0.0
 
 flutter:
