@@ -17,7 +17,7 @@ jobs:
       - run: cd benchmark && flutter pub get && flutter analyze && flutter test
       - name: Profile matrix (advisory; no performance thresholds)
         run: xvfb-run -a -s '-screen 0 1280x900x24' ./tool/benchmark.sh linux
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: benchmark-results

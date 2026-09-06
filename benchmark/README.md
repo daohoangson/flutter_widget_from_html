@@ -35,6 +35,11 @@ not a background isolate. Engine `FrameTiming` samples may be unavailable;
 empty samples produce null percentiles and `frame_status: unavailable`, never
 zero-cost claims. Web driver/engine support depends on the installed SDK.
 
+Until dependency-setup PR #1623 merges, the legacy root `tool/pub-get.sh`
+deletes all lockfiles, including `benchmark/pubspec.lock`. If you ran it, restore
+the committed benchmark lock before benchmarking, from the repository root:
+`git restore -- benchmark/pubspec.lock`.
+
 ## Protocol and interpretation
 
 All 24 combinations run in deterministic fixture → render mode → sync/async

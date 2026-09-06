@@ -20,7 +20,13 @@ void main() => runApp(
 
 Map<String, Object?> distribution(List<int> values) {
   if (values.isEmpty)
-    return {'count': 0, 'p50_us': null, 'p90_us': null, 'p99_us': null};
+    return {
+      'count': 0,
+      'p50_us': null,
+      'p90_us': null,
+      'p99_us': null,
+      'max_us': null
+    };
   final sorted = [...values]..sort();
   int percentile(double p) =>
       sorted[((sorted.length * p).ceil() - 1).clamp(0, sorted.length - 1)];
@@ -210,7 +216,7 @@ Future<Map<String, Object?>> runSuite({
       'physical_height': view.physicalSize.height,
       'device_pixel_ratio': view.devicePixelRatio,
       'warmups_per_case': 1,
-      'image_cache': 'cleared_before_each_case; repeated_single_asset',
+      'image_cache': 'cleared_before_each_trial; repeated_single_asset',
       'case_order': 'fixture, column/listView/sliverList, sync/async, trial',
     },
     'unmeasured': {

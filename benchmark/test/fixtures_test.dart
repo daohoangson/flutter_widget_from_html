@@ -15,7 +15,15 @@ void main() {
     expect(RegExp('<tr>').allMatches(fixtures()['table']!).length, 300);
   });
   test('nearest-rank summaries retain missing samples', () {
-    expect(distribution([])['p50_us'], isNull);
+    expect(distribution([]), {
+      'count': 0,
+      'p50_us': null,
+      'p90_us': null,
+      'p99_us': null,
+      'max_us': null,
+    });
+    expect(distribution([]).keys, unorderedEquals(distribution([5]).keys));
+    expect(distribution([9, 1, 5])['max_us'], 9);
     expect(distribution([9, 1, 5])['p50_us'], 5);
     expect(distribution([9, 1, 5])['p99_us'], 9);
   });
