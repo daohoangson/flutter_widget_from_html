@@ -22,8 +22,7 @@ dev_dependencies:
   file: any
   flutter_test:
     sdk: flutter
-  # Upgrade the lint preset deliberately; newer releases enable new rules.
-  lint: "<2.9.0"
+  lint: any
   mocktail: ^1.0.0
 
 funding:
