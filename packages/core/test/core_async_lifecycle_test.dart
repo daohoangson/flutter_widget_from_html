@@ -7,54 +7,56 @@ import 'package:html/dom.dart' as dom;
 
 void main() {
   for (final async in [true, false]) {
-    testWidgets('obsolete parse after newer ${async ? 'async' : 'sync'} render',
-        (tester) async {
-      await tester.runAsync(() async {
-        final oldParse = _ParseGate();
-        final newParse = _ParseGate();
-        final factory = _Factory();
-        final taps = <String>[];
-        Widget content(
-          String text,
-          _ParseGate gate, {
-          bool buildAsync = true,
-        }) =>
-            MaterialApp(
-              home: _HtmlWidget(
-                '<a href="https://example.com/$text">$text</a>',
-                gate: gate,
-                buildAsync: buildAsync,
-                factoryBuilder: () => factory,
-                onTapUrl: (url) {
-                  taps.add(url);
-                  return true;
-                },
-              ),
-            );
-        await tester.pumpWidget(content('old', oldParse));
-        await oldParse.ready.future;
-        await tester
-            .pumpWidget(content('current', newParse, buildAsync: async));
-        if (async) {
-          await newParse.ready.future;
-          newParse.release();
+    testWidgets(
+      'obsolete parse after newer ${async ? 'async' : 'sync'} render',
+      (tester) async {
+        await tester.runAsync(() async {
+          final oldParse = _ParseGate();
+          final newParse = _ParseGate();
+          final factory = _Factory();
+          final taps = <String>[];
+          Widget content(
+            String text,
+            _ParseGate gate, {
+            bool buildAsync = true,
+          }) => MaterialApp(
+            home: _HtmlWidget(
+              '<a href="https://example.com/$text">$text</a>',
+              gate: gate,
+              buildAsync: buildAsync,
+              factoryBuilder: () => factory,
+              onTapUrl: (url) {
+                taps.add(url);
+                return true;
+              },
+            ),
+          );
+          await tester.pumpWidget(content('old', oldParse));
+          await oldParse.ready.future;
+          await tester.pumpWidget(
+            content('current', newParse, buildAsync: async),
+          );
+          if (async) {
+            await newParse.ready.future;
+            newParse.release();
+            await tester.pump();
+          }
+          final current = find.text('current', findRichText: true);
+          expect(current, findsOneWidget);
+          await tester.tapAt(tester.getTopLeft(current) + const Offset(10, 8));
+          expect(taps, ['https://example.com/current']);
+          final resets = factory.resets;
+          oldParse.release();
           await tester.pump();
-        }
-        final current = find.text('current', findRichText: true);
-        expect(current, findsOneWidget);
-        await tester.tapAt(tester.getTopLeft(current) + const Offset(10, 8));
-        expect(taps, ['https://example.com/current']);
-        final resets = factory.resets;
-        oldParse.release();
-        await tester.pump();
-        expect(factory.resets, resets);
-        expect(current, findsOneWidget);
-        expect(find.text('old', findRichText: true), findsNothing);
-        await tester.tapAt(tester.getTopLeft(current) + const Offset(10, 8));
-        expect(taps, List.filled(2, 'https://example.com/current'));
-        expect(tester.takeException(), isNull);
-      });
-    });
+          expect(factory.resets, resets);
+          expect(current, findsOneWidget);
+          expect(find.text('old', findRichText: true), findsNothing);
+          await tester.tapAt(tester.getTopLeft(current) + const Offset(10, 8));
+          expect(taps, List.filled(2, 'https://example.com/current'));
+          expect(tester.takeException(), isNull);
+        });
+      },
+    );
   }
   testWidgets('disposal during parsing does not reset factory', (tester) async {
     await tester.runAsync(() async {
@@ -62,11 +64,7 @@ void main() {
       final factory = _Factory();
       await tester.pumpWidget(
         MaterialApp(
-          home: _HtmlWidget(
-            'old',
-            gate: gate,
-            factoryBuilder: () => factory,
-          ),
+          home: _HtmlWidget('old', gate: gate, factoryBuilder: () => factory),
         ),
       );
       await gate.ready.future;
@@ -126,20 +124,20 @@ class _ParseGate {
   late void Function() _resume;
   bool _released = false;
   void run(void Function() action) => runZoned(
-        action,
-        zoneSpecification: ZoneSpecification(
-          registerUnaryCallback: <R, T>(self, parent, zone, callback) {
-            return parent.registerUnaryCallback<R, T>(zone, (value) {
-              if (!_released && value is dom.NodeList) {
-                _resume = () => callback(value);
-                ready.complete();
-                return null as R;
-              }
-              return callback(value);
-            });
-          },
-        ),
-      );
+    action,
+    zoneSpecification: ZoneSpecification(
+      registerUnaryCallback: <R, T>(self, parent, zone, callback) {
+        return parent.registerUnaryCallback<R, T>(zone, (value) {
+          if (!_released && value is dom.NodeList) {
+            _resume = () => callback(value);
+            ready.complete();
+            return null as R;
+          }
+          return callback(value);
+        });
+      },
+    ),
+  );
   void release() {
     _released = true;
     _resume();
