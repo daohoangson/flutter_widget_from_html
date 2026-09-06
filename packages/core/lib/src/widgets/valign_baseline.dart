@@ -122,6 +122,25 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   var _paddingTop = 0.0;
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final scopedChild = child;
+    if (scopedChild == null) {
+      return null;
+    }
+
+    final cc = constraints.loosen().deflate(EdgeInsets.only(top: _paddingTop));
+    final childBaseline = scopedChild.getDryBaseline(cc, baseline);
+    if (childBaseline == null) {
+      return null;
+    }
+
+    return childBaseline + _paddingTop;
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _compute(child, constraints, ChildLayoutHelper.dryLayoutChild);
 

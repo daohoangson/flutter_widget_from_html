@@ -98,6 +98,13 @@ class _ListMarkerRenderObject extends RenderBox {
       _textPainter.computeDistanceToActualBaseline(baseline);
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) =>
+      _textPainter.computeDistanceToActualBaseline(baseline);
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       constraints.constrain(_textPainter.size);
 

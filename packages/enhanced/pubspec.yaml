@@ -1,5 +1,5 @@
 name: flutter_widget_from_html
-version: 0.17.2
+version: 0.17.3
 description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.17.2
-  fwfh_cached_network_image: ^0.16.1
+  flutter_widget_from_html_core: ^0.17.3
+  fwfh_cached_network_image: ^0.16.2
   fwfh_chewie: ^0.16.1
   fwfh_just_audio: ^0.17.0
   fwfh_svg: ^0.16.1
@@ -36,10 +36,6 @@ dependency_overrides:
     path: ../fwfh_webview
 
 dev_dependencies:
-  # trick Flutter@3.22 to use chewie@1.7.5
-  # otherwise it will install v1.8.7 which is in fact incompatible with Flutter@3.22
-  # TODO: remove this when our minimum Flutter version >= 3.24
-  chewie: ^1.7.5
   file:
   flutter_test:
     sdk: flutter

@@ -1,8 +1,11 @@
 part of '../core_parser.dart';
 
 const kCssBorder = 'border';
+const kCssBorderColor = 'border-color';
 const kCssBorderInherit = 'inherit';
 const kCssBorderNone = 'none';
+const kCssBorderStyle = 'border-style';
+const kCssBorderWidth = 'border-width';
 
 const kCssBorderRadius = 'border-radius';
 const kCssBorderRadiusSuffix = 'radius';
@@ -24,7 +27,11 @@ CssBorder tryParseBorder(BuildTree tree) {
       continue;
     }
 
-    if (key.endsWith(kCssBorderRadiusSuffix)) {
+    if (key == kCssBorderColor ||
+        key == kCssBorderStyle ||
+        key == kCssBorderWidth) {
+      border = _tryParseBorderComponent(border, style);
+    } else if (key.endsWith(kCssBorderRadiusSuffix)) {
       border = _tryParseBorderRadius(border, style);
     } else {
       border = _tryParseBorderSide(border, style);
@@ -36,6 +43,50 @@ CssBorder tryParseBorder(BuildTree tree) {
   return border;
 }
 
+CssBorder _tryParseBorderComponent(CssBorder border, css.Declaration style) {
+  final expressions = style.values;
+  if (expressions.isEmpty) {
+    return border;
+  }
+
+  // CSS box-model shorthand order:
+  //  1=all
+  //  2=top/bottom+left/right
+  //  3=top+left/right+bottom
+  //  4=top+right+bottom+left
+  final count = expressions.length;
+  final topExpr = expressions[0];
+  final rightExpr = expressions[count >= 2 ? 1 : 0];
+  final bottomExpr = expressions[count >= 3 ? 2 : 0];
+  final leftExpr = expressions[count >= 4 ? 3 : (count >= 2 ? 1 : 0)];
+
+  CssBorderSide? parseSide(css.Expression expr) {
+    switch (style.property) {
+      case kCssBorderStyle:
+        final val = expr is css.LiteralTerm ? expr.valueAsString : null;
+        if (val == kCssBorderNone) {
+          return CssBorderSide.none;
+        }
+        final s = tryParseTextDecorationStyle(expr);
+        return s != null ? CssBorderSide(style: s) : null;
+      case kCssBorderWidth:
+        final w = tryParseCssLength(expr);
+        return w != null ? CssBorderSide(width: w) : null;
+      case kCssBorderColor:
+        final c = tryParseColor(expr);
+        return c != null ? CssBorderSide(color: c) : null;
+    }
+    return null;
+  }
+
+  return border.copyWith(
+    top: parseSide(topExpr),
+    right: parseSide(rightExpr),
+    bottom: parseSide(bottomExpr),
+    left: parseSide(leftExpr),
+  );
+}
+
 CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
   final suffix = style.property.substring(kCssBorder.length);
   if (suffix.isEmpty && style.term == kCssBorderInherit) {
@@ -44,8 +95,6 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
 
   TextDecorationStyle? borderStyle;
   CssColor? color = CssColor.current();
-  // TODO: look for official document regarding this default value
-  // WebKit & Blink seem to follow the same (hidden?) specs
   var width = const CssLength(1);
   for (final expression in style.values) {
     final value =

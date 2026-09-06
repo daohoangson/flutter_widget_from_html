@@ -194,11 +194,11 @@ class CssBorderSide {
   bool get isNoOp => style == null || width?.isPositive != true;
 
   BorderSide? _getValue(InheritedProperties resolved) {
-    if (identical(this, none)) {
+    if (isNoOp) {
       return null;
     }
 
-    final scopedColor = color?.getValue(resolved);
+    final scopedColor = (color ?? CssColor.current()).getValue(resolved);
     if (scopedColor == null) {
       return null;
     }
@@ -228,10 +228,6 @@ class CssBorderSide {
         style: value.style ?? base.style,
         width: value.width ?? base.width,
       );
-    }
-
-    if (copied?.isNoOp == true) {
-      return none;
     }
 
     return copied;

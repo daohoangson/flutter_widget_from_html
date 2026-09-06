@@ -977,6 +977,30 @@ Future<void> main() async {
       );
     });
 
+    testWidgets('computeDryBaseline', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlListItem(
+              key: key,
+              marker: const Text('1.'),
+              textDirection: TextDirection.ltr,
+              child: const Text('Hello'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      final baseline = renderBox.getDryBaseline(
+        renderBox.constraints,
+        TextBaseline.alphabetic,
+      );
+      expect(baseline, isNotNull);
+    });
+
     testWidgets('computeIntrinsic', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
@@ -1128,6 +1152,33 @@ Future<void> main() async {
 
       expect(circle,
           contains('alpha: 1.0000, red: 0.0000, green: 1.0000, blue: 0.0000'));
+    });
+
+    testWidgets('computeDryBaseline', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlListItem(
+              marker: HtmlListMarker(
+                key: key,
+                markerType: HtmlListMarkerType.disc,
+                textStyle: const TextStyle(fontSize: 14),
+              ),
+              textDirection: TextDirection.ltr,
+              child: const Text('Hello'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      final baseline = renderBox.getDryBaseline(
+        renderBox.constraints,
+        TextBaseline.alphabetic,
+      );
+      expect(baseline, isNotNull);
     });
   });
 }
