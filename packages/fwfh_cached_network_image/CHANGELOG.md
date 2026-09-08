@@ -1,3 +1,7 @@
+## 0.16.3
+
+- Fix platform support metadata on pub.dev (#1630)
+
 ## 0.16.2
 
 - Add support for cached_network_image@4.0.0 (#1621)
