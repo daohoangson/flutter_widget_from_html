@@ -7,6 +7,14 @@ environment:
   flutter: ">=3.32.0"
   sdk: ">=3.4.0 <4.0.0"
 
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
 dependencies:
   flutter:
     sdk: flutter
