@@ -1,3 +1,9 @@
+## 0.17.4
+
+- Add support for CSS `font-size: xxx-large` (#1593, authored by @dariyooo)
+- Improve `<summary>` keyboard and screen reader accessibility (#1626)
+- Fix obsolete async parses resetting the widget factory (#1625)
+
 ## 0.17.3
 
 - Add support for standalone CSS `border-*` properties (#1570, authored by @CaptainDario)
