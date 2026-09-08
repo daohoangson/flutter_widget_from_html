@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'html_list_marker.dart';
@@ -93,15 +94,107 @@ class HtmlSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        final htmlDetails = context.htmlDetails;
-        if (htmlDetails != null) {
-          htmlDetails.setIsOpen(!htmlDetails.isOpen);
-        }
-      },
+    final details = context.htmlDetails;
+    if (details == null) {
+      return child ?? const SizedBox.shrink();
+    }
+    return _FocusableSummary(
+      isOpen: details.isOpen,
+      onActivate: () => details.setIsOpen(!details.isOpen),
+      style: style,
       child: child,
     );
+  }
+}
+
+class _FocusableSummary extends StatefulWidget {
+  final Widget? child;
+  final bool isOpen;
+  final VoidCallback onActivate;
+  final TextStyle style;
+
+  const _FocusableSummary({
+    required this.child,
+    required this.isOpen,
+    required this.onActivate,
+    required this.style,
+  });
+
+  @override
+  State<_FocusableSummary> createState() => _FocusableSummaryState();
+}
+
+class _FocusableSummaryState extends State<_FocusableSummary> {
+  var _showFocus = false;
+  late final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activateAction = _SummaryActivateAction(
+      focusNode: _focusNode,
+      onActivate: widget.onActivate,
+    );
+    return FocusableActionDetector(
+      focusNode: _focusNode,
+      actions: {
+        ActivateIntent: activateAction,
+        ButtonActivateIntent: activateAction,
+      },
+      onShowFocusHighlight: (value) => setState(() => _showFocus = value),
+      child: Semantics(
+        button: true,
+        expanded: widget.isOpen,
+        onTap: widget.onActivate,
+        child: GestureDetector(
+          excludeFromSemantics: true,
+          onTap: widget.onActivate,
+          child: DecoratedBox(
+            // Paint inside the existing bounds without shifting the summary.
+            position: DecorationPosition.foreground,
+            decoration: BoxDecoration(
+              border: _showFocus
+                  ? Border.all(
+                      color: widget.style.color ?? const Color(0xFF000000),
+                      width: 2,
+                    )
+                  : null,
+            ),
+            child: widget.child,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Use the enclosing app's platform shortcuts, including numpad Enter and
+// Apple's ButtonActivateIntent, without activating for a focused descendant.
+class _SummaryActivateAction extends Action<Intent> {
+  final FocusNode focusNode;
+  final VoidCallback onActivate;
+
+  _SummaryActivateAction({required this.focusNode, required this.onActivate});
+
+  @override
+  bool isEnabled(Intent intent) {
+    final keyboard = HardwareKeyboard.instance;
+    return focusNode.hasPrimaryFocus &&
+        !keyboard.isAltPressed &&
+        !keyboard.isControlPressed &&
+        !keyboard.isMetaPressed &&
+        !keyboard.isShiftPressed;
+  }
+
+  @override
+  Object? invoke(Intent intent) {
+    onActivate();
+    return null;
   }
 }
 

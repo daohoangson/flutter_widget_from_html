@@ -11,7 +11,7 @@
 
 ## Build, Test, and Development Commands
 
-- Install latest deps: `./tool/pub-get.sh`.
+- Install deps, preserving compatible lockfile resolutions: `./tool/pub-get.sh`. To refresh resolutions within declared constraints, use `./tool/pub-upgrade.sh`.
 - Analyze all + run tests: `./tool/test.sh` (accepts extra flags like `--coverage` or `--update-goldens`).
 - Format code: `dart format .`.
 - Per‑package checks: `flutter analyze` and `flutter test` from each package dir.
@@ -61,3 +61,10 @@ Most load-bearing points:
 - Tests mirror at `packages/core/test/style_*_test.dart` or `tag_*_test.dart`.
 - If code is unused, delete it. Do not keep commented‑out references or re‑export stubs.
 - `list-style-type` intentionally falls through to canvas‑drawn shapes (disc/circle/square) when a value is not in the `CssCounterStyle` registry.
+
+## Maintaining this file
+
+Keep this file for knowledge useful to almost every future agent session in this project.
+Do not repeat what the codebase already shows; point to the authoritative file or command instead.
+Prefer rewriting or pruning existing entries over appending new ones.
+When updating this file, preserve this bar for all agents and keep entries concise.
