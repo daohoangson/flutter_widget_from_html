@@ -295,13 +295,15 @@ dependency order above, it:
    (`https://pub.dev/packages/<name>/versions/<version>`) — **skips the package if that exact
    version is already published.** This is what makes it safe to run repeatedly / makes
    "some packages didn't change this cycle" a non-issue.
-3. Strips `dependency_overrides` from `pubspec.yaml` (pub.dev rejects packages with those
-   present), runs `flutter clean && flutter pub get`, and runs `flutter test` if a `test/`
-   directory exists.
-4. Builds a `.pubignore` from `.gitignore` plus `/test/` (so tests never ship), strips the
-   `flutter:` key from `pubspec.yaml`.
-5. Runs `flutter pub publish` for real.
-6. Reverts all local changes (`git checkout .`) and removes the generated `.pubignore`.
+3. Runs the automated preflight and packaging checks defined in the script. Keep those checks in
+   the script rather than duplicating their implementation here.
+4. Runs `flutter pub publish` for real. Temporary publishing changes are restored whether the
+   command succeeds or fails.
+
+Use direct funding URLs rather than redirectors. `https://www.patreon.com/daohoangson` responds
+directly to the `HEAD` request used by pub.dev; the version without `www` redirects and has
+produced cached reachability warnings. Do not release a package solely to change this metadata,
+but canonicalize the URL whenever that package next has a real release.
 
 `tool/pub-get.sh` is a different, sibling script — it just runs `flutter pub get` across every
 package and `demo_app`, preserving existing `pubspec.lock` resolutions where they're still
