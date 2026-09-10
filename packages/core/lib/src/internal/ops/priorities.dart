@@ -94,7 +94,8 @@ class BoxModel {
   static const padding = verticalAlign + _step;
   static const border = padding + _step;
   static const background = border + _step;
-  static const margin = background + _step;
+  static const clipPath = background + _step;
+  static const margin = clipPath + _step;
   static const sizingMinWidthZero = margin + _step;
 }
 

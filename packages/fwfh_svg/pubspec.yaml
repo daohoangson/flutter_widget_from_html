@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.0
   flutter_widget_from_html_core: ">=0.8.0 <0.18.0"
+  path_parsing: ">=1.0.0 <2.0.0"
 
 dependency_overrides:
   flutter_widget_from_html_core:

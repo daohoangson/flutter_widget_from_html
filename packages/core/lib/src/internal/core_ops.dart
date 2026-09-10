@@ -25,6 +25,7 @@ part 'ops/column.dart';
 part 'ops/priorities.dart';
 part 'ops/style_background.dart';
 part 'ops/style_border.dart';
+part 'ops/style_clip_path.dart';
 part 'ops/style_display.dart';
 part 'ops/style_display_flex.dart';
 part 'ops/style_ellipsis.dart';

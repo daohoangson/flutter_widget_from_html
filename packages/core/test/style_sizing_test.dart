@@ -444,6 +444,75 @@ Future<void> main() async {
     );
   });
 
+  group('empty element', () {
+    testWidgets('renders with explicit width and height', (tester) async {
+      const html = '<div style="width: 100px; height: 50px;"></div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[CssSizing:height=50.0,width=100.0,child=[widget0]]'),
+      );
+    });
+
+    testWidgets('renders with explicit width only', (tester) async {
+      const html = '<div style="width: 100px;"></div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[CssSizing:width=100.0,child=[widget0]]'),
+      );
+    });
+
+    testWidgets('renders with explicit height only', (tester) async {
+      const html = '<div style="height: 50px;"></div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[CssSizing:height=50.0,width=100.0%,child=[widget0]]'),
+      );
+    });
+
+    testWidgets('collapses without explicit size', (tester) async {
+      // A block with only display:block (100% width) and no content should
+      // still collapse — the isEmpty guard must keep the optimization.
+      const html = '<div></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('collapses with only width 100%', (tester) async {
+      const html = '<div style="width: 100%;"></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssSizing:width=100.0%,child=[widget0]]'));
+    });
+
+    testWidgets('collapses with only min-height', (tester) async {
+      const html = '<div style="min-height: 50px;"></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('collapses with only min-width', (tester) async {
+      const html = '<div style="min-width: 50px;"></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('renders with background and explicit size', (tester) async {
+      // Regression: empty div with background + size must be visible.
+      const html =
+          '<div style="width: 100px; height: 50px; background-color: red;"></div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:color=#FFFF0000,child='
+          '[CssSizing:height=50.0,width=100.0,child=[widget0]]]',
+        ),
+      );
+    });
+  });
+
   group('block', () {
     testWidgets('renders block within block', (WidgetTester tester) async {
       const html =

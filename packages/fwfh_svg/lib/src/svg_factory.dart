@@ -1,9 +1,9 @@
-// TODO: remove ignore for file when our minimum core version >= 1.0
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:path_parsing/path_parsing.dart';
 
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
@@ -129,6 +129,13 @@ mixin SvgFactory on WidgetFactory {
     return super.parse(meta);
   }
 
+  @override
+  Path? buildClipPathFromSvgData(String pathData) {
+    final path = Path();
+    writeSvgPathDataToPath(pathData, _PathProxy(path));
+    return path;
+  }
+
   Widget _buildSvgPicture(
     BuildMetadata meta,
     ImageSource src,
@@ -159,4 +166,30 @@ mixin SvgFactory on WidgetFactory {
       width: src.width,
     );
   }
+}
+
+class _PathProxy implements PathProxy {
+  final Path path;
+
+  _PathProxy(this.path);
+
+  @override
+  void close() => path.close();
+
+  @override
+  void cubicTo(
+    double x1,
+    double y1,
+    double x2,
+    double y2,
+    double x3,
+    double y3,
+  ) =>
+      path.cubicTo(x1, y1, x2, y2, x3, y3);
+
+  @override
+  void lineTo(double x, double y) => path.lineTo(x, y);
+
+  @override
+  void moveTo(double x, double y) => path.moveTo(x, y);
 }
