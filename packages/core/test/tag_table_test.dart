@@ -65,6 +65,46 @@ Future<void> main() async {
       // `HtmlTable` should not be put inside another one
       expect(explained, isNot(contains('SingleChildScrollView')));
     });
+
+    group('RenderMode.listView', () {
+      const windowSize = 100.0;
+
+      testWidgets('does not stretch auto width table', (tester) async {
+        tester.setWindowSize(const Size(windowSize, windowSize));
+
+        await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            '<table><tr><td>Foo</td></tr></table>',
+            key: helper.hwKey,
+            renderMode: RenderMode.listView,
+          ),
+          useExplainer: false,
+        );
+
+        final table = tester.renderObject<RenderBox>(find.byType(HtmlTable));
+        expect(table.size.width, lessThan(windowSize));
+      });
+
+      testWidgets('stretches width 100 percent table', (tester) async {
+        tester.setWindowSize(const Size(windowSize, windowSize));
+
+        await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            '<table style="width: 100%"><tr><td>Foo</td></tr></table>',
+            key: helper.hwKey,
+            renderMode: RenderMode.listView,
+          ),
+          useExplainer: false,
+        );
+
+        final table = tester.renderObject<RenderBox>(find.byType(HtmlTable));
+        expect(table.size.width, equals(windowSize));
+      });
+    });
   });
 
   group('rtl', () {
