@@ -125,10 +125,10 @@ HtmlWidget(
 `package:material_ui` theme. Use `MaterialThemeMode.flutter` or
 `MaterialThemeMode.materialUi` to force one library even when the other theme is
 nearer. The mode applies to link colors, loading indicators, tooltips, AUDIO
-controls and the default IFRAME fullscreen route. With no Material theme, auto
-mode falls back to Flutter's in-framework Material defaults for backwards
-compatibility; inherited text styling still takes normal CSS precedence,
-including in Cupertino-only applications.
+controls and the default Android IFRAME fullscreen route. With no Material
+theme, auto mode falls back to Flutter's in-framework Material defaults for
+backwards compatibility; inherited text styling still takes normal CSS
+precedence, including in Cupertino-only applications.
 
 VIDEO controls are supplied by the third-party `chewie` package, which currently
 uses Flutter's in-framework Material library; `materialThemeMode` does not

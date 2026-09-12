@@ -65,7 +65,7 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final bool mediaPlaybackAlwaysAllow;
 
-  /// Selects the Material library used by the default fullscreen route.
+  /// Selects the Material library used by the default Android fullscreen route.
   final MaterialThemeMode materialThemeMode;
 
   /// {@template web_view.onAndroidHideCustomWidget}
