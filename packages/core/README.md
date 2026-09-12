@@ -13,6 +13,8 @@ Supports [70+ most popular tags](https://demo.fwfh.dev/supported/tags.html).
 
 ## Getting Started
 
+Requires Flutter 3.44.0 or later and Dart 3.12.0 or later.
+
 Add this to your app's `pubspec.yaml` file:
 
 ```yaml
@@ -42,6 +44,11 @@ HtmlWidget(
   ''',
 
   // all other parameters are optional, a few notable params:
+
+  // follow the nearest package:flutter/material.dart or package:material_ui
+  // Theme automatically (the default); explicit flutter and materialUi modes
+  // are also available
+  materialThemeMode: MaterialThemeMode.auto,
 
   // specify custom styling for an element
   // see supported inline styling below
@@ -90,6 +97,16 @@ HtmlWidget(
   textStyle: TextStyle(fontSize: 14),
 ),
 ```
+
+### Material themes
+
+`MaterialThemeMode.auto` uses the nearest in-framework Flutter Material or
+`package:material_ui` theme for link colors, loading indicators and tooltips.
+Mixed and nested theme trees are supported. Use `MaterialThemeMode.flutter` or
+`MaterialThemeMode.materialUi` to force one library even when the other theme is
+nearer. With no Material theme, auto mode falls back to Flutter's in-framework
+Material defaults for backwards compatibility; inherited text styling still
+takes normal CSS precedence, including in Cupertino-only applications.
 
 ## Callbacks
 

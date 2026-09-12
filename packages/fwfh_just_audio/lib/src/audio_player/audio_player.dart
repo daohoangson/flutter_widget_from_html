@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as flutter_material;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:just_audio/just_audio.dart' as lib;
+import 'package:material_ui/material_ui.dart' as material_ui;
 
 /// An audio player.
 class AudioPlayer extends StatefulWidget {
@@ -24,6 +26,9 @@ class AudioPlayer extends StatefulWidget {
   /// Default: `false`.
   final bool muted;
 
+  /// Selects the Material library used by the player controls.
+  final MaterialThemeMode materialThemeMode;
+
   /// Controls whether to preload audio data.
   ///
   /// Default: `false`.
@@ -36,6 +41,7 @@ class AudioPlayer extends StatefulWidget {
     super.key,
     this.loop = false,
     this.muted = false,
+    this.materialThemeMode = MaterialThemeMode.auto,
     this.preload = false,
   });
 
@@ -88,7 +94,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
   Widget build(BuildContext context) => LayoutBuilder(
         builder: (_, bc) {
           final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
-          final theme = Theme.of(context);
+          final materialTheme =
+              resolveMaterialThemeMode(context, widget.materialThemeMode);
           final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
 
           final tsf = MediaQuery.textScalerOf(context);
@@ -96,7 +103,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
 
           return DecoratedBox(
             decoration: BoxDecoration(
-              color: theme.brightness == Brightness.light
+              color: materialTheme.brightness == Brightness.light
                   ? const Color.fromRGBO(0, 0, 0, .1)
                   : const Color.fromRGBO(255, 255, 255, .1),
               borderRadius: BorderRadius.circular(iconSize * 2),
@@ -108,6 +115,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
                   play: _player.play,
                   size: iconSize,
                   stream: _player.playingStream,
+                  materialThemeMode: materialTheme.mode,
                 ),
                 _PositionText(
                   durationStream: _player.durationStream,
@@ -121,12 +129,14 @@ class _AudioPlayerState extends State<AudioPlayer> {
                     positionStream: _player.positionStream,
                     seek: _player.seek,
                     size: iconSize,
+                    materialThemeMode: materialTheme.mode,
                   ),
                 ),
                 _MuteButton(
                   setVolume: _player.setVolume,
                   size: iconSize,
                   stream: _player.volumeStream,
+                  materialThemeMode: materialTheme.mode,
                 ),
               ],
             ),
@@ -140,21 +150,38 @@ class _PlayButton extends StatelessWidget {
   final VoidCallback play;
   final double size;
   final Stream<bool> stream;
+  final MaterialThemeMode materialThemeMode;
 
   const _PlayButton({
     required this.pause,
     required this.play,
     required this.size,
     required this.stream,
+    required this.materialThemeMode,
   });
 
   @override
   Widget build(BuildContext context) => StreamBuilder<bool>(
         builder: (_, snapshot) {
           final isPlaying = snapshot.data ?? false;
-          return IconButton(
+          if (materialThemeMode == MaterialThemeMode.materialUi) {
+            return material_ui.IconButton(
+              onPressed: isPlaying ? pause : play,
+              icon: material_ui.Icon(
+                isPlaying
+                    ? material_ui.Icons.pause
+                    : material_ui.Icons.play_arrow,
+              ),
+              iconSize: size * 2,
+            );
+          }
+          return flutter_material.IconButton(
             onPressed: isPlaying ? pause : play,
-            icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+            icon: flutter_material.Icon(
+              isPlaying
+                  ? flutter_material.Icons.pause
+                  : flutter_material.Icons.play_arrow,
+            ),
             iconSize: size * 2,
           );
         },
@@ -213,12 +240,14 @@ class _PositionSlider extends StatelessWidget {
   final Stream<Duration> positionStream;
   final void Function(Duration duration) seek;
   final double size;
+  final MaterialThemeMode materialThemeMode;
 
   const _PositionSlider({
     required this.durationStream,
     required this.positionStream,
     required this.seek,
     required this.size,
+    required this.materialThemeMode,
   });
 
   @override
@@ -232,11 +261,27 @@ class _PositionSlider extends StatelessWidget {
 
             final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
 
-            return SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                thumbShape: RoundSliderThumbShape(enabledThumbRadius: size / 2),
+            if (materialThemeMode == MaterialThemeMode.materialUi) {
+              return material_ui.SliderTheme(
+                data: material_ui.SliderTheme.of(context).copyWith(
+                  thumbShape: material_ui.RoundSliderThumbShape(
+                    enabledThumbRadius: size / 2,
+                  ),
+                ),
+                child: material_ui.Slider.adaptive(
+                  max: max,
+                  onChanged: onChanged,
+                  value: value,
+                ),
+              );
+            }
+            return flutter_material.SliderTheme(
+              data: flutter_material.SliderTheme.of(context).copyWith(
+                thumbShape: flutter_material.RoundSliderThumbShape(
+                  enabledThumbRadius: size / 2,
+                ),
               ),
-              child: Slider.adaptive(
+              child: flutter_material.Slider.adaptive(
                 max: max,
                 onChanged: onChanged,
                 value: value,
@@ -255,20 +300,37 @@ class _MuteButton extends StatelessWidget {
   final Future<void> Function(double value) setVolume;
   final double size;
   final Stream<double> stream;
+  final MaterialThemeMode materialThemeMode;
 
   const _MuteButton({
     required this.setVolume,
     required this.size,
     required this.stream,
+    required this.materialThemeMode,
   });
 
   @override
   Widget build(BuildContext context) => StreamBuilder<double>(
         builder: (_, snapshot) {
           final isMuted = (snapshot.data ?? 1.0) == 0;
-          return IconButton(
+          if (materialThemeMode == MaterialThemeMode.materialUi) {
+            return material_ui.IconButton(
+              onPressed: isMuted ? unmute : mute,
+              icon: material_ui.Icon(
+                isMuted
+                    ? material_ui.Icons.volume_off_outlined
+                    : material_ui.Icons.volume_up,
+              ),
+              iconSize: size * 2,
+            );
+          }
+          return flutter_material.IconButton(
             onPressed: isMuted ? unmute : mute,
-            icon: Icon(isMuted ? Icons.volume_off_outlined : Icons.volume_up),
+            icon: flutter_material.Icon(
+              isMuted
+                  ? flutter_material.Icons.volume_off_outlined
+                  : flutter_material.Icons.volume_up,
+            ),
             iconSize: size * 2,
           );
         },

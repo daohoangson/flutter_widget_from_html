@@ -23,6 +23,8 @@ If you don't want to include all of its dependencies in your build, it's possibl
 
 ## Getting Started
 
+Requires Flutter 3.44.0 or later and Dart 3.12.0 or later.
+
 Add this to your app's `pubspec.yaml` file:
 
 ```yaml
@@ -63,6 +65,11 @@ HtmlWidget(
   ''',
 
   // all other parameters are optional, a few notable params:
+
+  // follow the nearest package:flutter/material.dart or package:material_ui
+  // Theme automatically (the default); explicit flutter and materialUi modes
+  // are also available
+  materialThemeMode: MaterialThemeMode.auto,
 
   // specify custom styling for an element
   // see supported inline styling below
@@ -111,6 +118,22 @@ HtmlWidget(
   textStyle: TextStyle(fontSize: 14),
 ),
 ```
+
+### Material themes
+
+`MaterialThemeMode.auto` uses the nearest in-framework Flutter Material or
+`package:material_ui` theme. Use `MaterialThemeMode.flutter` or
+`MaterialThemeMode.materialUi` to force one library even when the other theme is
+nearer. The mode applies to link colors, loading indicators, tooltips, AUDIO
+controls and the default IFRAME fullscreen route. With no Material theme, auto
+mode falls back to Flutter's in-framework Material defaults for backwards
+compatibility; inherited text styling still takes normal CSS precedence,
+including in Cupertino-only applications.
+
+VIDEO controls are supplied by the third-party `chewie` package, which currently
+uses Flutter's in-framework Material library; `materialThemeMode` does not
+replace those controls. Loading and error UI around VIDEO still follows the
+selected mode.
 
 ## Callbacks
 

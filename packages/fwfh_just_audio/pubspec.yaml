@@ -4,14 +4,15 @@ description: WidgetFactory extension to render AUDIO with the just_audio plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=3.27.0"
-  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.44.0"
+  sdk: ">=3.12.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ">=0.8.0 <0.18.0"
   just_audio: ^0.10.4
+  material_ui: ^1.2.0
 
 dependency_overrides:
   flutter_widget_from_html_core:

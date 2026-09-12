@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as flutter_material;
+import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:logging/logging.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
@@ -174,11 +177,18 @@ class WebViewState extends State<WebView> {
   }
 
   void _onAndroidShowCustomWidgetDefault(Widget child) {
+    final mode =
+        resolveMaterialThemeMode(context, widget.materialThemeMode).mode;
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => child,
-        fullscreenDialog: true,
-      ),
+      mode == MaterialThemeMode.materialUi
+          ? material_ui.MaterialPageRoute<void>(
+              builder: (_) => child,
+              fullscreenDialog: true,
+            )
+          : flutter_material.MaterialPageRoute<void>(
+              builder: (_) => child,
+              fullscreenDialog: true,
+            ),
     );
   }
 

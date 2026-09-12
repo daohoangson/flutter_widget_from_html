@@ -4,7 +4,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'widget_factory.dart';
 
 export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show HtmlWidgetState;
+    show HtmlWidgetState, MaterialThemeMode;
 
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
@@ -18,6 +18,7 @@ class HtmlWidget extends core.HtmlWidget {
     super.enableCaching,
     WidgetFactory Function()? factoryBuilder,
     super.key,
+    super.materialThemeMode,
     super.baseUrl,
     super.customStylesBuilder,
     super.customWidgetBuilder,

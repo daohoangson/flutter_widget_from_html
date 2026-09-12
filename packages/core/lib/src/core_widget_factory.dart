@@ -1,10 +1,5 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart'
-    show
-        // we want to limit Material usages to be as generic as possible
-        CircularProgressIndicator,
-        Tooltip;
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
@@ -18,6 +13,7 @@ import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'internal/text_ops.dart' as text_ops;
+import 'material_theme.dart';
 import 'utils/css_counter_style.dart';
 
 final _logger = Logger('fwfh.WidgetFactory');
@@ -27,7 +23,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Setting this property to true replaces the default with a static [Text].
   /// This property is most useful for testing purposes.
   ///
-  /// Defaults to `false`, resulting in a [CircularProgressIndicator].
+  /// Defaults to `false`, resulting in a Material progress indicator.
   static bool debugDeterministicLoadingWidget = false;
 
   final _recognizersNeedDisposing = <GestureRecognizer>[];
@@ -45,6 +41,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   BuildOp? _tagPre;
   TagTable? _tagTable;
   HtmlWidget? _widget;
+
+  /// The Material library mode configured by the current [HtmlWidget].
+  MaterialThemeMode get materialThemeMode =>
+      _widget?.materialThemeMode ?? MaterialThemeMode.auto;
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -475,9 +475,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     );
   }
 
-  /// Builds [Tooltip].
+  /// Builds a Material tooltip.
   Widget? buildTooltip(BuildTree tree, Widget child, String message) =>
-      Tooltip(message: message, child: child);
+      buildMaterialTooltip(
+        child: child,
+        message: message,
+        mode: materialThemeMode,
+      );
 
   StylesMap? customStylesBuilder(dom.Element element) =>
       _widget?.customStylesBuilder?.call(element);
@@ -515,6 +519,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       CssWhitespace.normal,
       Directionality.maybeOf(context) ?? TextDirection.ltr,
       DefaultTextStyle.of(context).style,
+      resolveMaterialThemeMode(context, materialThemeMode),
 
       // performance critical
       // avoid adding broad dependencies like MediaQuery.of(context)
@@ -625,7 +630,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         padding: const EdgeInsets.all(8),
         child: debugDeterministicLoadingWidget
             ? const Text('Loading...')
-            : CircularProgressIndicator.adaptive(value: loadingProgress),
+            : buildMaterialProgressIndicator(
+                context,
+                mode: materialThemeMode,
+                value: loadingProgress,
+              ),
       ),
     );
   }

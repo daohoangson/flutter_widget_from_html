@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import 'fallback.dart'
     if (dart.library.io) 'io.dart'
@@ -63,6 +64,9 @@ class WebView extends StatefulWidget {
   /// Default: `false`.
   /// {@endtemplate}
   final bool mediaPlaybackAlwaysAllow;
+
+  /// Selects the Material library used by the default fullscreen route.
+  final MaterialThemeMode materialThemeMode;
 
   /// {@template web_view.onAndroidHideCustomWidget}
   /// Sets the callback that is invoked when the host application wants to
@@ -130,6 +134,7 @@ class WebView extends StatefulWidget {
     this.interceptNavigationRequest,
     this.js = true,
     this.mediaPlaybackAlwaysAllow = false,
+    this.materialThemeMode = MaterialThemeMode.auto,
     this.onAndroidHideCustomWidget,
     this.onAndroidShowCustomWidget,
     this.unsupportedWorkaroundForIssue37 = true,

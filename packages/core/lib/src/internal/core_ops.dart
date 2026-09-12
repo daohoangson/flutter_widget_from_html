@@ -4,10 +4,6 @@ import 'dart:math';
 import 'package:csslib/visitor.dart' as css;
 import 'package:csslib/visitor.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart'
-    show
-        // we want to limit Material usages to be as generic as possible
-        Theme;
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
@@ -15,6 +11,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import '../material_theme.dart';
 import '../utils/list_utils.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';

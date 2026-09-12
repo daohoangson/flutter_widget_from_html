@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fwfh_webview/src/web_view/web_view.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:measurer/measurer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -399,6 +401,32 @@ void main() {
     expect(fullscreenFinder, findsNothing);
   });
 
+  testWidgets('fullscreen uses the selected Material route', (tester) async {
+    const url = 'data:text/html,fullscreen';
+    final observer = _RouteObserver();
+    runApp(
+      MaterialApp(
+        navigatorObservers: [observer],
+        home: const Scaffold(
+          body: WebView(
+            url,
+            aspectRatio: 16 / 9,
+            materialThemeMode: MaterialThemeMode.materialUi,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    FakeWebViewController.instance?.androidOnShowCustomWidget?.call(
+      const SizedBox.shrink(),
+      () {},
+    );
+    await tester.pumpAndSettle();
+
+    expect(observer.lastRoute, isA<material_ui.MaterialPageRoute<void>>());
+  });
+
   group('unsupportedWorkaroundForIssue37', () {
     testWidgets('reloads on pause', (WidgetTester tester) async {
       const html = 'reloads on pause';
@@ -450,4 +478,14 @@ void main() {
       expect(FakeWebViewController.instance?.userAgent, equals('fwfh'));
     });
   });
+}
+
+class _RouteObserver extends NavigatorObserver {
+  Route<dynamic>? lastRoute;
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    lastRoute = route;
+    super.didPush(route, previousRoute);
+  }
 }
