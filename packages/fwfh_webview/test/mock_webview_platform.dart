@@ -18,22 +18,6 @@ void mockWebViewPlatform() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
   messenger.setMockMessageHandler(
-    // TODO: remove this when webview_flutter_android version >= 4.1.0
-    'dev.flutter.pigeon.webview_flutter_android.InstanceManagerHostApi.clear',
-    (_) => Future.value(emptyList),
-  );
-  messenger.setMockMessageHandler(
-    // TODO: remove this when webview_flutter_android version >= 4.1.0
-    'dev.flutter.pigeon.webview_flutter_android.WebViewHostApi.setWebContentsDebuggingEnabled',
-    (message) async {
-      final decodedMessage = codec.decodeMessage(message) as List<Object?>;
-      FakeWebViewController.instance?.debuggingEnabled =
-          decodedMessage[0] == true;
-      return emptyList;
-    },
-  );
-
-  messenger.setMockMessageHandler(
     'dev.flutter.pigeon.webview_flutter_android.PigeonInternalInstanceManager.clear',
     (_) => Future.value(emptyList),
   );
@@ -231,10 +215,8 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   @override
   Future<void> setUseWideViewPort(bool use) => throw UnimplementedError();
 
-  // TODO: Use WebAuthenticationSupport when webview_flutter_android >= 4.14.0.
   @override
-  // ignore: override_on_non_overriding_member
-  Future<void> setWebAuthenticationSupport(dynamic support) =>
+  Future<void> setWebAuthenticationSupport(WebAuthenticationSupport support) =>
       throw UnimplementedError();
 
   @override

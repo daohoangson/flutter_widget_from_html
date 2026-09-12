@@ -116,9 +116,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   Future<void> _initControllers() async {
-    // TODO: remove lint ignore when our minimum video_player version >= 2.7
-    // ignore: deprecated_member_use
-    final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
+    final vpc = _vpc = lib.VideoPlayerController.networkUrl(
+      Uri.parse(widget.url),
+    );
     Object? vpcError;
     try {
       await vpc.initialize();
