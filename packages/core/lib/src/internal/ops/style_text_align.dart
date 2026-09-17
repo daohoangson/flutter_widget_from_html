@@ -16,12 +16,12 @@ const kTagCenter = 'center';
 
 extension StyleTextAlign on WidgetFactory {
   BuildOp get styleTextAlign => const BuildOp.v2(
-    alwaysRenderBlock: false,
-    debugLabel: kCssTextAlign,
-    onParsed: _onParsed,
-    onRenderBlock: _onRenderBlock,
-    priority: Early.cssTextAlign,
-  );
+        alwaysRenderBlock: false,
+        debugLabel: kCssTextAlign,
+        onParsed: _onParsed,
+        onRenderBlock: _onRenderBlock,
+        priority: Early.cssTextAlign,
+      );
 
   static Widget _center(BuildContext context, Widget child) =>
       Center(heightFactor: 1.0, child: child);
@@ -46,7 +46,8 @@ extension StyleTextAlign on WidgetFactory {
   static InheritedProperties _textAlign(
     InheritedProperties resolving,
     TextAlign value,
-  ) => resolving.copyWith(value: value);
+  ) =>
+      resolving.copyWith(value: value);
 }
 
 extension on BuildTree {

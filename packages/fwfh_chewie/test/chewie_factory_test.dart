@@ -143,8 +143,7 @@ void main() {
     testWidgets('renders video player with asset', (tester) async {
       const package = 'flutter_widget_from_html_core';
       const assetName = 'test/images/logo.png';
-      const h =
-          '<video poster="asset:$assetName?package=$package">'
+      const h = '<video poster="asset:$assetName?package=$package">'
           '<source src="$src"></video>';
       final explained = await explain(tester, h);
       expect(

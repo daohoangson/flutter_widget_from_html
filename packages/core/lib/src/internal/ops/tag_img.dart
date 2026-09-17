@@ -16,27 +16,27 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    alwaysRenderBlock: false,
-    debugLabel: kTagImg,
-    defaultStyles: _defaultStyles,
-    onParsed: (tree) {
-      final data = _parse(tree);
-      final built = wf.buildImage(tree, data);
-      if (built == null) {
-        final imgText = data.alt ?? data.title ?? '';
-        if (imgText.isNotEmpty) {
-          tree.addText(imgText);
-        }
-        return tree;
-      }
+        alwaysRenderBlock: false,
+        debugLabel: kTagImg,
+        defaultStyles: _defaultStyles,
+        onParsed: (tree) {
+          final data = _parse(tree);
+          final built = wf.buildImage(tree, data);
+          if (built == null) {
+            final imgText = data.alt ?? data.title ?? '';
+            if (imgText.isNotEmpty) {
+              tree.addText(imgText);
+            }
+            return tree;
+          }
 
-      _builts[tree] = built;
-      return tree;
-    },
-    onRenderBlock: _onRenderBlock,
-    onRenderInline: _onRenderInline,
-    priority: Priority.tagImg,
-  );
+          _builts[tree] = built;
+          return tree;
+        },
+        onRenderBlock: _onRenderBlock,
+        onRenderInline: _onRenderInline,
+        priority: Priority.tagImg,
+      );
 
   ImageMetadata _parse(BuildTree tree) {
     final attrs = tree.element.attributes;

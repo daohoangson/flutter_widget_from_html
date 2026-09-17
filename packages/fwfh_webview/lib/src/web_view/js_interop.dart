@@ -46,6 +46,8 @@ class WebViewState extends State<WebView> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      AspectRatio(aspectRatio: widget.aspectRatio, child: _iframeWidget);
+  Widget build(BuildContext context) => AspectRatio(
+        aspectRatio: widget.aspectRatio,
+        child: _iframeWidget,
+      );
 }

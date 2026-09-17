@@ -59,7 +59,8 @@ void textEmphasisApply(BuildTree tree, css.Declaration style) {
 InheritedProperties _emphasisColorResolver(
   InheritedProperties resolving,
   Color value,
-) => resolving.copyWith(value: _TextEmphasisColor(value));
+) =>
+    resolving.copyWith(value: _TextEmphasisColor(value));
 
 @immutable
 class _TextEmphasisColor {
@@ -147,7 +148,10 @@ String? _emphasisChar(String shape, bool open) {
 
 /// Rebuilds [tree] so that every non-whitespace character is wrapped in an
 /// [HtmlRuby] with the emphasis glyph displayed above it.
-BuildTree _applyEmphasis(BuildTree tree, String emphasisChar) {
+BuildTree _applyEmphasis(
+  BuildTree tree,
+  String emphasisChar,
+) {
   // Preserve the original element so that structural checks like isRtTree
   // (which tests element.localName == 'rt') still pass after the replacement.
   // tree.parent.sub() would inherit the parent's element, breaking ruby layout
@@ -178,7 +182,7 @@ BuildTree _applyEmphasis(BuildTree tree, String emphasisChar) {
               replacement,
               WidgetPlaceholder(
                 debugLabel: kCssTextEmphasis,
-                builder: (_, _) => HtmlRuby(
+                builder: (_, __) => HtmlRuby(
                   ruby: rubyTree.build(),
                   // Wrap in SelectionContainer.disabled so the glyph is
                   // excluded from text selection.
@@ -207,7 +211,9 @@ InheritedProperties _applyEmphasisMarkColor(
 ]) {
   final emphColor = resolving.get<_TextEmphasisColor>();
   if (emphColor != null) {
-    return resolving.copyWith(style: TextStyle(color: emphColor.color));
+    return resolving.copyWith(
+      style: TextStyle(color: emphColor.color),
+    );
   }
   return resolving;
 }
@@ -217,9 +223,10 @@ InheritedProperties _applyEmphasisMarkColor(
 InheritedProperties _clearEmphasisMarkStyle(
   InheritedProperties resolving,
   bool _,
-) => resolving
-    .copyWith(style: const TextStyle(decoration: TextDecoration.none))
-    .copyWith(value: const TextStyleShadows([]));
+) =>
+    resolving
+        .copyWith(style: const TextStyle(decoration: TextDecoration.none))
+        .copyWith(value: const TextStyleShadows([]));
 
 Widget? _disableSelection(Widget? widget) =>
     widget != null ? SelectionContainer.disabled(child: widget) : null;

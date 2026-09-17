@@ -21,35 +21,34 @@ class TagAudio {
   TagAudio(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    // TODO: set debugLabel when our minimum core version >= 1.0
-    onWidgets: (meta, widgets) {
-      if (defaultTargetPlatform != TargetPlatform.android &&
-          defaultTargetPlatform != TargetPlatform.iOS &&
-          defaultTargetPlatform != TargetPlatform.macOS &&
-          !kIsWeb) {
-        // these are the just_audio's supported platforms
-        // https://pub.dev/packages/just_audio/versions/0.9.5
-        return widgets;
-      }
+        // TODO: set debugLabel when our minimum core version >= 1.0
+        onWidgets: (meta, widgets) {
+          if (defaultTargetPlatform != TargetPlatform.android &&
+              defaultTargetPlatform != TargetPlatform.iOS &&
+              defaultTargetPlatform != TargetPlatform.macOS &&
+              !kIsWeb) {
+            // these are the just_audio's supported platforms
+            // https://pub.dev/packages/just_audio/versions/0.9.5
+            return widgets;
+          }
 
-      final attrs = meta.element.attributes;
-      final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
-      if (url == null) {
-        return widgets;
-      }
+          final attrs = meta.element.attributes;
+          final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
+          if (url == null) {
+            return widgets;
+          }
 
-      final built = wf.buildAudioPlayer(
-        meta,
-        url,
-        autoplay: attrs.containsKey(kAttributeAudioAutoplay),
-        loop: attrs.containsKey(kAttributeAudioLoop),
-        muted: attrs.containsKey(kAttributeAudioMuted),
-        preload:
-            attrs.containsKey(kAttributeAudioPreload) &&
-            attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
+          final built = wf.buildAudioPlayer(
+            meta,
+            url,
+            autoplay: attrs.containsKey(kAttributeAudioAutoplay),
+            loop: attrs.containsKey(kAttributeAudioLoop),
+            muted: attrs.containsKey(kAttributeAudioMuted),
+            preload: attrs.containsKey(kAttributeAudioPreload) &&
+                attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
+          );
+
+          return listOrNull(built) ?? widgets;
+        },
       );
-
-      return listOrNull(built) ?? widgets;
-    },
-  );
 }

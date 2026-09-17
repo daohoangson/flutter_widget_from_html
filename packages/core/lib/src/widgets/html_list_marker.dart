@@ -18,15 +18,15 @@ class HtmlListMarker extends LeafRenderObjectWidget {
 
   /// Creates a circle marker.
   const HtmlListMarker.circle(this.textStyle, {super.key})
-    : markerType = HtmlListMarkerType.circle;
+      : markerType = HtmlListMarkerType.circle;
 
   /// Creates a disc marker.
   const HtmlListMarker.disc(this.textStyle, {super.key})
-    : markerType = HtmlListMarkerType.disc;
+      : markerType = HtmlListMarkerType.disc;
 
   /// Creates a square marker.
   const HtmlListMarker.square(this.textStyle, {super.key})
-    : markerType = HtmlListMarkerType.square;
+      : markerType = HtmlListMarkerType.square;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
@@ -101,7 +101,8 @@ class _ListMarkerRenderObject extends RenderBox {
   double? computeDryBaseline(
     BoxConstraints constraints,
     TextBaseline baseline,
-  ) => _textPainter.computeDistanceToActualBaseline(baseline);
+  ) =>
+      _textPainter.computeDistanceToActualBaseline(baseline);
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
@@ -112,15 +113,14 @@ class _ListMarkerRenderObject extends RenderBox {
     final canvas = context.canvas;
 
     final m = _textMetrics.isNotEmpty ? _textMetrics.first : null;
-    final center =
-        offset +
+    final center = offset +
         Offset(
           size.width / 2,
           (m != null && m.descent.isFinite && m.unscaledAscent.isFinite)
               ? size.height -
-                    m.descent -
-                    m.unscaledAscent +
-                    m.unscaledAscent * .7
+                  m.descent -
+                  m.unscaledAscent +
+                  m.unscaledAscent * .7
               : size.height / 2,
         );
 
@@ -142,7 +142,11 @@ class _ListMarkerRenderObject extends RenderBox {
             ..style = PaintingStyle.stroke,
         );
       case HtmlListMarkerType.disc:
-        canvas.drawCircle(center, radius, Paint()..color = color);
+        canvas.drawCircle(
+          center,
+          radius,
+          Paint()..color = color,
+        );
       case HtmlListMarkerType.disclosureClosed:
         final d = radius * 2;
         canvas

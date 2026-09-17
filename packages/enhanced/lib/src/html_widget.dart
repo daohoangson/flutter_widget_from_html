@@ -1,6 +1,5 @@
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core
-    show HtmlWidget;
+    as core show HtmlWidget;
 
 import 'widget_factory.dart';
 

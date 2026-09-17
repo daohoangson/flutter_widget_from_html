@@ -126,7 +126,11 @@ class CssSizing extends SingleChildRenderObjectWidget {
         minHeight: minHeight,
         minWidth: minWidth,
       )
-      ..setPreferredSize(preferredAxis, preferredWidth, preferredHeight);
+      ..setPreferredSize(
+        preferredAxis,
+        preferredWidth,
+        preferredHeight,
+      );
   }
 }
 
@@ -156,14 +160,21 @@ class CssSizingHint extends InheritedWidget {
 class _RenderCssSizing extends RenderProxyBox {
   _RenderCssSizing({
     RenderBox? child,
-    this._maxHeight,
-    this._maxWidth,
-    this._minHeight,
-    this._minWidth,
-    this._preferredAxis,
-    this._preferredHeight,
-    this._preferredWidth,
-  }) : super(child);
+    CssSizingValue? maxHeight,
+    CssSizingValue? maxWidth,
+    CssSizingValue? minHeight,
+    CssSizingValue? minWidth,
+    Axis? preferredAxis,
+    CssSizingValue? preferredHeight,
+    CssSizingValue? preferredWidth,
+  })  : _maxHeight = maxHeight,
+        _maxWidth = maxWidth,
+        _minHeight = minHeight,
+        _minWidth = minWidth,
+        _preferredAxis = preferredAxis,
+        _preferredHeight = preferredHeight,
+        _preferredWidth = preferredWidth,
+        super(child);
 
   CssSizingValue? _maxHeight;
   CssSizingValue? _maxWidth;
@@ -263,10 +274,8 @@ class _RenderCssSizing extends RenderProxyBox {
     final minHeight = calculatedMinHeight.isFinite ? calculatedMinHeight : .0;
     final minWidth = calculatedMinWidth.isFinite ? calculatedMinWidth : .0;
 
-    final calculatedPreferredHeight = _preferredHeight?.clamp(
-      minHeight,
-      maxHeight,
-    );
+    final calculatedPreferredHeight =
+        _preferredHeight?.clamp(minHeight, maxHeight);
     final calculatedPreferredWidth = _preferredWidth?.clamp(minWidth, maxWidth);
     // ignore preferred value if it's infinite
     final preferredHeight = calculatedPreferredHeight?.isFinite == true
@@ -380,7 +389,7 @@ abstract class CssSizingValue {
 class _CssSizingAuto extends CssSizingValue {
   const _CssSizingAuto() : super._();
   @override
-  double? clamp(double _, double _) => null;
+  double? clamp(double _, double __) => null;
 
   @override
   int get hashCode => 0;

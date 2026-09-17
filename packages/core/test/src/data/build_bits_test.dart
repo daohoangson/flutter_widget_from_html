@@ -316,7 +316,9 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--String')) {
       tree.register(
-        BuildOp(onParsed: (tree) => tree..append(_OutputStringBit(tree))),
+        BuildOp(
+          onParsed: (tree) => tree..append(_OutputStringBit(tree)),
+        ),
       );
     }
 
@@ -394,12 +396,12 @@ String _data(BuildTree text) => text.bits
       (bit) => bit is TextBit
           ? bit.data
           : bit is WhitespaceBit
-          ? bit.data
-          : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''),
+              ? bit.data
+              : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''),
     )
     .join();
 
 BuildTree _text() => CoreBuildTree.root(
-  inheritanceResolvers: InheritanceResolvers(),
-  wf: WidgetFactory(),
-);
+      inheritanceResolvers: InheritanceResolvers(),
+      wf: WidgetFactory(),
+    );

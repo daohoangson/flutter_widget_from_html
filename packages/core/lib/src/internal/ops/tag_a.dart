@@ -10,78 +10,82 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    alwaysRenderBlock: false,
-    debugLabel: 'a[href]',
-    defaultStyles: _defaultStyles,
-    onParsed: (tree) {
-      final href = tree.element.attributes[kAttributeAHref];
-      if (href == null) {
-        return tree;
-      }
+        alwaysRenderBlock: false,
+        debugLabel: 'a[href]',
+        defaultStyles: _defaultStyles,
+        onParsed: (tree) {
+          final href = tree.element.attributes[kAttributeAHref];
+          if (href == null) {
+            return tree;
+          }
 
-      final url = wf.urlFull(href) ?? href;
-      final recognizer = wf.buildGestureRecognizer(
-        tree,
-        onTap: () => wf.onTapUrl(url),
-      );
-      if (recognizer == null) {
-        return tree;
-      }
+          final url = wf.urlFull(href) ?? href;
+          final recognizer = wf.buildGestureRecognizer(
+            tree,
+            onTap: () => wf.onTapUrl(url),
+          );
+          if (recognizer == null) {
+            return tree;
+          }
 
-      if (tree.isInline == true) {
-        for (final bit in tree.bits) {
-          if (bit is WidgetBit && bit.isInline == false) {
-            bit.child.wrapWith((context, child) {
-              // for inline A tag: wrap inner blocks in gesture detectors
+          if (tree.isInline == true) {
+            for (final bit in tree.bits) {
+              if (bit is WidgetBit && bit.isInline == false) {
+                bit.child.wrapWith((context, child) {
+                  // for inline A tag: wrap inner blocks in gesture detectors
+                  return wf.buildGestureDetector(tree, child, recognizer);
+                });
+              }
+            }
+          }
+
+          return tree
+            // for inline spans
+            ..inherit(_builder, recognizer)
+            // for onRenderBlock
+            ..setNonInheritedRecognizer(recognizer);
+        },
+        onRenderBlock: (tree, placeholder) {
+          final recognizer = tree.nonInheritedRecognizer;
+          if (recognizer != null) {
+            placeholder.wrapWith((context, child) {
+              if (child == widget0) {
+                return null;
+              }
+
+              // for block A tag: wrap itself in a gesture detector
               return wf.buildGestureDetector(tree, child, recognizer);
             });
           }
-        }
-      }
-
-      return tree
-        // for inline spans
-        ..inherit(_builder, recognizer)
-        // for onRenderBlock
-        ..setNonInheritedRecognizer(recognizer);
-    },
-    onRenderBlock: (tree, placeholder) {
-      final recognizer = tree.nonInheritedRecognizer;
-      if (recognizer != null) {
-        placeholder.wrapWith((context, child) {
-          if (child == widget0) {
-            return null;
-          }
-
-          // for block A tag: wrap itself in a gesture detector
-          return wf.buildGestureDetector(tree, child, recognizer);
-        });
-      }
-      return placeholder;
-    },
-    priority: Priority.tagA,
-  );
+          return placeholder;
+        },
+        priority: Priority.tagA,
+      );
 
   static InheritedProperties defaultColor(
     InheritedProperties resolving,
     BuildContext? context,
-  ) => context == null
-      ? resolving
-      : resolving.copyWith(
-          style: TextStyle(
-            color: resolving.get<MaterialThemeModeData>()?.primaryColor,
-            debugLabel: 'fwfh: a[href] default color',
-          ),
-        );
+  ) =>
+      context == null
+          ? resolving
+          : resolving.copyWith(
+              style: TextStyle(
+                color: resolving.get<MaterialThemeModeData>()?.primaryColor,
+                debugLabel: 'fwfh: a[href] default color',
+              ),
+            );
 
   static StylesMap _defaultStyles(dom.Element _) {
-    return const {kCssTextDecoration: kCssTextDecorationUnderline};
+    return const {
+      kCssTextDecoration: kCssTextDecorationUnderline,
+    };
   }
 
   static InheritedProperties _builder(
     InheritedProperties resolving,
     GestureRecognizer value,
-  ) => resolving.copyWith<GestureRecognizer>(value: value);
+  ) =>
+      resolving.copyWith<GestureRecognizer>(value: value);
 }
 
 extension on BuildTree {

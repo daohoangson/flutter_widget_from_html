@@ -13,8 +13,7 @@ Future<void> main() async {
   await loadAppFonts();
 
   group('basic usage', () {
-    const html =
-        '<table>'
+    const html = '<table>'
         '<caption>Caption</caption>'
         '<tbody>'
         '<tr><th>Header 1</th><th>Header 2</th></tr>'
@@ -69,8 +68,7 @@ Future<void> main() async {
   });
 
   group('rtl', () {
-    const html =
-        '<table dir="rtl">'
+    const html = '<table dir="rtl">'
         '<tbody><tr><td>Foo</td><td>Bar</td></tr></tbody>'
         '</table>';
 
@@ -83,8 +81,7 @@ Future<void> main() async {
   });
 
   testWidgets('renders 2 tables', (WidgetTester tester) async {
-    const html =
-        '<table><tr><td>Foo</td></tr></table>'
+    const html = '<table><tr><td>Foo</td></tr></table>'
         '<table><tr><td>Bar</td></tr></table>';
     final explained = await explain(tester, html);
     expect(
@@ -123,8 +120,7 @@ Future<void> main() async {
 
   group('inline style', () {
     testWidgets('renders cell stylings', (WidgetTester tester) async {
-      const html =
-          '<table>'
+      const html = '<table>'
           '<tr><th>Header 1</th><th style="text-align: center">Header 2</th></tr>'
           '<tr><td>Value <em>1</em></td><td style="font-weight: bold">Value 2</td></tr>'
           '</table>';
@@ -135,8 +131,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders row stylings', (WidgetTester tester) async {
-      const html =
-          '<table>'
+      const html = '<table>'
           '<tr style="text-align: center"><th>Header 1</th><th>Header 2</th></tr>'
           '<tr style="font-weight: bold"><td>Value <em>1</em></td><td>Value 2</td></tr>'
           '</table>';
@@ -148,8 +143,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders section stylings', (WidgetTester tester) async {
-      const html =
-          '<table>'
+      const html = '<table>'
           '<tbody style="text-align: right">'
           '<tr><th>Header 1</th><th style="text-align: center">Header 2</th></tr>'
           '<tr><td>Value <em>1</em></td><td style="font-weight: bold">Value 2</td></tr>'
@@ -186,8 +180,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
-      const html =
-          '<table style="border: 1px solid black"><tbody>'
+      const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
       await explain(tester, html);
       final table = tester.table;
@@ -212,8 +205,7 @@ Future<void> main() async {
 
     group('inline style', () {
       testWidgets('renders table=1 cell=1', (WidgetTester tester) async {
-        const html =
-            '<table cellpadding="1">'
+        const html = '<table cellpadding="1">'
             '<tr><td style="padding: 1px">Foo</td></tr>'
             '</table>';
         final explained = await explain(tester, html);
@@ -221,8 +213,7 @@ Future<void> main() async {
       });
 
       testWidgets('renders table=1 cell=2', (WidgetTester tester) async {
-        const html =
-            '<table cellpadding="1">'
+        const html = '<table cellpadding="1">'
             '<tr><td style="padding: 2px">Foo</td></tr>'
             '</table>';
         final explained = await explain(tester, html);
@@ -240,8 +231,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders cellspacing=1', (WidgetTester tester) async {
-      const html =
-          '<table cellspacing="1"><tbody>'
+      const html = '<table cellspacing="1"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
       await explain(tester, html);
@@ -249,8 +239,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders border-spacing', (WidgetTester tester) async {
-      const html =
-          '<table style="border-spacing: 1px"><tbody>'
+      const html = '<table style="border-spacing: 1px"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
       await explain(tester, html);
@@ -258,8 +247,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders border-collapse without border', (tester) async {
-      const html =
-          '<table style="border-collapse: collapse"><tbody>'
+      const html = '<table style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
       await explain(tester, html);
@@ -270,8 +258,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders border-collapse with border=1', (tester) async {
-      const html =
-          '<table border="1" style="border-collapse: collapse"><tbody>'
+      const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
       await explain(tester, html);
@@ -298,8 +285,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders colspan=2', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td>1</td><td>2</td></tr>'
           '<tr><td colspan="2">Foo</td></tr>'
           '</tbody></table>';
@@ -308,8 +294,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders colspan=3 as 2', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td>1</td><td>2</td></tr>'
           '<tr><td colspan="3">Foo</td></tr>'
           '</tbody></table>';
@@ -332,8 +317,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders rowspan=2', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td rowspan="2">Foo</td><td>1</td></tr>'
           '<tr><td>2</td></tr>'
           '</tbody></table>';
@@ -345,8 +329,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders rowspan=3 as 2', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td rowspan="3">Foo</td><td>1</td></tr>'
           '<tr><td>2</td></tr>'
           '</tbody></table>';
@@ -358,8 +341,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders rowspan=0', (t) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td rowspan="0">1.1</td><td>1.2</td></tr>'
           '<tr><td>2</td></tr>'
           '</tbody></table>';
@@ -378,8 +360,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders colspan=2 rowspan=2', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td colspan="2" rowspan="2">Foo</td><td>1</td></tr>'
           '<tr><td>2</td></td>'
           '<tr><td>3</td><td>4</td><td>5</td></td>'
@@ -395,8 +376,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders cells being split by rowspan from above', (t) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><td>1.1</td><td rowspan="2">1.2</td><td>1.3</td></tr>'
           '<tr><td>2.1</td><td>2.2</td></tr>'
           '</tbody></table>';
@@ -441,8 +421,7 @@ Future<void> main() async {
   group('combos', () {
     testWidgets('renders nested table', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
-      const html =
-          '<p>Foo bar bar</p>'
+      const html = '<p>Foo bar bar</p>'
           '<table cellpadding="0"><tr><td>'
           '<table cellpadding="0"><tr>'
           '<td>Foo bar</td>'
@@ -464,8 +443,7 @@ Future<void> main() async {
       const windowSize = 100.0;
       tester.setWindowSize(const Size(windowSize, windowSize));
 
-      const html =
-          '<table style="width: 100%"><tr><td align="center">'
+      const html = '<table style="width: 100%"><tr><td align="center">'
           '<table><tr><td>Foo</td></tr></table>'
           '</td></tr></table>';
       await explain(tester, html);
@@ -506,8 +484,7 @@ Future<void> main() async {
 
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><th>Header 1</th></tr>'
           '<tr><td>Value 1</td><td>Value 2</td></tr>'
           '</tbody></table>';
@@ -519,8 +496,7 @@ Future<void> main() async {
     });
 
     testWidgets('missing cell', (WidgetTester tester) async {
-      const html =
-          '<table><tbody>'
+      const html = '<table><tbody>'
           '<tr><th>Header 1</th><th>Header 2</th></tr>'
           '<tr><td>Value 1</td></tr>'
           '</tbody></table>';
@@ -569,8 +545,7 @@ Future<void> main() async {
     });
 
     testWidgets('TR display:none', (WidgetTester tester) async {
-      const html =
-          '<table><tr style="display: none"><td>Foo</td></tr>'
+      const html = '<table><tr style="display: none"><td>Foo</td></tr>'
           '<tr><td>Bar</td></tr></table>';
       final explained = await explain(tester, html);
       expect(
@@ -591,8 +566,7 @@ Future<void> main() async {
     });
 
     testWidgets('TD display:none', (WidgetTester tester) async {
-      const html =
-          '<table><tr><td style="display: none">Foo</td>'
+      const html = '<table><tr><td style="display: none">Foo</td>'
           '<td>Bar</td></tr></table>';
       final explained = await explain(tester, html);
       expect(
@@ -740,7 +714,10 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                Padding(padding: EdgeInsets.all(10), child: Text('Bar')),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Bar'),
+                ),
               ],
             ),
           ),
@@ -771,7 +748,10 @@ Future<void> main() async {
                     ),
                   ],
                 ),
-                Padding(padding: EdgeInsets.all(10), child: Text('Foo')),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
               ],
             ),
           ),
@@ -788,8 +768,13 @@ Future<void> main() async {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                HtmlTable(children: []),
-                Padding(padding: EdgeInsets.all(10), child: Text('Foo')),
+                HtmlTable(
+                  children: [],
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
               ],
             ),
           ),
@@ -816,7 +801,10 @@ Future<void> main() async {
 
       expect(
         key.renderBox.getDryLayout(
-          const BoxConstraints(maxHeight: 100, maxWidth: 100),
+          const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          ),
         ),
         equals(const Size(100, 50)),
       );
@@ -824,7 +812,12 @@ Future<void> main() async {
 
     testWidgets('computeDryLayout without cell', (tester) async {
       final key = GlobalKey();
-      await tester.pumpWidget(HtmlTable(key: key, children: const []));
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [],
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(
@@ -841,7 +834,11 @@ Future<void> main() async {
           child: HtmlTable(
             key: key,
             children: const [
-              HtmlTableCell(columnStart: 0, rowStart: 0, child: Text('Cell')),
+              HtmlTableCell(
+                columnStart: 0,
+                rowStart: 0,
+                child: Text('Cell'),
+              ),
             ],
           ),
         ),
@@ -935,12 +932,7 @@ Future<void> main() async {
               const HtmlTableCell(
                 columnStart: 1,
                 rowStart: 0,
-                child: Text(
-                  'super'
-                  'wide'
-                  'without'
-                  'space',
-                ),
+                child: Text('super' 'wide' 'without' 'space'),
               ),
             ],
           ),
@@ -958,19 +950,14 @@ Future<void> main() async {
                 columnStart: 0,
                 rowStart: 0,
                 child: LayoutBuilder(
-                  builder: (_, _) => const Text('Foo foo foo foo'),
+                  builder: (_, __) => const Text('Foo foo foo foo'),
                   key: left,
                 ),
               ),
               const HtmlTableCell(
                 columnStart: 1,
                 rowStart: 0,
-                child: Text(
-                  'super'
-                  'wide'
-                  'without'
-                  'space',
-                ),
+                child: Text('super' 'wide' 'without' 'space'),
               ),
             ],
           ),
@@ -996,12 +983,7 @@ Future<void> main() async {
               const HtmlTableCell(
                 columnStart: 1,
                 rowStart: 0,
-                child: Text(
-                  'super'
-                  'wide'
-                  'without'
-                  'space',
-                ),
+                child: Text('super' 'wide' 'without' 'space'),
               ),
               HtmlTableCell(
                 columnStart: 0,
@@ -1024,30 +1006,33 @@ Future<void> main() async {
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
-              ? null
-              : 'Linux only'
+            ? null
+            : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
     GoldenToolkit.runWithConfiguration(
       () {
-        group('screenshot testing', () {
-          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
-          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+        group(
+          'screenshot testing',
+          () {
+            setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+            tearDown(
+              () => WidgetFactory.debugDeterministicLoadingWidget = false,
+            );
 
-          final multiline =
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
-              3;
-          const tableWithImage =
-              '<table border="1"><tr><td><img src="asset:test/images/logo.png" width="50" height="50" /></td></tr></table>';
-          final testCases = <String, String>{
-            'aspect_ratio_img':
-                '''
+            final multiline =
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
+                    3;
+            const tableWithImage =
+                '<table border="1"><tr><td><img src="asset:test/images/logo.png" width="50" height="50" /></td></tr></table>';
+            final testCases = <String, String>{
+              'aspect_ratio_img': '''
 <div>$tableWithImage</div><br />
 
 <div style="width: 25px">$tableWithImage</div><br />
 
 <div style="height: 25px">$tableWithImage</div>''',
-            'collapsed_border': '''
+              'collapsed_border': '''
 <table border="1" style="border-collapse: collapse">
   <tr>
     <td>Foo</td>
@@ -1055,19 +1040,18 @@ Future<void> main() async {
     <td style="border: 5px solid green">Bar</td>
   </tr>
 </table>''',
-            'colspan': '''
+              'colspan': '''
 <table border="1">
   <tr><td colspan="2">Lorem ipsum dolor sit amet.</td></tr>
   <tr><td>Foo</td><td>Bar</td></tr>
 </table>''',
-            'rowspan':
-                '''
+              'rowspan': '''
 <table border="1">
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
   <tr><td>Bar</td></tr>
 </table>''',
-            // TODO: doesn't match browser output
-            'sizing_height_1px': '''
+              // TODO: doesn't match browser output
+              'sizing_height_1px': '''
 Above
 
 <table border="1" style="height: 1px">
@@ -1077,7 +1061,7 @@ Above
 </table>
 
 Below''',
-            'sizing_width_100_percent': '''
+              'sizing_width_100_percent': '''
 <table border="1" style="width: 100%">
   <tr>
     <td>One</td>
@@ -1085,15 +1069,14 @@ Below''',
     <td>Three</td>
   </tr>
 </table>''',
-            'valign_baseline_1a':
-                '''
+              'valign_baseline_1a': '''
 <table border="1">
   <tr>
     <td valign="baseline">$multiline</td>
     <td valign="baseline"><div style="margin: 10px">Foo</div></td>
   </tr>
 </table>''',
-            'valign_baseline_1b': '''
+              'valign_baseline_1b': '''
 <table border="1">
   <tr>
     <td valign="baseline">Foo</td>
@@ -1102,7 +1085,7 @@ Below''',
     <td valign="baseline"><div style="margin: 20px">20px</div></td>
   </tr>
 </table>''',
-            'valign_baseline_1c': '''
+              'valign_baseline_1c': '''
 <table border="1">
   <tr>
     <td valign="baseline"><div style="margin: 10px">10px</div></td>
@@ -1111,25 +1094,23 @@ Below''',
     <td valign="baseline"><div style="margin: 20px">20px</div></td>
   </tr>
 </table>''',
-            'valign_baseline_2':
-                '''
+              'valign_baseline_2': '''
 <table border="1">
   <tr>
     <td valign="baseline"><div style="padding: 10px">Foo</div></td>
     <td valign="baseline">$multiline</td>
   </tr>
 </table>''',
-            'valign_baseline_3':
-                '''
+              'valign_baseline_3': '''
 <table border="1">
   <tr>
     <td valign="baseline"><div style="padding: 10px">$multiline</div></td>
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
-            // https://github.com/daohoangson/flutter_widget_from_html/issues/171
-            // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
-            'row_color': '''
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/171
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
+              'row_color': '''
 <table style="border-collapse: collapse;">
   <tr>
     <th>First Name</th>
@@ -1152,7 +1133,7 @@ Below''',
     <td style="background-color: red;">67</td>
   </tr>
 </table>''',
-            'rtl': '''
+              'rtl': '''
 <table dir="rtl">
   <tr>
     <td>Foo Foo Foo</td>
@@ -1164,17 +1145,17 @@ Below''',
   </tr>
 </table>
 ''',
-            // TODO: doesn't match browser output
-            // `LayoutBuilder` prevents baseline alignment from working properly since #1073
-            'table_in_list': '''
+              // TODO: doesn't match browser output
+              // `LayoutBuilder` prevents baseline alignment from working properly since #1073
+              'table_in_list': '''
 <ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>
   </li>
 </ul>''',
-            // TODO: doesn't match browser output
-            // `LayoutBuilder` prevents baseline alignment from working properly since #1073
-            'table_with_2_cells_in_list': '''
+              // TODO: doesn't match browser output
+              // `LayoutBuilder` prevents baseline alignment from working properly since #1073
+              'table_with_2_cells_in_list': '''
 <ul>
   <li>
     <table border="1">
@@ -1185,8 +1166,7 @@ Below''',
     </table>
   </li>
 </ul>''',
-            'table_in_table':
-                '''
+              'table_in_table': '''
 <table border="1">
   <tr>
     <td style="background: red">
@@ -1197,9 +1177,9 @@ Below''',
     <td>$multiline</td>
   </tr>
 </table>''',
-            // https://github.com/daohoangson/flutter_widget_from_html/issues/1322
-            // https://github.com/daohoangson/flutter_widget_from_html/issues/1446
-            'text_align_center': '''
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1322
+              // https://github.com/daohoangson/flutter_widget_from_html/issues/1446
+              'text_align_center': '''
 <table border="1">
   <tr>
     <td>Long long long text</td>
@@ -1209,7 +1189,7 @@ Below''',
   </tr>
 </table>
 ''',
-            'width_redistribution_wide': '''
+              'width_redistribution_wide': '''
 <div style="background: red; width: 400px">
   <table border="1">
     <tr>
@@ -1219,7 +1199,7 @@ Below''',
     </tr>
   </table>
 </div>''',
-            'width_redistribution_wide2': '''
+              'width_redistribution_wide2': '''
 <div style="background: red; width: 200px">
   <table border="1">
     <tr>
@@ -1229,15 +1209,15 @@ Below''',
     </tr>
   </table>
 </div>''',
-            // TODO: doesn't match browser output
-            'width_in_percent': '''
+              // TODO: doesn't match browser output
+              'width_in_percent': '''
 <table border="1">
   <tr>
     <td style="background: red; width: 30%">Foo</td>
     <td style="background: green; width: 70%">Bar</td>
   </tr>
 </table>''',
-            'width_in_percent_100_nested': '''
+              'width_in_percent_100_nested': '''
 <table border="1">
   <tr>
     <td>
@@ -1249,30 +1229,36 @@ Below''',
     </td>
   </tr>
 </table>''',
-            'width_in_px': '''
+              'width_in_px': '''
 <table border="1">
   <tr>
     <td style="width: 50px">Foo</td>
     <td style="width: 100px">Bar</td>
   </tr>
 </table>''',
-          };
+            };
 
-          for (final testCase in testCases.entries) {
-            testGoldens(testCase.key, (tester) async {
-              await tester.pumpWidgetBuilder(
-                _Golden(testCase.value.trim()),
-                wrapper: materialAppWrapper(theme: ThemeData.light()),
-                surfaceSize: const Size(600, 400),
+            for (final testCase in testCases.entries) {
+              testGoldens(
+                testCase.key,
+                (tester) async {
+                  await tester.pumpWidgetBuilder(
+                    _Golden(testCase.value.trim()),
+                    wrapper: materialAppWrapper(theme: ThemeData.light()),
+                    surfaceSize: const Size(600, 400),
+                  );
+
+                  await screenMatchesGolden(tester, testCase.key);
+                },
+                skip: goldenSkip != null,
               );
+            }
 
-              await screenMatchesGolden(tester, testCase.key);
-            }, skip: goldenSkip != null);
-          }
-
-          testGoldens('horizontal_scroll_view', (tester) async {
-            await tester.pumpWidgetBuilder(
-              const _Golden('''
+            testGoldens(
+              'horizontal_scroll_view',
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  const _Golden('''
 <table border="1">
   <tr>
     <td>Foofoofoofoofoofoofoofoofoofoo</td>
@@ -1280,17 +1266,21 @@ Below''',
   </tr>
 </table>
 '''),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(100, 100),
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(100, 100),
+                );
+
+                await screenMatchesGolden(tester, 'horizontal_scroll_view/foo');
+
+                final bar = helper.findText('Bar').evaluate().single;
+                await Scrollable.ensureVisible(bar);
+                await screenMatchesGolden(tester, 'horizontal_scroll_view/bar');
+              },
+              skip: goldenSkip != null,
             );
-
-            await screenMatchesGolden(tester, 'horizontal_scroll_view/foo');
-
-            final bar = helper.findText('Bar').evaluate().single;
-            await Scrollable.ensureVisible(bar);
-            await screenMatchesGolden(tester, 'horizontal_scroll_view/bar');
-          }, skip: goldenSkip != null);
-        }, skip: goldenSkip);
+          },
+          skip: goldenSkip,
+        );
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (n) => '${helper.kGoldenFilePrefix}/table/$n.png',
@@ -1355,7 +1345,10 @@ Below''',
             body: ValignBaselineContainer(
               child: Row(
                 children: [
-                  ValignBaseline(index: 0, child: Text('Foo', key: foo)),
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Foo', key: foo),
+                  ),
                   ValignBaseline(
                     index: 0,
                     child: Padding(
@@ -1395,7 +1388,10 @@ Below''',
                       child: Text('Foo', key: foo),
                     ),
                   ),
-                  ValignBaseline(index: 0, child: Text('Bar', key: bar)),
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Bar', key: bar),
+                  ),
                 ],
               ),
             ),
@@ -1413,7 +1409,12 @@ Below''',
     testWidgets('renders without container', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: ValignBaseline(index: 0, child: Text('Foo'))),
+          home: Scaffold(
+            body: ValignBaseline(
+              index: 0,
+              child: Text('Foo'),
+            ),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -1433,8 +1434,7 @@ Future<String> explain(
   return helper.explain(tester, html, hw: hw, useExplainer: useExplainer);
 }
 
-String _padding(String child) =>
-    '[HtmlTableCell:child='
+String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='
     '[Align:alignment=centerLeft,widthFactor=1.0,child=[CssBlock:child='
     '$child]]]]';
@@ -1451,8 +1451,7 @@ void _loggerSetup() {
       return;
     }
 
-    final prefix =
-        '${record.time.toIso8601String().substring(11)} '
+    final prefix = '${record.time.toIso8601String().substring(11)} '
         '${record.loggerName}@${record.level.name} ';
     debugPrint('$prefix${record.message}');
 
@@ -1476,9 +1475,9 @@ class _Golden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: HtmlWidget(contents),
-    ),
-  );
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(contents),
+        ),
+      );
 }

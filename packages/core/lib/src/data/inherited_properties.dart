@@ -31,10 +31,14 @@ class InheritedProperties {
       );
     }
 
-    return InheritedProperties._(null, [
-      ...deps,
-      if (style.height != null) NormalLineHeight(style.height),
-    ], style);
+    return InheritedProperties._(
+      null,
+      [
+        ...deps,
+        if (style.height != null) NormalLineHeight(style.height),
+      ],
+      style,
+    );
   }
 
   /// Creates a copy with the given fields replaced with the new values.
@@ -93,8 +97,10 @@ class InheritedProperties {
 }
 
 /// A callback to resolve an [InheritedProperties].
-typedef InheritanceResolverCallback<T> =
-    InheritedProperties Function(InheritedProperties resolving, T input);
+typedef InheritanceResolverCallback<T> = InheritedProperties Function(
+  InheritedProperties resolving,
+  T input,
+);
 
 /// A set of resolvers for [InheritedProperties].
 ///
@@ -115,7 +121,10 @@ class InheritanceResolvers {
   /// The callback will receive the [InheritedProperties] being resolved.
   /// As a special case, declare `T=BuildContext?` to receive the [BuildContext].
   /// {@endtemplate}
-  void enqueue<T>(InheritanceResolverCallback<T> callback, [T? input]) {
+  void enqueue<T>(
+    InheritanceResolverCallback<T> callback, [
+    T? input,
+  ]) {
     final item = _InheritanceResolverCallbackWithInput(callback, input as T);
     final list = _callbacks ??= [];
     list.add(item);
@@ -154,8 +163,7 @@ class InheritanceResolvers {
   ///
   /// If the parent's values are unchanged, the cached resolved set will be used.
   InheritedProperties resolve(BuildContext context) {
-    final parentResolved =
-        parent?.resolve(context) ??
+    final parentResolved = parent?.resolve(context) ??
         const InheritedProperties._(null, [], TextStyle());
     final scopedCallbacks = _callbacks;
     if (scopedCallbacks == null) {
@@ -190,8 +198,7 @@ class InheritanceResolvers {
   InheritanceResolvers sub() => InheritanceResolvers(this);
 
   @override
-  String toString() =>
-      'inheritanceResolvers#$hashCode'
+  String toString() => 'inheritanceResolvers#$hashCode'
       '${parent != null ? '(parent=#${parent.hashCode})' : ''}';
 }
 

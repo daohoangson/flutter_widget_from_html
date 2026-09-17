@@ -62,7 +62,11 @@ void main() {
       null,
       hw: SelectionArea(
         onSelectionChanged: (v) => content = v,
-        child: HtmlWidget(html, key: hwKey, renderMode: RenderMode.listView),
+        child: HtmlWidget(
+          html,
+          key: hwKey,
+          renderMode: RenderMode.listView,
+        ),
       ),
     );
 
@@ -108,7 +112,11 @@ void main() {
         onSelectionChanged: (v) => content = v,
         child: CustomScrollView(
           slivers: [
-            HtmlWidget(html, key: hwKey, renderMode: RenderMode.sliverList),
+            HtmlWidget(
+              html,
+              key: hwKey,
+              renderMode: RenderMode.sliverList,
+            ),
           ],
         ),
       ),

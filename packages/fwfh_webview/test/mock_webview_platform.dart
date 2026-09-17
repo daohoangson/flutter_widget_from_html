@@ -132,19 +132,22 @@ abstract class FakeWebViewController extends PlatformWebViewController {
     _uris.add(_currentUri = uri);
 
     _onPageFinishedTimer?.cancel();
-    _onPageFinishedTimer = Timer(const Duration(milliseconds: 10), () {
-      final redirectToString =
-          _currentUri?.queryParameters['redirect_to'] ?? '';
-      if (redirectToString.isNotEmpty) {
-        final redirectTo = Uri.tryParse(redirectToString);
-        if (redirectTo != null) {
-          _onPageStarted(redirectTo);
-          return;
+    _onPageFinishedTimer = Timer(
+      const Duration(milliseconds: 10),
+      () {
+        final redirectToString =
+            _currentUri?.queryParameters['redirect_to'] ?? '';
+        if (redirectToString.isNotEmpty) {
+          final redirectTo = Uri.tryParse(redirectToString);
+          if (redirectTo != null) {
+            _onPageStarted(redirectTo);
+            return;
+          }
         }
-      }
 
-      _handler?._onPageFinished?.call(uri.toString());
-    });
+        _handler?._onPageFinished?.call(uri.toString());
+      },
+    );
   }
 }
 
@@ -180,7 +183,8 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   Future<void> setGeolocationPermissionsPromptCallbacks({
     OnGeolocationPermissionsShowPrompt? onShowPrompt,
     OnGeolocationPermissionsHidePrompt? onHidePrompt,
-  }) => throw UnimplementedError();
+  }) =>
+      throw UnimplementedError();
 
   @override
   Future<void> setInsetsForWebContentToIgnore(dynamic insets) =>
@@ -197,8 +201,9 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   @override
   Future<void> setOnShowFileSelector(
     Future<List<String>> Function(FileSelectorParams params)?
-    onShowFileSelector,
-  ) => throw UnimplementedError();
+        onShowFileSelector,
+  ) =>
+      throw UnimplementedError();
 
   @override
   Future<void> setPaymentRequestEnabled(bool enabled) =>
@@ -232,7 +237,8 @@ class __FakeWebKitWebViewController extends FakeWebViewController
   @override
   Future<void> setOnCanGoBackChange(
     void Function(bool) onCanGoBackChangeCallback,
-  ) => throw UnimplementedError();
+  ) =>
+      throw UnimplementedError();
 
   @override
   Future<void> setInspectable(bool value) async {
@@ -299,7 +305,9 @@ class _FakeWebViewWidget extends PlatformWebViewWidget {
       controller: params.controller as FakeWebViewController,
       child: const ColoredBox(
         color: Colors.grey,
-        child: Placeholder(color: Colors.black),
+        child: Placeholder(
+          color: Colors.black,
+        ),
       ),
     );
   }

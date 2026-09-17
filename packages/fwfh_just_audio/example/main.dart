@@ -12,12 +12,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'fwfh_just_audio',
       home: Scaffold(
-        appBar: AppBar(title: const Text('JustAudioFactory Demo')),
+        appBar: AppBar(
+          title: const Text('JustAudioFactory Demo'),
+        ),
         body: Center(
-          child: HtmlWidget('''
+          child: HtmlWidget(
+            '''
 <audio controls src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
   <code>AUDIO</code> support is not enabled.
-</audio>''', factoryBuilder: () => MyWidgetFactory()),
+</audio>''',
+            factoryBuilder: () => MyWidgetFactory(),
+          ),
         ),
       ),
     );

@@ -26,7 +26,10 @@ void main() {
     final explained = await explain(
       tester,
       html,
-      textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
     );
     expect(explained, equals('[RichText:(@20.0+b:Hello world)]'));
   });
@@ -35,7 +38,9 @@ void main() {
     final explained = await explain(
       tester,
       null,
-      hw: SelectionArea(child: HtmlWidget('Foo', key: hwKey)),
+      hw: SelectionArea(
+        child: HtmlWidget('Foo', key: hwKey),
+      ),
     );
     expect(explained, equals('[MouseRegion:child=[RichText:(:Foo)]]'));
   });
@@ -246,8 +251,7 @@ void main() {
   });
 
   group('block elements', () {
-    const blockOutput =
-        '[Column:children='
+    const blockOutput = '[Column:children='
         '[CssBlock:child=[RichText:(:First.)]],'
         '[CssBlock:child=[RichText:(:Second one.)]]'
         ']';
@@ -287,8 +291,7 @@ void main() {
       'renders FIGURE/FIGCAPTION tags',
       (tester) => mockNetworkImages(() async {
         const src = 'http://domain.com/image.png';
-        const html =
-            '''
+        const html = '''
 <figure>
   <img src="$src" />
   <figcaption><i>fig. 1</i> Foo</figcaption>
@@ -369,16 +372,14 @@ void main() {
     });
 
     testWidgets('skips SCRIPT tag', (WidgetTester tester) async {
-      const html =
-          '<script>document.write("SCRIPT is working");</script>'
+      const html = '<script>document.write("SCRIPT is working");</script>'
           '<noscript>SCRIPT is not working</noscript>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:SCRIPT is not working)]'));
     });
 
     testWidgets('skips STYLE tag', (WidgetTester tester) async {
-      const html =
-          '<style>.xxx { color: red; }</style>'
+      const html = '<style>.xxx { color: red; }</style>'
           '<span class="xxx">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
@@ -412,8 +413,7 @@ void main() {
   });
 
   group('code', () {
-    const php =
-        '<span style="color: #000000">'
+    const php = '<span style="color: #000000">'
         '<span style="color: #0000BB">&lt;?php\n'
         'phpinfo</span>'
         '<span style="color: #007700">();\n'
@@ -476,7 +476,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[RichText:(+font=Courier+fonts=monospace:Teletype)]'),
+        equals(
+          '[RichText:(+font=Courier+fonts=monospace:Teletype)]',
+        ),
       );
     });
   });
@@ -594,8 +596,7 @@ void main() {
 
   group('color (inline style)', () {
     testWidgets('renders hex values', (WidgetTester tester) async {
-      const html =
-          '<span style="color: #F00">red</span>'
+      const html = '<span style="color: #F00">red</span>'
           '<span style="color: #F008">red 53%</span>'
           '<span style="color: #00FF00">green</span>'
           '<span style="color: #00FF0080">green 50%</span>';
@@ -610,8 +611,7 @@ void main() {
     });
 
     testWidgets('renders overlaps', (WidgetTester tester) async {
-      const html =
-          '<span style="color: #FF0000">red '
+      const html = '<span style="color: #FF0000">red '
           '<span style="color: #00FF00">green</span> red again</span>';
       final explained = await explain(tester, html);
       expect(
@@ -905,8 +905,7 @@ void main() {
 
     testWidgets('inline block with bg, v-align', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/799
-      const html =
-          '<span style="background-color: #FF6600; '
+      const html = '<span style="background-color: #FF6600; '
           'display: inline-block; vertical-align: middle">Foo</span>';
       final e = await explain(tester, html);
       expect(e, equals('[Container:color=#FFFF6600,child=[RichText:(:Foo)]]'));
@@ -976,8 +975,7 @@ void main() {
       testWidgets(
         'renders IMG with dimensions as block',
         (tester) => mockNetworkImages(() async {
-          const html =
-              '<img src="$src" width="1" '
+          const html = '<img src="$src" width="1" '
               'height="1" style="display: block" />';
           final explained = await explain(tester, html);
           expect(
@@ -1158,8 +1156,7 @@ void main() {
     });
 
     testWidgets('renders medium', (WidgetTester tester) async {
-      const html =
-          '<span style="font-size: 100px">F'
+      const html = '<span style="font-size: 100px">F'
           '<span style="font-size: medium">o</span>o</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(@100.0:F)(:o)(@100.0:o))]'));
@@ -1184,16 +1181,14 @@ void main() {
     });
 
     testWidgets('renders larger', (WidgetTester tester) async {
-      const html =
-          '<span style="font-size: larger">F'
+      const html = '<span style="font-size: larger">F'
           '<span style="font-size: larger">o</span>o</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(@12.0:F)(@14.4:o)(@12.0:o))]'));
     });
 
     testWidgets('renders smaller', (WidgetTester tester) async {
-      const html =
-          '<span style="font-size: smaller">F'
+      const html = '<span style="font-size: smaller">F'
           '<span style="font-size: smaller">o</span>o</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(@8.3:F)(@6.9:o)(@8.3:o))]'));
@@ -1207,8 +1202,7 @@ void main() {
       });
 
       testWidgets('renders em', (WidgetTester tester) async {
-        const html =
-            '<span style="font-size: 2em">F'
+        const html = '<span style="font-size: 2em">F'
             '<span style="font-size: 2em">o</span>o</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:(@20.0:F)(@40.0:o)(@20.0:o))]'));
@@ -1247,8 +1241,7 @@ void main() {
       });
 
       testWidgets('renders em', (WidgetTester tester) async {
-        const html =
-            '<span style="font-size: 2em">F'
+        const html = '<span style="font-size: 2em">F'
             '<span style="font-size: 2em">o</span>o</span>';
         final e = await explain2x(tester, html);
         expect(e, equals('[RichText:(@20.0:(@40.0:F)(@80.0:o)(@40.0:o))]'));
@@ -1336,8 +1329,7 @@ void main() {
     });
 
     testWidgets('renders inline style: normal', (WidgetTester tester) async {
-      const html =
-          '<span style="font-style: italic">Italic '
+      const html = '<span style="font-style: italic">Italic '
           '<span style="font-style: normal">normal</span></span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(+i:Italic )(-i:normal))]'));
@@ -1357,9 +1349,8 @@ void main() {
       expect(explained, equals('[RichText:(:This is a (+b:strong)(: text.))]'));
     });
 
-    testWidgets('renders font-weight inline style', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders font-weight inline style',
+        (WidgetTester tester) async {
       const html = '''
 <span style="font-weight: bold">bold</span>
 <span style="font-weight: 100">one</span>
@@ -1396,7 +1387,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'),
+        equals(
+          '[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]',
+        ),
       );
     });
 
@@ -1569,7 +1562,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: CupertinoPageScaffold(child: HtmlWidget(html, key: key)),
+          home: CupertinoPageScaffold(
+            child: HtmlWidget(html, key: key),
+          ),
         ),
       );
 
@@ -1583,8 +1578,12 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(typography: Typography.material2018()),
-          home: Scaffold(body: HtmlWidget(html, key: key)),
+          theme: ThemeData(
+            typography: Typography.material2018(),
+          ),
+          home: Scaffold(
+            body: HtmlWidget(html, key: key),
+          ),
         ),
       );
 
@@ -1598,7 +1597,7 @@ class _InlineOnRenderBlockFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.localName == 'span') {
-      tree.register(BuildOp(onRenderBlock: (_, _) => const Text('Bar')));
+      tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Bar')));
     }
     super.parse(tree);
   }

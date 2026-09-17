@@ -4,10 +4,10 @@ const kTagBr = 'br';
 
 extension TagBr on WidgetFactory {
   BuildOp get tagBr => const BuildOp.v2(
-    debugLabel: kTagBr,
-    onParsed: _onParsed,
-    priority: Priority.tagBr,
-  );
+        debugLabel: kTagBr,
+        onParsed: _onParsed,
+        priority: Priority.tagBr,
+      );
 
   static BuildTree _onParsed(BuildTree tree) => tree..append(TagBrBit(tree));
 }

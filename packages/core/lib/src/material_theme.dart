@@ -96,13 +96,13 @@ Widget buildMaterialTooltip({
   required Widget child,
   required String message,
   required MaterialThemeMode mode,
-}) => Builder(
-  builder: (context) =>
-      resolveMaterialThemeMode(context, mode).mode ==
-          MaterialThemeMode.materialUi
-      ? material_ui.Tooltip(message: message, child: child)
-      : flutter_material.Tooltip(message: message, child: child),
-);
+}) =>
+    Builder(
+      builder: (context) => resolveMaterialThemeMode(context, mode).mode ==
+              MaterialThemeMode.materialUi
+          ? material_ui.Tooltip(message: message, child: child)
+          : flutter_material.Tooltip(message: message, child: child),
+    );
 
 /// Builds a circular progress indicator from the selected Material library.
 Widget buildMaterialProgressIndicator(
@@ -111,5 +111,5 @@ Widget buildMaterialProgressIndicator(
   double? value,
 }) =>
     resolveMaterialThemeMode(context, mode).mode == MaterialThemeMode.materialUi
-    ? material_ui.CircularProgressIndicator.adaptive(value: value)
-    : flutter_material.CircularProgressIndicator.adaptive(value: value);
+        ? material_ui.CircularProgressIndicator.adaptive(value: value)
+        : flutter_material.CircularProgressIndicator.adaptive(value: value);

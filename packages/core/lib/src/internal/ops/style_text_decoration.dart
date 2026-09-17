@@ -72,7 +72,8 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
 InheritedProperties textDecorationColor(
   InheritedProperties resolving,
   CssColor value,
-) => resolving.copyWith(value: TextStyleDecorationColor(value));
+) =>
+    resolving.copyWith(value: TextStyleDecorationColor(value));
 
 InheritedProperties textDecorationLine(
   InheritedProperties resolving,
@@ -121,22 +122,24 @@ InheritedProperties textDecorationLine(
 InheritedProperties textDecorationStyle(
   InheritedProperties resolving,
   TextDecorationStyle value,
-) => resolving.copyWith(
-  style: TextStyle(
-    decorationStyle: value,
-    debugLabel: 'fwfh: $kCssTextDecorationStyle',
-  ),
-);
+) =>
+    resolving.copyWith(
+      style: TextStyle(
+        decorationStyle: value,
+        debugLabel: 'fwfh: $kCssTextDecorationStyle',
+      ),
+    );
 
 InheritedProperties textDecorationThickness(
   InheritedProperties resolving,
   double value,
-) => resolving.copyWith(
-  style: TextStyle(
-    decorationThickness: value,
-    debugLabel: 'fwfh: $kCssTextDecorationThickness',
-  ),
-);
+) =>
+    resolving.copyWith(
+      style: TextStyle(
+        decorationThickness: value,
+        debugLabel: 'fwfh: $kCssTextDecorationThickness',
+      ),
+    );
 
 @immutable
 class TextDecorationLine {
@@ -144,7 +147,11 @@ class TextDecorationLine {
   final bool? strike;
   final bool? under;
 
-  const TextDecorationLine({this.over, this.strike, this.under});
+  const TextDecorationLine({
+    this.over,
+    this.strike,
+    this.under,
+  });
 
   static TextDecorationLine? tryParse(css.Expression expression) {
     if (expression is css.LiteralTerm) {

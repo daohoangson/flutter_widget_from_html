@@ -35,7 +35,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'),
+        equals(
+          '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]',
+        ),
       );
     });
 
@@ -50,7 +52,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:align=right,(:__X)]]'),
+        equals(
+          '[CssBlock:child=[RichText:align=right,(:__X)]]',
+        ),
       );
     });
   });
@@ -61,7 +65,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'),
+        equals(
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]',
+        ),
       );
     });
 
@@ -76,7 +82,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'),
+        equals(
+          '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]',
+        ),
       );
     });
 
@@ -91,7 +99,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:align=right,(:__X)]]'),
+        equals(
+          '[CssBlock:child=[RichText:align=right,(:__X)]]',
+        ),
       );
     });
 
@@ -363,8 +373,7 @@ void main() {
 
   testWidgets('renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
-    const html =
-        '<em><span style="color: red;">'
+    const html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
     final explained = await explain(tester, html);
     expect(
@@ -377,8 +386,7 @@ void main() {
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
-    const html =
-        '<div style="text-align: center">'
+    const html = '<div style="text-align: center">'
         '<div style="margin: 5px">Foo</div></div>';
     final explained = await explainMargin(tester, html);
     expect(
@@ -395,8 +403,7 @@ void main() {
   });
 
   testWidgets('renders padding with block & inline', (tester) async {
-    const html =
-        '<div style="text-align: right; padding: 5px">'
+    const html = '<div style="text-align: right; padding: 5px">'
         '<div>Foo</div><span>Bar</span></div>';
     final explained = await explainMargin(tester, html);
     expect(

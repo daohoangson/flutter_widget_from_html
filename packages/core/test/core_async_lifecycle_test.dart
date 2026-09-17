@@ -19,18 +19,19 @@ void main() {
             String text,
             _ParseGate gate, {
             bool buildAsync = true,
-          }) => MaterialApp(
-            home: _HtmlWidget(
-              '<a href="https://example.com/$text">$text</a>',
-              gate: gate,
-              buildAsync: buildAsync,
-              factoryBuilder: () => factory,
-              onTapUrl: (url) {
-                taps.add(url);
-                return true;
-              },
-            ),
-          );
+          }) =>
+              MaterialApp(
+                home: _HtmlWidget(
+                  '<a href="https://example.com/$text">$text</a>',
+                  gate: gate,
+                  buildAsync: buildAsync,
+                  factoryBuilder: () => factory,
+                  onTapUrl: (url) {
+                    taps.add(url);
+                    return true;
+                  },
+                ),
+              );
           await tester.pumpWidget(content('old', oldParse));
           await oldParse.ready.future;
           await tester.pumpWidget(
@@ -58,7 +59,8 @@ void main() {
       },
     );
 
-    testWidgets('held link gesture survives obsolete parse after newer '
+    testWidgets(
+        'held link gesture survives obsolete parse after newer '
         '${async ? 'async' : 'sync'} render', (tester) async {
       await tester.runAsync(() async {
         final oldParse = _ParseGate();
@@ -68,17 +70,18 @@ void main() {
           String text,
           _ParseGate gate, {
           bool buildAsync = true,
-        }) => MaterialApp(
-          home: _HtmlWidget(
-            '<a href="https://example.com/$text">$text</a>',
-            gate: gate,
-            buildAsync: buildAsync,
-            onTapUrl: (url) {
-              taps.add(url);
-              return true;
-            },
-          ),
-        );
+        }) =>
+            MaterialApp(
+              home: _HtmlWidget(
+                '<a href="https://example.com/$text">$text</a>',
+                gate: gate,
+                buildAsync: buildAsync,
+                onTapUrl: (url) {
+                  taps.add(url);
+                  return true;
+                },
+              ),
+            );
         await tester.pumpWidget(content('old', oldParse));
         await oldParse.ready.future;
         await tester.pumpWidget(
@@ -174,20 +177,20 @@ class _ParseGate {
   late void Function() _resume;
   bool _released = false;
   void run(void Function() action) => runZoned(
-    action,
-    zoneSpecification: ZoneSpecification(
-      registerUnaryCallback: <R, T>(self, parent, zone, callback) {
-        return parent.registerUnaryCallback<R, T>(zone, (value) {
-          if (!_released && value is dom.NodeList) {
-            _resume = () => callback(value);
-            ready.complete();
-            return null as R;
-          }
-          return callback(value);
-        });
-      },
-    ),
-  );
+        action,
+        zoneSpecification: ZoneSpecification(
+          registerUnaryCallback: <R, T>(self, parent, zone, callback) {
+            return parent.registerUnaryCallback<R, T>(zone, (value) {
+              if (!_released && value is dom.NodeList) {
+                _resume = () => callback(value);
+                ready.complete();
+                return null as R;
+              }
+              return callback(value);
+            });
+          },
+        ),
+      );
   void release() {
     _released = true;
     _resume();

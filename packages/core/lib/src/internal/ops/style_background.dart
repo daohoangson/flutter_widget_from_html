@@ -28,51 +28,54 @@ class StyleBackground {
   StyleBackground(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    alwaysRenderBlock: false,
-    debugLabel: kCssBackground,
-    onRenderBlock: (tree, placeholder) {
-      final data = tree.backgroundData;
-      final color = data.color;
-      final imageUrl = data.imageUrl;
+        alwaysRenderBlock: false,
+        debugLabel: kCssBackground,
+        onRenderBlock: (tree, placeholder) {
+          final data = tree.backgroundData;
+          final color = data.color;
+          final imageUrl = data.imageUrl;
 
-      if (color == null && imageUrl == null) {
-        return placeholder;
-      }
+          if (color == null && imageUrl == null) {
+            return placeholder;
+          }
 
-      final image = wf.buildDecorationImage(
-        tree,
-        imageUrl,
-        alignment: data.alignment,
-        fit: data.size,
-        repeat: data.repeat,
+          final image = wf.buildDecorationImage(
+            tree,
+            imageUrl,
+            alignment: data.alignment,
+            fit: data.size,
+            repeat: data.repeat,
+          );
+
+          return placeholder.wrapWith(
+            (context, child) {
+              final resolved = tree.inheritanceResolvers.resolve(context);
+              final resolvedColor = color?.getValue(resolved);
+              return wf.buildDecoration(
+                tree,
+                child,
+                color: resolvedColor,
+                image: image,
+              );
+            },
+          );
+        },
+        onRenderInline: (tree) {
+          final color = tree.backgroundData.color;
+          if (color == null) {
+            return;
+          }
+
+          tree.inherit(_textStyleBackground, color);
+        },
+        priority: BoxModel.background,
       );
-
-      return placeholder.wrapWith((context, child) {
-        final resolved = tree.inheritanceResolvers.resolve(context);
-        final resolvedColor = color?.getValue(resolved);
-        return wf.buildDecoration(
-          tree,
-          child,
-          color: resolvedColor,
-          image: image,
-        );
-      });
-    },
-    onRenderInline: (tree) {
-      final color = tree.backgroundData.color;
-      if (color == null) {
-        return;
-      }
-
-      tree.inherit(_textStyleBackground, color);
-    },
-    priority: BoxModel.background,
-  );
 
   static InheritedProperties _textStyleBackground(
     InheritedProperties resolving,
     CssColor color,
-  ) => resolving.copyWith(value: TextStyleBackground(color));
+  ) =>
+      resolving.copyWith(value: TextStyleBackground(color));
 }
 
 extension on BuildTree {
@@ -168,13 +171,14 @@ class _StyleBackgroundData {
     String? imageUrl,
     ImageRepeat? repeat,
     BoxFit? size,
-  }) => _StyleBackgroundData(
-    alignment: alignment ?? this.alignment,
-    color: color ?? this.color,
-    imageUrl: imageUrl ?? this.imageUrl,
-    repeat: repeat ?? this.repeat,
-    size: size ?? this.size,
-  );
+  }) =>
+      _StyleBackgroundData(
+        alignment: alignment ?? this.alignment,
+        color: color ?? this.color,
+        imageUrl: imageUrl ?? this.imageUrl,
+        repeat: repeat ?? this.repeat,
+        size: size ?? this.size,
+      );
 
   _StyleBackgroundData copyWithColor(_StyleBackgroundDeclaration style) {
     final color = tryParseColor(style.value);
@@ -327,8 +331,8 @@ class _StyleBackgroundDeclaration {
   var _i = 0;
 
   _StyleBackgroundDeclaration(css.Declaration style)
-    : property = style.property,
-      values = style.values;
+      : property = style.property,
+        values = style.values;
 
   bool get hasValue => _i < values.length;
 
@@ -340,4 +344,10 @@ class _StyleBackgroundDeclaration {
   void increaseIndex([int delta = 1]) => _i += delta;
 }
 
-enum _StyleBackgroundPosition { bottom, center, left, right, top }
+enum _StyleBackgroundPosition {
+  bottom,
+  center,
+  left,
+  right,
+  top,
+}

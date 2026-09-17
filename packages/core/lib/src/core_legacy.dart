@@ -12,18 +12,15 @@ typedef BuildMetadata = BuildTree;
 
 extension BuildMetadataLegacy on BuildMetadata {
   /// The associated [HtmlStyle] builder.
-  @Deprecated(
-    'Use .inherit to quickly enqueue callbacks or '
-    '.inheritanceResolvers to access the resolvers directly.',
-  )
+  @Deprecated('Use .inherit to quickly enqueue callbacks or '
+      '.inheritanceResolvers to access the resolvers directly.')
   TextStyleBuilder get tsb => inheritanceResolvers;
 }
 
 extension LegacyWidgetFactory on WidgetFactory {
   /// Prepares [GestureTapCallback].
   @Deprecated('Use .onTapUrl instead.')
-  GestureTapCallback? gestureTapCallback(String url) =>
-      () => onTapUrl(url);
+  GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
 }
 
 /// A legacy HTML styling set.
@@ -32,10 +29,8 @@ typedef TextStyleHtml = InheritedProperties;
 
 extension LegacyTextStyleHtml on TextStyleHtml {
   /// The [TextStyle].
-  @Deprecated(
-    'Use `prepareTextStyle` to build one. '
-    'For usage in resolving.copyWith, check the migration guide.',
-  )
+  @Deprecated('Use `prepareTextStyle` to build one. '
+      'For usage in resolving.copyWith, check the migration guide.')
   TextStyle get style => prepareTextStyle();
 
   /// Gets dependency by type [T].

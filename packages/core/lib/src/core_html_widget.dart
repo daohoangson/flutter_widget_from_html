@@ -78,15 +78,15 @@ class HtmlWidget extends StatefulWidget {
   /// - [renderMode]
   /// - [textStyle]
   List<dynamic> get rebuildTriggers => [
-    baseUrl,
-    buildAsync,
-    enableCaching,
-    html,
-    materialThemeMode,
-    renderMode,
-    textStyle,
-    ..._rebuildTriggers ?? const [],
-  ];
+        baseUrl,
+        buildAsync,
+        enableCaching,
+        html,
+        materialThemeMode,
+        renderMode,
+        textStyle,
+        ..._rebuildTriggers ?? const [],
+      ];
   final List<dynamic>? _rebuildTriggers;
 
   /// The render mode.
@@ -141,8 +141,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
-  CoreBuildTree get _rootTree =>
-      CoreBuildTree.root(inheritanceResolvers: _rootResolvers, wf: _wf);
+  CoreBuildTree get _rootTree => CoreBuildTree.root(
+        inheritanceResolvers: _rootResolvers,
+        wf: _wf,
+      );
 
   Widget get _sliverOrWidget0 => _sliverToBoxAdapterIfNeeded(widget0);
 
@@ -313,7 +315,10 @@ class _RootResolvers extends InheritanceResolvers {
 class _RootWidget extends InheritedWidget {
   final InheritedProperties? resolved;
 
-  const _RootWidget({required super.child, required this.resolved});
+  const _RootWidget({
+    required super.child,
+    required this.resolved,
+  });
 
   @override
   bool updateShouldNotify(_RootWidget oldWidget) =>

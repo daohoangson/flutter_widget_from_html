@@ -15,83 +15,86 @@ class TagDetails {
   TagDetails(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    alwaysRenderBlock: true,
-    debugLabel: kTagDetails,
-    onRenderedChildren: (tree, children) {
-      Widget? summaryOrNull;
-      final rest = <WidgetPlaceholder>[];
-      for (final child in children) {
-        if (summaryOrNull == null && child.summaryTree != null) {
-          summaryOrNull = child;
-        } else {
-          rest.add(child);
-        }
-      }
-      final column = wf.buildColumnPlaceholder(tree, rest);
-      if (column == null) {
-        return null;
-      }
+        alwaysRenderBlock: true,
+        debugLabel: kTagDetails,
+        onRenderedChildren: (tree, children) {
+          Widget? summaryOrNull;
+          final rest = <WidgetPlaceholder>[];
+          for (final child in children) {
+            if (summaryOrNull == null && child.summaryTree != null) {
+              summaryOrNull = child;
+            } else {
+              rest.add(child);
+            }
+          }
+          final column = wf.buildColumnPlaceholder(tree, rest);
+          if (column == null) {
+            return null;
+          }
 
-      final attrs = tree.element.attributes;
-      final open = attrs.containsKey(kAttributeDetailsOpen);
+          final attrs = tree.element.attributes;
+          final open = attrs.containsKey(kAttributeDetailsOpen);
 
-      return column..wrapWith((context, child) {
-        final resolved = tree.inheritanceResolvers.resolve(context);
-        final textStyle = resolved.prepareTextStyle();
-        final summary =
-            summaryOrNull ??
-            wf.buildText(
-              tree,
-              resolved,
-              TextSpan(
-                children: [
-                  WidgetSpan(
-                    alignment: _markerMarkerAlignment,
-                    child: HtmlDetailsMarker(style: textStyle),
-                  ),
-                  // TODO: i18n
-                  TextSpan(text: 'Details', style: textStyle),
-                ],
-              ),
-            );
+          return column
+            ..wrapWith((context, child) {
+              final resolved = tree.inheritanceResolvers.resolve(context);
+              final textStyle = resolved.prepareTextStyle();
+              final summary = summaryOrNull ??
+                  wf.buildText(
+                    tree,
+                    resolved,
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          alignment: _markerMarkerAlignment,
+                          child: HtmlDetailsMarker(style: textStyle),
+                        ),
+                        // TODO: i18n
+                        TextSpan(text: 'Details', style: textStyle),
+                      ],
+                    ),
+                  );
 
-        return HtmlDetails(
-          open: open,
-          child: wf.buildColumnWidget(context, [
-            HtmlSummary(
-              style:
-                  summaryOrNull?.summaryTree?.inheritanceResolvers
-                      .resolve(context)
-                      .prepareTextStyle() ??
-                  textStyle,
-              child: summary,
+              return HtmlDetails(
+                open: open,
+                child: wf.buildColumnWidget(
+                  context,
+                  [
+                    HtmlSummary(
+                      style: summaryOrNull?.summaryTree?.inheritanceResolvers
+                              .resolve(context)
+                              .prepareTextStyle() ??
+                          textStyle,
+                      child: summary,
+                    ),
+                    HtmlDetailsContents(child: child),
+                  ],
+                  dir: resolved.directionOrLtr,
+                ),
+              );
+            });
+        },
+        onVisitChild: (detailsTree, subTree) {
+          final e = subTree.element;
+          if (e.parent != detailsTree.element) {
+            return;
+          }
+          if (e.localName != kTagSummary) {
+            return;
+          }
+
+          subTree.register(
+            const BuildOp.v2(
+              alwaysRenderBlock: true,
+              debugLabel: kTagSummary,
+              onParsed: _onSummaryParsed,
+              onRenderedBlock: _markBlockIsSummary,
+              priority: Late.tagSummary,
             ),
-            HtmlDetailsContents(child: child),
-          ], dir: resolved.directionOrLtr),
-        );
-      });
-    },
-    onVisitChild: (detailsTree, subTree) {
-      final e = subTree.element;
-      if (e.parent != detailsTree.element) {
-        return;
-      }
-      if (e.localName != kTagSummary) {
-        return;
-      }
-
-      subTree.register(
-        const BuildOp.v2(
-          alwaysRenderBlock: true,
-          debugLabel: kTagSummary,
-          onParsed: _onSummaryParsed,
-          onRenderedBlock: _markBlockIsSummary,
-          priority: Late.tagSummary,
-        ),
+          );
+        },
+        priority: Priority.tagDetails,
       );
-    },
-    priority: Priority.tagDetails,
-  );
 
   static BuildTree _onSummaryParsed(BuildTree summaryTree) {
     if (summaryTree.isEmpty) {

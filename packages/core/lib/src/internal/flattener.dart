@@ -16,7 +16,7 @@ class Flattener implements Flattened {
   final _widgets = <WidgetPlaceholder>[];
 
   List<InlineSpan? Function(BuildContext context, {bool? isLast})>?
-  _childrenBuilder;
+      _childrenBuilder;
   late InheritanceResolvers _firstInheritanceResolvers;
   late List<_String> _firstStrings;
 
@@ -155,23 +155,25 @@ class Flattener implements Flattened {
       final scopedInheritanceResolvers = _inheritanceResolvers;
       final scopedStrings = _strings;
 
-      _childrenBuilder?.add((context, {bool? isLast}) {
-        final resolved = scopedInheritanceResolvers.resolve(context);
-        final text = scopedStrings.toText(
-          resolved.whitespaceOrNormal,
-          isFirst: false,
-          isLast: isLast != false,
-        );
-        if (text.isEmpty) {
-          return null;
-        }
+      _childrenBuilder?.add(
+        (context, {bool? isLast}) {
+          final resolved = scopedInheritanceResolvers.resolve(context);
+          final text = scopedStrings.toText(
+            resolved.whitespaceOrNormal,
+            isFirst: false,
+            isLast: isLast != false,
+          );
+          if (text.isEmpty) {
+            return null;
+          }
 
-        return wf.buildTextSpan(
-          recognizer: _getInlineRecognizer(context, resolved),
-          style: resolved.prepareTextStyle(),
-          text: text,
-        );
-      });
+          return wf.buildTextSpan(
+            recognizer: _getInlineRecognizer(context, resolved),
+            style: resolved.prepareTextStyle(),
+            text: text,
+          );
+        },
+      );
     }
 
     _strings = [];

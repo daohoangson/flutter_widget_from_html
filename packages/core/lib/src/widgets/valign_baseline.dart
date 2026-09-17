@@ -59,7 +59,7 @@ class _ValignBaselineInheritedWidget extends InheritedWidget {
   final Baselines baselines;
 
   const _ValignBaselineInheritedWidget(this.baselines, Widget child)
-    : super(child: child);
+      : super(child: child);
 
   @override
   bool updateShouldNotify(_ValignBaselineInheritedWidget oldWidget) =>
@@ -77,7 +77,8 @@ class _ValignBaselineClearer extends SingleChildRenderObjectWidget {
   void updateRenderObject(
     BuildContext context,
     covariant _ValignBaselineClearerRenderObject renderObject,
-  ) => renderObject.setBaselines(context.baselines);
+  ) =>
+      renderObject.setBaselines(context.baselines);
 }
 
 class _ValignBaselineClearerRenderObject extends RenderProxyBox {
@@ -152,8 +153,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
       return;
     }
 
-    final baselineWithOffset = _baselineWithOffset =
-        effectiveOffset.dy +
+    final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
         (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
 
     final siblings = _baselines;
@@ -173,9 +173,8 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           // skip painting this frame, wait for the correct padding
           _paddingTop += offsetY;
           _baselineWithOffset = siblingBaseline;
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => markNeedsLayout(),
-          );
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => markNeedsLayout());
           return;
         }
       } else if (siblingBaseline < baselineWithOffset) {
@@ -188,9 +187,8 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           if (offsetY != 0.0) {
             sibling._paddingTop += offsetY;
             sibling._baselineWithOffset = baselineWithOffset;
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => sibling.markNeedsLayout(),
-            );
+            WidgetsBinding.instance
+                .addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
         }
       }

@@ -12,7 +12,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'fwfh_svg',
       home: Scaffold(
-        appBar: AppBar(title: const Text('SvgFactory Demo')),
+        appBar: AppBar(
+          title: const Text('SvgFactory Demo'),
+        ),
         body: Center(
           child: HtmlWidget(
             '<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0000998/demo_app/logos/icon.svg" />',

@@ -42,19 +42,17 @@ void main() {
         isTrue,
       );
       expect(
-        tester.getSemantics(summary).flagsCollection.isExpanded ==
-            Tristate.isTrue,
-        isFalse,
-      );
+          tester.getSemantics(summary).flagsCollection.isExpanded ==
+              Tristate.isTrue,
+          isFalse);
       expect(find.bySemanticsLabel('Hidden content'), findsNothing);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
       expect(
-        tester.getSemantics(summary).flagsCollection.isFocused ==
-            Tristate.isTrue,
-        isTrue,
-      );
+          tester.getSemantics(summary).flagsCollection.isFocused ==
+              Tristate.isTrue,
+          isTrue);
       final outline = find.descendant(
         of: find.byType(FocusableActionDetector),
         matching: find.byType(DecoratedBox),
@@ -68,25 +66,22 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
       expect(
-        tester.getSemantics(summary).flagsCollection.isExpanded ==
-            Tristate.isTrue,
-        isTrue,
-      );
+          tester.getSemantics(summary).flagsCollection.isExpanded ==
+              Tristate.isTrue,
+          isTrue);
       expect(find.bySemanticsLabel('Hidden content'), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
       await tester.pumpAndSettle();
       expect(
-        tester.getSemantics(summary).flagsCollection.isExpanded ==
-            Tristate.isTrue,
-        isFalse,
-      );
+          tester.getSemantics(summary).flagsCollection.isExpanded ==
+              Tristate.isTrue,
+          isFalse);
       expect(find.bySemanticsLabel('Hidden content'), findsNothing);
       expect(
-        tester.getSemantics(summary).flagsCollection.isFocused ==
-            Tristate.isTrue,
-        isTrue,
-      );
+          tester.getSemantics(summary).flagsCollection.isFocused ==
+              Tristate.isTrue,
+          isTrue);
     } finally {
       semantics.dispose();
     }
@@ -134,9 +129,8 @@ void main() {
       LogicalKeyboardKey.space,
       LogicalKeyboardKey.numpadEnter,
     ]) {
-      testWidgets('$platform ${key.keyLabel} activates on keydown and repeat', (
-        tester,
-      ) async {
+      testWidgets('$platform ${key.keyLabel} activates on keydown and repeat',
+          (tester) async {
         final semantics = tester.ensureSemantics();
         debugDefaultTargetPlatformOverride = platform;
         try {
@@ -147,57 +141,48 @@ void main() {
           final summary = find.bySemanticsLabel(RegExp('More information'));
           // Keep raw event encoding consistent; the target platform still
           // selects Flutter's platform-specific shortcuts.
-          await tester.sendKeyEvent(
-            LogicalKeyboardKey.tab,
-            platform: 'android',
-          );
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab,
+              platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isFocused ==
-                Tristate.isTrue,
-            isTrue,
-          );
+              tester.getSemantics(summary).flagsCollection.isFocused ==
+                  Tristate.isTrue,
+              isTrue);
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isFalse,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isFalse);
 
           await tester.sendKeyDownEvent(key, platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isTrue,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isTrue);
           await tester.sendKeyUpEvent(key, platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isTrue,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isTrue);
           await tester.sendKeyDownEvent(key, platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isFalse,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isFalse);
           await tester.sendKeyRepeatEvent(key, platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isTrue,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isTrue);
           await tester.sendKeyUpEvent(key, platform: 'android');
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isTrue,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isTrue);
         } finally {
           semantics.dispose();
           debugDefaultTargetPlatformOverride = null;
@@ -224,19 +209,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(
-        tester.getSemantics(summary).flagsCollection.isExpanded ==
-            Tristate.isTrue,
-        isFalse,
-      );
+          tester.getSemantics(summary).flagsCollection.isExpanded ==
+              Tristate.isTrue,
+          isFalse);
       expect(find.bySemanticsLabel('Contents'), findsNothing);
     } finally {
       semantics.dispose();
     }
   });
 
-  testWidgets('summary does not handle Space from a focused child', (
-    tester,
-  ) async {
+  testWidgets('summary does not handle Space from a focused child',
+      (tester) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
     await pumpHtml(
@@ -255,9 +238,11 @@ void main() {
 
     expect(find.bySemanticsLabel('Hidden content'), findsNothing);
     expect(
-      tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
-      isTrue,
-    );
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .focusNode
+            .hasFocus,
+        isTrue);
     await tester.enterText(find.byType(EditableText), ' ');
     expect(controller.text, ' ');
   });
@@ -278,10 +263,9 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pumpAndSettle();
         expect(
-          tester.getSemantics(summary).flagsCollection.isFocused ==
-              Tristate.isTrue,
-          isTrue,
-        );
+            tester.getSemantics(summary).flagsCollection.isFocused ==
+                Tristate.isTrue,
+            isTrue);
         for (final modifier in <LogicalKeyboardKey>[
           LogicalKeyboardKey.shiftLeft,
           LogicalKeyboardKey.controlLeft,
@@ -293,19 +277,17 @@ void main() {
           await tester.sendKeyUpEvent(modifier);
           await tester.pumpAndSettle();
           expect(
-            tester.getSemantics(summary).flagsCollection.isExpanded ==
-                Tristate.isTrue,
-            isFalse,
-          );
+              tester.getSemantics(summary).flagsCollection.isExpanded ==
+                  Tristate.isTrue,
+              isFalse);
         }
       } finally {
         semantics.dispose();
       }
     });
 
-    testWidgets('summary ignores ${key.keyLabel} from a focused child', (
-      tester,
-    ) async {
+    testWidgets('summary ignores ${key.keyLabel} from a focused child',
+        (tester) async {
       final semantics = tester.ensureSemantics();
       final childFocus = FocusNode();
       try {
@@ -326,10 +308,9 @@ void main() {
         await tester.pumpAndSettle();
         final summary = find.bySemanticsLabel(RegExp('More information'));
         expect(
-          tester.getSemantics(summary).flagsCollection.isExpanded ==
-              Tristate.isTrue,
-          isFalse,
-        );
+            tester.getSemantics(summary).flagsCollection.isExpanded ==
+                Tristate.isTrue,
+            isFalse);
       } finally {
         semantics.dispose();
         childFocus.dispose();
@@ -337,7 +318,8 @@ void main() {
     });
   }
 
-  testWidgets('baseline link, heading text, and image description are exposed', (
+  testWidgets('baseline link, heading text, and image description are exposed',
+      (
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
@@ -358,12 +340,7 @@ void main() {
       }
 
       collect(
-        tester
-            .binding
-            .renderViews
-            .single
-            .owner!
-            .semanticsOwner!
+        tester.binding.renderViews.single.owner!.semanticsOwner!
             .rootSemanticsNode!,
       );
       final link = nodes.singleWhere((node) => node.label == 'Link text');

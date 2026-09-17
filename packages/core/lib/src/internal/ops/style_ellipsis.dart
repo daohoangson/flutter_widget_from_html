@@ -26,7 +26,10 @@ class _BuildTreeEllipsis {
     this.overflow = TextOverflow.clip,
   });
 
-  _BuildTreeEllipsis copyWith({int? maxLines, TextOverflow? overflow}) =>
+  _BuildTreeEllipsis copyWith({
+    int? maxLines,
+    TextOverflow? overflow,
+  }) =>
       _BuildTreeEllipsis(
         maxLines: maxLines ?? this.maxLines,
         overflow: overflow ?? this.overflow,

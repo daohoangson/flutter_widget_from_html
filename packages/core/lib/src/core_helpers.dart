@@ -70,21 +70,23 @@ typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 ///
 /// The future is resolved after scrolling is completed.
 /// It will be `true` if scrolling succeed or `false` otherwise.
-typedef EnsureVisible =
-    Future<bool> Function(
-      String id, {
-      Curve curve,
-      Duration duration,
-      Curve jumpCurve,
-      Duration jumpDuration,
-    });
+typedef EnsureVisible = Future<bool> Function(
+  String id, {
+  Curve curve,
+  Duration duration,
+  Curve jumpCurve,
+  Duration jumpDuration,
+});
 
 /// A builder function that is called if an error occurs
 /// during a complicated element rendering.
 ///
 /// See [OnLoadingBuilder] for the full list.
-typedef OnErrorBuilder =
-    Widget? Function(BuildContext context, dom.Element element, dynamic error);
+typedef OnErrorBuilder = Widget? Function(
+  BuildContext context,
+  dom.Element element,
+  dynamic error,
+);
 
 /// A builder that specifies the widget to display to the user
 /// while a complicated element is still loading.
@@ -93,12 +95,11 @@ typedef OnErrorBuilder =
 /// - The [HtmlWidget] itself
 /// - Image
 /// - Video
-typedef OnLoadingBuilder =
-    Widget? Function(
-      BuildContext context,
-      dom.Element element,
-      double? loadingProgress,
-    );
+typedef OnLoadingBuilder = Widget? Function(
+  BuildContext context,
+  dom.Element element,
+  double? loadingProgress,
+);
 
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
@@ -114,8 +115,8 @@ class WidgetPlaceholder extends StatelessWidget {
     Widget? child,
     this.debugLabel,
     super.key,
-  }) : _builders = builder != null ? [builder] : [],
-       _firstChild = child;
+  })  : _builders = builder != null ? [builder] : [],
+        _firstChild = child;
 
   /// Whether this placeholder renders anything.
   bool get isEmpty => _firstChild == null && _builders.isEmpty;
@@ -158,8 +159,8 @@ class WidgetPlaceholder extends StatelessWidget {
   // ignore: prefer_constructors_over_static_methods
   static WidgetPlaceholder lazy(Widget child, {String? debugLabel}) =>
       child is WidgetPlaceholder
-      ? child
-      : WidgetPlaceholder(debugLabel: debugLabel, child: child);
+          ? child
+          : WidgetPlaceholder(debugLabel: debugLabel, child: child);
 
   /// Builds widget if it is a placeholder.
   static Widget unwrap(BuildContext context, Widget widget) =>
@@ -167,8 +168,10 @@ class WidgetPlaceholder extends StatelessWidget {
 }
 
 /// A callback for [WidgetPlaceholder].
-typedef WidgetPlaceholderBuilder =
-    Widget? Function(BuildContext context, Widget child);
+typedef WidgetPlaceholderBuilder = Widget? Function(
+  BuildContext context,
+  Widget child,
+);
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 

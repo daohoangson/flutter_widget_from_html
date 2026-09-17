@@ -47,7 +47,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[SizedBox:0.0x1.0],[CssBlock:child=[RichText:(:Foo)]]'),
+        equals(
+          '[SizedBox:0.0x1.0],[CssBlock:child=[RichText:(:Foo)]]',
+        ),
       );
     });
 
@@ -82,7 +84,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]'),
+        equals(
+          '[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]',
+        ),
       );
     });
 
@@ -277,8 +281,7 @@ void main() {
   });
 
   testWidgets('renders margin within another', (WidgetTester tester) async {
-    const html =
-        '<div style="margin: 1px">'
+    const html = '<div style="margin: 1px">'
         '<div style="margin: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(
@@ -295,8 +298,7 @@ void main() {
   });
 
   testWidgets('renders margins back to back', (WidgetTester tester) async {
-    const html =
-        '<div style="margin: 3px">1</div>'
+    const html = '<div style="margin: 3px">1</div>'
         '<div style="margin: 3px">2</div>'
         '<div style="margin: 3px">3</div>';
     final explained = await explain(tester, html);
@@ -315,8 +317,7 @@ void main() {
   });
 
   testWidgets('renders block margins back to back', (tester) async {
-    const html =
-        '<div style="margin: 3px"><div>1a</div><div>1b</div></div>'
+    const html = '<div style="margin: 3px"><div>1a</div><div>1b</div></div>'
         '<div style="margin: 3px"><div>2a</div><div>2b</div></div>';
     final explained = await explain(tester, html);
     expect(
@@ -343,7 +344,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[SizedBox:0.0x3.0],[CssBlock:child=[RichText:(:Foo)]]'),
+        equals(
+          '[SizedBox:0.0x3.0],[CssBlock:child=[RichText:(:Foo)]]',
+        ),
       );
     });
 
@@ -352,7 +355,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[SizedBox:0.0x3.0],[CssBlock:child=[RichText:(:Foo)]]'),
+        equals(
+          '[SizedBox:0.0x3.0],[CssBlock:child=[RichText:(:Foo)]]',
+        ),
       );
     });
 
@@ -399,7 +404,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]'),
+        equals(
+          '[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]',
+        ),
       );
     });
 
@@ -408,7 +415,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]'),
+        equals(
+          '[CssBlock:child=[RichText:(:Foo)]],[SizedBox:0.0x3.0]',
+        ),
       );
     });
 
@@ -597,24 +606,21 @@ void main() {
 
   group('trimming', () {
     testWidgets('trims top intances', (WidgetTester tester) async {
-      const html =
-          '<div style="margin-top: 1em">'
+      const html = '<div style="margin-top: 1em">'
           '<div style="margin-top: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims bottom instances', (WidgetTester tester) async {
-      const html =
-          '<div style="margin-bottom: 1em">'
+      const html = '<div style="margin-bottom: 1em">'
           '<div style="margin-bottom: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims both ways', (WidgetTester tester) async {
-      const html =
-          '<div style="margin: 1em 0">Foo</div>'
+      const html = '<div style="margin: 1em 0">Foo</div>'
           '<div style="margin: 1em 0">Bar</div>';
       final explained = await helper.explain(tester, html);
       expect(
@@ -783,7 +789,10 @@ void main() {
     });
 
     testWidgets('computeDryLayout', (tester) async {
-      await tester.pumpSizedBox(left: double.infinity, right: double.infinity);
+      await tester.pumpSizedBox(
+        left: double.infinity,
+        right: double.infinity,
+      );
 
       final bc = BoxConstraints.loose(const Size(50, 50));
       final drySize = tester.horizontalMargin.getDryLayout(bc);
@@ -920,7 +929,13 @@ extension on WidgetTester {
         child: HorizontalMargin(
           left: left,
           right: right,
-          child: isNull ? null : SizedBox(height: 10, key: key, width: 10),
+          child: isNull
+              ? null
+              : SizedBox(
+                  height: 10,
+                  key: key,
+                  width: 10,
+                ),
         ),
       ),
     );

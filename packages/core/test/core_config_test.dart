@@ -18,12 +18,13 @@ void main() {
       WidgetTester tester,
       String html, {
       bool? buildAsync,
-    }) => helper.explain(
-      tester,
-      null,
-      hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
-      useExplainer: false,
-    );
+    }) =>
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
+          useExplainer: false,
+        );
 
     testWidgets('uses FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
@@ -68,19 +69,20 @@ void main() {
       required bool enableCaching,
       List<dynamic>? rebuildTriggers,
       TextStyle? textStyle,
-    }) => helper.explain(
-      tester,
-      null,
-      hw: HtmlWidget(
-        html,
-        baseUrl: baseUrl,
-        buildAsync: buildAsync,
-        enableCaching: enableCaching,
-        key: helper.hwKey,
-        rebuildTriggers: rebuildTriggers,
-        textStyle: textStyle,
-      ),
-    );
+    }) =>
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            baseUrl: baseUrl,
+            buildAsync: buildAsync,
+            enableCaching: enableCaching,
+            key: helper.hwKey,
+            rebuildTriggers: rebuildTriggers,
+            textStyle: textStyle,
+          ),
+        );
 
     void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as InheritedWidget).child;
@@ -163,7 +165,12 @@ void main() {
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, enableCaching: true, rebuildTriggers: [2]);
+      await explain(
+        tester,
+        html,
+        enableCaching: true,
+        rebuildTriggers: [2],
+      );
       final built2 = helper.buildCurrentState();
       enableCachingExpect(built1, built2, isFalse);
     });
@@ -331,10 +338,8 @@ void main() {
     const html = 'Foo <table><tr><td>bar</td></tr></table>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, key: helper.hwKey),
-      );
+      final explained =
+          await explain(tester, HtmlWidget(html, key: helper.hwKey));
       expect(explained, isNot(contains('Bar')));
     });
 
@@ -357,23 +362,27 @@ void main() {
       required bool buildAsync,
       OnErrorBuilder? onErrorBuilder,
     }) async {
-      await runZonedGuarded(() async {
-        await helper.explain(
-          tester,
-          null,
-          hw: HtmlWidget(
-            'Foo <span class="throw">bar</span>.',
-            buildAsync: buildAsync,
-            factoryBuilder: () => _OnErrorBuilderFactory(),
-            key: helper.hwKey,
-            onErrorBuilder: onErrorBuilder,
-          ),
-          useExplainer: false,
-        );
+      await runZonedGuarded(
+        () async {
+          await helper.explain(
+            tester,
+            null,
+            hw: HtmlWidget(
+              'Foo <span class="throw">bar</span>.',
+              buildAsync: buildAsync,
+              factoryBuilder: () => _OnErrorBuilderFactory(),
+              key: helper.hwKey,
+              onErrorBuilder: onErrorBuilder,
+            ),
+            useExplainer: false,
+          );
 
-        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
-        await tester.pump();
-      }, (_, _) {});
+          await tester
+              .runAsync(() => Future.delayed(const Duration(seconds: 1)));
+          await tester.pump();
+        },
+        (_, __) {},
+      );
 
       return await helper.explainWithoutPumping(useExplainer: false);
     }
@@ -387,7 +396,7 @@ void main() {
       final explained = await explain(
         tester,
         buildAsync: false,
-        onErrorBuilder: (_, _, _) => const Text('sync error'),
+        onErrorBuilder: (_, __, ___) => const Text('sync error'),
       );
       expect(explained, contains('RichText(text: "sync error")'));
     });
@@ -401,7 +410,7 @@ void main() {
       final explained = await explain(
         tester,
         buildAsync: true,
-        onErrorBuilder: (_, _, _) => const Text('async error'),
+        onErrorBuilder: (_, __, ___) => const Text('async error'),
       );
       expect(explained, contains('RichText(text: "async error")'));
     });
@@ -411,17 +420,18 @@ void main() {
     Future<String?> explain(
       WidgetTester tester, {
       OnLoadingBuilder? onLoadingBuilder,
-    }) => helper.explain(
-      tester,
-      null,
-      hw: HtmlWidget(
-        'Foo',
-        buildAsync: true,
-        key: helper.hwKey,
-        onLoadingBuilder: onLoadingBuilder,
-      ),
-      useExplainer: false,
-    );
+    }) =>
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            'Foo',
+            buildAsync: true,
+            key: helper.hwKey,
+            onLoadingBuilder: onLoadingBuilder,
+          ),
+          useExplainer: false,
+        );
 
     testWidgets('renders CircularProgressIndicator', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -441,7 +451,7 @@ void main() {
     testWidgets('renders custom', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        onLoadingBuilder: (_, _, _) => const Text('Custom'),
+        onLoadingBuilder: (_, __, ___) => const Text('Custom'),
       );
       expect(explained, contains('RichText(text: "Custom")'));
     });
@@ -543,7 +553,10 @@ void main() {
       final onTapCallbackResults = [];
 
       await tester.pumpWidget(
-        _OnTapUrlApp(href: href, onTapCallbackResults: onTapCallbackResults),
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+        ),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -706,15 +719,16 @@ class _OnTapUrlApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    home: Scaffold(
-      body: HtmlWidget(
-        '<a href="$href">Tap me</a>',
-        factoryBuilder: () =>
-            _OnTapUrlFactory(onTapCallbackResults: onTapCallbackResults),
-        onTapUrl: onTapUrl,
-      ),
-    ),
-  );
+        home: Scaffold(
+          body: HtmlWidget(
+            '<a href="$href">Tap me</a>',
+            factoryBuilder: () => _OnTapUrlFactory(
+              onTapCallbackResults: onTapCallbackResults,
+            ),
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }
 
 class _OnTapUrlFactory extends WidgetFactory {

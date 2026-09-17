@@ -10,5 +10,6 @@ class ColumnMode extends RenderMode {
     WidgetFactory wf,
     BuildContext context,
     List<Widget> children,
-  ) => wf.buildColumnWidget(context, children);
+  ) =>
+      wf.buildColumnWidget(context, children);
 }

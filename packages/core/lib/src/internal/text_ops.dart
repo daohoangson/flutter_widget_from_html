@@ -8,7 +8,10 @@ import 'core_parser.dart';
 
 InheritedProperties color(InheritedProperties resolving, Color color) =>
     resolving.copyWith(
-      style: TextStyle(color: color, debugLabel: 'fwfh: $kCssColor'),
+      style: TextStyle(
+        color: color,
+        debugLabel: 'fwfh: $kCssColor',
+      ),
     );
 
 InheritedProperties fontFamily(InheritedProperties resolving, List<String> v) =>
@@ -114,12 +117,18 @@ double? _fontSizeMultiplyWith(double? fontSize, double value) =>
 
 InheritedProperties fontStyle(InheritedProperties resolving, FontStyle v) =>
     resolving.copyWith(
-      style: TextStyle(debugLabel: 'fwfh: $kCssFontStyle', fontStyle: v),
+      style: TextStyle(
+        debugLabel: 'fwfh: $kCssFontStyle',
+        fontStyle: v,
+      ),
     );
 
 InheritedProperties fontWeight(InheritedProperties resolving, FontWeight v) =>
     resolving.copyWith(
-      style: TextStyle(debugLabel: 'fwfh: $kCssFontWeight', fontWeight: v),
+      style: TextStyle(
+        debugLabel: 'fwfh: $kCssFontWeight',
+        fontWeight: v,
+      ),
     );
 
 InheritedProperties lineHeight(
@@ -233,7 +242,8 @@ FontWeight? fontWeightTryParse(css.Expression expression) {
 InheritedProperties whitespace(
   InheritedProperties resolving,
   CssWhitespace whitespace,
-) => resolving.copyWith(value: whitespace);
+) =>
+    resolving.copyWith(value: whitespace);
 
 CssWhitespace? whitespaceTryParse(String value) {
   switch (value) {

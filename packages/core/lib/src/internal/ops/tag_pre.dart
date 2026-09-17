@@ -8,13 +8,13 @@ class TagPre {
   TagPre(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    debugLabel: kTagPre,
-    defaultStyles: _defaultStyles,
-    onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
-      (_, child) => wf.buildHorizontalScrollView(tree, child),
-    ),
-    priority: Priority.tagPre,
-  );
+        debugLabel: kTagPre,
+        defaultStyles: _defaultStyles,
+        onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
+          (_, child) => wf.buildHorizontalScrollView(tree, child),
+        ),
+        priority: Priority.tagPre,
+      );
 
   static StylesMap _defaultStyles(dom.Element _) {
     return const {

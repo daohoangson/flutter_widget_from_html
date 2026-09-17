@@ -53,15 +53,20 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     AlignmentGeometry alignment, {
     double? heightFactor,
     double? widthFactor,
-  }) => Align(
-    alignment: alignment,
-    heightFactor: heightFactor,
-    widthFactor: widthFactor,
-    child: child,
-  );
+  }) =>
+      Align(
+        alignment: alignment,
+        heightFactor: heightFactor,
+        widthFactor: widthFactor,
+        child: child,
+      );
 
   /// Builds [AspectRatio].
-  Widget? buildAspectRatio(BuildTree tree, Widget child, double aspectRatio) =>
+  Widget? buildAspectRatio(
+    BuildTree tree,
+    Widget child,
+    double aspectRatio,
+  ) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds body widget.
@@ -109,7 +114,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       return children.first;
     }
 
-    return ColumnPlaceholder(children: children, tree: tree, wf: this);
+    return ColumnPlaceholder(
+      children: children,
+      tree: tree,
+      wf: this,
+    );
   }
 
   /// Builds [Column].
@@ -150,9 +159,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final container = child is Container ? child : null;
     final grandChild = container?.child;
     final prevDeco = container?.decoration;
-    final baseDeco = prevDeco is BoxDecoration
-        ? prevDeco
-        : const BoxDecoration();
+    final baseDeco =
+        prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     var decoration = baseDeco.copyWith(
       border: border,
       color: color,
@@ -277,9 +285,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BuildTree tree, {
     GestureTapCallback? onTap,
   }) {
-    final recognizer = onTap != null
-        ? (TapGestureRecognizer()..onTap = onTap)
-        : null;
+    final recognizer =
+        onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
     if (recognizer != null) {
       _recognizersNeedDisposing.add(recognizer);
     }
@@ -397,9 +404,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     BuildTree tree,
     Widget child,
     EdgeInsetsGeometry padding,
-  ) => padding == EdgeInsets.zero
-      ? child
-      : Padding(padding: padding, child: child);
+  ) =>
+      padding == EdgeInsets.zero
+          ? child
+          : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
   Widget? buildText(
@@ -419,7 +427,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         final selectionRegistrar = SelectionContainer.maybeOf(context);
         final selectionColor = selectionRegistrar != null
             ? DefaultSelectionStyle.of(context).selectionColor ??
-                  DefaultSelectionStyle.defaultColor
+                DefaultSelectionStyle.defaultColor
             : null;
 
         Widget built = RichText(
@@ -752,7 +760,10 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        tree.inherit(text_ops.fontFamily, const [kTagCodeFont1, kTagCodeFont2]);
+        tree.inherit(
+          text_ops.fontFamily,
+          const [kTagCodeFont1, kTagCodeFont2],
+        );
       case kTagPre:
         tree.register(_tagPre ??= TagPre(this).buildOp);
 
@@ -1008,18 +1019,16 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kCssFontStyle:
         final term = style.term;
-        final fontStyle = term != null
-            ? text_ops.fontStyleTryParse(term)
-            : null;
+        final fontStyle =
+            term != null ? text_ops.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
           tree.inherit(text_ops.fontStyle, fontStyle);
         }
 
       case kCssFontWeight:
         final value = style.value;
-        final fontWeight = value != null
-            ? text_ops.fontWeightTryParse(value)
-            : null;
+        final fontWeight =
+            value != null ? text_ops.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
           tree.inherit(text_ops.fontWeight, fontWeight);
         }
@@ -1072,9 +1081,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
       case kCssWhitespace:
         final term = style.term;
-        final whitespace = term != null
-            ? text_ops.whitespaceTryParse(term)
-            : null;
+        final whitespace =
+            term != null ? text_ops.whitespaceTryParse(term) : null;
         if (whitespace != null) {
           tree.inherit(text_ops.whitespace, whitespace);
         }
@@ -1165,21 +1173,17 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     return value != null ? {kCssDirection: value} : const {};
   }
 
-  static StylesMap _cssDisplayBlock(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-  };
+  static StylesMap _cssDisplayBlock(dom.Element _) =>
+      {kCssDisplay: kCssDisplayBlock};
 
-  static StylesMap _cssDisplayNone(dom.Element _) => {
-    kCssDisplay: kCssDisplayNone,
-  };
+  static StylesMap _cssDisplayNone(dom.Element _) =>
+      {kCssDisplay: kCssDisplayNone};
 
-  static StylesMap _cssDisplayTable(dom.Element _) => {
-    kCssDisplay: kCssDisplayTable,
-  };
+  static StylesMap _cssDisplayTable(dom.Element _) =>
+      {kCssDisplay: kCssDisplayTable};
 
-  static StylesMap _cssTextAlignCenter(dom.Element _) => {
-    kCssTextAlign: kCssTextAlignCenter,
-  };
+  static StylesMap _cssTextAlignCenter(dom.Element _) =>
+      {kCssTextAlign: kCssTextAlignCenter};
 
   static StylesMap _cssTextAlignFromAttribute(dom.Element element) {
     final value = element.attributes[kAttributeAlign];
@@ -1192,125 +1196,123 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     return value != null ? {kCssTextAlign: value} : const {};
   }
 
-  static StylesMap _cssTextDecorationLineThrough(dom.Element _) => {
-    kCssTextDecorationLine: kCssTextDecorationLineThrough,
-  };
+  static StylesMap _cssTextDecorationLineThrough(dom.Element _) =>
+      {kCssTextDecorationLine: kCssTextDecorationLineThrough};
 
-  static StylesMap _cssTextDecorationUnderline(dom.Element _) => {
-    kCssTextDecorationLine: kCssTextDecorationUnderline,
-  };
+  static StylesMap _cssTextDecorationUnderline(dom.Element _) =>
+      {kCssTextDecorationLine: kCssTextDecorationUnderline};
 
-  static StylesMap _cssVerticalAlignMiddle(dom.Element _) => {
-    kCssVerticalAlign: kCssVerticalAlignMiddle,
-  };
+  static StylesMap _cssVerticalAlignMiddle(dom.Element _) =>
+      {kCssVerticalAlign: kCssVerticalAlignMiddle};
 
   static StylesMap _tagAcronym(dom.Element _) => {
-    kCssTextDecorationLine: kCssTextDecorationUnderline,
-    kCssTextDecorationStyle: kCssTextDecorationStyleDotted,
-  };
+        kCssTextDecorationLine: kCssTextDecorationUnderline,
+        kCssTextDecorationStyle: kCssTextDecorationStyleDotted,
+      };
 
   static StylesMap _tagAddress(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontStyle: kCssFontStyleItalic,
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontStyle: kCssFontStyleItalic,
+      };
 
   static StylesMap _tagCenter(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssTextAlign: kCssTextAlignWebkitCenter,
-    kCssWidth: '100%',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssTextAlign: kCssTextAlignWebkitCenter,
+        kCssWidth: '100%',
+      };
 
   static StylesMap _tagDd(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssMargin: '0 0 1em 40px',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '0 0 1em 40px',
+      };
 
   static StylesMap _tagDt(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontWeight: kCssFontWeightBold,
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+      };
 
   static StylesMap _tagFigure(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssMargin: '1em 40px',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 40px',
+      };
 
   static StylesMap _tagH1(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontSize: '2em',
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '0.67em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '2em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.67em 0',
+      };
 
   static StylesMap _tagH2(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontSize: '1.5em',
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '0.83em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.5em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.83em 0',
+      };
 
   static StylesMap _tagH3(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontSize: '1.17em',
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '1em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.17em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1em 0',
+      };
 
   static StylesMap _tagH4(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '1.33em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.33em 0',
+      };
 
   static StylesMap _tagH5(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontSize: '0.83em',
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '1.67em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.83em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.67em 0',
+      };
 
   static StylesMap _tagH6(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssFontSize: '0.67em',
-    kCssFontWeight: kCssFontWeightBold,
-    kCssMargin: '2.33em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.67em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '2.33em 0',
+      };
 
   static StylesMap _tagHrDefaultStyles(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssMargin: '0.5em 0',
-    kCssBorder + kSuffixTop: '1px solid',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '0.5em 0',
+        kCssBorder + kSuffixTop: '1px solid',
+      };
 
   static WidgetPlaceholder _tagHrOnRenderBlock(
     BuildTree _,
     WidgetPlaceholder placeholder,
-  ) => placeholder.wrapWith((_, _) => Container());
+  ) =>
+      placeholder.wrapWith((_, __) => Container());
 
   static StylesMap _tagMark(dom.Element _) => {
-    kCssBackgroundColor: '#ff0',
-    kCssColor: '#000',
-  };
+        kCssBackgroundColor: '#ff0',
+        kCssColor: '#000',
+      };
 
   static StylesMap _tagP(dom.Element _) => {
-    kCssDisplay: kCssDisplayBlock,
-    kCssMargin: '1em 0',
-  };
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 0',
+      };
 
   static StylesMap _tagSub(dom.Element _) => {
-    kCssVerticalAlign: kCssVerticalAlignSub,
-    kCssFontSize: kCssFontSizeSmaller,
-  };
+        kCssVerticalAlign: kCssVerticalAlignSub,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
 
   static StylesMap _tagSup(dom.Element _) => {
-    kCssVerticalAlign: kCssVerticalAlignSuper,
-    kCssFontSize: kCssFontSizeSmaller,
-  };
+        kCssVerticalAlign: kCssVerticalAlignSuper,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
 
   static StylesMap _tagTableHeaderCell(dom.Element _) => {
-    kCssFontWeight: kCssFontWeightBold,
-    kCssVerticalAlign: kCssVerticalAlignMiddle,
-  };
+        kCssFontWeight: kCssFontWeightBold,
+        kCssVerticalAlign: kCssVerticalAlignMiddle,
+      };
 }
 
 /// A factory to build widgets.

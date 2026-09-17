@@ -63,8 +63,7 @@ mixin WebViewFactory on WidgetFactory {
     final allow = a[kAttributeIframeAllow];
     final allowFullscreen = a.containsKey(kAttributeIframeAllowFullscreen);
     final dimensOk = height != null && height > 0 && width != null && width > 0;
-    final js =
-        webViewJs &&
+    final js = webViewJs &&
         (sandbox == null ||
             sandbox.contains(kAttributeIframeSandboxAllowScripts));
     return WebView(
@@ -95,7 +94,10 @@ mixin WebViewFactory on WidgetFactory {
 
   /// Builds fallback link when [HtmlWidget.webView] is disabled.
   Widget? buildWebViewLinkOnly(BuildMetadata meta, String url) =>
-      GestureDetector(onTap: gestureTapCallback(url), child: Text(url));
+      GestureDetector(
+        onTap: gestureTapCallback(url),
+        child: Text(url),
+      );
 
   @override
   void parse(BuildMetadata meta) {
@@ -139,8 +141,7 @@ mixin WebViewFactory on WidgetFactory {
               final dataSrc = a[kAttributeIframeDataSrc];
               final srcAttr = a[kAttributeIframeSrc];
               final src = urlFull(
-                (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? ''),
-              );
+                  (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? ''));
               if (src == null) {
                 return widgets;
               }

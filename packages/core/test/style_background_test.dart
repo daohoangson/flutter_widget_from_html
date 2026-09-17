@@ -33,8 +33,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders with margins and paddings', (tester) async {
-      const html =
-          '<div style="background-color: #f00; '
+      const html = '<div style="background-color: #f00; '
           'margin: 1px; padding: 2px">Foo</div>';
       final explained = await explainMargin(tester, html);
       expect(
@@ -102,7 +101,9 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[RichText:(:(color=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]'),
+        equals(
+          '[RichText:(:(color=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]',
+        ),
       );
     });
   });
@@ -187,68 +188,73 @@ Future<void> main() async {
       const backgroundAssetImage =
           'background-image: url(asset:test/images/logo.png)';
 
-      final positionTestCases = ValueVariant<_PositionTestCase>({
-        // bottom
-        'bottom'.position(Alignment.bottomCenter),
-        'bottom bottom'.position(Alignment.bottomCenter),
-        'bottom center'.position(Alignment.bottomCenter),
-        'bottom left'.position(Alignment.bottomLeft),
-        'bottom right'.position(Alignment.bottomRight),
-        'bottom top'.position(Alignment.bottomCenter),
+      final positionTestCases = ValueVariant<_PositionTestCase>(
+        {
+          // bottom
+          'bottom'.position(Alignment.bottomCenter),
+          'bottom bottom'.position(Alignment.bottomCenter),
+          'bottom center'.position(Alignment.bottomCenter),
+          'bottom left'.position(Alignment.bottomLeft),
+          'bottom right'.position(Alignment.bottomRight),
+          'bottom top'.position(Alignment.bottomCenter),
 
-        // center
-        'center'.position(Alignment.center),
-        'center bottom'.position(Alignment.bottomCenter),
-        'center center'.position(Alignment.center),
-        'center left'.position(Alignment.centerLeft),
-        'center right'.position(Alignment.centerRight),
-        'center top'.position(Alignment.topCenter),
+          // center
+          'center'.position(Alignment.center),
+          'center bottom'.position(Alignment.bottomCenter),
+          'center center'.position(Alignment.center),
+          'center left'.position(Alignment.centerLeft),
+          'center right'.position(Alignment.centerRight),
+          'center top'.position(Alignment.topCenter),
 
-        // left
-        'left'.position(Alignment.centerLeft),
-        'left bottom'.position(Alignment.bottomLeft),
-        'left center'.position(Alignment.centerLeft),
-        'left left'.position(Alignment.centerLeft),
-        'left right'.position(Alignment.centerLeft),
-        'left top'.position(Alignment.topLeft),
+          // left
+          'left'.position(Alignment.centerLeft),
+          'left bottom'.position(Alignment.bottomLeft),
+          'left center'.position(Alignment.centerLeft),
+          'left left'.position(Alignment.centerLeft),
+          'left right'.position(Alignment.centerLeft),
+          'left top'.position(Alignment.topLeft),
 
-        // right
-        'right'.position(Alignment.centerRight),
-        'right bottom'.position(Alignment.bottomRight),
-        'right center'.position(Alignment.centerRight),
-        'right left'.position(Alignment.centerRight),
-        'right right'.position(Alignment.centerRight),
-        'right top'.position(Alignment.topRight),
+          // right
+          'right'.position(Alignment.centerRight),
+          'right bottom'.position(Alignment.bottomRight),
+          'right center'.position(Alignment.centerRight),
+          'right left'.position(Alignment.centerRight),
+          'right right'.position(Alignment.centerRight),
+          'right top'.position(Alignment.topRight),
 
-        // top
-        'top'.position(Alignment.topCenter),
-        'top bottom'.position(Alignment.topCenter),
-        'top center'.position(Alignment.topCenter),
-        'top left'.position(Alignment.topLeft),
-        'top right'.position(Alignment.topRight),
-        'top top'.position(Alignment.topCenter),
+          // top
+          'top'.position(Alignment.topCenter),
+          'top bottom'.position(Alignment.topCenter),
+          'top center'.position(Alignment.topCenter),
+          'top left'.position(Alignment.topLeft),
+          'top right'.position(Alignment.topRight),
+          'top top'.position(Alignment.topCenter),
 
-        // default
-        'foo'.position(Alignment.topLeft),
-      });
+          // default
+          'foo'.position(Alignment.topLeft),
+        },
+      );
 
-      testWidgets('renders alignment', (WidgetTester tester) async {
-        final testCase = positionTestCases.currentValue!;
-        final html =
-            '<div style="$backgroundAssetImage; '
-            'background-position: ${testCase.value}">Foo</div>';
+      testWidgets(
+        'renders alignment',
+        (WidgetTester tester) async {
+          final testCase = positionTestCases.currentValue!;
+          final html = '<div style="$backgroundAssetImage; '
+              'background-position: ${testCase.value}">Foo</div>';
 
-        await explain(tester, html);
-        final container = tester.widget<Container>(find.byType(Container));
-        expect(
-          container.decoration,
-          isA<BoxDecoration>().having(
-            (deco) => deco.image?.alignment,
-            'image.alignment',
-            equals(testCase.alignment),
-          ),
-        );
-      }, variant: positionTestCases);
+          await explain(tester, html);
+          final container = tester.widget<Container>(find.byType(Container));
+          expect(
+            container.decoration,
+            isA<BoxDecoration>().having(
+              (deco) => deco.image?.alignment,
+              'image.alignment',
+              equals(testCase.alignment),
+            ),
+          );
+        },
+        variant: positionTestCases,
+      );
     });
   });
 
@@ -332,8 +338,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders everything', (WidgetTester tester) async {
-      const html =
-          '<div style="background: #f00 '
+      const html = '<div style="background: #f00 '
           'url(asset:$assetName) bottom right repeat cover">Foo</div>';
       final explained = await explain(tester, html);
       expect(
@@ -350,8 +355,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders unrecognized values', (WidgetTester tester) async {
-      const html =
-          '<div style="background: foo1 #f00 foo2 '
+      const html = '<div style="background: foo1 #f00 foo2 '
           'url(asset:$assetName) foo3 bottom right '
           'foo4 repeat foo5 cover">Foo</div>';
       final explained = await explain(tester, html);
@@ -372,63 +376,71 @@ Future<void> main() async {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
-            ? null
-            : 'Linux only'
+          ? null
+          : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
   GoldenToolkit.runWithConfiguration(
     () {
-      group('background-image', () {
-        const image44 = 'background-image: url(asset:test/images/44px.png)';
-        const size100x75 = 'width: 100px; height: 75px';
-        const size100x100 = 'width: 100px; height: 100px';
-        const testCases = <String, String>{
-          'position/center':
-              '<div style="background-position: center; $image44; $size100x100">Foo</div>',
-          'position/top':
-              '<div style="background-position: top; $image44; $size100x100">Foo</div>',
-          'position/top_right':
-              '<div style="background-position: top right; $image44; $size100x100">Foo</div>',
-          'position/right':
-              '<div style="background-position: right; $image44; $size100x100">Foo</div>',
-          'position/bottom_right':
-              '<div style="background-position: bottom right; $image44; $size100x100">Foo</div>',
-          'position/bottom':
-              '<div style="background-position: bottom; $image44; $size100x100">Foo</div>',
-          'position/bottom_left':
-              '<div style="background-position: bottom left; $image44; $size100x100">Foo</div>',
-          'position/left':
-              '<div style="background-position: left; $image44; $size100x100">Foo</div>',
-          'position/top_left':
-              '<div style="background-position: top left; $image44; $size100x100">Foo</div>',
-          'repeat/no-repeat':
-              '<div style="background-repeat: no-repeat; $image44; $size100x100">Foo</div>',
-          'repeat/repeat-x':
-              '<div style="background-repeat: repeat-x; $image44; $size100x100">Foo</div>',
-          'repeat/repeat-y':
-              '<div style="background-repeat: repeat-y; $image44; $size100x100">Foo</div>',
-          'repeat/repeat':
-              '<div style="background-repeat: repeat; $image44; $size100x100">Foo</div>',
-          'size/auto':
-              '<div style="background-size: auto; $image44; $size100x75">Foo</div>',
-          'size/contain':
-              '<div style="background-size: contain; $image44; $size100x75">Foo</div>',
-          'size/cover':
-              '<div style="background-size: cover; $image44; $size100x75">Foo</div>',
-        };
+      group(
+        'background-image',
+        () {
+          const image44 = 'background-image: url(asset:test/images/44px.png)';
+          const size100x75 = 'width: 100px; height: 75px';
+          const size100x100 = 'width: 100px; height: 100px';
+          const testCases = <String, String>{
+            'position/center':
+                '<div style="background-position: center; $image44; $size100x100">Foo</div>',
+            'position/top':
+                '<div style="background-position: top; $image44; $size100x100">Foo</div>',
+            'position/top_right':
+                '<div style="background-position: top right; $image44; $size100x100">Foo</div>',
+            'position/right':
+                '<div style="background-position: right; $image44; $size100x100">Foo</div>',
+            'position/bottom_right':
+                '<div style="background-position: bottom right; $image44; $size100x100">Foo</div>',
+            'position/bottom':
+                '<div style="background-position: bottom; $image44; $size100x100">Foo</div>',
+            'position/bottom_left':
+                '<div style="background-position: bottom left; $image44; $size100x100">Foo</div>',
+            'position/left':
+                '<div style="background-position: left; $image44; $size100x100">Foo</div>',
+            'position/top_left':
+                '<div style="background-position: top left; $image44; $size100x100">Foo</div>',
+            'repeat/no-repeat':
+                '<div style="background-repeat: no-repeat; $image44; $size100x100">Foo</div>',
+            'repeat/repeat-x':
+                '<div style="background-repeat: repeat-x; $image44; $size100x100">Foo</div>',
+            'repeat/repeat-y':
+                '<div style="background-repeat: repeat-y; $image44; $size100x100">Foo</div>',
+            'repeat/repeat':
+                '<div style="background-repeat: repeat; $image44; $size100x100">Foo</div>',
+            'size/auto':
+                '<div style="background-size: auto; $image44; $size100x75">Foo</div>',
+            'size/contain':
+                '<div style="background-size: contain; $image44; $size100x75">Foo</div>',
+            'size/cover':
+                '<div style="background-size: cover; $image44; $size100x75">Foo</div>',
+          };
 
-        for (final testCase in testCases.entries) {
-          testGoldens(testCase.key, (tester) async {
-            await tester.pumpWidgetBuilder(
-              _Golden(testCase.value),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(116, 116),
+          for (final testCase in testCases.entries) {
+            testGoldens(
+              testCase.key,
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  _Golden(testCase.value),
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(116, 116),
+                );
+
+                await screenMatchesGolden(tester, testCase.key);
+              },
+              skip: goldenSkip != null,
             );
-
-            await screenMatchesGolden(tester, testCase.key);
-          }, skip: goldenSkip != null);
-        }
-      }, skip: goldenSkip);
+          }
+        },
+        skip: goldenSkip,
+      );
     },
     config: GoldenToolkitConfiguration(
       fileNameFactory: (name) => '$kGoldenFilePrefix/background/$name.png',
@@ -448,20 +460,20 @@ class _Golden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: HtmlWidget(
-        html,
-        customStylesBuilder: (element) {
-          if (element.localName == 'div') {
-            return const {kCssBackgroundColor: 'lightgray'};
-          }
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            html,
+            customStylesBuilder: (element) {
+              if (element.localName == 'div') {
+                return const {kCssBackgroundColor: 'lightgray'};
+              }
 
-          return null;
-        },
-      ),
-    ),
-  );
+              return null;
+            },
+          ),
+        ),
+      );
 }
 
 @immutable

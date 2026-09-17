@@ -16,10 +16,11 @@ import 'web_view.dart';
 
 final _logger = Logger('fwfh_webview');
 
-Future<void>? _ignoreError(Future<void>? future) =>
-    future?.onError((error, stackTrace) {
-      _logger.warning('Ignored controller error', error, stackTrace);
-    });
+Future<void>? _ignoreError(Future<void>? future) => future?.onError(
+      (error, stackTrace) {
+        _logger.warning('Ignored controller error', error, stackTrace);
+      },
+    );
 
 class WebViewState extends State<WebView> {
   late final lib.WebViewController _controller;
@@ -106,7 +107,10 @@ class WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(aspectRatio: _aspectRatio, child: _buildWebView());
+    return AspectRatio(
+      aspectRatio: _aspectRatio,
+      child: _buildWebView(),
+    );
   }
 
   @override
@@ -145,10 +149,10 @@ class WebViewState extends State<WebView> {
   }
 
   Widget _buildWebView() => lib.WebViewWidget(
-    controller: _controller,
-    gestureRecognizers: widget.gestureRecognizers,
-    key: Key(widget.url),
-  );
+        controller: _controller,
+        gestureRecognizers: widget.gestureRecognizers,
+        key: Key(widget.url),
+      );
 
   lib.NavigationDecision _interceptNavigationRequest(
     lib.NavigationRequest req,
@@ -173,10 +177,8 @@ class WebViewState extends State<WebView> {
   }
 
   void _onAndroidShowCustomWidgetDefault(Widget child) {
-    final mode = resolveMaterialThemeMode(
-      context,
-      widget.materialThemeMode,
-    ).mode;
+    final mode =
+        resolveMaterialThemeMode(context, widget.materialThemeMode).mode;
     Navigator.of(context).push(
       mode == MaterialThemeMode.materialUi
           ? material_ui.MaterialPageRoute<void>(
@@ -215,7 +217,7 @@ class _ResizeObserver {
   final WebViewState wvs;
 
   _ResizeObserver(this.wvs)
-    : channelName = 'FwfhWebViewResizeObserver${wvs.hashCode}';
+      : channelName = 'FwfhWebViewResizeObserver${wvs.hashCode}';
 
   Future<dynamic> close() => stream.close();
 

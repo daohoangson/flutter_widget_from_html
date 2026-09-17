@@ -7,7 +7,11 @@ class HtmlDetails extends StatefulWidget {
   final Widget child;
   final bool open;
 
-  const HtmlDetails({required this.child, this.open = false, super.key});
+  const HtmlDetails({
+    required this.child,
+    this.open = false,
+    super.key,
+  });
 
   @override
   State<HtmlDetails> createState() => _HtmlDetailsState();
@@ -82,7 +86,11 @@ class HtmlSummary extends StatelessWidget {
   final Widget? child;
   final TextStyle style;
 
-  const HtmlSummary({super.key, this.child, required this.style});
+  const HtmlSummary({
+    super.key,
+    this.child,
+    required this.style,
+  });
 
   @override
   Widget build(BuildContext context) {

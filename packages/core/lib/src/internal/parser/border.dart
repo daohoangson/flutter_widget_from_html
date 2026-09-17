@@ -97,9 +97,8 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
   CssColor? color = CssColor.current();
   var width = const CssLength(1);
   for (final expression in style.values) {
-    final value = expression is css.LiteralTerm
-        ? expression.valueAsString
-        : null;
+    final value =
+        expression is css.LiteralTerm ? expression.valueAsString : null;
     if (value == kCssBorderNone) {
       borderStyle = null;
       color = null;
@@ -261,8 +260,8 @@ CssBorder _tryParseBorderRadius(CssBorder border, css.Declaration style) {
 
 CssRadius _newCssRadius(CssLength x, CssLength y) =>
     x == CssLength.zero && y == CssLength.zero
-    ? CssRadius.zero
-    : CssRadius(x, y);
+        ? CssRadius.zero
+        : CssRadius(x, y);
 
 CssRadius _tryParseRadius(css.Declaration style) {
   final expressions = style.values;

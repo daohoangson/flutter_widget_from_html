@@ -42,21 +42,24 @@ class StyleSizing {
   }
 
   factory StyleSizing() => const StyleSizing._(
-    blockOp: BuildOp.v2(alwaysRenderBlock: true, debugLabel: 'display: block'),
-    childOp: BuildOp.v2(
-      alwaysRenderBlock: false,
-      debugLabel: 'sizing (min-width=0)',
-      onRenderBlock: _childZero,
-      priority: BoxModel.sizingMinWidthZero,
-    ),
-    sizingOp: BuildOp.v2(
-      alwaysRenderBlock: false,
-      debugLabel: 'sizing',
-      onRenderBlock: _sizingBlock,
-      onRenderInline: _sizingInline,
-      priority: BoxModel.sizing,
-    ),
-  );
+        blockOp: BuildOp.v2(
+          alwaysRenderBlock: true,
+          debugLabel: 'display: block',
+        ),
+        childOp: BuildOp.v2(
+          alwaysRenderBlock: false,
+          debugLabel: 'sizing (min-width=0)',
+          onRenderBlock: _childZero,
+          priority: BoxModel.sizingMinWidthZero,
+        ),
+        sizingOp: BuildOp.v2(
+          alwaysRenderBlock: false,
+          debugLabel: 'sizing',
+          onRenderBlock: _sizingBlock,
+          onRenderInline: _sizingInline,
+          priority: BoxModel.sizing,
+        ),
+      );
 
   const StyleSizing._({
     required this.blockOp,
@@ -87,7 +90,10 @@ class StyleSizing {
 
     return placeholder.wrapWith((context, child) {
       final dir = subTree.inheritanceResolvers.resolve(context).directionOrLtr;
-      return _MinWidthZero(textDirection: dir, child: child);
+      return _MinWidthZero(
+        textDirection: dir,
+        child: child,
+      );
     });
   }
 
@@ -130,9 +136,8 @@ class StyleSizing {
       return;
     }
 
-    placeholder.wrapWith(
-      (c, w) => _build(c, w, input, tree.inheritanceResolvers),
-    );
+    placeholder
+        .wrapWith((c, w) => _build(c, w, input, tree.inheritanceResolvers));
   }
 
   static Widget _build(
@@ -171,8 +176,7 @@ class StyleSizing {
 
 extension on BuildTree {
   _StyleSizingInput? get sizingInput {
-    final input =
-        getNonInherited<_StyleSizingInput>() ??
+    final input = getNonInherited<_StyleSizingInput>() ??
         setNonInherited<_StyleSizingInput>(_parse());
 
     if (input.maxHeight == null &&
@@ -265,13 +269,15 @@ extension on CssLength {
 }
 
 class _MinWidthZero extends ConstraintsTransformBox {
-  const _MinWidthZero({super.child, required TextDirection textDirection})
-    : super(
-        alignment: textDirection == TextDirection.ltr
-            ? Alignment.topLeft
-            : Alignment.topRight,
-        constraintsTransform: transform,
-      );
+  const _MinWidthZero({
+    super.child,
+    required TextDirection textDirection,
+  }) : super(
+          alignment: textDirection == TextDirection.ltr
+              ? Alignment.topLeft
+              : Alignment.topRight,
+          constraintsTransform: transform,
+        );
 
   static BoxConstraints transform(BoxConstraints bc) =>
       bc.copyWith(minWidth: 0);

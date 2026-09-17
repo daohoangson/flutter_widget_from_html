@@ -81,7 +81,11 @@ void main() {
       final explained = await explain(
         tester,
         null,
-        hw: HtmlWidget(html, key: hwKey, renderMode: RenderMode.listView),
+        hw: HtmlWidget(
+          html,
+          key: hwKey,
+          renderMode: RenderMode.listView,
+        ),
         useExplainer: false,
       );
       expect(explained, contains('[GlobalKey anchor-0--header]'));
@@ -96,7 +100,11 @@ void main() {
         null,
         hw: CustomScrollView(
           slivers: [
-            HtmlWidget(html, key: hwKey, renderMode: RenderMode.sliverList),
+            HtmlWidget(
+              html,
+              key: hwKey,
+              renderMode: RenderMode.sliverList,
+            ),
           ],
         ),
         useExplainer: false,
@@ -140,8 +148,7 @@ void main() {
         tester,
         _ColumnTestApp(
           baseUrl: Uri.https('domain.com', 'path'),
-          html:
-              '<div id="fragment">Foo</div>'
+          html: '<div id="fragment">Foo</div>'
               '<a href="https://domain.com/path#fragment">Tap me</a>',
         ),
       );
@@ -260,8 +267,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#div">Tap me</a>'
+            html: '<a href="#div">Tap me</a>'
                 '${htmlAsc * 3}'
                 '<div id="div">Foo</div>',
           ),
@@ -276,8 +282,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span">Tap me</a>'
+            html: '<a href="#span">Tap me</a>'
                 '${htmlAsc * 10}'
                 '<span id="span">Foo</span>',
           ),
@@ -292,8 +297,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span">Tap me</a>'
+            html: '<a href="#span">Tap me</a>'
                 '${htmlAsc * 3}'
                 '<div id="div">YOLO</div>'
                 '${htmlAsc * 3}'
@@ -310,8 +314,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span">Tap me</a>'
+            html: '<a href="#span">Tap me</a>'
                 '${htmlAsc * 3}'
                 '<span id="span">Foo</span>'
                 '${htmlAsc * 3}'
@@ -329,8 +332,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span">Tap me</a>'
+            html: '<a href="#span">Tap me</a>'
                 '${htmlAsc * 3}'
                 '<div id="div">YOLO</div>'
                 '${htmlAsc * 3}'
@@ -350,8 +352,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span1">Tap me 1</a>'
+            html: '<a href="#span1">Tap me 1</a>'
                 '${htmlAsc * 10}'
                 '<div id="div">YOLO</div>'
                 '${htmlAsc * 10}'
@@ -375,8 +376,7 @@ void main() {
         await pumpWidget(
           tester,
           _ListViewTestApp(
-            html:
-                '<a href="#span">Tap me</a>'
+            html: '<a href="#span">Tap me</a>'
                 '${htmlAsc * 10}'
                 '<p style="display: none">Foo <span id="span">bar</span>.</p>',
           ),
@@ -433,8 +433,7 @@ const htmlDesc = '''
 <p>12</p>
 <p>1</p>''';
 
-final htmlDefault =
-    '''
+final htmlDefault = '''
 <a href="#target">Scroll down</a>
 ${htmlAsc * 3}
 <p><a name="target"></a>--&gt; TARGET &lt--</p>
@@ -457,24 +456,28 @@ class _ColumnTestApp extends StatelessWidget {
   final String? html;
   final Key? keyBottom;
 
-  const _ColumnTestApp({this.baseUrl, this.html, this.keyBottom});
+  const _ColumnTestApp({
+    this.baseUrl,
+    this.html,
+    this.keyBottom,
+  });
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          HtmlWidget(
-            html ?? htmlDefault,
-            baseUrl: baseUrl,
-            factoryBuilder: () => _WidgetFactory(),
-            key: globalKey,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              HtmlWidget(
+                html ?? htmlDefault,
+                baseUrl: baseUrl,
+                factoryBuilder: () => _WidgetFactory(),
+                key: globalKey,
+              ),
+              SizedBox.shrink(key: keyBottom),
+            ],
           ),
-          SizedBox.shrink(key: keyBottom),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
 
 class _ListViewTestApp extends StatelessWidget {
@@ -484,13 +487,13 @@ class _ListViewTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: HtmlWidget(
-      html ?? htmlDefault,
-      factoryBuilder: () => _WidgetFactory(),
-      key: globalKey,
-      renderMode: RenderMode.listView,
-    ),
-  );
+        body: HtmlWidget(
+          html ?? htmlDefault,
+          factoryBuilder: () => _WidgetFactory(),
+          key: globalKey,
+          renderMode: RenderMode.listView,
+        ),
+      );
 }
 
 class _SliverListTestApp extends StatelessWidget {
@@ -500,19 +503,19 @@ class _SliverListTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: CustomScrollView(
-      scrollCacheExtent: const ScrollCacheExtent.pixels(0),
-      slivers: [
-        HtmlWidget(
-          htmlDefault,
-          factoryBuilder: () => _WidgetFactory(),
-          key: globalKey,
-          renderMode: RenderMode.sliverList,
+        body: CustomScrollView(
+          scrollCacheExtent: const ScrollCacheExtent.pixels(0),
+          slivers: [
+            HtmlWidget(
+              htmlDefault,
+              factoryBuilder: () => _WidgetFactory(),
+              key: globalKey,
+              renderMode: RenderMode.sliverList,
+            ),
+            SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
+          ],
         ),
-        SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
-      ],
-    ),
-  );
+      );
 }
 
 class _WidgetFactory extends WidgetFactory {
@@ -536,10 +539,11 @@ class _NoBuildBodyAnchorForItemListViewRenderMode extends RenderMode {
     WidgetFactory wf,
     BuildContext context,
     List<Widget> children,
-  ) => ListView.builder(
-    addAutomaticKeepAlives: false,
-    addSemanticIndexes: false,
-    itemBuilder: (c, i) => children[i],
-    itemCount: children.length,
-  );
+  ) =>
+      ListView.builder(
+        addAutomaticKeepAlives: false,
+        addSemanticIndexes: false,
+        itemBuilder: (c, i) => children[i],
+        itemCount: children.length,
+      );
 }

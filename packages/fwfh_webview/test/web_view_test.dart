@@ -146,10 +146,8 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
-        url: url2,
-        isMainFrame: true,
-      );
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([url2]));
       expect(result2, equals(NavigationDecision.prevent));
@@ -176,10 +174,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result = await FakeWebViewController.instance?.onNavigationRequest(
-        url: url,
-        isMainFrame: true,
-      );
+      final result = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([]));
       expect(result, equals(NavigationDecision.navigate));
@@ -207,10 +203,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
-        url: url2,
-        isMainFrame: true,
-      );
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([]));
       expect(result2, equals(NavigationDecision.navigate));
@@ -238,10 +232,8 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
-        url: url2,
-        isMainFrame: false,
-      );
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: false);
 
       expect(navigationRequestUrls, equals([]));
       expect(result2, equals(NavigationDecision.navigate));
@@ -289,8 +281,7 @@ void main() {
         runApp(WebView(url, aspectRatio: aspectRatio));
         expect(
           FakeWebViewController
-              .instance
-              ?.androidMediaPlaybackRequiresUserGesture,
+              .instance?.androidMediaPlaybackRequiresUserGesture,
           isTrue,
         );
         debugDefaultTargetPlatformOverride = null;
@@ -307,8 +298,7 @@ void main() {
         );
         expect(
           FakeWebViewController
-              .instance
-              ?.androidMediaPlaybackRequiresUserGesture,
+              .instance?.androidMediaPlaybackRequiresUserGesture,
           isFalse,
         );
         debugDefaultTargetPlatformOverride = null;
@@ -319,8 +309,7 @@ void main() {
         runApp(WebView(url, aspectRatio: aspectRatio));
         expect(
           FakeWebViewController
-              .instance
-              ?.androidMediaPlaybackRequiresUserGesture,
+              .instance?.androidMediaPlaybackRequiresUserGesture,
           isTrue,
         );
         debugDefaultTargetPlatformOverride = null;
@@ -377,7 +366,12 @@ void main() {
 
     runApp(
       MaterialApp(
-        home: Scaffold(body: WebView(url, aspectRatio: aspectRatio)),
+        home: Scaffold(
+          body: WebView(
+            url,
+            aspectRatio: aspectRatio,
+          ),
+        ),
       ),
     );
 
@@ -389,7 +383,11 @@ void main() {
 
     // video goes fullscreen
     FakeWebViewController.instance?.androidOnShowCustomWidget?.call(
-      const Scaffold(body: Center(child: Text('Fullscreen'))),
+      const Scaffold(
+        body: Center(
+          child: Text('Fullscreen'),
+        ),
+      ),
       () {},
     );
     await tester.pumpAndSettle();

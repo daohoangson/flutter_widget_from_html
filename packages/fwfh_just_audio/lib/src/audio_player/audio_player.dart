@@ -58,9 +58,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
     super.initState();
 
     _player = lib.AudioPlayer();
-    _processingStateStreamSub = _player.processingStateStream.listen((
-      processingState,
-    ) {
+    _processingStateStreamSub =
+        _player.processingStateStream.listen((processingState) {
       if (!mounted) {
         return;
       }
@@ -93,59 +92,57 @@ class _AudioPlayerState extends State<AudioPlayer> {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-    builder: (_, bc) {
-      final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
-      final materialTheme = resolveMaterialThemeMode(
-        context,
-        widget.materialThemeMode,
-      );
-      final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
+        builder: (_, bc) {
+          final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
+          final materialTheme =
+              resolveMaterialThemeMode(context, widget.materialThemeMode);
+          final fontSize = DefaultTextStyle.of(context).style.fontSize ?? 14.0;
 
-      final tsf = MediaQuery.textScalerOf(context);
-      final iconSize = tsf.scale(fontSize);
+          final tsf = MediaQuery.textScalerOf(context);
+          final iconSize = tsf.scale(fontSize);
 
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          color: materialTheme.brightness == Brightness.light
-              ? const Color.fromRGBO(0, 0, 0, .1)
-              : const Color.fromRGBO(255, 255, 255, .1),
-          borderRadius: BorderRadius.circular(iconSize * 2),
-        ),
-        child: Row(
-          children: [
-            _PlayButton(
-              pause: _player.pause,
-              play: _player.play,
-              size: iconSize,
-              stream: _player.playingStream,
-              materialThemeMode: materialTheme.mode,
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: materialTheme.brightness == Brightness.light
+                  ? const Color.fromRGBO(0, 0, 0, .1)
+                  : const Color.fromRGBO(255, 255, 255, .1),
+              borderRadius: BorderRadius.circular(iconSize * 2),
             ),
-            _PositionText(
-              durationStream: _player.durationStream,
-              isNarrow: isNarrow,
-              positionStream: _player.positionStream,
-              size: iconSize,
+            child: Row(
+              children: [
+                _PlayButton(
+                  pause: _player.pause,
+                  play: _player.play,
+                  size: iconSize,
+                  stream: _player.playingStream,
+                  materialThemeMode: materialTheme.mode,
+                ),
+                _PositionText(
+                  durationStream: _player.durationStream,
+                  isNarrow: isNarrow,
+                  positionStream: _player.positionStream,
+                  size: iconSize,
+                ),
+                Expanded(
+                  child: _PositionSlider(
+                    durationStream: _player.durationStream,
+                    positionStream: _player.positionStream,
+                    seek: _player.seek,
+                    size: iconSize,
+                    materialThemeMode: materialTheme.mode,
+                  ),
+                ),
+                _MuteButton(
+                  setVolume: _player.setVolume,
+                  size: iconSize,
+                  stream: _player.volumeStream,
+                  materialThemeMode: materialTheme.mode,
+                ),
+              ],
             ),
-            Expanded(
-              child: _PositionSlider(
-                durationStream: _player.durationStream,
-                positionStream: _player.positionStream,
-                seek: _player.seek,
-                size: iconSize,
-                materialThemeMode: materialTheme.mode,
-              ),
-            ),
-            _MuteButton(
-              setVolume: _player.setVolume,
-              size: iconSize,
-              stream: _player.volumeStream,
-              materialThemeMode: materialTheme.mode,
-            ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 class _PlayButton extends StatelessWidget {
@@ -165,29 +162,31 @@ class _PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<bool>(
-    builder: (_, snapshot) {
-      final isPlaying = snapshot.data ?? false;
-      if (materialThemeMode == MaterialThemeMode.materialUi) {
-        return material_ui.IconButton(
-          onPressed: isPlaying ? pause : play,
-          icon: material_ui.Icon(
-            isPlaying ? material_ui.Icons.pause : material_ui.Icons.play_arrow,
-          ),
-          iconSize: size * 2,
-        );
-      }
-      return flutter_material.IconButton(
-        onPressed: isPlaying ? pause : play,
-        icon: flutter_material.Icon(
-          isPlaying
-              ? flutter_material.Icons.pause
-              : flutter_material.Icons.play_arrow,
-        ),
-        iconSize: size * 2,
+        builder: (_, snapshot) {
+          final isPlaying = snapshot.data ?? false;
+          if (materialThemeMode == MaterialThemeMode.materialUi) {
+            return material_ui.IconButton(
+              onPressed: isPlaying ? pause : play,
+              icon: material_ui.Icon(
+                isPlaying
+                    ? material_ui.Icons.pause
+                    : material_ui.Icons.play_arrow,
+              ),
+              iconSize: size * 2,
+            );
+          }
+          return flutter_material.IconButton(
+            onPressed: isPlaying ? pause : play,
+            icon: flutter_material.Icon(
+              isPlaying
+                  ? flutter_material.Icons.pause
+                  : flutter_material.Icons.play_arrow,
+            ),
+            iconSize: size * 2,
+          );
+        },
+        stream: stream,
       );
-    },
-    stream: stream,
-  );
 }
 
 class _PositionText extends StatelessWidget {
@@ -205,25 +204,25 @@ class _PositionText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Duration?>(
-    builder: (_, duration) => StreamBuilder<Duration>(
-      builder: (_, position) {
-        final max = duration.data?.inSeconds ?? -1;
-        final value = position.data?.inSeconds ?? -1;
-        final remaining = max > value ? max - value : 0;
-        final text = isNarrow
-            ? '-${_secondsToString(remaining)}'
-            : '${_secondsToString(value)} / '
-                  '${_secondsToString(max)}';
-        return Text(
-          text,
-          style: TextStyle(fontSize: size),
-          textScaler: TextScaler.noScaling,
-        );
-      },
-      stream: positionStream,
-    ),
-    stream: durationStream,
-  );
+        builder: (_, duration) => StreamBuilder<Duration>(
+          builder: (_, position) {
+            final max = duration.data?.inSeconds ?? -1;
+            final value = position.data?.inSeconds ?? -1;
+            final remaining = max > value ? max - value : 0;
+            final text = isNarrow
+                ? '-${_secondsToString(remaining)}'
+                : '${_secondsToString(value)} / '
+                    '${_secondsToString(max)}';
+            return Text(
+              text,
+              style: TextStyle(fontSize: size),
+              textScaler: TextScaler.noScaling,
+            );
+          },
+          stream: positionStream,
+        ),
+        stream: durationStream,
+      );
 
   String _secondsToString(int value) {
     if (value < 0) {
@@ -253,46 +252,46 @@ class _PositionSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<Duration?>(
-    builder: (_, duration) => StreamBuilder<Duration>(
-      builder: (_, position) {
-        final max = duration.data?.inMilliseconds.toDouble();
-        if (max == null || max == 0) {
-          return widget0;
-        }
+        builder: (_, duration) => StreamBuilder<Duration>(
+          builder: (_, position) {
+            final max = duration.data?.inMilliseconds.toDouble();
+            if (max == null || max == 0) {
+              return widget0;
+            }
 
-        final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
+            final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
 
-        if (materialThemeMode == MaterialThemeMode.materialUi) {
-          return material_ui.SliderTheme(
-            data: material_ui.SliderTheme.of(context).copyWith(
-              thumbShape: material_ui.RoundSliderThumbShape(
-                enabledThumbRadius: size / 2,
+            if (materialThemeMode == MaterialThemeMode.materialUi) {
+              return material_ui.SliderTheme(
+                data: material_ui.SliderTheme.of(context).copyWith(
+                  thumbShape: material_ui.RoundSliderThumbShape(
+                    enabledThumbRadius: size / 2,
+                  ),
+                ),
+                child: material_ui.Slider.adaptive(
+                  max: max,
+                  onChanged: onChanged,
+                  value: value,
+                ),
+              );
+            }
+            return flutter_material.SliderTheme(
+              data: flutter_material.SliderTheme.of(context).copyWith(
+                thumbShape: flutter_material.RoundSliderThumbShape(
+                  enabledThumbRadius: size / 2,
+                ),
               ),
-            ),
-            child: material_ui.Slider.adaptive(
-              max: max,
-              onChanged: onChanged,
-              value: value,
-            ),
-          );
-        }
-        return flutter_material.SliderTheme(
-          data: flutter_material.SliderTheme.of(context).copyWith(
-            thumbShape: flutter_material.RoundSliderThumbShape(
-              enabledThumbRadius: size / 2,
-            ),
-          ),
-          child: flutter_material.Slider.adaptive(
-            max: max,
-            onChanged: onChanged,
-            value: value,
-          ),
-        );
-      },
-      stream: positionStream,
-    ),
-    stream: durationStream,
-  );
+              child: flutter_material.Slider.adaptive(
+                max: max,
+                onChanged: onChanged,
+                value: value,
+              ),
+            );
+          },
+          stream: positionStream,
+        ),
+        stream: durationStream,
+      );
 
   void onChanged(double ms) => seek(Duration(milliseconds: ms.toInt()));
 }
@@ -312,31 +311,31 @@ class _MuteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<double>(
-    builder: (_, snapshot) {
-      final isMuted = (snapshot.data ?? 1.0) == 0;
-      if (materialThemeMode == MaterialThemeMode.materialUi) {
-        return material_ui.IconButton(
-          onPressed: isMuted ? unmute : mute,
-          icon: material_ui.Icon(
-            isMuted
-                ? material_ui.Icons.volume_off_outlined
-                : material_ui.Icons.volume_up,
-          ),
-          iconSize: size * 2,
-        );
-      }
-      return flutter_material.IconButton(
-        onPressed: isMuted ? unmute : mute,
-        icon: flutter_material.Icon(
-          isMuted
-              ? flutter_material.Icons.volume_off_outlined
-              : flutter_material.Icons.volume_up,
-        ),
-        iconSize: size * 2,
+        builder: (_, snapshot) {
+          final isMuted = (snapshot.data ?? 1.0) == 0;
+          if (materialThemeMode == MaterialThemeMode.materialUi) {
+            return material_ui.IconButton(
+              onPressed: isMuted ? unmute : mute,
+              icon: material_ui.Icon(
+                isMuted
+                    ? material_ui.Icons.volume_off_outlined
+                    : material_ui.Icons.volume_up,
+              ),
+              iconSize: size * 2,
+            );
+          }
+          return flutter_material.IconButton(
+            onPressed: isMuted ? unmute : mute,
+            icon: flutter_material.Icon(
+              isMuted
+                  ? flutter_material.Icons.volume_off_outlined
+                  : flutter_material.Icons.volume_up,
+            ),
+            iconSize: size * 2,
+          );
+        },
+        stream: stream,
       );
-    },
-    stream: stream,
-  );
 
   void mute() => setVolume(0);
 

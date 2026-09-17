@@ -8,50 +8,51 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
-    alwaysRenderBlock: false,
-    debugLabel: kCssBorder,
-    onParsed: (tree) {
-      final parent = tree.parent;
-      if (tree.isInline != true) {
-        return tree;
-      }
+        alwaysRenderBlock: false,
+        debugLabel: kCssBorder,
+        onParsed: (tree) {
+          final parent = tree.parent;
+          if (tree.isInline != true) {
+            return tree;
+          }
 
-      final border = tryParseBorder(tree);
-      if (border.isNoOp) {
-        return tree;
-      }
+          final border = tryParseBorder(tree);
+          if (border.isNoOp) {
+            return tree;
+          }
 
-      // Don't skip onRenderBlock — let it handle border decoration
-      // during tree.build() so it can be merged with background color
-      // by buildDecoration's Container merge logic.
-      return parent.sub()..append(
-        WidgetBit.inline(
-          tree,
-          WidgetPlaceholder(
+          // Don't skip onRenderBlock — let it handle border decoration
+          // during tree.build() so it can be merged with background color
+          // by buildDecoration's Container merge logic.
+          return parent.sub()
+            ..append(
+              WidgetBit.inline(
+                tree,
+                WidgetPlaceholder(
+                  debugLabel: '${tree.element.localName}--$kCssBorder',
+                  child: tree.build(),
+                ),
+              ),
+            );
+        },
+        onRenderBlock: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return placeholder;
+          }
+
+          final border = tryParseBorder(tree);
+          if (border.isNoOp) {
+            return placeholder;
+          }
+
+          skip(tree);
+          return WidgetPlaceholder(
+            builder: (ctx, _) => _buildBorder(tree, ctx, placeholder, border),
             debugLabel: '${tree.element.localName}--$kCssBorder',
-            child: tree.build(),
-          ),
-        ),
+          );
+        },
+        priority: BoxModel.border,
       );
-    },
-    onRenderBlock: (tree, placeholder) {
-      if (_skipBuilding[tree] == true) {
-        return placeholder;
-      }
-
-      final border = tryParseBorder(tree);
-      if (border.isNoOp) {
-        return placeholder;
-      }
-
-      skip(tree);
-      return WidgetPlaceholder(
-        builder: (ctx, _) => _buildBorder(tree, ctx, placeholder, border),
-        debugLabel: '${tree.element.localName}--$kCssBorder',
-      );
-    },
-    priority: BoxModel.border,
-  );
 
   Widget? _buildBorder(
     BuildTree tree,

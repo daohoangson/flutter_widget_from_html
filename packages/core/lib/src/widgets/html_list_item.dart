@@ -18,11 +18,21 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
     Widget? marker,
     this.textAlign,
     required this.textDirection,
-  }) : super(children: child != null ? [child, ?marker] : const []);
+  }) : super(
+          children: child != null
+              ? [
+                  child,
+                  if (marker != null) marker,
+                ]
+              : const [],
+        );
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _ListItemRenderObject(textAlign: textAlign, textDirection: textDirection);
+      _ListItemRenderObject(
+        textAlign: textAlign,
+        textDirection: textDirection,
+      );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -45,7 +55,11 @@ class _ListItemRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _ListItemData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
-  _ListItemRenderObject({this._textAlign, required this._textDirection});
+  _ListItemRenderObject({
+    TextAlign? textAlign,
+    required TextDirection textDirection,
+  })  : _textAlign = textAlign,
+        _textDirection = textDirection;
 
   TextAlign? get textAlign => _textAlign;
   TextAlign? _textAlign;
@@ -155,10 +169,10 @@ class _ListItemRenderObject extends RenderBox
         const baseline = TextBaseline.alphabetic;
         final markerDistance =
             marker.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerSize.height;
+                markerSize.height;
         final childDistance =
             child.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerDistance;
+                markerDistance;
 
         final markerData = marker.parentData! as _ListItemData;
         markerData.offset = Offset(

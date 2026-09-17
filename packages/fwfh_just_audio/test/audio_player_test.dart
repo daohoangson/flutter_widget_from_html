@@ -26,7 +26,10 @@ Future<void> main() async {
       initializeMockPlatform();
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(audioSessionMc, (_) => null);
+          .setMockMethodCallHandler(
+        audioSessionMc,
+        (_) => null,
+      );
     });
 
     tearDown(() {
@@ -35,7 +38,11 @@ Future<void> main() async {
 
     testWidgets('plays then pauses on completion', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: fwfh.AudioPlayer(src))),
+        const MaterialApp(
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src),
+          ),
+        ),
       );
 
       await tester.tapWithAsyncDelay(find.byIcon(Icons.play_arrow));
@@ -76,9 +83,8 @@ Future<void> main() async {
       expect(commands.length, equals(2));
     });
 
-    testWidgets('uses controls from the selected Material library', (
-      tester,
-    ) async {
+    testWidgets('uses controls from the selected Material library',
+        (tester) async {
       await tester.pumpWidget(
         const material_ui.MaterialApp(
           home: material_ui.Scaffold(
@@ -113,7 +119,9 @@ Future<void> main() async {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: fwfh.AudioPlayer(src, preload: true)),
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
         ),
       );
       expect(find.text('-0:00'), findsOneWidget);
@@ -128,7 +136,9 @@ Future<void> main() async {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: fwfh.AudioPlayer(src, preload: true)),
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
         ),
       );
       expect(find.text('0:00 / 0:00'), findsOneWidget);
@@ -143,7 +153,9 @@ Future<void> main() async {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: fwfh.AudioPlayer(src, preload: true)),
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
         ),
       );
 
@@ -172,7 +184,9 @@ Future<void> main() async {
       testWidgets('shows unmuted and mutes', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(body: fwfh.AudioPlayer(src, preload: true)),
+            home: Scaffold(
+              body: fwfh.AudioPlayer(src, preload: true),
+            ),
           ),
         );
 
@@ -213,27 +227,31 @@ Future<void> main() async {
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
-              ? null
-              : 'Linux only'
+            ? null
+            : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
     GoldenToolkit.runWithConfiguration(
       () {
-        testGoldens('screenshot testing', (tester) async {
-          Widget build(ThemeData theme) {
-            final wrapper = materialAppWrapper(theme: theme);
-            return AspectRatio(
-              aspectRatio: 4,
-              child: wrapper(const Center(child: fwfh.AudioPlayer(src))),
-            );
-          }
+        testGoldens(
+          'screenshot testing',
+          (tester) async {
+            Widget build(ThemeData theme) {
+              final wrapper = materialAppWrapper(theme: theme);
+              return AspectRatio(
+                aspectRatio: 4,
+                child: wrapper(const Center(child: fwfh.AudioPlayer(src))),
+              );
+            }
 
-          final builder = GoldenBuilder.column()
-            ..addScenario('Light theme', build(ThemeData.light()))
-            ..addScenario('Dark theme', build(ThemeData.dark()));
-          await tester.pumpWidgetBuilder(builder.build());
-          await screenMatchesGolden(tester, 'scenarios');
-        }, skip: goldenSkip != null);
+            final builder = GoldenBuilder.column()
+              ..addScenario('Light theme', build(ThemeData.light()))
+              ..addScenario('Dark theme', build(ThemeData.dark()));
+            await tester.pumpWidgetBuilder(builder.build());
+            await screenMatchesGolden(tester, 'scenarios');
+          },
+          skip: goldenSkip != null,
+        );
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) =>

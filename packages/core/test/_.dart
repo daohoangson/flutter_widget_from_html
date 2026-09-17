@@ -38,7 +38,11 @@ Future<String> explain(
 }) async {
   assert((html == null) != (hw == null));
   key ??= hwKey;
-  hw ??= HtmlWidget(html!, key: key, textStyle: textStyle);
+  hw ??= HtmlWidget(
+    html!,
+    key: key,
+    textStyle: textStyle,
+  );
 
   final ThemeData theme = ThemeData(useMaterial3: false);
 
@@ -55,11 +59,11 @@ Future<String> explain(
           child: Builder(
             builder: (context) => DefaultTextStyle(
               style: DefaultTextStyle.of(context).style.copyWith(
-                color: kColor,
-                fontSize: 10.0,
-                fontWeight: FontWeight.normal,
-                height: height,
-              ),
+                    color: kColor,
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.normal,
+                    height: height,
+                  ),
               child: Directionality(
                 textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
                 child: hw!,
@@ -121,10 +125,8 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp(r'Semantics\(.+\)\n'), 'Semantics(...)\n');
 
     // trim boring properties
-    str = str.replaceAll(
-      RegExp('(, )?(this.)?excludeFromSemantics: false'),
-      '',
-    );
+    str =
+        str.replaceAll(RegExp('(, )?(this.)?excludeFromSemantics: false'), '');
     str = str.replaceAll(RegExp('(, )?clipBehavior: none'), '');
     str = str.replaceAll(RegExp('(, )?crossAxisAlignment: start'), '');
     str = str.replaceAll(RegExp('(, )?direction: vertical'), '');
@@ -154,7 +156,10 @@ Future<String> explainWithoutPumping({
     return 'null';
   }
 
-  var str = Explainer(key.currentContext!, explainer: explainer).explain(built);
+  var str = Explainer(
+    key.currentContext!,
+    explainer: explainer,
+  ).explain(built);
 
   str = str.replaceAll(RegExp('String#[^,]+,'), 'String,');
   str = str.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
@@ -222,7 +227,7 @@ class Explainer {
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
-    : _defaultStyle = DefaultTextStyle.of(context).style;
+      : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
 
@@ -246,8 +251,8 @@ class Explainer {
 
   String _borderSide(BorderSide s) => s != BorderSide.none
       ? '${s.width}'
-            '@${s.style.name}'
-            '${_color(s.color)}'
+          '@${s.style.name}'
+          '${_color(s.color)}'
       : 'none';
 
   String _boxBorder(BoxBorder? b) {
@@ -342,7 +347,7 @@ class Explainer {
 
   String _edgeInsets(EdgeInsetsGeometry e) => e is EdgeInsets
       ? '(${e.top.truncate()},${e.right.truncate()},'
-            '${e.bottom.truncate()},${e.left.truncate()})'
+          '${e.bottom.truncate()},${e.left.truncate()})'
       : e.toString();
 
   String _htmlListMarker(HtmlListMarker marker) {
@@ -382,10 +387,9 @@ class Explainer {
     if (inlineSpan is WidgetSpan) {
       var s = _widget(inlineSpan.child);
       if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
-        s += inlineSpan.alignment.toString().replaceAll(
-          'PlaceholderAlignment.',
-          '@',
-        );
+        s += inlineSpan.alignment
+            .toString()
+            .replaceAll('PlaceholderAlignment.', '@');
       }
       return s;
     }
@@ -393,8 +397,7 @@ class Explainer {
     final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
     final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
     final text = textSpan?.text ?? '';
-    final children =
-        textSpan?.children
+    final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
             .join() ??
         '';
@@ -412,9 +415,8 @@ class Explainer {
       }
 
       if (recognizerSb.isEmpty) {
-        recognizerSb.write(
-          '+${textSpan.recognizer}'.replaceAll(RegExp(r'#\w+'), ''),
-        );
+        recognizerSb
+            .write('+${textSpan.recognizer}'.replaceAll(RegExp(r'#\w+'), ''));
       }
     }
 
@@ -422,9 +424,8 @@ class Explainer {
   }
 
   String _key(Key key) {
-    final matches = RegExp(
-      r'^\[GlobalKey#[^ ]+ (.+)\]$',
-    ).firstMatch(key.toString());
+    final matches =
+        RegExp(r'^\[GlobalKey#[^ ]+ (.+)\]$').firstMatch(key.toString());
     if (matches == null) {
       return '';
     }
@@ -436,8 +437,7 @@ class Explainer {
 
   String _sizedBox(SizedBox box) {
     var clazz = box.runtimeType.toString();
-    var size =
-        '${box.width?.toStringAsFixed(1) ?? 0.0}x'
+    var size = '${box.width?.toStringAsFixed(1) ?? 0.0}x'
         '${box.height?.toStringAsFixed(1) ?? 0.0}';
     switch (size) {
       case '0.0x0.0':
@@ -458,18 +458,18 @@ class Explainer {
 
   String _textAlign(TextAlign? textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
-      ? 'align=${textAlign.name}'
-      : '';
+          ? 'align=${textAlign.name}'
+          : '';
 
   String _textDirection(TextDirection? textDirection) =>
       (textDirection != null && textDirection != TextDirection.ltr)
-      ? 'dir=${textDirection.name}'
-      : '';
+          ? 'dir=${textDirection.name}'
+          : '';
 
   String _textOverflow(TextOverflow? textOverflow) =>
       (textOverflow != null && textOverflow != TextOverflow.clip)
-      ? 'overflow=${textOverflow.name}'
-      : '';
+          ? 'overflow=${textOverflow.name}'
+          : '';
 
   String _textStyle(TextStyle? style, TextStyle parent) {
     var s = '';
@@ -526,16 +526,15 @@ class Explainer {
       return '';
     }
 
-    final decorationStyle =
-        (style.decorationStyle == null ||
+    final decorationStyle = (style.decorationStyle == null ||
             style.decorationStyle == TextDecorationStyle.solid)
         ? ''
         : '${style.decorationStyle}'.replaceFirst(RegExp(r'^.+\.'), '/');
 
     final decorationColor =
         (style.decorationColor == null || style.decorationColor == style.color)
-        ? ''
-        : '/${_color(style.decorationColor!)}';
+            ? ''
+            : '/${_color(style.decorationColor!)}';
 
     final decorationThickness = style.decorationThickness == null
         ? ''
@@ -581,8 +580,7 @@ class Explainer {
     String s = '';
 
     shadows?.forEach((element) {
-      s +=
-          'Shadow=[color=${_color(element.color)},'
+      s += 'Shadow=[color=${_color(element.color)},'
           'offset=${element.offset},'
           'blurRadius=${element.blurRadius}]';
     });
@@ -608,16 +606,12 @@ class Explainer {
         widget.runtimeType.toString() == 'HtmlLayoutBuilder') {
       return _widget(
         (widget as dynamic).builder(
-              context,
-              BoxConstraints.loose(
-                TestWidgetsFlutterBinding
-                    .instance
-                    .platformDispatcher
-                    .implicitView!
-                    .physicalSize,
-              ),
-            )
-            as Widget,
+          context,
+          BoxConstraints.loose(
+            TestWidgetsFlutterBinding
+                .instance.platformDispatcher.implicitView!.physicalSize,
+          ),
+        ) as Widget,
       );
     }
 
@@ -689,8 +683,8 @@ class Explainer {
     final maxLines = widget is RichText
         ? widget.maxLines
         : widget is Text
-        ? widget.maxLines
-        : null;
+            ? widget.maxLines
+            : null;
     if (maxLines != null) {
       attr.add('maxLines=$maxLines');
     }
@@ -698,8 +692,8 @@ class Explainer {
     final softWrap = widget is RichText
         ? widget.softWrap
         : widget is Text
-        ? widget.softWrap
-        : null;
+            ? widget.softWrap
+            : null;
     if (softWrap == false) {
       attr.add('softWrap=$softWrap');
     }
@@ -717,10 +711,10 @@ class Explainer {
         widget is Column
             ? widget.textDirection
             : widget is Flex
-            ? widget.textDirection
-            : widget is RichText
-            ? widget.textDirection
-            : (widget is Text ? widget.textDirection : null),
+                ? widget.textDirection
+                : widget is RichText
+                    ? widget.textDirection
+                    : (widget is Text ? widget.textDirection : null),
       ),
     );
 
@@ -729,8 +723,8 @@ class Explainer {
         widget is RichText
             ? widget.overflow
             : widget is Text
-            ? widget.overflow
-            : null,
+                ? widget.overflow
+                : null,
       ),
     );
 
@@ -780,10 +774,8 @@ class Explainer {
         attr.add(
           // TODO: remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
-          'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'.replaceAll(
-            'CrossAxisAlignment.',
-            '',
-          ),
+          'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
+              .replaceAll('CrossAxisAlignment.', ''),
         );
         attr.add(
           // TODO: remove ignore when our minimum core version >= 1.0
@@ -793,10 +785,8 @@ class Explainer {
         attr.add(
           // TODO: remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
-          'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'.replaceAll(
-            'MainAxisAlignment.',
-            '',
-          ),
+          'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
+              .replaceAll('MainAxisAlignment.', ''),
         );
 
         // TODO: remove ignore when our minimum core version >= 1.0
@@ -846,8 +836,8 @@ class Explainer {
       widget is RichText
           ? _inlineSpan(widget.text)
           : widget is MultiChildRenderObjectWidget
-          ? _widgetChildren(widget.children)
-          : '',
+              ? _widgetChildren(widget.children)
+              : '',
     );
     // `MouseRegion` is a `SingleChildRenderObjectWidget` since Flutter 2.11
     // (see https://github.com/flutter/flutter/pull/96636)
@@ -855,27 +845,31 @@ class Explainer {
       widget is MouseRegion
           ? _widgetChild(widget.child)
           : widget is SingleChildRenderObjectWidget
-          ? _widgetChild(widget.child)
-          : '',
+              ? _widgetChild(widget.child)
+              : '',
     );
 
     // A-F
-    attr.add(widget is Container ? _widgetChild(widget.child) : '');
+    attr.add(
+      widget is Container ? _widgetChild(widget.child) : '',
+    );
 
     // G-M
-    attr.add(widget is GestureDetector ? _widgetChild(widget.child) : '');
+    attr.add(
+      widget is GestureDetector ? _widgetChild(widget.child) : '',
+    );
 
     // N-T
     attr.add(
       widget is ProxyWidget
           ? _widgetChild(widget.child)
           : widget is SingleChildScrollView
-          ? _widgetChild(widget.child)
-          : widget is Text
-          ? widget.data!
-          : widget is Tooltip
-          ? _widgetChild(widget.child)
-          : '',
+              ? _widgetChild(widget.child)
+              : widget is Text
+                  ? widget.data!
+                  : widget is Tooltip
+                      ? _widgetChild(widget.child)
+                      : '',
     );
 
     // U-Z
@@ -900,16 +894,16 @@ class HitTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    home: Scaffold(
-      body: HtmlWidget(
-        html,
-        onTapUrl: (url) {
-          list.add(url);
-          return true;
-        },
-      ),
-    ),
-  );
+        home: Scaffold(
+          body: HtmlWidget(
+            html,
+            onTapUrl: (url) {
+              list.add(url);
+              return true;
+            },
+          ),
+        ),
+      );
 }
 
 extension RenderBoxElement on Element {

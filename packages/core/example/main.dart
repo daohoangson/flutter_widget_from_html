@@ -11,8 +11,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Widget from HTML (core)',
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter Widget from HTML (core)')),
-        body: const Center(child: HtmlWidget('Hello World!')),
+        appBar: AppBar(
+          title: const Text('Flutter Widget from HTML (core)'),
+        ),
+        body: const Center(
+          child: HtmlWidget('Hello World!'),
+        ),
       ),
     );
   }

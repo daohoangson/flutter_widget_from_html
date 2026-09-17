@@ -146,8 +146,7 @@ void main() {
     });
 
     testWidgets('renders DIV tags', (tester) async {
-      const html =
-          '<a href="$kHref" style="display: block">'
+      const html = '<a href="$kHref" style="display: block">'
           '<div>Foo</div><div>Bar</div></a>';
       final explained = await explain(tester, html);
       expect(
@@ -177,8 +176,7 @@ void main() {
     });
 
     testWidgets('renders SPAN tags', (tester) async {
-      const html =
-          '<a href="$kHref" style="display: block">'
+      const html = '<a href="$kHref" style="display: block">'
           '<span>Foo</span> <span>bar</span></a>';
       final explained = await explain(tester, html);
       expect(
@@ -192,8 +190,7 @@ void main() {
     });
 
     testWidgets('renders DIV and SPAN tags', (tester) async {
-      const html =
-          '<a href="$kHref" style="display: block">'
+      const html = '<a href="$kHref" style="display: block">'
           '<div>Foo</div> <span>bar</span></a>';
       final explained = await explain(tester, html);
       expect(
@@ -384,9 +381,8 @@ void main() {
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/1547
   group('#1547: customStylesBuilder text-decoration on A tag', () {
-    testWidgets('line-through should override default underline', (
-      tester,
-    ) async {
+    testWidgets('line-through should override default underline',
+        (tester) async {
       const html = '<a href="$kHref">Foo</a>';
       final explained = await explain(
         tester,

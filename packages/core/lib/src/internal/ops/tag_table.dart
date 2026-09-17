@@ -77,9 +77,8 @@ class TagTable {
 
     final border = tryParseBorder(tableTree);
     final borderCollapse = tableTree.getStyle(kCssBorderCollapse)?.term;
-    final borderSpacingExpression = tableTree
-        .getStyle(kCssBorderSpacing)
-        ?.value;
+    final borderSpacingExpression =
+        tableTree.getStyle(kCssBorderSpacing)?.value;
     final borderSpacing = borderSpacingExpression != null
         ? tryParseCssLength(borderSpacingExpression)
         : null;
@@ -224,9 +223,8 @@ class TagTable {
     };
   }
 
-  static StylesMap _cssBorderInherit(dom.Element _) => {
-    kCssBorder: kCssBorderInherit,
-  };
+  static StylesMap _cssBorderInherit(dom.Element _) =>
+      {kCssBorder: kCssBorderInherit};
 
   static String? _getCssDisplayValue(BuildTree tree) {
     for (final style in tree.element.styles.reversed) {

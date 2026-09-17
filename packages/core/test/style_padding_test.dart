@@ -245,8 +245,7 @@ void main() {
   });
 
   testWidgets('renders padding within another', (WidgetTester tester) async {
-    const html =
-        '<div style="padding: 1px">'
+    const html = '<div style="padding: 1px">'
         '<div style="padding: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(
@@ -261,8 +260,7 @@ void main() {
   });
 
   testWidgets('renders paddings back to back', (WidgetTester tester) async {
-    const html =
-        '<div style="padding: 3px">1</div>'
+    const html = '<div style="padding: 3px">1</div>'
         '<div style="padding: 3px">2</div>'
         '<div style="padding: 3px">3</div>';
     final explained = await explain(tester, html);
@@ -277,8 +275,7 @@ void main() {
   });
 
   testWidgets('renders block paddings back to back', (tester) async {
-    const html =
-        '<div style="padding: 3px"><div>1a</div><div>1b</div></div>'
+    const html = '<div style="padding: 3px"><div>1a</div><div>1b</div></div>'
         '<div style="padding: 3px"><div>2a</div><div>2b</div></div>';
     final explained = await explain(tester, html);
     expect(
@@ -649,8 +646,7 @@ void main() {
 
   group('combos', () {
     testWidgets('renders with background & h2', (WidgetTester tester) async {
-      const html =
-          '<div style="background: red; padding: 5px">'
+      const html = '<div style="background: red; padding: 5px">'
           '<h2>Foo</h2></div>';
       final explained = await explain(tester, html);
       expect(

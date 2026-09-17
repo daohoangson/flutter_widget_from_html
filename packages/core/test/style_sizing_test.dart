@@ -253,7 +253,12 @@ Future<void> main() async {
       final explained = await explain(
         tester,
         null,
-        hw: SingleChildScrollView(child: HtmlWidget(html, key: hwKey)),
+        hw: SingleChildScrollView(
+          child: HtmlWidget(
+            html,
+            key: hwKey,
+          ),
+        ),
       );
       expect(
         explained,
@@ -331,7 +336,10 @@ Future<void> main() async {
         null,
         hw: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: HtmlWidget(html, key: hwKey),
+          child: HtmlWidget(
+            html,
+            key: hwKey,
+          ),
         ),
       );
       expect(
@@ -484,8 +492,7 @@ Future<void> main() async {
 
     testWidgets('renders text-align / vertical-align', (tester) async {
       const src = 'https://domain.com/image.jpg';
-      const html =
-          '<div style="text-align: center">'
+      const html = '<div style="text-align: center">'
           '<img src="$src" width="10" height="10" style="vertical-align: middle" /></div>';
       final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
@@ -539,7 +546,9 @@ Future<void> main() async {
       );
       expect(
         before,
-        contains('CssSizing(preferredHeight: 10.0, preferredWidth*: 20.0)'),
+        contains(
+          'CssSizing(preferredHeight: 10.0, preferredWidth*: 20.0)',
+        ),
       );
 
       final after = await explain(
@@ -549,14 +558,19 @@ Future<void> main() async {
       );
       expect(
         after,
-        contains('CssSizing(preferredHeight*: 20.0, preferredWidth: 10.0)'),
+        contains(
+          'CssSizing(preferredHeight*: 20.0, preferredWidth: 10.0)',
+        ),
       );
     });
 
     testWidgets('computeDryLayout', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        CssSizing(key: key, child: const SizedBox(width: 50, height: 50)),
+        CssSizing(
+          key: key,
+          child: const SizedBox(width: 50, height: 50),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -582,7 +596,10 @@ Future<void> main() async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CssSizing(key: key, child: const Text('Hello')),
+            body: CssSizing(
+              key: key,
+              child: const Text('Hello'),
+            ),
           ),
         ),
       );
@@ -700,26 +717,30 @@ Future<void> main() async {
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
-              ? null
-              : 'Linux only'
+            ? null
+            : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
     GoldenToolkit.runWithConfiguration(
       () {
-        group('_guessChildSize', () {
-          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
-          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+        group(
+          '_guessChildSize',
+          () {
+            setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+            tearDown(
+              () => WidgetFactory.debugDeterministicLoadingWidget = false,
+            );
 
-          const assetName = 'test/images/logo.png';
-          const childHeightGtMaxHeight = 'child_height_gt_max_height';
-          const testCases = <String, String>{
-            'native_192x192':
-                '<img src="asset:$assetName" width="192" height="192" />',
-            'child_width_gt_max_width':
-                '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
-            childHeightGtMaxHeight:
-                '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
-            'sized_inline_block': '''
+            const assetName = 'test/images/logo.png';
+            const childHeightGtMaxHeight = 'child_height_gt_max_height';
+            const testCases = <String, String>{
+              'native_192x192':
+                  '<img src="asset:$assetName" width="192" height="192" />',
+              'child_width_gt_max_width':
+                  '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
+              childHeightGtMaxHeight:
+                  '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
+              'sized_inline_block': '''
 <!-- https://github.com/daohoangson/flutter_widget_from_html/issues/799 -->
 <p>
   <span style="display: inline-block; width: 18px; height: 22px; line-height: 22px; float: left; font-size: 15px; background: 0px 0px; margin-right: 4px; color: #FF6600; letter-spacing: -1px; opacity: 1;">1</span>
@@ -727,22 +748,28 @@ Future<void> main() async {
   <span style="display: inline-block; padding: 0px 2px; text-align: center; vertical-align: middle; font-size: 12px; line-height: 16px; color: #FFFFFF; overflow: hidden; margin-left: 6px; height: 16px; border-radius: 4px; background-color: #FF6600;">bar</span>
 </p>
 ''',
-          };
+            };
 
-          for (final testCase in testCases.entries) {
-            testGoldens(testCase.key, (tester) async {
-              await tester.pumpWidgetBuilder(
-                _Golden(testCase.value),
-                wrapper: materialAppWrapper(theme: ThemeData.light()),
-                surfaceSize: testCase.key == childHeightGtMaxHeight
-                    ? const Size(250, 200)
-                    : const Size(200, 250),
+            for (final testCase in testCases.entries) {
+              testGoldens(
+                testCase.key,
+                (tester) async {
+                  await tester.pumpWidgetBuilder(
+                    _Golden(testCase.value),
+                    wrapper: materialAppWrapper(theme: ThemeData.light()),
+                    surfaceSize: testCase.key == childHeightGtMaxHeight
+                        ? const Size(250, 200)
+                        : const Size(200, 250),
+                  );
+
+                  await screenMatchesGolden(tester, testCase.key);
+                },
+                skip: goldenSkip != null,
               );
-
-              await screenMatchesGolden(tester, testCase.key);
-            }, skip: goldenSkip != null);
-          }
-        }, skip: goldenSkip);
+            }
+          },
+          skip: goldenSkip,
+        );
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) =>
@@ -752,42 +779,55 @@ Future<void> main() async {
 
     GoldenToolkit.runWithConfiguration(
       () {
-        group('100 percent', () {
-          testGoldens('width', (tester) async {
-            await tester.pumpWidgetBuilder(
-              const Scaffold(
-                body: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
+        group(
+          '100 percent',
+          () {
+            testGoldens(
+              'width',
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  const Scaffold(
+                    body: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: HtmlWidget('<div style="width: 100%">Foo</div>'),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(200, 200),
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(200, 200),
+                );
+
+                await screenMatchesGolden(tester, 'width');
+              },
+              skip: goldenSkip != null,
             );
 
-            await screenMatchesGolden(tester, 'width');
-          }, skip: goldenSkip != null);
-
-          testGoldens('height', (tester) async {
-            await tester.pumpWidgetBuilder(
-              const Scaffold(
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: HtmlWidget('<div style="height: 100%">Foo</div>'),
+            testGoldens(
+              'height',
+              (tester) async {
+                await tester.pumpWidgetBuilder(
+                  const Scaffold(
+                    body: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            HtmlWidget('<div style="height: 100%">Foo</div>'),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(200, 200),
-            );
+                  wrapper: materialAppWrapper(theme: ThemeData.light()),
+                  surfaceSize: const Size(200, 200),
+                );
 
-            await screenMatchesGolden(tester, 'height');
-          }, skip: goldenSkip != null);
-        }, skip: goldenSkip);
+                await screenMatchesGolden(tester, 'height');
+              },
+              skip: goldenSkip != null,
+            );
+          },
+          skip: goldenSkip,
+        );
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) =>
@@ -804,6 +844,9 @@ class _Golden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Padding(padding: const EdgeInsets.all(8.0), child: HtmlWidget(html)),
-  );
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(html),
+        ),
+      );
 }

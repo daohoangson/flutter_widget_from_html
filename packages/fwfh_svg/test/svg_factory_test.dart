@@ -196,22 +196,26 @@ Future<void> main() async {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
-            ? null
-            : 'Linux only'
+          ? null
+          : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
   GoldenToolkit.runWithConfiguration(
     () {
-      group('screenshot testing', () {
-        setUp(() {
-          WidgetFactory.debugDeterministicLoadingWidget = true;
-        });
-        tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+      group(
+        'screenshot testing',
+        () {
+          setUp(() {
+            WidgetFactory.debugDeterministicLoadingWidget = true;
+          });
+          tearDown(
+            () => WidgetFactory.debugDeterministicLoadingWidget = false,
+          );
 
-        const svg = 'Foo.\n$redTriangle\nBar.';
+          const svg = 'Foo.\n$redTriangle\nBar.';
 
-        // https://github.com/daohoangson/flutter_widget_from_html/issues/1142
-        const svg1142 = '''
+          // https://github.com/daohoangson/flutter_widget_from_html/issues/1142
+          const svg1142 = '''
 <svg xmlns="http://www.w3.org/2000/svg" width="153px" height="48px" viewbox="0 -1971.3 8504.1 2679.3" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" style="">
   <defs>
     <path id="MJX-8-TEX-N-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
@@ -291,67 +295,70 @@ Future<void> main() async {
   </g>
 </svg>''';
 
-        const asset = '''
+          const asset = '''
 Foo.
 <img src="asset:test/images/red_triangle.svg" style="display: block" />
 Bar.''';
-        final file =
-            '''
+          final file = '''
 Foo.
 <img src="file://${Directory.current.path}/test/images/red_triangle.svg" style="display: block" />
 Bar.''';
-        final memory =
-            '''
+          final memory = '''
 Foo.
 <img src="data:image/svg+xml;base64,${base64Encode(redTriangleBytes)}" style="display: block" />
 Bar.''';
-        const network = '''
+          const network = '''
 Foo.
 <img src="http://domain.com/red_triangle.svg" style="display: block" />
 Bar.''';
 
-        final testCases = <String, String>{
-          'SVG': svg,
-          'SVG.allow_drawing_outside': svg,
-          'SVG.scaled': svg1142,
-          'asset': asset,
-          'asset.allow_drawing_outside': asset,
-          'file': file,
-          'file.allow_drawing_outside': file,
-          'memory': memory,
-          'memory.allow_drawing_outside': memory,
-          'network': network,
-          'network.allow_drawing_outside': network,
-        };
+          final testCases = <String, String>{
+            'SVG': svg,
+            'SVG.allow_drawing_outside': svg,
+            'SVG.scaled': svg1142,
+            'asset': asset,
+            'asset.allow_drawing_outside': asset,
+            'file': file,
+            'file.allow_drawing_outside': file,
+            'memory': memory,
+            'memory.allow_drawing_outside': memory,
+            'network': network,
+            'network.allow_drawing_outside': network,
+          };
 
-        for (final testCase in testCases.entries) {
-          testGoldens(testCase.key, (tester) async {
-            await HttpOverrides.runZoned(
-              () => tester.runAsync(
-                () => tester.pumpWidgetBuilder(
-                  _Golden(
-                    testCase.value.trim(),
-                    allowDrawingOutsideViewBox: testCase.key.contains(
-                      'allow_drawing_outside',
+          for (final testCase in testCases.entries) {
+            testGoldens(
+              testCase.key,
+              (tester) async {
+                await HttpOverrides.runZoned(
+                  () => tester.runAsync(
+                    () => tester.pumpWidgetBuilder(
+                      _Golden(
+                        testCase.value.trim(),
+                        allowDrawingOutsideViewBox:
+                            testCase.key.contains('allow_drawing_outside'),
+                      ),
+                      wrapper: materialAppWrapper(theme: ThemeData.light()),
+                      surfaceSize: const Size(400, 400),
                     ),
                   ),
-                  wrapper: materialAppWrapper(theme: ThemeData.light()),
-                  surfaceSize: const Size(400, 400),
-                ),
-              ),
-              createHttpClient: (_) => _createMockSvgImageHttpClient(),
+                  createHttpClient: (_) => _createMockSvgImageHttpClient(),
+                );
+
+                if (testCase.key.startsWith(RegExp('(file|network)'))) {
+                  await tester.runAsync(
+                    () => Future.delayed(const Duration(milliseconds: 100)),
+                  );
+                }
+
+                await screenMatchesGolden(tester, testCase.key);
+              },
+              skip: goldenSkip != null,
             );
-
-            if (testCase.key.startsWith(RegExp('(file|network)'))) {
-              await tester.runAsync(
-                () => Future.delayed(const Duration(milliseconds: 100)),
-              );
-            }
-
-            await screenMatchesGolden(tester, testCase.key);
-          }, skip: goldenSkip != null);
-        }
-      }, skip: goldenSkip);
+          }
+        },
+        skip: goldenSkip,
+      );
     },
     config: GoldenToolkitConfiguration(
       fileNameFactory: (name) => '${core.kGoldenFilePrefix}/svg/$name.png',
@@ -364,20 +371,23 @@ class _Golden extends StatelessWidget {
 
   final String contents;
 
-  const _Golden(this.contents, {required this.allowDrawingOutsideViewBox});
+  const _Golden(
+    this.contents, {
+    required this.allowDrawingOutsideViewBox,
+  });
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: HtmlWidget(
-        contents,
-        factoryBuilder: allowDrawingOutsideViewBox
-            ? () => _GoldenAllowFactory()
-            : () => _GoldenDisallowFactory(),
-      ),
-    ),
-  );
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            contents,
+            factoryBuilder: allowDrawingOutsideViewBox
+                ? () => _GoldenAllowFactory()
+                : () => _GoldenDisallowFactory(),
+          ),
+        ),
+      );
 }
 
 class _GoldenAllowFactory extends WidgetFactory with SvgFactory {
@@ -438,9 +448,8 @@ HttpClient _createMockSvgImageHttpClient() {
         invocation.positionalArguments[0] as void Function(List<int> data);
     final onDone =
         invocation.namedArguments[const Symbol('onDone')] as Function?;
-    return Stream.fromIterable(<List<int>>[redTriangleBytes]).listen((
-      data,
-    ) async {
+    return Stream.fromIterable(<List<int>>[redTriangleBytes])
+        .listen((data) async {
       await Future.delayed(const Duration(milliseconds: 10));
       onData(data);
 
@@ -453,15 +462,13 @@ HttpClient _createMockSvgImageHttpClient() {
   when(() => client.openUrl(any(), any())).thenAnswer((_) async => request);
   when(() => request.headers).thenReturn(headers);
   when(() => request.close()).thenAnswer((_) async => response);
-  when(
-    () => response.compressionState,
-  ).thenReturn(HttpClientResponseCompressionState.notCompressed);
+  when(() => response.compressionState)
+      .thenReturn(HttpClientResponseCompressionState.notCompressed);
   when(() => response.contentLength).thenReturn(redTriangleBytes.length);
   when(() => response.headers).thenReturn(headers);
   when(() => response.statusCode).thenReturn(HttpStatus.ok);
-  when(
-    () => response.handleError(any(), test: any(named: 'test')),
-  ).thenAnswer((_) => Stream.fromIterable(<List<int>>[redTriangleBytes]));
+  when(() => response.handleError(any(), test: any(named: 'test')))
+      .thenAnswer((_) => Stream.fromIterable(<List<int>>[redTriangleBytes]));
 
   return client;
 }
@@ -473,5 +480,6 @@ class _NullLoadingFactory extends WidgetFactory with SvgFactory {
     BuildMetadata meta, [
     double? loadingProgress,
     dynamic data,
-  ]) => null;
+  ]) =>
+      null;
 }
