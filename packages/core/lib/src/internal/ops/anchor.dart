@@ -8,35 +8,34 @@ class Anchor {
   final AnchorRegistry registry;
 
   Anchor(AnchorWidgetFactory wf, this.id)
-      : anchor = GlobalKey(debugLabel: id),
-        registry = wf._registry;
+    : anchor = GlobalKey(debugLabel: id),
+      registry = wf._registry;
 
   BuildOp get buildOp => BuildOp(
-        alwaysRenderBlock: false,
-        debugLabel: 'anchor#$id',
-        onParsed: (tree) {
-          registry.register(id, anchor);
-          return tree..addAnchor(anchor);
-        },
-        onRenderInline: (tree) {
-          final widget = WidgetPlaceholder(
-            builder: (context, _) => SizedBox(
-              height: tree.inheritanceResolvers
-                  .resolve(context)
-                  .get<TextStyle>()
-                  ?.fontSize,
-              key: anchor,
-            ),
-            debugLabel: '${tree.element.localName}--anchor#$id',
-          );
-
-          tree.prepend(WidgetBit.inline(tree, widget));
-        },
-        onRenderBlock: (_, placeholder) => placeholder.wrapWith(
-          (_, child) => SizedBox(key: anchor, child: child),
+    alwaysRenderBlock: false,
+    debugLabel: 'anchor#$id',
+    onParsed: (tree) {
+      registry.register(id, anchor);
+      return tree..addAnchor(anchor);
+    },
+    onRenderInline: (tree) {
+      final widget = WidgetPlaceholder(
+        builder: (context, _) => SizedBox(
+          height: tree.inheritanceResolvers
+              .resolve(context)
+              .get<TextStyle>()
+              ?.fontSize,
+          key: anchor,
         ),
-        priority: Late.anchor,
+        debugLabel: '${tree.element.localName}--anchor#$id',
       );
+
+      tree.prepend(WidgetBit.inline(tree, widget));
+    },
+    onRenderBlock: (_, placeholder) =>
+        placeholder.wrapWith((_, child) => SizedBox(key: anchor, child: child)),
+    priority: Late.anchor,
+  );
 
   static void wrapWidgetAnchors(BuildTree tree, WidgetPlaceholder placeholder) {
     final anchors = tree.anchors;
@@ -121,11 +120,7 @@ class AnchorRegistry {
     if (anchorContext != null) {
       _logger.info(() => 'Scrolling to $anchor...');
       return completer.complete(
-        _ensureVisibleContext(
-          anchorContext,
-          curve: curve,
-          duration: duration,
-        ),
+        _ensureVisibleContext(anchorContext, curve: curve, duration: duration),
       );
     }
 
@@ -328,14 +323,14 @@ class _AnchorBodyItemIndex {
   final int max;
 
   _AnchorBodyItemIndex.exact(int index)
-      : isExact = true,
-        min = index,
-        max = index;
+    : isExact = true,
+      min = index,
+      max = index;
 
   _AnchorBodyItemIndex.guesstimate(int prevMax, int nextMin)
-      : isExact = false,
-        min = prevMax + 1,
-        max = nextMin - 1;
+    : isExact = false,
+      min = prevMax + 1,
+      max = nextMin - 1;
 }
 
 class _BodyItemWidget extends ProxyWidget {

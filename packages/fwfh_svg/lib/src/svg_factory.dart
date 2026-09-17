@@ -107,14 +107,19 @@ mixin SvgFactory on WidgetFactory {
               final height = attrs[kAttributeSvgHeight];
               final width = attrs[kAttributeSvgWidth];
 
-              return {
+              final styles = {
                 'height': 'auto',
                 'min-width': '0px',
                 'min-height': '0px',
                 'width': 'auto',
-                if (height != null) 'height': height,
-                if (width != null) 'width': width,
               };
+              if (height != null) {
+                styles['height'] = height;
+              }
+              if (width != null) {
+                styles['width'] = width;
+              }
+              return styles;
             },
             onWidgets: (meta, widgets) {
               final bytesLoader = SvgStringLoader(meta.element.outerHtml);

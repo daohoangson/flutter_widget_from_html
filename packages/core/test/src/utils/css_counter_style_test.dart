@@ -57,26 +57,38 @@ void main() {
       test('format(3847)', () => expect(style.format(3847), 'mmmdcccxlvii.'));
       test('format(3999)', () => expect(style.format(3999), 'mmmcmxcix.'));
       test('format(0) - out of range', () => expect(style.format(0), null));
-      test('format(4000) - out of range',
-          () => expect(style.format(4000), null));
+      test(
+        'format(4000) - out of range',
+        () => expect(style.format(4000), null),
+      );
       test('format(-55) - out of range', () => expect(style.format(-55), null));
     });
 
     group('upper-roman (ported from roman_numerals_converter_test.dart)', () {
       final style = CssCounterStyle.lookup('upper-roman')!;
       test('GIVEN 0 THEN returns null', () => expect(style.format(0), null));
-      test('GIVEN negative THEN returns null',
-          () => expect(style.format(-55), null));
+      test(
+        'GIVEN negative THEN returns null',
+        () => expect(style.format(-55), null),
+      );
       test('GIVEN 7 THEN returns VII.', () => expect(style.format(7), 'VII.'));
       test('GIVEN 90 THEN returns XC.', () => expect(style.format(90), 'XC.'));
-      test('GIVEN 3999 THEN returns MMMCMXCIX.',
-          () => expect(style.format(3999), 'MMMCMXCIX.'));
-      test('GIVEN 4001 THEN returns null',
-          () => expect(style.format(4001), null));
-      test('GIVEN 1416 THEN returns MCDXVI.',
-          () => expect(style.format(1416), 'MCDXVI.'));
-      test('GIVEN 3847 THEN returns MMMDCCCXLVII.',
-          () => expect(style.format(3847), 'MMMDCCCXLVII.'));
+      test(
+        'GIVEN 3999 THEN returns MMMCMXCIX.',
+        () => expect(style.format(3999), 'MMMCMXCIX.'),
+      );
+      test(
+        'GIVEN 4001 THEN returns null',
+        () => expect(style.format(4001), null),
+      );
+      test(
+        'GIVEN 1416 THEN returns MCDXVI.',
+        () => expect(style.format(1416), 'MCDXVI.'),
+      );
+      test(
+        'GIVEN 3847 THEN returns MMMDCCCXLVII.',
+        () => expect(style.format(3847), 'MMMDCCCXLVII.'),
+      );
       test('GIVEN all numbers in range (1-3999) THEN returns not null', () {
         for (var n = 1; n < 4000; n += 1) {
           expect(style.format(n), isNotNull, reason: 'Failed at $n');
@@ -97,8 +109,10 @@ void main() {
       test('format(10)', () => expect(style.format(10), 'י.'));
       test('format(15)', () => expect(style.format(15), 'יה.'));
       test('format(1099)', () => expect(style.format(1099), 'תתרצט.'));
-      test('format(1100) - out of range',
-          () => expect(style.format(1100), null));
+      test(
+        'format(1100) - out of range',
+        () => expect(style.format(1100), null),
+      );
     });
 
     group('armenian', () {
@@ -323,8 +337,10 @@ void main() {
       test('format(10)', () => expect(style.format(10), '壱拾、'));
       test('format(100)', () => expect(style.format(100), '壱百、'));
       test('format(1000)', () => expect(style.format(1000), '壱阡、'));
-      test('format(10000) - out of range',
-          () => expect(style.format(10000), null));
+      test(
+        'format(10000) - out of range',
+        () => expect(style.format(10000), null),
+      );
     });
 
     group('simp-chinese-formal', () {
@@ -390,11 +406,15 @@ void main() {
       });
       test('simp-chinese-informal resolves same as cjk-ideographic', () {
         expect(
-            CssCounterStyle.lookup('simp-chinese-informal')!.format(1), '一、');
+          CssCounterStyle.lookup('simp-chinese-informal')!.format(1),
+          '一、',
+        );
       });
       test('trad-chinese-informal resolves same as cjk-ideographic', () {
         expect(
-            CssCounterStyle.lookup('trad-chinese-informal')!.format(1), '一、');
+          CssCounterStyle.lookup('trad-chinese-informal')!.format(1),
+          '一、',
+        );
       });
     });
 
@@ -407,7 +427,9 @@ void main() {
       // Test single quotes
       final styleSingle = CssCounterStyle.lookup("'👉'")!;
       test(
-          'format(1) single quotes', () => expect(styleSingle.format(1), '👉'));
+        'format(1) single quotes',
+        () => expect(styleSingle.format(1), '👉'),
+      );
     });
 
     group('base-N numeric (binary, hex)', () {
@@ -429,8 +451,10 @@ void main() {
       test('format(10)', () => expect(style.format(10), '一十、'));
       test('format(11)', () => expect(style.format(11), '一十一、'));
 
-      test('format(101) - additive fallback',
-          () => expect(style.format(101), '一百一、'));
+      test(
+        'format(101) - additive fallback',
+        () => expect(style.format(101), '一百一、'),
+      );
 
       test('format(9999)', () => expect(style.format(9999), '九千九百九十九、'));
       test('format(0)', () => expect(style.format(0), '零、'));

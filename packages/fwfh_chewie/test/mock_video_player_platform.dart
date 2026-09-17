@@ -30,16 +30,24 @@ class _FakeVideoPlayerPlatform extends VideoPlayerPlatform
   }
 
   @override
-  Future<void> dispose(int textureId) async {/* intentionally left empty */}
+  Future<void> dispose(int textureId) async {
+    /* intentionally left empty */
+  }
 
   @override
-  Future<void> init() async {/* intentionally left empty */}
+  Future<void> init() async {
+    /* intentionally left empty */
+  }
 
   @override
-  Future<void> play(int textureId) async {/* intentionally left empty */}
+  Future<void> play(int textureId) async {
+    /* intentionally left empty */
+  }
 
   @override
-  Future<void> pause(int textureId) async {/* intentionally left empty */}
+  Future<void> pause(int textureId) async {
+    /* intentionally left empty */
+  }
 
   @override
   Future<void> setLooping(int textureId, bool looping) async {

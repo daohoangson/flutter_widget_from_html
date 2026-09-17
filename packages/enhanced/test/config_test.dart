@@ -18,13 +18,12 @@ void main() {
       WidgetTester tester,
       String html, {
       bool? buildAsync,
-    }) =>
-        helper.explain(
-          tester,
-          null,
-          hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
-          useExplainer: false,
-        );
+    }) => helper.explain(
+      tester,
+      null,
+      hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
+      useExplainer: false,
+    );
 
     testWidgets('uses FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
@@ -69,20 +68,19 @@ void main() {
       required bool enableCaching,
       List<dynamic>? rebuildTriggers,
       TextStyle? textStyle,
-    }) =>
-        helper.explain(
-          tester,
-          null,
-          hw: HtmlWidget(
-            html,
-            baseUrl: baseUrl,
-            buildAsync: buildAsync,
-            enableCaching: enableCaching,
-            key: helper.hwKey,
-            rebuildTriggers: rebuildTriggers,
-            textStyle: textStyle ?? const TextStyle(),
-          ),
-        );
+    }) => helper.explain(
+      tester,
+      null,
+      hw: HtmlWidget(
+        html,
+        baseUrl: baseUrl,
+        buildAsync: buildAsync,
+        enableCaching: enableCaching,
+        key: helper.hwKey,
+        rebuildTriggers: rebuildTriggers,
+        textStyle: textStyle ?? const TextStyle(),
+      ),
+    );
 
     void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as InheritedWidget).child;
@@ -165,12 +163,7 @@ void main() {
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(
-        tester,
-        html,
-        enableCaching: true,
-        rebuildTriggers: [2],
-      );
+      await explain(tester, html, enableCaching: true, rebuildTriggers: [2]);
       final built2 = helper.buildCurrentState();
       enableCachingExpect(built1, built2, isFalse);
     });
@@ -328,8 +321,10 @@ void main() {
     const html = 'Foo <video width="21" height="9"><source src="$src"></video>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained =
-          await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      final explained = await explain(
+        tester,
+        HtmlWidget(html, key: helper.hwKey),
+      );
       expect(
         explained,
         equals(
@@ -360,27 +355,23 @@ void main() {
       required bool buildAsync,
       OnErrorBuilder? onErrorBuilder,
     }) async {
-      await runZonedGuarded(
-        () async {
-          await helper.explain(
-            tester,
-            null,
-            hw: HtmlWidget(
-              'Foo <span class="throw">bar</span>.',
-              buildAsync: buildAsync,
-              factoryBuilder: () => _OnErrorBuilderFactory(),
-              key: helper.hwKey,
-              onErrorBuilder: onErrorBuilder,
-            ),
-            useExplainer: false,
-          );
+      await runZonedGuarded(() async {
+        await helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            'Foo <span class="throw">bar</span>.',
+            buildAsync: buildAsync,
+            factoryBuilder: () => _OnErrorBuilderFactory(),
+            key: helper.hwKey,
+            onErrorBuilder: onErrorBuilder,
+          ),
+          useExplainer: false,
+        );
 
-          await tester
-              .runAsync(() => Future.delayed(const Duration(seconds: 1)));
-          await tester.pump();
-        },
-        (_, __) {},
-      );
+        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+        await tester.pump();
+      }, (_, _) {});
 
       return await helper.explainWithoutPumping(useExplainer: false);
     }
@@ -394,7 +385,7 @@ void main() {
       final explained = await explain(
         tester,
         buildAsync: false,
-        onErrorBuilder: (_, __, ___) => const Text('sync error'),
+        onErrorBuilder: (_, _, _) => const Text('sync error'),
       );
       expect(explained, contains('RichText(text: "sync error")'));
     });
@@ -408,7 +399,7 @@ void main() {
       final explained = await explain(
         tester,
         buildAsync: true,
-        onErrorBuilder: (_, __, ___) => const Text('async error'),
+        onErrorBuilder: (_, _, _) => const Text('async error'),
       );
       expect(explained, contains('RichText(text: "async error")'));
     });
@@ -418,18 +409,17 @@ void main() {
     Future<String?> explain(
       WidgetTester tester, {
       OnLoadingBuilder? onLoadingBuilder,
-    }) =>
-        helper.explain(
-          tester,
-          null,
-          hw: HtmlWidget(
-            'Foo',
-            buildAsync: true,
-            key: helper.hwKey,
-            onLoadingBuilder: onLoadingBuilder,
-          ),
-          useExplainer: false,
-        );
+    }) => helper.explain(
+      tester,
+      null,
+      hw: HtmlWidget(
+        'Foo',
+        buildAsync: true,
+        key: helper.hwKey,
+        onLoadingBuilder: onLoadingBuilder,
+      ),
+      useExplainer: false,
+    );
 
     testWidgets('renders CircularProgressIndicator', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -449,7 +439,7 @@ void main() {
     testWidgets('renders custom', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        onLoadingBuilder: (_, __, ___) => const Text('Custom'),
+        onLoadingBuilder: (_, _, _) => const Text('Custom'),
       );
       expect(explained, contains('RichText(text: "Custom")'));
     });
@@ -544,10 +534,7 @@ void main() {
 
     testWidgets('default handler', (WidgetTester tester) async {
       const href = 'http://domain.com/can-launch/default';
-      await explain(
-        tester,
-        const HtmlWidget('<a href="$href">Tap me</a>'),
-      );
+      await explain(tester, const HtmlWidget('<a href="$href">Tap me</a>'));
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 

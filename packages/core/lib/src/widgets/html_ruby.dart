@@ -6,16 +6,8 @@ import 'package:flutter/widgets.dart';
 /// A RUBY widget.
 class HtmlRuby extends MultiChildRenderObjectWidget {
   /// Creates a RUBY widget.
-  HtmlRuby({
-    super.key,
-    Widget? rt,
-    Widget? ruby,
-  }) : super(
-          children: [
-            if (ruby != null) ruby,
-            if (rt != null) rt,
-          ],
-        );
+  HtmlRuby({super.key, Widget? rt, Widget? ruby})
+    : super(children: [?ruby, ?rt]);
 
   @override
   RenderObject createRenderObject(BuildContext context) => _RubyRenderObject();
@@ -59,12 +51,12 @@ class _RubyRenderObject extends RenderBox
     final rt = (ruby.parentData! as _RubyParentData).nextSibling;
     final rtHeight = rt != null
         ? rt
-            .getDryLayout(
-              rubyConstraints.copyWith(
-                maxHeight: rubyConstraints.maxHeight - rubySize.height,
-              ),
-            )
-            .height
+              .getDryLayout(
+                rubyConstraints.copyWith(
+                  maxHeight: rubyConstraints.maxHeight - rubySize.height,
+                ),
+              )
+              .height
         : 0.0;
 
     return rtHeight + rubyBaseline;

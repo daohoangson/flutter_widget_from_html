@@ -122,10 +122,7 @@ abstract class BuildTree extends BuildBit with NonInheritedPropertiesOwner {
   List<BuildBit>? _children;
 
   /// Creates a tree.
-  BuildTree({
-    required this.element,
-    required this.inheritanceResolvers,
-  });
+  BuildTree({required this.element, required this.inheritanceResolvers});
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -225,10 +222,7 @@ abstract class BuildTree extends BuildBit with NonInheritedPropertiesOwner {
   css.Declaration? getStyle(String property);
 
   /// {@macro flutter_widget_from_html.inherit}
-  void inherit<T>(
-    InheritanceResolverCallback<T> callback, [
-    T? input,
-  ]) =>
+  void inherit<T>(InheritanceResolverCallback<T> callback, [T? input]) =>
       inheritanceResolvers.enqueue(callback, input);
 
   /// Prepends [bit].
@@ -333,16 +327,15 @@ abstract class WidgetBit<T> extends BuildBit {
     Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
-  }) =>
-      _WidgetBitInline(
-        parent,
-        WidgetPlaceholder.lazy(
-          child,
-          debugLabel: '${parent.element.localName}--WidgetBit.inline',
-        ),
-        alignment,
-        baseline,
-      );
+  }) => _WidgetBitInline(
+    parent,
+    WidgetPlaceholder.lazy(
+      child,
+      debugLabel: '${parent.element.localName}--WidgetBit.inline',
+    ),
+    alignment,
+    baseline,
+  );
 }
 
 class _WidgetBitBlock extends WidgetBit<Widget> {
@@ -381,11 +374,8 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       _WidgetBitInline(parent ?? this.parent, child, alignment, baseline);
 
   @override
-  void flatten(Flattened f) => f.inlineWidget(
-        alignment: alignment,
-        baseline: baseline,
-        child: child,
-      );
+  void flatten(Flattened f) =>
+      f.inlineWidget(alignment: alignment, baseline: baseline, child: child);
 
   @override
   String toString() => 'WidgetBit.inline#$hashCode $child';

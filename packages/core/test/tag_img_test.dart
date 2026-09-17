@@ -341,7 +341,7 @@ void main() {
               html,
               factoryBuilder: () => _LoadingBuilderFactory(streamCompleter),
               key: helper.hwKey,
-              onLoadingBuilder: (_, __, loadingProgress) {
+              onLoadingBuilder: (_, _, loadingProgress) {
                 values.add(loadingProgress);
                 return widget0;
               },

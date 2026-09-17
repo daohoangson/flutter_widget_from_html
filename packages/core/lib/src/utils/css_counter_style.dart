@@ -12,45 +12,34 @@ class CssCounterStyle {
   final (int, int)? _range; // null = auto
   final (int, String)? _pad; // (minLength, padChar)
 
-  const CssCounterStyle._alphabetic({
-    required List<String> symbols,
-    this.suffix = '.',
-    (int, int)? range,
-  })  : _system = _System.alphabetic,
-        _symbols = symbols,
-        _additiveSymbols = const [],
-        _range = range,
-        _pad = null;
+  const CssCounterStyle._alphabetic({required this._symbols, this.suffix = '.'})
+    : _range = null,
+      _system = _System.alphabetic,
+      _additiveSymbols = const [],
+      _pad = null;
 
   const CssCounterStyle._numeric({
-    required List<String> symbols,
+    required this._symbols,
     this.suffix = '.',
-    (int, int)? range,
-    (int, String)? pad,
-  })  : _system = _System.numeric,
-        _symbols = symbols,
-        _additiveSymbols = const [],
-        _range = range,
-        _pad = pad;
+    this._pad,
+  }) : _range = null,
+       _system = _System.numeric,
+       _additiveSymbols = const [];
 
   const CssCounterStyle._additive({
-    required List<(int, String)> additiveSymbols,
+    required this._additiveSymbols,
     this.suffix = '.',
-    (int, int)? range,
-  })  : _system = _System.additive,
-        _symbols = const [],
-        _additiveSymbols = additiveSymbols,
-        _range = range,
-        _pad = null;
+    this._range,
+  }) : _system = _System.additive,
+       _symbols = const [],
+       _pad = null;
 
-  const CssCounterStyle._cyclic({
-    required List<String> symbols,
-  })  : suffix = '',
-        _system = _System.cyclic,
-        _symbols = symbols,
-        _additiveSymbols = const [],
-        _range = null,
-        _pad = null;
+  const CssCounterStyle._cyclic({required this._symbols})
+    : suffix = '',
+      _system = _System.cyclic,
+      _additiveSymbols = const [],
+      _range = null,
+      _pad = null;
 
   /// Returns the [CssCounterStyle] for the given [type].
   /// Supports predefined styles and CSS string literals (e.g., '"★"' or "'👉'").
@@ -67,7 +56,8 @@ class CssCounterStyle {
     }
 
     // is it explicitly quoted?
-    final isExplicitlyQuoted = type.length >= 2 &&
+    final isExplicitlyQuoted =
+        type.length >= 2 &&
         ((type.startsWith('"') && type.endsWith('"')) ||
             (type.startsWith("'") && type.endsWith("'")));
 
@@ -76,8 +66,9 @@ class CssCounterStyle {
 
     if (isExplicitlyQuoted || isSymbolOrTextWithSpaces) {
       // strip the quotes if they survived the html parser
-      final literal =
-          isExplicitlyQuoted ? type.substring(1, type.length - 1) : type;
+      final literal = isExplicitlyQuoted
+          ? type.substring(1, type.length - 1)
+          : type;
 
       // return a dynamic cyclic style for the literal
       return CssCounterStyle._cyclic(symbols: [literal]);
@@ -122,11 +113,11 @@ class CssCounterStyle {
   }
 
   String? _represent(int n) => switch (_system) {
-        _System.alphabetic => _representAlphabetic(n),
-        _System.numeric => _representNumeric(n),
-        _System.additive => _representAdditive(n),
-        _System.cyclic => _representCyclic(n),
-      };
+    _System.alphabetic => _representAlphabetic(n),
+    _System.numeric => _representNumeric(n),
+    _System.additive => _representAdditive(n),
+    _System.cyclic => _representCyclic(n),
+  };
 
   String? _representAlphabetic(int n) {
     if (n < 1) {
@@ -215,9 +206,7 @@ const _decimalLeadingZero = CssCounterStyle._numeric(
   pad: (2, '0'),
 );
 
-const _binary = CssCounterStyle._numeric(
-  symbols: ['0', '1'],
-);
+const _binary = CssCounterStyle._numeric(symbols: ['0', '1']);
 
 const _octal = CssCounterStyle._numeric(
   symbols: ['0', '1', '2', '3', '4', '5', '6', '7'],
@@ -240,7 +229,7 @@ const _lowerHexadecimal = CssCounterStyle._numeric(
     'c',
     'd',
     'e',
-    'f'
+    'f',
   ],
 );
 
@@ -261,7 +250,7 @@ const _upperHexadecimal = CssCounterStyle._numeric(
     'C',
     'D',
     'E',
-    'F'
+    'F',
   ],
 );
 
@@ -712,7 +701,7 @@ const _hangul = CssCounterStyle._alphabetic(
     '카',
     '타',
     '파',
-    '하'
+    '하',
   ],
 );
 
@@ -731,7 +720,7 @@ const _hangulConsonant = CssCounterStyle._alphabetic(
     'ㅋ',
     'ㅌ',
     'ㅍ',
-    'ㅎ'
+    'ㅎ',
   ],
 );
 

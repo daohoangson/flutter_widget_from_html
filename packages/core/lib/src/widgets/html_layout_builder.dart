@@ -11,10 +11,7 @@ class HtmlLayoutBuilder extends ConstrainedLayoutBuilder<BoxConstraints> {
 
   @override
   RenderAbstractLayoutBuilderMixin<BoxConstraints, RenderBox>
-      createRenderObject(
-    BuildContext context,
-  ) =>
-          _RenderLayoutBuilder();
+  createRenderObject(BuildContext context) => _RenderLayoutBuilder();
 }
 
 class _RenderLayoutBuilder extends RenderBox
@@ -30,7 +27,9 @@ class _RenderLayoutBuilder extends RenderBox
 
   @override
   double? computeDryBaseline(
-      BoxConstraints constraints, TextBaseline baseline) {
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
     return null;
   }
 

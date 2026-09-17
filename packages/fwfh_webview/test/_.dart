@@ -7,8 +7,9 @@ import '../../core/test/_.dart' as helper;
 
 String? webViewExplainer(helper.Explainer parent, Widget widget) {
   if (widget is WebView) {
-    final allow =
-        widget.allow?.isNotEmpty == true ? ',allow=${widget.allow}' : '';
+    final allow = widget.allow?.isNotEmpty == true
+        ? ',allow=${widget.allow}'
+        : '';
     final allowFullscreen = widget.allowFullscreen
         ? ',allowFullscreen=${widget.allowFullscreen}'
         : '';
@@ -23,9 +24,9 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
         : '';
     final unsupportedWorkaroundForIssue37 =
         !widget.unsupportedWorkaroundForIssue37
-            ? ',unsupportedWorkaroundForIssue37='
-                '${widget.unsupportedWorkaroundForIssue37}'
-            : '';
+        ? ',unsupportedWorkaroundForIssue37='
+              '${widget.unsupportedWorkaroundForIssue37}'
+        : '';
     final userAgent = widget.userAgent?.isNotEmpty == true
         ? ',userAgent=${widget.userAgent}'
         : '';
@@ -52,18 +53,17 @@ Future<String> explain(
   String html, {
   Uri? baseUrl,
   bool useExplainer = true,
-}) =>
-    helper.explain(
-      tester,
-      null,
-      explainer: webViewExplainer,
-      hw: HtmlWidget(
-        html,
-        baseUrl: baseUrl,
-        key: helper.hwKey,
-        factoryBuilder: () => WebViewWidgetFactory(),
-      ),
-      useExplainer: useExplainer,
-    );
+}) => helper.explain(
+  tester,
+  null,
+  explainer: webViewExplainer,
+  hw: HtmlWidget(
+    html,
+    baseUrl: baseUrl,
+    key: helper.hwKey,
+    factoryBuilder: () => WebViewWidgetFactory(),
+  ),
+  useExplainer: useExplainer,
+);
 
 class WebViewWidgetFactory extends WidgetFactory with WebViewFactory {}

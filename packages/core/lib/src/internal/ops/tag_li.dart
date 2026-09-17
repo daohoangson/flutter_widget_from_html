@@ -54,35 +54,35 @@ class TagLi {
   TagLi(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        debugLabel: kTagUnorderedList,
-        defaultStyles: _defaultStyles,
-        onVisitChild: (listTree, subTree) {
-          final element = subTree.element;
+    debugLabel: kTagUnorderedList,
+    defaultStyles: _defaultStyles,
+    onVisitChild: (listTree, subTree) {
+      final element = subTree.element;
 
-          switch (element.localName) {
-            case kTagOrderedList:
-            case kTagUnorderedList:
-              element.elementDepth = subTree.increaseListDepth();
-            case kTagLi:
-              if (element.parent == listTree.element) {
-                subTree.register(
-                  BuildOp(
-                    debugLabel: kTagLi,
-                    onRenderBlock: (itemTree, placeholder) {
-                      final i = listTree.increaseListItems() - 1;
+      switch (element.localName) {
+        case kTagOrderedList:
+        case kTagUnorderedList:
+          element.elementDepth = subTree.increaseListDepth();
+        case kTagLi:
+          if (element.parent == listTree.element) {
+            subTree.register(
+              BuildOp(
+                debugLabel: kTagLi,
+                onRenderBlock: (itemTree, placeholder) {
+                  final i = listTree.increaseListItems() - 1;
 
-                      return placeholder.wrapWith(
-                        (ctx, w) => _buildItem(ctx, listTree, itemTree, w, i),
-                      );
-                    },
-                    priority: Priority.tagLiItem,
-                  ),
-                );
-              }
+                  return placeholder.wrapWith(
+                    (ctx, w) => _buildItem(ctx, listTree, itemTree, w, i),
+                  );
+                },
+                priority: Priority.tagLiItem,
+              ),
+            );
           }
-        },
-        priority: Priority.tagLiList,
-      );
+      }
+    },
+    priority: Priority.tagLiList,
+  );
 
   Widget _buildItem(
     BuildContext context,
@@ -121,7 +121,7 @@ class TagLi {
     if (element.localName == kTagOrderedList) {
       listStyleType =
           _listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
-              kCssListStyleTypeDecimal;
+          kCssListStyleTypeDecimal;
     } else {
       switch (depth) {
         case 0:
@@ -176,12 +176,12 @@ extension on BuildTree {
       getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
   int increaseListDepth() => setNonInherited<_TagLiListData>(
-        listData.copyWith(dataDepth: listData.dataDepth + 1),
-      ).dataDepth;
+    listData.copyWith(dataDepth: listData.dataDepth + 1),
+  ).dataDepth;
 
   int increaseListItems() => setNonInherited<_TagLiListData>(
-        listData.copyWith(items: listData.items + 1),
-      ).items;
+    listData.copyWith(items: listData.items + 1),
+  ).items;
 
   _TagLiListData _parse() {
     final attrs = element.attributes;
@@ -213,10 +213,7 @@ class _TagLiListData {
     this.items = 0,
   });
 
-  _TagLiListData copyWith({
-    int? dataDepth,
-    int? items,
-  }) {
+  _TagLiListData copyWith({int? dataDepth, int? items}) {
     return _TagLiListData(
       markerReversed: markerReversed,
       markerStart: markerStart,

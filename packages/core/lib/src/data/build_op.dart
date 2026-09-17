@@ -37,10 +37,8 @@ typedef OnParsed = BuildTree Function(BuildTree tree);
 ///
 /// This only works if it's a block element.
 /// {@endtemplate}
-typedef OnRenderBlock = Widget Function(
-  BuildTree tree,
-  WidgetPlaceholder placeholder,
-);
+typedef OnRenderBlock =
+    Widget Function(BuildTree tree, WidgetPlaceholder placeholder);
 
 /// {@template flutter_widget_from_html.onRenderInline}
 /// The callback that will be called before flattening.
@@ -75,10 +73,11 @@ typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 /// If there are more than one [BuildOp]s with this callback, the first one
 /// returning a non-null value will win.
 /// {@endtemplate}
-typedef OnRenderedChildren = WidgetPlaceholder? Function(
-  BuildTree tree,
-  Iterable<WidgetPlaceholder> children,
-);
+typedef OnRenderedChildren =
+    WidgetPlaceholder? Function(
+      BuildTree tree,
+      Iterable<WidgetPlaceholder> children,
+    );
 
 /// {@template flutter_widget_from_html.onVisitChild}
 /// The callback that will be called before processing a child element.
@@ -161,11 +160,13 @@ class BuildOp {
     Iterable<Widget>? Function(
       BuildMetadata meta,
       Iterable<WidgetPlaceholder> widgets,
-    )? onWidgets,
+    )?
+    onWidgets,
     @Deprecated('Use alwaysRenderBlock instead.')
     bool onWidgetsIsOptional = false,
   }) {
-    final onRenderBlockOrOnWidgets = onRenderBlock ??
+    final onRenderBlockOrOnWidgets =
+        onRenderBlock ??
         (onWidgets != null
             ? (tree, placeholder) {
                 final children = onWidgets(tree, [placeholder]);
@@ -185,11 +186,13 @@ class BuildOp {
             : null);
 
     return BuildOp.v2(
-      alwaysRenderBlock: alwaysRenderBlock ??
+      alwaysRenderBlock:
+          alwaysRenderBlock ??
           (onWidgetsIsOptional ? null : (onRenderBlockOrOnWidgets != null)),
       debugLabel: debugLabel,
       defaultStyles: defaultStyles,
-      onParsed: onParsed ??
+      onParsed:
+          onParsed ??
           (onTree != null
               ? (tree) {
                   onTree(tree, tree);
@@ -197,13 +200,15 @@ class BuildOp {
                 }
               : null),
       onRenderBlock: onRenderBlockOrOnWidgets,
-      onRenderInline: onRenderInline ??
+      onRenderInline:
+          onRenderInline ??
           (onTreeFlattening != null
               ? (tree) => onTreeFlattening(tree, tree)
               : null),
       onRenderedBlock: onRenderedBlock,
       onRenderedChildren: onRenderedChildren,
-      onVisitChild: onVisitChild ??
+      onVisitChild:
+          onVisitChild ??
           (onChild != null ? (_, subTree) => onChild(subTree) : null),
       priority: priority,
     );
@@ -216,40 +221,38 @@ class BuildOp {
     String? debugLabel,
     required OnRenderInlineBlock onRenderInlineBlock,
     int priority = kPriorityInlineBlockDefault,
-  }) =>
-      BuildOp.v2(
-        debugLabel: debugLabel,
-        onParsed: (tree) {
-          final bits = [...tree.bits];
-          if (bits.length == 1) {
-            final bit = bits.first;
-            if (bit is WidgetBit &&
-                bit.isInline == true &&
-                bit.alignment == alignment &&
-                bit.baseline == baseline) {
-              // tree has exactly 1 inline bit & all configurations match
-              // let's reuse the existing placeholder
-              bit.child.wrapWith((_, w) => onRenderInlineBlock(tree, w));
-              return tree;
-            }
-          }
+  }) => BuildOp.v2(
+    debugLabel: debugLabel,
+    onParsed: (tree) {
+      final bits = [...tree.bits];
+      if (bits.length == 1) {
+        final bit = bits.first;
+        if (bit is WidgetBit &&
+            bit.isInline == true &&
+            bit.alignment == alignment &&
+            bit.baseline == baseline) {
+          // tree has exactly 1 inline bit & all configurations match
+          // let's reuse the existing placeholder
+          bit.child.wrapWith((_, w) => onRenderInlineBlock(tree, w));
+          return tree;
+        }
+      }
 
-          final parent = tree.parent;
-          return parent.sub()
-            ..append(
-              WidgetBit.inline(
-                parent,
-                WidgetPlaceholder(
-                  debugLabel: debugLabel,
-                  child: onRenderInlineBlock(tree, tree.build() ?? widget0),
-                ),
-                alignment: alignment,
-                baseline: baseline,
-              ),
-            );
-        },
-        priority: priority,
+      final parent = tree.parent;
+      return parent.sub()..append(
+        WidgetBit.inline(
+          parent,
+          WidgetPlaceholder(
+            debugLabel: debugLabel,
+            child: onRenderInlineBlock(tree, tree.build() ?? widget0),
+          ),
+          alignment: alignment,
+          baseline: baseline,
+        ),
       );
+    },
+    priority: priority,
+  );
 
   /// Creates a second generation build op.
   const BuildOp.v2({

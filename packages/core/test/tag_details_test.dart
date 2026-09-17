@@ -120,7 +120,8 @@ void main() {
     });
 
     testWidgets('double DETAILS', (WidgetTester tester) async {
-      const html = '<details open><summary>Foo1</summary>Foo2</details>'
+      const html =
+          '<details open><summary>Foo1</summary>Foo2</details>'
           '<details open><summary>Bar1</summary>Bar2</details>';
       final explained = await explain(tester, html);
       expect(
@@ -140,7 +141,8 @@ void main() {
     });
 
     testWidgets('double SUMMARY', (WidgetTester tester) async {
-      const html = '<details><summary>One</summary>'
+      const html =
+          '<details><summary>One</summary>'
           '<summary>Two</summary>Foo</details>';
       final explained = await explain(tester, html);
       expect(

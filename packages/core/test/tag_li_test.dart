@@ -119,10 +119,7 @@ Future<void> main() async {
     final explained = await explain(tester, html);
 
     final li221And222 = padding(
-      list([
-        item(square, '2.2.1'),
-        item(square, '2.2.2'),
-      ]),
+      list([item(square, '2.2.1'), item(square, '2.2.2')]),
     );
     final li21And22And23 = padding(
       list([
@@ -180,13 +177,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          padding(
-            list([
-              item('1.', 'x'),
-              item('2.', 'x'),
-              item('3.', 'x'),
-            ]),
-          ),
+          padding(list([item('1.', 'x'), item('2.', 'x'), item('3.', 'x')])),
         ),
       );
     });
@@ -197,13 +188,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          padding(
-            list([
-              item('3.', 'x'),
-              item('2.', 'x'),
-              item('1.', 'x'),
-            ]),
-          ),
+          padding(list([item('3.', 'x'), item('2.', 'x'), item('1.', 'x')])),
         ),
       );
     });
@@ -215,13 +200,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          padding(
-            list([
-              item('99.', 'x'),
-              item('98.', 'x'),
-              item('97.', 'x'),
-            ]),
-          ),
+          padding(list([item('99.', 'x'), item('98.', 'x'), item('97.', 'x')])),
         ),
       );
     });
@@ -247,13 +226,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          padding(
-            list([
-              item('x.', 'x'),
-              item('y.', 'x'),
-              item('z.', 'x'),
-            ]),
-          ),
+          padding(list([item('x.', 'x'), item('y.', 'x'), item('z.', 'x')])),
         ),
       );
     });
@@ -398,11 +371,7 @@ Future<void> main() async {
             explained,
             equals(
               padding(
-                list([
-                  item('1.', 'x'),
-                  item('2.', 'x'),
-                  item('3.', 'x'),
-                ]),
+                list([item('1.', 'x'), item('2.', 'x'), item('3.', 'x')]),
               ),
             ),
           );
@@ -416,11 +385,7 @@ Future<void> main() async {
             explained,
             equals(
               padding(
-                list([
-                  item('1.', 'x'),
-                  item('2.', 'x'),
-                  item('3.', 'x'),
-                ]),
+                list([item('1.', 'x'), item('2.', 'x'), item('3.', 'x')]),
               ),
             ),
           );
@@ -647,13 +612,7 @@ Future<void> main() async {
         expect(
           explained,
           equals(
-            padding(
-              list([
-                item('一、', 'x'),
-                item('二、', 'x'),
-                item('三、', 'x'),
-              ]),
-            ),
+            padding(list([item('一、', 'x'), item('二、', 'x'), item('三、', 'x')])),
           ),
         );
       });
@@ -665,13 +624,7 @@ Future<void> main() async {
         expect(
           explained,
           equals(
-            padding(
-              list([
-                item('α.', 'x'),
-                item('β.', 'x'),
-                item('γ.', 'x'),
-              ]),
-            ),
+            padding(list([item('α.', 'x'), item('β.', 'x'), item('γ.', 'x')])),
           ),
         );
       });
@@ -684,11 +637,7 @@ Future<void> main() async {
           explained,
           equals(
             padding(
-              list([
-                item('1.', 'x'),
-                item('10.', 'x'),
-                item('11.', 'x'),
-              ]),
+              list([item('1.', 'x'), item('10.', 'x'), item('11.', 'x')]),
             ),
           ),
         );
@@ -745,10 +694,7 @@ Future<void> main() async {
         explained,
         equals(
           padding(
-            list([
-              item('1.', '', child: '[widget0]'),
-              item('2.', 'Foo'),
-            ]),
+            list([item('1.', '', child: '[widget0]'), item('2.', 'Foo')]),
           ),
         ),
       );
@@ -770,12 +716,7 @@ Future<void> main() async {
           padding(
             list([
               item(disc, 'One'),
-              padding(
-                list([
-                  item(circle, 'Two'),
-                  item(circle, 'Three'),
-                ]),
-              ),
+              padding(list([item(circle, 'Two'), item(circle, 'Three')])),
             ]),
           ),
         ),
@@ -964,10 +905,7 @@ Future<void> main() async {
     testWidgets('computeDryLayout without child', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlListItem(
-          key: key,
-          textDirection: TextDirection.ltr,
-        ),
+        HtmlListItem(key: key, textDirection: TextDirection.ltr),
       );
       await tester.pumpAndSettle();
 
@@ -1022,10 +960,7 @@ Future<void> main() async {
     testWidgets('computeIntrinsic without child', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlListItem(
-          key: key,
-          textDirection: TextDirection.ltr,
-        ),
+        HtmlListItem(key: key, textDirection: TextDirection.ltr),
       );
       await tester.pumpAndSettle();
 
@@ -1055,61 +990,51 @@ Future<void> main() async {
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
-            ? null
-            : 'Linux only'
+              ? null
+              : 'Linux only'
         : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
     GoldenToolkit.runWithConfiguration(
       () {
-        group(
-          'baseline calculation',
-          () {
-            setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
-            tearDown(
-              () => WidgetFactory.debugDeterministicLoadingWidget = false,
-            );
+        group('baseline calculation', () {
+          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
 
-            const assetName = 'test/images/logo.png';
-            final testCases = <String, String>{
-              'img_block':
-                  '<img src="asset:$assetName" style="display: block; height: 30px;" />',
-              'img_block_between_text':
-                  'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
-              'img_block_then_text':
-                  '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
-              'img_inline':
-                  '<img src="asset:$assetName" style="height: 30px;" />',
-              'img_inline_between_text':
-                  'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
-              'img_inline_then_text':
-                  '<img src="asset:$assetName" style="height: 30px;" /> foo',
-              // TODO: doesn't match browser output
-              'li_within_li': '<li>Foo</li>',
-              'list_within_li': '<ul><li>Foo</li></ul>',
-              'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
-              'multiline': 'Lorem ipsum dolor sit amet.<br />\n' * 3,
-              'padding': '<div style="padding: 10px">Foo</div>',
-              'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
-            };
+          const assetName = 'test/images/logo.png';
+          final testCases = <String, String>{
+            'img_block':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" />',
+            'img_block_between_text':
+                'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
+            'img_block_then_text':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
+            'img_inline':
+                '<img src="asset:$assetName" style="height: 30px;" />',
+            'img_inline_between_text':
+                'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
+            'img_inline_then_text':
+                '<img src="asset:$assetName" style="height: 30px;" /> foo',
+            // TODO: doesn't match browser output
+            'li_within_li': '<li>Foo</li>',
+            'list_within_li': '<ul><li>Foo</li></ul>',
+            'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
+            'multiline': 'Lorem ipsum dolor sit amet.<br />\n' * 3,
+            'padding': '<div style="padding: 10px">Foo</div>',
+            'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
+          };
 
-            for (final testCase in testCases.entries) {
-              testGoldens(
-                testCase.key,
-                (tester) async {
-                  await tester.pumpWidgetBuilder(
-                    _Golden(testCase.value),
-                    wrapper: materialAppWrapper(theme: ThemeData.light()),
-                    surfaceSize: const Size(600, 400),
-                  );
-
-                  await screenMatchesGolden(tester, testCase.key);
-                },
-                skip: goldenSkip != null,
+          for (final testCase in testCases.entries) {
+            testGoldens(testCase.key, (tester) async {
+              await tester.pumpWidgetBuilder(
+                _Golden(testCase.value),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: const Size(600, 400),
               );
-            }
-          },
-          skip: goldenSkip,
-        );
+
+              await screenMatchesGolden(tester, testCase.key);
+            }, skip: goldenSkip != null);
+          }
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
@@ -1141,8 +1066,10 @@ Future<void> main() async {
         useExplainer: false,
       );
 
-      expect(disc,
-          contains('alpha: 1.0000, red: 1.0000, green: 0.0000, blue: 0.0000'));
+      expect(
+        disc,
+        contains('alpha: 1.0000, red: 1.0000, green: 0.0000, blue: 0.0000'),
+      );
 
       final circle = await explain(
         tester,
@@ -1150,8 +1077,10 @@ Future<void> main() async {
         useExplainer: false,
       );
 
-      expect(circle,
-          contains('alpha: 1.0000, red: 0.0000, green: 1.0000, blue: 0.0000'));
+      expect(
+        circle,
+        contains('alpha: 1.0000, red: 0.0000, green: 1.0000, blue: 0.0000'),
+      );
     });
 
     testWidgets('computeDryBaseline', (tester) async {
@@ -1190,13 +1119,12 @@ class _Golden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              HtmlWidget(
-                '''
+    body: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          HtmlWidget('''
 <ul>
   <li>Above</li>
   <li>$contents</li>
@@ -1208,12 +1136,11 @@ class _Golden extends StatelessWidget {
   <li>$contents</li>
   <li>Third</li>
 </ol>
-''',
-              ),
-            ],
-          ),
-        ),
-      );
+'''),
+        ],
+      ),
+    ),
+  );
 }
 
 class _NullListMarkerWidgetFactory extends WidgetFactory {

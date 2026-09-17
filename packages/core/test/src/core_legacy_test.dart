@@ -15,7 +15,8 @@ import '../_.dart';
 void main() {
   group('BuildMetadata', () {
     testWidgets('SmilieScreen works', (tester) async {
-      const html = '<p>Hello <img class="smilie smilie-1" alt=":)" '
+      const html =
+          '<p>Hello <img class="smilie smilie-1" alt=":)" '
           'src="http://domain.com/sprites.png" />!</p>';
       final explained = await explain(
         tester,
@@ -30,7 +31,8 @@ void main() {
     });
 
     testWidgets('style operators work', (tester) async {
-      const html = '<span class="setter">Foo</span> '
+      const html =
+          '<span class="setter">Foo</span> '
           '<span class="getter" style="-fwfh-font-size: 42px">bar</span>';
       final explained = await explain(
         tester,
@@ -259,7 +261,7 @@ void main() {
           hw: HtmlWidget(
             html,
             factoryBuilder: () => _BuildOpWidgetFactory(
-              BuildOp(onWidgets: (_, __) => listOrNull(null)),
+              BuildOp(onWidgets: (_, _) => listOrNull(null)),
             ),
             key: hwKey,
           ),
@@ -275,9 +277,8 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpWidgetFactory(
-              BuildOp(onWidgets: (_, __) => const []),
-            ),
+            factoryBuilder: () =>
+                _BuildOpWidgetFactory(BuildOp(onWidgets: (_, _) => const [])),
             key: hwKey,
           ),
           useExplainer: false,
@@ -293,7 +294,7 @@ void main() {
           hw: HtmlWidget(
             html,
             factoryBuilder: () => _BuildOpWidgetFactory(
-              BuildOp(onWidgets: (_, __) => listOrNull(const Text('Hi'))),
+              BuildOp(onWidgets: (_, _) => listOrNull(const Text('Hi'))),
             ),
             key: hwKey,
           ),
@@ -314,17 +315,14 @@ void main() {
             child: HtmlWidget(
               html,
               factoryBuilder: () => _BuildOpWidgetFactory(
-                BuildOp(onWidgets: (_, __) => const [Text('One'), Text('Two')]),
+                BuildOp(onWidgets: (_, _) => const [Text('One'), Text('Two')]),
               ),
               key: hwKey,
             ),
           ),
           useExplainer: false,
         );
-        expect(
-          records.map((r) => r.error),
-          equals([isA<UnsupportedError>()]),
-        );
+        expect(records.map((r) => r.error), equals([isA<UnsupportedError>()]));
       });
     });
 
@@ -441,13 +439,11 @@ class _BuildMetadataStyleOperators extends WidgetFactory {
         BuildOp(
           onTree: (meta, tree) {
             final value = meta['-fwfh-font-size']?.value;
-            meta.tsb.enqueue(
-              (p, _) {
-                final length = value != null ? tryParseCssLength(value) : null;
-                final fontSize = length?.getValue(p);
-                return p.copyWith(style: p.style.copyWith(fontSize: fontSize));
-              },
-            );
+            meta.tsb.enqueue((p, _) {
+              final length = value != null ? tryParseCssLength(value) : null;
+              final fontSize = length?.getValue(p);
+              return p.copyWith(style: p.style.copyWith(fontSize: fontSize));
+            });
           },
         ),
       );
@@ -489,9 +485,7 @@ class _BuildOpOnChild extends WidgetFactory {
           onChild: (subTree) {
             if (subTree.element.classes.contains('child')) {
               subTree.register(
-                BuildOp(
-                  onTreeFlattening: (_, subTree) => subTree.addText('!'),
-                ),
+                BuildOp(onTreeFlattening: (_, subTree) => subTree.addText('!')),
               );
             }
           },
@@ -512,18 +506,8 @@ class _BuildOpPriority extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     tree
-      ..register(
-        BuildOp(
-          onTree: (_, tree) => tree.addText(' A'),
-          priority: a,
-        ),
-      )
-      ..register(
-        BuildOp(
-          onTree: (_, tree) => tree.addText(' B'),
-          priority: b,
-        ),
-      );
+      ..register(BuildOp(onTree: (_, tree) => tree.addText(' A'), priority: a))
+      ..register(BuildOp(onTree: (_, tree) => tree.addText(' B'), priority: b));
 
     return super.parse(tree);
   }
@@ -552,10 +536,7 @@ class _LoggerApp extends StatefulWidget {
   final Widget child;
   final List<LogRecord> records;
 
-  const _LoggerApp({
-    required this.child,
-    required this.records,
-  });
+  const _LoggerApp({required this.child, required this.records});
 
   @override
   State<_LoggerApp> createState() => _LoggerAppState();

@@ -1,5 +1,6 @@
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core show WidgetFactory;
+    as core
+    show WidgetFactory;
 import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
 import 'package:fwfh_just_audio/fwfh_just_audio.dart';

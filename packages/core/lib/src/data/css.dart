@@ -32,13 +32,13 @@ class CssBorder {
     this.radiusBottomRight = CssRadius.zero,
     this.radiusTopLeft = CssRadius.zero,
     this.radiusTopRight = CssRadius.zero,
-  })  : _all = all,
-        _bottom = bottom,
-        _inlineEnd = inlineEnd,
-        _inlineStart = inlineStart,
-        _left = left,
-        _right = right,
-        _top = top;
+  }) : _all = all,
+       _bottom = bottom,
+       _inlineEnd = inlineEnd,
+       _inlineStart = inlineStart,
+       _left = left,
+       _right = right,
+       _top = top;
 
   /// Returns `true` if all sides are unset, all radius are zero.
   bool get isNoOp =>
@@ -56,18 +56,18 @@ class CssBorder {
 
   /// Creates a copy of this border with the sides from [other].
   CssBorder copyFrom(CssBorder other) => copyWith(
-        all: other._all,
-        bottom: other._bottom,
-        inlineEnd: other._inlineEnd,
-        inlineStart: other._inlineStart,
-        left: other._left,
-        right: other._right,
-        top: other._top,
-        radiusBottomLeft: other.radiusBottomLeft,
-        radiusBottomRight: other.radiusBottomRight,
-        radiusTopLeft: other.radiusTopLeft,
-        radiusTopRight: other.radiusTopRight,
-      );
+    all: other._all,
+    bottom: other._bottom,
+    inlineEnd: other._inlineEnd,
+    inlineStart: other._inlineStart,
+    left: other._left,
+    right: other._right,
+    top: other._top,
+    radiusBottomLeft: other.radiusBottomLeft,
+    radiusBottomRight: other.radiusBottomRight,
+    radiusTopLeft: other.radiusTopLeft,
+    radiusTopRight: other.radiusTopRight,
+  );
 
   /// Creates a copy of this border but with the given fields
   /// replaced with the new values.
@@ -83,24 +83,24 @@ class CssBorder {
     CssRadius? radiusBottomRight,
     CssRadius? radiusTopLeft,
     CssRadius? radiusTopRight,
-  }) =>
-      CssBorder(
-        inherit: inherit,
-        all: CssBorderSide._copyWith(_all, all),
-        bottom: all != null ? null : CssBorderSide._copyWith(_bottom, bottom),
-        inlineEnd:
-            all != null ? null : CssBorderSide._copyWith(_inlineEnd, inlineEnd),
-        inlineStart: all != null
-            ? null
-            : CssBorderSide._copyWith(_inlineStart, inlineStart),
-        left: all != null ? null : CssBorderSide._copyWith(_left, left),
-        right: all != null ? null : CssBorderSide._copyWith(_right, right),
-        top: all != null ? null : CssBorderSide._copyWith(_top, top),
-        radiusBottomLeft: radiusBottomLeft ?? this.radiusBottomLeft,
-        radiusBottomRight: radiusBottomRight ?? this.radiusBottomRight,
-        radiusTopLeft: radiusTopLeft ?? this.radiusTopLeft,
-        radiusTopRight: radiusTopRight ?? this.radiusTopRight,
-      );
+  }) => CssBorder(
+    inherit: inherit,
+    all: CssBorderSide._copyWith(_all, all),
+    bottom: all != null ? null : CssBorderSide._copyWith(_bottom, bottom),
+    inlineEnd: all != null
+        ? null
+        : CssBorderSide._copyWith(_inlineEnd, inlineEnd),
+    inlineStart: all != null
+        ? null
+        : CssBorderSide._copyWith(_inlineStart, inlineStart),
+    left: all != null ? null : CssBorderSide._copyWith(_left, left),
+    right: all != null ? null : CssBorderSide._copyWith(_right, right),
+    top: all != null ? null : CssBorderSide._copyWith(_top, top),
+    radiusBottomLeft: radiusBottomLeft ?? this.radiusBottomLeft,
+    radiusBottomRight: radiusBottomRight ?? this.radiusBottomRight,
+    radiusTopLeft: radiusTopLeft ?? this.radiusTopLeft,
+    radiusTopRight: radiusTopRight ?? this.radiusTopRight,
+  );
 
   /// Calculates [Border].
   Border? getBorder(InheritedProperties resolved) {
@@ -363,10 +363,10 @@ class CssLengthBox {
     CssLength? left,
     CssLength? right,
     this.top,
-  })  : _inlineEnd = inlineEnd,
-        _inlineStart = inlineStart,
-        _left = left,
-        _right = right;
+  }) : _inlineEnd = inlineEnd,
+       _inlineStart = inlineStart,
+       _left = left,
+       _right = right;
 
   /// Creates a copy with the given measurements replaced with the new values.
   CssLengthBox copyWith({
@@ -376,15 +376,14 @@ class CssLengthBox {
     CssLength? left,
     CssLength? right,
     CssLength? top,
-  }) =>
-      CssLengthBox(
-        bottom: bottom ?? this.bottom,
-        inlineEnd: inlineEnd ?? _inlineEnd,
-        inlineStart: inlineStart ?? _inlineStart,
-        left: left ?? _left,
-        right: right ?? _right,
-        top: top ?? this.top,
-      );
+  }) => CssLengthBox(
+    bottom: bottom ?? this.bottom,
+    inlineEnd: inlineEnd ?? _inlineEnd,
+    inlineStart: inlineStart ?? _inlineStart,
+    left: left ?? _left,
+    right: right ?? _right,
+    top: top ?? this.top,
+  );
 
   /// Returns `true` if left or inline measurements are set.
   bool get mayHaveLeft =>

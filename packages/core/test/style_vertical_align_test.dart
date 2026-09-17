@@ -188,21 +188,24 @@ void main() {
 
   group('possible conflict', () {
     testWidgets('display: inline', (WidgetTester tester) async {
-      const html = 'Foo <span style="display: inline; '
+      const html =
+          'Foo <span style="display: inline; '
           'vertical-align: top">bar</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
     });
 
     testWidgets('display: inline-block', (WidgetTester tester) async {
-      const html = 'Foo <span style="display: inline-block; '
+      const html =
+          'Foo <span style="display: inline-block; '
           'vertical-align: top">bar</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo [RichText:(:bar)]@top)]'));
     });
 
     testWidgets('display: block', (WidgetTester tester) async {
-      const html = 'Foo <span style="display: block; '
+      const html =
+          'Foo <span style="display: block; '
           'vertical-align: top">bar</span>';
       final explained = await explain(tester, html);
       expect(

@@ -6,10 +6,7 @@ const String kCssTextShadow = 'text-shadow';
 void textShadowApply(BuildTree tree, css.Declaration style) {
   final expressions = style.values;
   if (expressions.isNotEmpty) {
-    tree.inherit(
-      _textShadow,
-      _extractToIndividualExpressions(expressions),
-    );
+    tree.inherit(_textShadow, _extractToIndividualExpressions(expressions));
   }
 }
 

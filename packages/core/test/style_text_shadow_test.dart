@@ -87,46 +87,32 @@ void main() {
   testWidgets('text-shadow no shadow on missing offset', (tester) async {
     const html = '<p style="text-shadow: 1px #558ABB;">Anime</p>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[CssBlock:child=[RichText:(:Anime)]]'),
-    );
+    expect(explained, equals('[CssBlock:child=[RichText:(:Anime)]]'));
   });
 
-  testWidgets('text-shadow no shadow on missing offset color first',
-      (WidgetTester tester) async {
+  testWidgets('text-shadow no shadow on missing offset color first', (
+    WidgetTester tester,
+  ) async {
     const html = '<p style="text-shadow: #558ABB 2px;">Anime</p>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[CssBlock:child=[RichText:(:Anime)]]'),
-    );
+    expect(explained, equals('[CssBlock:child=[RichText:(:Anime)]]'));
   });
 
   testWidgets('text-shadow no shadow on data < 1', (WidgetTester tester) async {
     const html = '<p style="text-shadow: 5px;">Anime</p>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[CssBlock:child=[RichText:(:Anime)]]'),
-    );
+    expect(explained, equals('[CssBlock:child=[RichText:(:Anime)]]'));
   });
 
   testWidgets('text-shadow no shadow on data > 4', (WidgetTester tester) async {
     const html = '<p style="text-shadow: #558ABB 2px 5px 6px 4px;">Anime</p>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[CssBlock:child=[RichText:(:Anime)]]'),
-    );
+    expect(explained, equals('[CssBlock:child=[RichText:(:Anime)]]'));
   });
 
   testWidgets('text-shadow no shadow only has color', (tester) async {
     const html = '<p style="text-shadow: #558ABB;">Anime</p>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[CssBlock:child=[RichText:(:Anime)]]'),
-    );
+    expect(explained, equals('[CssBlock:child=[RichText:(:Anime)]]'));
   });
 }

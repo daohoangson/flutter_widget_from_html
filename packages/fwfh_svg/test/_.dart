@@ -11,7 +11,8 @@ String? svgExplainer(helper.Explainer parent, Widget widget) {
     final bytesLoader = widget.bytesLoader;
     var bytesLoaderString = bytesLoader.runtimeType.toString();
     if (bytesLoader is SvgAssetLoader) {
-      bytesLoaderString = 'SvgAssetLoader(assetName: ${bytesLoader.assetName}, '
+      bytesLoaderString =
+          'SvgAssetLoader(assetName: ${bytesLoader.assetName}, '
           'packageName: ${bytesLoader.packageName})';
     } else if (bytesLoader is SvgFileLoader) {
       bytesLoaderString = 'SvgFileLoader(${bytesLoader.file.path})';
@@ -27,17 +28,16 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool useExplainer = true,
-}) =>
-    helper.explain(
-      tester,
-      null,
-      explainer: svgExplainer,
-      hw: HtmlWidget(
-        html,
-        key: helper.hwKey,
-        factoryBuilder: () => _WidgetFactory(),
-      ),
-      useExplainer: useExplainer,
-    );
+}) => helper.explain(
+  tester,
+  null,
+  explainer: svgExplainer,
+  hw: HtmlWidget(
+    html,
+    key: helper.hwKey,
+    factoryBuilder: () => _WidgetFactory(),
+  ),
+  useExplainer: useExplainer,
+);
 
 class _WidgetFactory extends WidgetFactory with SvgFactory {}

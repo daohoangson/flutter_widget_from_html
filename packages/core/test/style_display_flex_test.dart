@@ -67,8 +67,12 @@ Future<void> main() async {
       final built = await explainWithoutPumping(useExplainer: false);
       expect(built, isNot(contains('ProgressIndicator')));
 
-      final box =
-          find.byType(RichText).evaluate().first.renderObject?.renderBox;
+      final box = find
+          .byType(RichText)
+          .evaluate()
+          .first
+          .renderObject
+          ?.renderBox;
       expect(box?.size.width, equals(tester.windowWidth));
     });
 
@@ -95,7 +99,8 @@ Future<void> main() async {
     });
 
     testWidgets('#1169: renders super wide contents', (tester) async {
-      const html = '<div style="display: flex">'
+      const html =
+          '<div style="display: flex">'
           '<div style="width: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
@@ -103,7 +108,8 @@ Future<void> main() async {
     });
 
     testWidgets('renders super wide contents with margins', (tester) async {
-      const html = '<div style="display: flex; margin: 5px">'
+      const html =
+          '<div style="display: flex; margin: 5px">'
           '<div style="width: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
@@ -114,7 +120,8 @@ Future<void> main() async {
     });
 
     testWidgets('renders super tall contents', (WidgetTester tester) async {
-      const html = '<div style="display: flex; flex-direction: column">'
+      const html =
+          '<div style="display: flex; flex-direction: column">'
           '<div style="height: 9999px">Foo</div>'
           '</div>';
       await explain(tester, html);
@@ -217,17 +224,19 @@ Future<void> main() async {
 
       testWidgets('updates textDirection', (WidgetTester tester) async {
         await explain(
-            tester,
-            '<div dir="ltr"><div style="display: flex; flex-direction: row">'
-            '<div>Foo</div><div>Bar</div>'
-            '</div></div>');
+          tester,
+          '<div dir="ltr"><div style="display: flex; flex-direction: row">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div></div>',
+        );
         expect(tester.foo.left, lessThan(tester.bar.left));
 
         await explain(
-            tester,
-            '<div dir="rtl"><div style="display: flex; flex-direction: row">'
-            '<div>Foo</div><div>Bar</div>'
-            '</div></div>');
+          tester,
+          '<div dir="rtl"><div style="display: flex; flex-direction: row">'
+          '<div>Foo</div><div>Bar</div>'
+          '</div></div>',
+        );
         expect(tester.foo.left, greaterThan(tester.bar.left));
       });
     });
@@ -241,14 +250,8 @@ Future<void> main() async {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  HtmlFlex(
-                    direction: Axis.horizontal,
-                    children: [Text('Foo')],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text('Bar'),
-                  ),
+                  HtmlFlex(direction: Axis.horizontal, children: [Text('Foo')]),
+                  Padding(padding: EdgeInsets.all(10), child: Text('Bar')),
                 ],
               ),
             ),
@@ -265,14 +268,8 @@ Future<void> main() async {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  HtmlFlex(
-                    direction: Axis.vertical,
-                    children: [Text('Foo')],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text('Bar'),
-                  ),
+                  HtmlFlex(direction: Axis.vertical, children: [Text('Foo')]),
+                  Padding(padding: EdgeInsets.all(10), child: Text('Bar')),
                 ],
               ),
             ),
@@ -444,70 +441,59 @@ Future<void> main() async {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
   final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
-          ? null
-          : 'Linux only'
+            ? null
+            : 'Linux only'
       : 'GOLDEN_SKIP=$goldenSkipEnvVar';
 
   GoldenToolkit.runWithConfiguration(
     () {
-      group(
-        'display: flex',
-        () {
-          const flexDirections = [
-            kCssFlexDirectionColumn,
-            kCssFlexDirectionRow,
-          ];
+      group('display: flex', () {
+        const flexDirections = [kCssFlexDirectionColumn, kCssFlexDirectionRow];
 
-          const alignItems = [
-            kCssAlignItemsFlexStart,
-            kCssAlignItemsFlexEnd,
-            kCssAlignItemsCenter,
-            kCssAlignItemsBaseline,
-            kCssAlignItemsStretch,
-          ];
+        const alignItems = [
+          kCssAlignItemsFlexStart,
+          kCssAlignItemsFlexEnd,
+          kCssAlignItemsCenter,
+          kCssAlignItemsBaseline,
+          kCssAlignItemsStretch,
+        ];
 
-          const List<int?> gaps = [null, 2];
+        const List<int?> gaps = [null, 2];
 
-          const justifyContents = [
-            kCssJustifyContentFlexStart,
-            kCssJustifyContentFlexEnd,
-            kCssJustifyContentCenter,
-            kCssJustifyContentSpaceBetween,
-            kCssJustifyContentSpaceAround,
-            kCssJustifyContentSpaceEvenly,
-          ];
+        const justifyContents = [
+          kCssJustifyContentFlexStart,
+          kCssJustifyContentFlexEnd,
+          kCssJustifyContentCenter,
+          kCssJustifyContentSpaceBetween,
+          kCssJustifyContentSpaceAround,
+          kCssJustifyContentSpaceEvenly,
+        ];
 
-          for (final flexDirection in flexDirections) {
-            for (final alignItem in alignItems) {
-              for (final justifyContent in justifyContents) {
-                for (final gap in gaps) {
-                  final key =
-                      '$flexDirection/$alignItem/${gap != null ? 'gap-$gap/' : ''}$justifyContent';
-                  testGoldens(
-                    key,
-                    (tester) async {
-                      await tester.pumpWidgetBuilder(
-                        _Golden(
-                          flexDirection: flexDirection,
-                          alignItem: alignItem,
-                          gap: gap,
-                          justifyContent: justifyContent,
-                        ),
-                        wrapper: materialAppWrapper(theme: ThemeData.light()),
-                        surfaceSize: const Size(316, 166),
-                      );
-
-                      await screenMatchesGolden(tester, key);
-                    },
-                    skip: goldenSkip != null,
+        for (final flexDirection in flexDirections) {
+          for (final alignItem in alignItems) {
+            for (final justifyContent in justifyContents) {
+              for (final gap in gaps) {
+                final key =
+                    '$flexDirection/$alignItem/${gap != null ? 'gap-$gap/' : ''}$justifyContent';
+                testGoldens(key, (tester) async {
+                  await tester.pumpWidgetBuilder(
+                    _Golden(
+                      flexDirection: flexDirection,
+                      alignItem: alignItem,
+                      gap: gap,
+                      justifyContent: justifyContent,
+                    ),
+                    wrapper: materialAppWrapper(theme: ThemeData.light()),
+                    surfaceSize: const Size(316, 166),
                   );
-                }
+
+                  await screenMatchesGolden(tester, key);
+                }, skip: goldenSkip != null);
               }
             }
           }
-        },
-        skip: goldenSkip,
-      );
+        }
+      }, skip: goldenSkip);
     },
     config: GoldenToolkitConfiguration(
       fileNameFactory: (name) => '$kGoldenFilePrefix/flex/$name.png',
@@ -536,7 +522,8 @@ class _Golden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inlineStyle = '$kCssDisplay: $kCssDisplayFlex; '
+    final inlineStyle =
+        '$kCssDisplay: $kCssDisplayFlex; '
         '$kCssFlexDirection: $flexDirection; '
         '$kCssAlignItems: $alignItem; '
         '${gap != null ? '$kCssGap: ${gap}px; ' : ''}'

@@ -105,9 +105,9 @@ class ColumnPlaceholder extends WidgetPlaceholder {
         : null;
 
     return [
-      if (marginTop != null) marginTop,
+      ?marginTop,
       if (column != null) callBuilders(context, column),
-      if (marginBottom != null) marginBottom,
+      ?marginBottom,
     ];
   }
 

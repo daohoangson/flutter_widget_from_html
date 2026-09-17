@@ -6,14 +6,15 @@ const kTagRt = 'rt';
 
 extension TagRuby on WidgetFactory {
   BuildOp get tagRuby => const BuildOp.v2(
-        debugLabel: kTagRuby,
-        onParsed: _onParsed,
-        onVisitChild: _onVisitChild,
-        priority: Priority.tagRuby,
-      );
+    debugLabel: kTagRuby,
+    onParsed: _onParsed,
+    onVisitChild: _onVisitChild,
+    priority: Priority.tagRuby,
+  );
 
-  static StylesMap _cssDisplayNone(dom.Element _) =>
-      {kCssDisplay: kCssDisplayNone};
+  static StylesMap _cssDisplayNone(dom.Element _) => {
+    kCssDisplay: kCssDisplayNone,
+  };
 
   static BuildTree _onParsed(BuildTree tree) {
     final replacement = tree.parent.sub();
@@ -41,10 +42,8 @@ extension TagRuby on WidgetFactory {
         WidgetBit.inline(
           replacement,
           WidgetPlaceholder(
-            builder: (_, __) => HtmlRuby(
-              rt: rtTree.build(),
-              ruby: rubyTree.build(),
-            ),
+            builder: (_, _) =>
+                HtmlRuby(rt: rtTree.build(), ruby: rubyTree.build()),
             debugLabel: kTagRuby,
           ),
         ),

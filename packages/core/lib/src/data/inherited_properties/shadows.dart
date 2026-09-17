@@ -14,8 +14,5 @@ TextStyle _prepareShadows(TextStyle style, InheritedProperties resolved) {
     return style;
   }
 
-  return style.copyWith(
-    debugLabel: 'fwfh: text-shadow',
-    shadows: shadows,
-  );
+  return style.copyWith(debugLabel: 'fwfh: text-shadow', shadows: shadows);
 }

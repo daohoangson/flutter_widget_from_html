@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'fwfh_webview',
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('WebViewFactory Demo'),
-        ),
+        appBar: AppBar(title: const Text('WebViewFactory Demo')),
         body: Center(
           child: HtmlWidget(
             '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',

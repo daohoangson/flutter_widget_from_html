@@ -12,8 +12,8 @@ class HorizontalMargin extends SingleChildRenderObjectWidget {
     super.key,
     required this.left,
     required this.right,
-  })  : assert(left >= .0),
-        assert(right >= .0);
+  }) : assert(left >= .0),
+       assert(right >= .0);
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -31,11 +31,9 @@ class HorizontalMargin extends SingleChildRenderObjectWidget {
 class _HorizontalMarginRenderObject extends RenderShiftedBox {
   _HorizontalMarginRenderObject({
     RenderBox? child,
-    required double left,
-    required double right,
-  })  : _left = left,
-        _right = right,
-        super(child);
+    required this._left,
+    required this._right,
+  }) : super(child);
 
   double _left;
   void setLeft(double value) {
@@ -126,8 +124,8 @@ class _HorizontalMarginRenderObject extends RenderShiftedBox {
 extension on double {
   double orChildWithMargins(Size child, double left, double right) =>
       (isFinite && (left.isInfinite || right.isInfinite))
-          ? this
-          : child.width + left.or(0) + right.or(0);
+      ? this
+      : child.width + left.or(0) + right.or(0);
 
   double or(double value) => isInfinite ? value : this;
 }

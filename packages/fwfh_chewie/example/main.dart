@@ -12,18 +12,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'fwfh_chewie',
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('ChewieFactory Demo'),
-        ),
+        appBar: AppBar(title: const Text('ChewieFactory Demo')),
         body: Center(
-          child: HtmlWidget(
-            '''
+          child: HtmlWidget('''
 <video controls width="250">
   <source src="https://flutter-widget-from-html.github.io/pages/flower.mp4" type="video/mp4">
   <code>VIDEO</code> support is not enabled.
-</video>''',
-            factoryBuilder: () => MyWidgetFactory(),
-          ),
+</video>''', factoryBuilder: () => MyWidgetFactory()),
         ),
       ),
     );

@@ -19,15 +19,14 @@ mixin JustAudioFactory on WidgetFactory {
     required bool loop,
     required bool muted,
     required bool preload,
-  }) =>
-      AudioPlayer(
-        url,
-        autoplay: autoplay,
-        loop: loop,
-        muted: muted,
-        materialThemeMode: materialThemeMode,
-        preload: preload,
-      );
+  }) => AudioPlayer(
+    url,
+    autoplay: autoplay,
+    loop: loop,
+    muted: muted,
+    materialThemeMode: materialThemeMode,
+    preload: preload,
+  );
 
   @override
   void parse(BuildMetadata meta) {

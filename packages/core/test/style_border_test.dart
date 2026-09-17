@@ -14,7 +14,8 @@ void main() {
   });
 
   group('3 values', () {
-    const expected = '[Container:'
+    const expected =
+        '[Container:'
         'border=2.0@solid#FFFF0000,'
         'child=[RichText:(:Foo)]]';
 
@@ -743,7 +744,8 @@ void main() {
     });
 
     testWidgets('#959: border-radius then border', (tester) async {
-      const html = '<span style="border-radius: 1px; '
+      const html =
+          '<span style="border-radius: 1px; '
           'border: solid 2px red;">Foo</span>';
       final explained = await explain(tester, html);
       expect(
@@ -757,7 +759,8 @@ void main() {
     });
 
     testWidgets('#959: border then border-radius', (tester) async {
-      const html = '<span style="border: solid 2px red; '
+      const html =
+          '<span style="border: solid 2px red; '
           'border-radius: 1px;">Foo</span>';
       final explained = await explain(tester, html);
       expect(
@@ -770,9 +773,11 @@ void main() {
       );
     });
 
-    testWidgets('#1560: border-radius with background-color and margin',
-        (tester) async {
-      const html = '<span style="border-radius: 1px; '
+    testWidgets('#1560: border-radius with background-color and margin', (
+      tester,
+    ) async {
+      const html =
+          '<span style="border-radius: 1px; '
           'background-color: red; margin-right: 1px;">Foo</span>';
       final explained = await explain(tester, html);
       expect(
@@ -786,23 +791,26 @@ void main() {
       );
     });
 
-    testWidgets('#1560: block border-radius with background-color clips',
-        (tester) async {
+    testWidgets('#1560: block border-radius with background-color clips', (
+      tester,
+    ) async {
       const html =
           '<section style="border-radius: 1px; background-color: red;">'
           'Foo</section>';
       await explain(tester, html);
 
-      final container =
-          tester.widgetList<Container>(find.byType(Container)).firstWhere(
-                (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
-              );
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
+          .firstWhere(
+            (c) => (c.decoration as BoxDecoration?)?.borderRadius != null,
+          );
       expect(container.clipBehavior, equals(Clip.hardEdge));
     });
 
     testWidgets('ignore radius if border is not uniform', (t) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/909
-      const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
+      const html =
+          '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
           'border-bottom-right-radius: 0px;">Foo</section>';
       final explained = await explain(t, html);
       expect(
@@ -1249,8 +1257,9 @@ void main() {
       );
     });
 
-    testWidgets('2-value style with width renders',
-        (WidgetTester tester) async {
+    testWidgets('2-value style with width renders', (
+      WidgetTester tester,
+    ) async {
       // 2 values: top/bottom and left/right — both render as solid
       const html =
           '<span style="border-style: solid dotted; border-width: 2px">Foo</span>';
@@ -1358,8 +1367,9 @@ void main() {
   });
 
   group('standalone property cascade order', () {
-    testWidgets('shorthand after standalone overrides',
-        (WidgetTester tester) async {
+    testWidgets('shorthand after standalone overrides', (
+      WidgetTester tester,
+    ) async {
       const html =
           '<span style="border-width: 2px; border: solid red">Foo</span>';
       final explained = await explain(tester, html);
@@ -1369,8 +1379,9 @@ void main() {
       );
     });
 
-    testWidgets('standalone after shorthand updates single component',
-        (WidgetTester tester) async {
+    testWidgets('standalone after shorthand updates single component', (
+      WidgetTester tester,
+    ) async {
       const html =
           '<span style="border: 1px solid red; border-width: 2px">Foo</span>';
       final explained = await explain(tester, html);
@@ -1383,7 +1394,8 @@ void main() {
 
   group('combos', () {
     testWidgets('renders with background & h2', (WidgetTester tester) async {
-      const html = '<div style="background: red; border: solid">'
+      const html =
+          '<div style="background: red; border: solid">'
           '<h2>Foo</h2></div>';
       final explained = await explain(tester, html);
       expect(

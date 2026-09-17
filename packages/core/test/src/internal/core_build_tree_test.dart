@@ -84,13 +84,10 @@ void main() {
   });
 }
 
-CoreBuildTree _newTree({
-  WidgetFactory? wf,
-}) =>
-    CoreBuildTree.root(
-      inheritanceResolvers: InheritanceResolvers(),
-      wf: wf ?? _WidgetFactory(),
-    );
+CoreBuildTree _newTree({WidgetFactory? wf}) => CoreBuildTree.root(
+  inheritanceResolvers: InheritanceResolvers(),
+  wf: wf ?? _WidgetFactory(),
+);
 
 List<css.Declaration> _parseCss(String input) =>
     css.parse('*{$input}').collectDeclarations();
@@ -102,10 +99,7 @@ class _WidgetFactory extends WidgetFactory {
   final void Function(BuildTree value)? onParse;
   final void Function(BuildTree value)? onParseStyle;
 
-  _WidgetFactory({
-    this.onParse,
-    this.onParseStyle,
-  });
+  _WidgetFactory({this.onParse, this.onParseStyle});
 
   @override
   void parse(BuildTree tree) {

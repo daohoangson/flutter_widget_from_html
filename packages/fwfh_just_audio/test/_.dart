@@ -22,17 +22,16 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool useExplainer = true,
-}) =>
-    helper.explain(
-      tester,
-      null,
-      explainer: audioPlayerExplainer,
-      hw: HtmlWidget(
-        html,
-        key: helper.hwKey,
-        factoryBuilder: () => _WidgetFactory(),
-      ),
-      useExplainer: useExplainer,
-    );
+}) => helper.explain(
+  tester,
+  null,
+  explainer: audioPlayerExplainer,
+  hw: HtmlWidget(
+    html,
+    key: helper.hwKey,
+    factoryBuilder: () => _WidgetFactory(),
+  ),
+  useExplainer: useExplainer,
+);
 
 class _WidgetFactory extends WidgetFactory with JustAudioFactory {}

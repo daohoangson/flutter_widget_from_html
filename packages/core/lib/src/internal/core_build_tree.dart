@@ -34,21 +34,19 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree._({
     required super.element,
     required super.inheritanceResolvers,
-    BuildTree? parent,
-    Iterable<_CoreBuildOp> parentOps = const [],
+    this._parent,
+    this._parentOps = const [],
     required this.wf,
-  })  : _parent = parent,
-        _parentOps = parentOps;
+  });
 
   factory CoreBuildTree.root({
     required InheritanceResolvers inheritanceResolvers,
     required WidgetFactory wf,
-  }) =>
-      CoreBuildTree._(
-        element: _rootElement,
-        inheritanceResolvers: inheritanceResolvers,
-        wf: wf,
-      );
+  }) => CoreBuildTree._(
+    element: _rootElement,
+    inheritanceResolvers: inheritanceResolvers,
+    wf: wf,
+  );
 
   @override
   bool get hasParent => _parent != null;
@@ -87,7 +85,8 @@ class CoreBuildTree extends BuildTree {
       }
     }
 
-    var placeholder = customPlaceholder ??
+    var placeholder =
+        customPlaceholder ??
         wf.buildColumnPlaceholder(this, children) ??
         const _WidgetPlaceholderDefault();
     for (final op in ops) {
@@ -119,10 +118,11 @@ class CoreBuildTree extends BuildTree {
     BuildTree? parent,
   }) {
     final copiedParent = parent ?? this.parent;
-    final scopedInheritanceResolvers = inheritanceResolvers ??
-        this
-            .inheritanceResolvers
-            .copyWith(parent: copiedParent.inheritanceResolvers);
+    final scopedInheritanceResolvers =
+        inheritanceResolvers ??
+        this.inheritanceResolvers.copyWith(
+          parent: copiedParent.inheritanceResolvers,
+        );
     final copied = CoreBuildTree._(
       element: element ?? this.element,
       inheritanceResolvers: scopedInheritanceResolvers,
@@ -193,11 +193,11 @@ class CoreBuildTree extends BuildTree {
 
   @override
   CoreBuildTree sub({dom.Element? element}) => copyWith(
-        copyContents: false,
-        element: element,
-        inheritanceResolvers: inheritanceResolvers.sub(),
-        parent: this,
-      );
+    copyContents: false,
+    element: element,
+    inheritanceResolvers: inheritanceResolvers.sub(),
+    parent: this,
+  );
 
   void _addBitsFromNode(dom.Node domNode) {
     if (domNode.nodeType == dom.Node.TEXT_NODE) {

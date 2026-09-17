@@ -61,8 +61,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
         ifTrue: 'borderCollapse: true',
       ),
     );
-    properties
-        .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
+    properties.add(
+      DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0),
+    );
     properties.add(
       DiagnosticsProperty(
         'textDirection',
@@ -93,11 +94,7 @@ class HtmlTableCaption extends HtmlTableCell {
     required super.columnSpan,
     required int rowIndex,
     super.key,
-  }) : super._(
-          columnStart: 0,
-          isCaption: true,
-          rowStart: rowIndex,
-        );
+  }) : super._(columnStart: 0, isCaption: true, rowStart: rowIndex);
 }
 
 /// A TD (table cell) widget.
@@ -135,15 +132,14 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     required super.child,
     this.columnSpan = 1,
     required this.columnStart,
-    bool isCaption = false,
+    this._isCaption = false,
     super.key,
     this.rowSpan = 1,
     required this.rowStart,
-  })  : assert(columnSpan >= 1),
-        assert(columnStart >= 0),
-        assert(rowSpan >= 1),
-        assert(rowStart >= 0),
-        _isCaption = isCaption;
+  }) : assert(columnSpan >= 1),
+       assert(columnStart >= 0),
+       assert(rowSpan >= 1),
+       assert(rowStart >= 0);
 
   @override
   void applyParentData(RenderObject renderObject) {
@@ -226,7 +222,7 @@ extension on List<double> {
     final columnWidth = calculatedWidth.isNaN
         ? double.nan
         : ((calculatedWidth - tro._calculateColumnGaps(data)) /
-            data.columnSpan);
+              data.columnSpan);
     for (var c = 0; c < data.columnSpan; c++) {
       final column = data.columnStart + c;
 
@@ -283,8 +279,10 @@ class _TableRenderLayout {
 
   const _TableRenderLayout(this.cellRect, this.totalSize);
 
-  static const _TableRenderLayout zero =
-      _TableRenderLayout(Rect.zero, Size.zero);
+  static const _TableRenderLayout zero = _TableRenderLayout(
+    Rect.zero,
+    Size.zero,
+  );
 }
 
 class _TableRenderLayouter {
@@ -293,10 +291,10 @@ class _TableRenderLayouter {
   final _TableRenderObject tro;
 
   _TableRenderLayouter(this.tro, this.constraints)
-      : layouter = ChildLayoutHelper.layoutChild;
+    : layouter = ChildLayoutHelper.layoutChild;
 
   _TableRenderLayouter.dry(this.tro, this.constraints)
-      : layouter = ChildLayoutHelper.dryLayoutChild;
+    : layouter = ChildLayoutHelper.dryLayoutChild;
 
   Logger get logger => tro.logger;
 
@@ -386,8 +384,9 @@ class _TableRenderLayouter {
 
     final cellSizes = List<Size?>.filled(children.length, null);
     final childMinWidths = List<double?>.filled(children.length, null);
-    final maxColumnWidths =
-        step2.naiveColumnWidths.map((v) => v ?? .0).toList();
+    final maxColumnWidths = step2.naiveColumnWidths
+        .map((v) => v ?? .0)
+        .toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
     // the current algorithm prioritizes naive value, then layouter value as column width
@@ -395,10 +394,7 @@ class _TableRenderLayouter {
     var columnWidths = maxColumnWidths;
     if (columnWidths.zeros.isEmpty &&
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
-      return _TableDataStep3(
-        step2,
-        columnWidths: columnWidths,
-      );
+      return _TableDataStep3(step2, columnWidths: columnWidths);
     }
 
     var shouldLoop = true;
@@ -456,10 +452,7 @@ class _TableRenderLayouter {
       }
     }
 
-    return _TableDataStep3(
-      step2,
-      columnWidths: columnWidths,
-    );
+    return _TableDataStep3(step2, columnWidths: columnWidths);
   }
 
   double? step3GetMinIntrinsicWidthIfNeeded(
@@ -551,9 +544,12 @@ class _TableRenderLayouter {
     final calculatedHeight =
         tro.paddingTop + step4.rowHeights.sum + rowGapsSum + tro.paddingBottom;
     final constraintedHeight = constraints.constrainHeight(calculatedHeight);
-    final deltaHeight =
-        max(0, (constraintedHeight - calculatedHeight) / step1.rowCount);
-    final calculatedWidth = tro.paddingLeft +
+    final deltaHeight = max(
+      0,
+      (constraintedHeight - calculatedHeight) / step1.rowCount,
+    );
+    final calculatedWidth =
+        tro.paddingLeft +
         step3.columnWidths.sum +
         columnGapsSum +
         tro.paddingRight;
@@ -617,15 +613,17 @@ class _TableRenderLayouter {
     final maxOrFairValues = maxValues
         .map((value) => value.isNaN ? fairValue : value)
         .toList(growable: false);
-    final result = minValues.asMap().entries.map(
-      (entry) {
-        final i = entry.key;
-        final minValue = entry.value;
-        // minimum may be NaN if there were an error during measurement
-        final minOrFairValue = minValue.isNaN ? fairValue : minValue;
-        return min(minOrFairValue, maxOrFairValues[i]);
-      },
-    ).toList(growable: false);
+    final result = minValues
+        .asMap()
+        .entries
+        .map((entry) {
+          final i = entry.key;
+          final minValue = entry.value;
+          // minimum may be NaN if there were an error during measurement
+          final minOrFairValue = minValue.isNaN ? fairValue : minValue;
+          return min(minOrFairValue, maxOrFairValues[i]);
+        })
+        .toList(growable: false);
     final remaining = max(.0, available - result.sum);
     if (remaining.isZero) {
       // nothing left to redistribute
@@ -682,10 +680,7 @@ class _TableDataStep2 {
 
   final List<double?> naiveColumnWidths;
 
-  const _TableDataStep2(
-    this.step1, {
-    required this.naiveColumnWidths,
-  });
+  const _TableDataStep2(this.step1, {required this.naiveColumnWidths});
 }
 
 @immutable
@@ -694,10 +689,7 @@ class _TableDataStep3 {
 
   final List<double> columnWidths;
 
-  const _TableDataStep3(
-    this.step2, {
-    required this.columnWidths,
-  });
+  const _TableDataStep3(this.step2, {required this.columnWidths});
 }
 
 @immutable
@@ -724,15 +716,11 @@ class _TableRenderObject extends RenderBox
   _TableRenderObject(
     this._border,
     this._textDirection, {
-    required double borderSpacing,
-    required bool borderCollapse,
-    required double? maxWidth,
-    required double? minWidth,
-  })  : logger = Logger('fwfh.HtmlTable${loggers++}'),
-        _borderCollapse = borderCollapse,
-        _borderSpacing = borderSpacing,
-        _maxWidth = maxWidth,
-        _minWidth = minWidth;
+    required this._borderSpacing,
+    required this._borderCollapse,
+    required this._maxWidth,
+    required this._minWidth,
+  }) : logger = Logger('fwfh.HtmlTable${loggers++}');
 
   Border? _border;
   void setBorder(Border? v) {

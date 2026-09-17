@@ -37,8 +37,7 @@ class _FakeJustAudioPlatform extends Fake
   @override
   Future<DisposePlayerResponse> disposePlayer(
     DisposePlayerRequest request,
-  ) async =>
-      DisposePlayerResponse();
+  ) async => DisposePlayerResponse();
 }
 
 class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
@@ -144,18 +143,11 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
   @override
   Future<SetShuffleModeResponse> setShuffleMode(
     SetShuffleModeRequest request,
-  ) async =>
-      SetShuffleModeResponse();
+  ) async => SetShuffleModeResponse();
 
   @override
   Future<DisposeResponse> dispose(DisposeRequest request) async =>
       DisposeResponse();
 }
 
-enum CommandType {
-  load,
-  pause,
-  play,
-  seek,
-  setVolume,
-}
+enum CommandType { load, pause, play, seek, setVolume }

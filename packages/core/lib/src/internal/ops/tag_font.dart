@@ -37,10 +37,10 @@ const kCssFontWeightBold = 'bold';
 
 extension TagFont on WidgetFactory {
   BuildOp get tagFont => const BuildOp.v2(
-        debugLabel: kTagFont,
-        defaultStyles: _defaultStyles,
-        priority: Priority.tagFont,
-      );
+    debugLabel: kTagFont,
+    defaultStyles: _defaultStyles,
+    priority: Priority.tagFont,
+  );
 
   static StylesMap _defaultStyles(dom.Element element) {
     final attrs = element.attributes;
@@ -48,9 +48,9 @@ extension TagFont on WidgetFactory {
     final fontFace = attrs[kAttributeFontFace];
     final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];
     return {
-      if (color != null) kCssColor: color,
-      if (fontFace != null) kCssFontFamily: fontFace,
-      if (fontSize != null) kCssFontSize: fontSize,
+      kCssColor: ?color,
+      kCssFontFamily: ?fontFace,
+      kCssFontSize: ?fontSize,
     };
   }
 }

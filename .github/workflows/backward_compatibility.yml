@@ -39,7 +39,11 @@ jobs:
       GOLDEN_SKIP: "yes"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - name: Update pubspec.yaml
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           set -e
 
@@ -47,6 +51,21 @@ jobs:
 
           # delete all overrides and use pub.dev versions
           yq e 'del(.dependency_overrides)' -i pubspec.yaml
+
+          # These packages consume core APIs introduced in this branch. When
+          # they change alongside core, test every other dependency at its
+          # declared minimum while resolving the unreleased core locally.
+          git diff --name-only "$BASE_SHA"...HEAD > "$RUNNER_TEMP/changed-files"
+          case "${{ matrix.package }}" in
+            enhanced|fwfh_just_audio|fwfh_webview) _requiresWorkspaceCore=yes ;;
+            *) _requiresWorkspaceCore=no ;;
+          esac
+          if [ "$_requiresWorkspaceCore" = yes ] &&
+            grep -q '^packages/core/' "$RUNNER_TEMP/changed-files" &&
+            grep -q '^packages/${{ matrix.package }}/' "$RUNNER_TEMP/changed-files"; then
+            yq e '.dependency_overrides.flutter_widget_from_html_core.path = "../core"' \
+              -i pubspec.yaml
+          fi
 
           # back up SDK constraint
           _sdkVersion=$( yq e .environment.sdk pubspec.yaml )

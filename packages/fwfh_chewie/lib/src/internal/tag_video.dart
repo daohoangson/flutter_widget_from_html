@@ -21,43 +21,43 @@ class TagVideo {
   TagVideo(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        debugLabel: kTagVideo,
-        onRenderBlock: (tree, placeholder) {
-          if (defaultTargetPlatform != TargetPlatform.android &&
-              defaultTargetPlatform != TargetPlatform.iOS &&
-              defaultTargetPlatform != TargetPlatform.macOS &&
-              !kIsWeb) {
-            // these are the player's supported platforms
-            // https://pub.dev/packages/video_player/versions/2.8.1
-            return placeholder;
-          }
+    debugLabel: kTagVideo,
+    onRenderBlock: (tree, placeholder) {
+      if (defaultTargetPlatform != TargetPlatform.android &&
+          defaultTargetPlatform != TargetPlatform.iOS &&
+          defaultTargetPlatform != TargetPlatform.macOS &&
+          !kIsWeb) {
+        // these are the player's supported platforms
+        // https://pub.dev/packages/video_player/versions/2.8.1
+        return placeholder;
+      }
 
-          final attrs = tree.element.attributes;
-          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-          if (url != null) {
-            tree.videoData.urls.add(url);
-          }
+      final attrs = tree.element.attributes;
+      final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+      if (url != null) {
+        tree.videoData.urls.add(url);
+      }
 
-          return _buildPlayer(tree) ?? placeholder;
-        },
-        onVisitChild: (tree, subTree) {
-          final e = subTree.element;
-          if (e.localName != kTagVideoSource) {
-            return;
-          }
-          if (e.parent != tree.element) {
-            return;
-          }
+      return _buildPlayer(tree) ?? placeholder;
+    },
+    onVisitChild: (tree, subTree) {
+      final e = subTree.element;
+      if (e.localName != kTagVideoSource) {
+        return;
+      }
+      if (e.parent != tree.element) {
+        return;
+      }
 
-          final attrs = e.attributes;
-          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-          if (url == null) {
-            return;
-          }
+      final attrs = e.attributes;
+      final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+      if (url == null) {
+        return;
+      }
 
-          tree.videoData.urls.add(url);
-        },
-      );
+      tree.videoData.urls.add(url);
+    },
+  );
 
   Widget? _buildPlayer(BuildTree tree) {
     final sourceUrls = tree.videoData.urls;

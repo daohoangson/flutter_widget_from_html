@@ -66,7 +66,8 @@ void main() {
 
   group('possible conflict', () {
     testWidgets('triple renders', (WidgetTester tester) async {
-      const html = '<ruby><ruby>ruby1 <rt>ruby2</rt></ruby> '
+      const html =
+          '<ruby><ruby>ruby1 <rt>ruby2</rt></ruby> '
           '<rt><ruby>rt1 <rt>rt2</rt></ruby></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
@@ -81,7 +82,8 @@ void main() {
     });
 
     testWidgets('renders with A tag', (WidgetTester tester) async {
-      const html = '<ruby><a href="http://domain.com/foo">foo</a> '
+      const html =
+          '<ruby><a href="http://domain.com/foo">foo</a> '
           '<rt><a href="http://domain.com/bar">bar</a></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
@@ -169,10 +171,7 @@ void main() {
                   rt: const SizedBox(width: 10, height: 5),
                   ruby: const SizedBox(width: 50, height: 10),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text('Foo'),
-                ),
+                const Padding(padding: EdgeInsets.all(10), child: Text('Foo')),
               ],
             ),
           ),
@@ -181,8 +180,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('computeDistanceToActualBaseline without children',
-        (tester) async {
+    testWidgets('computeDistanceToActualBaseline without children', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -191,10 +191,7 @@ void main() {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 HtmlRuby(),
-                const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text('Foo'),
-                ),
+                const Padding(padding: EdgeInsets.all(10), child: Text('Foo')),
               ],
             ),
           ),
@@ -234,10 +231,7 @@ void main() {
     testWidgets('computeDryLayout without rt', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlRuby(
-          key: key,
-          ruby: const SizedBox(width: 50, height: 10),
-        ),
+        HtmlRuby(key: key, ruby: const SizedBox(width: 50, height: 10)),
       );
       await tester.pumpAndSettle();
 
@@ -335,10 +329,7 @@ void main() {
     testWidgets('computeIntrinsic without rt', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
-        HtmlRuby(
-          key: key,
-          ruby: const SizedBox(width: 50, height: 10),
-        ),
+        HtmlRuby(key: key, ruby: const SizedBox(width: 50, height: 10)),
       );
       await tester.pumpAndSettle();
 

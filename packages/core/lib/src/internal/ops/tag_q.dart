@@ -4,10 +4,10 @@ const kTagQ = 'q';
 
 extension TagQ on WidgetFactory {
   BuildOp get tagQ => const BuildOp.v2(
-        debugLabel: kTagQ,
-        onParsed: _onParsed,
-        priority: Priority.tagQ,
-      );
+    debugLabel: kTagQ,
+    onParsed: _onParsed,
+    priority: Priority.tagQ,
+  );
 
   static BuildTree _onParsed(BuildTree tree) {
     const opening = '“';

@@ -92,7 +92,7 @@ void main() {
         final parent = InheritanceResolvers();
         final r1 = parent.sub();
         final r2 = parent.sub();
-        r2.enqueue((resolving, __) => resolving);
+        r2.enqueue((resolving, _) => resolving);
 
         expect(r1.isIdenticalWith(r2), isFalse);
         expect(r2.isIdenticalWith(r1), isFalse);
@@ -143,8 +143,9 @@ void main() {
       test('triggers callback with parent properties', () {
         final parent = _MockInheritanceResolvers();
         final now = DateTime.now();
-        when(() => parent.resolve(any()))
-            .thenReturn(InheritedProperties.root([now]));
+        when(
+          () => parent.resolve(any()),
+        ).thenReturn(InheritedProperties.root([now]));
 
         final resolvers = InheritanceResolvers(parent);
         final dep1 = _Dep1();
@@ -157,8 +158,9 @@ void main() {
 
       test('returns cached output', () {
         final parent = _MockInheritanceResolvers();
-        when(() => parent.resolve(any()))
-            .thenReturn(InheritedProperties.root());
+        when(
+          () => parent.resolve(any()),
+        ).thenReturn(InheritedProperties.root());
 
         final resolvers = InheritanceResolvers(parent);
         resolvers.enqueue((r, _) => r.copyWith(value: DateTime.now()));
@@ -170,8 +172,7 @@ void main() {
 
       test('throws if output is not copied with', () {
         final resolvers = InheritanceResolvers();
-        resolvers
-            .enqueue((_, __) => InheritedProperties.root([DateTime.now()]));
+        resolvers.enqueue((_, _) => InheritedProperties.root([DateTime.now()]));
 
         expect(
           () => resolvers.resolve(_MockBuildContext()),

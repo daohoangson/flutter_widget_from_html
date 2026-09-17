@@ -16,74 +16,68 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        alwaysRenderBlock: false,
-        debugLabel: kCssVerticalAlign,
-        onParsed: (tree) {
-          final parent = tree.parent;
-          if (tree.isInline != true) {
-            return tree;
-          }
+    alwaysRenderBlock: false,
+    debugLabel: kCssVerticalAlign,
+    onParsed: (tree) {
+      final parent = tree.parent;
+      if (tree.isInline != true) {
+        return tree;
+      }
 
-          final v = tree.getStyle(kCssVerticalAlign)?.term;
-          if (v == null || v == kCssVerticalAlignBaseline) {
-            return tree;
-          }
+      final v = tree.getStyle(kCssVerticalAlign)?.term;
+      if (v == null || v == kCssVerticalAlignBaseline) {
+        return tree;
+      }
 
-          final alignment = _tryParsePlaceholderAlignment(v);
-          if (alignment == null) {
-            return tree;
-          }
+      final alignment = _tryParsePlaceholderAlignment(v);
+      if (alignment == null) {
+        return tree;
+      }
 
-          _skipBuilding[tree] = true;
-          final placeholder = WidgetPlaceholder(
-            debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
-            child: tree.build(),
-          );
-
-          if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
-            placeholder.wrapWith(
-              (context, child) {
-                final padding = EdgeInsets.only(
-                  bottom: v == kCssVerticalAlignSuper ? .4 : 0,
-                  top: v == kCssVerticalAlignSub ? .4 : 0,
-                );
-                return _buildPaddedAlign(context, tree, child, padding);
-              },
-            );
-          }
-
-          return parent.sub()
-            ..append(
-              WidgetBit.inline(
-                tree,
-                placeholder,
-                alignment: alignment,
-              ),
-            );
-        },
-        onRenderBlock: (tree, placeholder) {
-          if (_skipBuilding[tree] == true) {
-            return placeholder;
-          }
-
-          final value = tree.getStyle(kCssVerticalAlign)?.term;
-          if (value == null) {
-            return placeholder;
-          }
-
-          return placeholder.wrapWith((context, child) {
-            final resolved = tree.inheritanceResolvers.resolve(context);
-            final alignment =
-                _tryParseAlignmentGeometry(resolved.directionOrLtr, value);
-            if (alignment == null) {
-              return child;
-            }
-
-            return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
-          });
-        },
-        priority: BoxModel.verticalAlign,
+      _skipBuilding[tree] = true;
+      final placeholder = WidgetPlaceholder(
+        debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
+        child: tree.build(),
       );
+
+      if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
+        placeholder.wrapWith((context, child) {
+          final padding = EdgeInsets.only(
+            bottom: v == kCssVerticalAlignSuper ? .4 : 0,
+            top: v == kCssVerticalAlignSub ? .4 : 0,
+          );
+          return _buildPaddedAlign(context, tree, child, padding);
+        });
+      }
+
+      return parent.sub()
+        ..append(WidgetBit.inline(tree, placeholder, alignment: alignment));
+    },
+    onRenderBlock: (tree, placeholder) {
+      if (_skipBuilding[tree] == true) {
+        return placeholder;
+      }
+
+      final value = tree.getStyle(kCssVerticalAlign)?.term;
+      if (value == null) {
+        return placeholder;
+      }
+
+      return placeholder.wrapWith((context, child) {
+        final resolved = tree.inheritanceResolvers.resolve(context);
+        final alignment = _tryParseAlignmentGeometry(
+          resolved.directionOrLtr,
+          value,
+        );
+        if (alignment == null) {
+          return child;
+        }
+
+        return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
+      });
+    },
+    priority: BoxModel.verticalAlign,
+  );
 
   Widget? _buildPaddedAlign(
     BuildContext context,
@@ -109,8 +103,9 @@ class StyleVerticalAlign {
       return child;
     }
 
-    final alignment =
-        padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter;
+    final alignment = padding.bottom > 0
+        ? Alignment.topCenter
+        : Alignment.bottomCenter;
     return wf.buildAlign(tree, withPadding, alignment, widthFactor: 1.0);
   }
 }

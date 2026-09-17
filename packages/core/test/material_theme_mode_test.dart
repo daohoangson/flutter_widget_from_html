@@ -140,8 +140,9 @@ void main() {
     expect(find.byType(material_ui.Tooltip), findsNothing);
   });
 
-  testWidgets('loading indicators use the selected Material library',
-      (tester) async {
+  testWidgets('loading indicators use the selected Material library', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _materialUiApp(
         Builder(
@@ -179,25 +180,25 @@ void main() {
 flutter_material.ThemeData get _flutterTheme =>
     flutter_material.ThemeData().copyWith(
       colorScheme: flutter_material.ThemeData().colorScheme.copyWith(
-            primary: _flutterColor,
-          ),
+        primary: _flutterColor,
+      ),
     );
 
 material_ui.ThemeData get _materialUiTheme => material_ui.ThemeData().copyWith(
-      colorScheme: material_ui.ThemeData().colorScheme.copyWith(
-            primary: _materialUiColor,
-          ),
-    );
+  colorScheme: material_ui.ThemeData().colorScheme.copyWith(
+    primary: _materialUiColor,
+  ),
+);
 
 Widget _flutterApp(Widget child) => flutter_material.MaterialApp(
-      theme: _flutterTheme,
-      home: flutter_material.Scaffold(body: child),
-    );
+  theme: _flutterTheme,
+  home: flutter_material.Scaffold(body: child),
+);
 
 Widget _materialUiApp(Widget child) => material_ui.MaterialApp(
-      theme: _materialUiTheme,
-      home: material_ui.Scaffold(body: child),
-    );
+  theme: _materialUiTheme,
+  home: material_ui.Scaffold(body: child),
+);
 
 Color? _linkColor(WidgetTester tester) => _spanColor(tester, 'Link');
 
@@ -244,14 +245,14 @@ class _MutableAppState extends State<_MutableApp> {
 
   @override
   Widget build(BuildContext context) => flutter_material.MaterialApp(
-        theme: _flutterTheme,
-        home: material_ui.Theme(
-          data: _materialUiTheme.copyWith(
-            colorScheme: _materialUiTheme.colorScheme.copyWith(
-              primary: materialUiColor,
-            ),
-          ),
-          child: HtmlWidget(_html, materialThemeMode: mode),
+    theme: _flutterTheme,
+    home: material_ui.Theme(
+      data: _materialUiTheme.copyWith(
+        colorScheme: _materialUiTheme.colorScheme.copyWith(
+          primary: materialUiColor,
         ),
-      );
+      ),
+      child: HtmlWidget(_html, materialThemeMode: mode),
+    ),
+  );
 }

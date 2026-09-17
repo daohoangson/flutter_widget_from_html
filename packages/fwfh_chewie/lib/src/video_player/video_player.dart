@@ -30,12 +30,12 @@ class VideoPlayer extends StatefulWidget {
 
   /// A builder function that is called if an error occurs during video loading.
   final Widget Function(BuildContext context, String url, dynamic error)?
-      errorBuilder;
+  errorBuilder;
 
   /// A builder that specifies the widget to display to the user while a video
   /// is still loading.
   final Widget Function(BuildContext context, String url, Widget child)?
-      loadingBuilder;
+  loadingBuilder;
 
   /// Controls whether to play video in loops.
   ///
@@ -86,7 +86,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final aspectRatio = ((widget.autoResize && _controller != null)
+    final aspectRatio =
+        ((widget.autoResize && _controller != null)
             ? _vpc?.value.aspectRatio
             : null) ??
         widget.aspectRatio;
@@ -109,10 +110,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       }
     }
 
-    return AspectRatio(
-      aspectRatio: aspectRatio,
-      child: child,
-    );
+    return AspectRatio(aspectRatio: aspectRatio, child: child);
   }
 
   Future<void> _initControllers() async {

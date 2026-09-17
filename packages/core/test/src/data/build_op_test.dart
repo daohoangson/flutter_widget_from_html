@@ -11,18 +11,16 @@ void main() {
       WidgetTester tester,
       String html, {
       BuildOp? inlineBuildOp,
-    }) =>
-        helper.explain(
-          tester,
-          null,
-          hw: HtmlWidget(
-            html,
-            factoryBuilder: () => _BuildOpWidgetFactory(
-              inlineBuildOp: inlineBuildOp,
-            ),
-            key: helper.hwKey,
-          ),
-        );
+    }) => helper.explain(
+      tester,
+      null,
+      hw: HtmlWidget(
+        html,
+        factoryBuilder: () =>
+            _BuildOpWidgetFactory(inlineBuildOp: inlineBuildOp),
+        key: helper.hwKey,
+      ),
+    );
 
     group('onRenderInlineBlock', () {
       testWidgets('renders span box', (WidgetTester tester) async {
@@ -32,10 +30,7 @@ void main() {
           html,
           inlineBuildOp: BuildOp.inline(
             onRenderInlineBlock: (tree, child) {
-              return ColoredBox(
-                color: Colors.red,
-                child: child,
-              );
+              return ColoredBox(color: Colors.red, child: child);
             },
           ),
         );
@@ -52,10 +47,7 @@ void main() {
           html,
           inlineBuildOp: BuildOp.inline(
             onRenderInlineBlock: (tree, child) {
-              return ColoredBox(
-                color: Colors.green,
-                child: child,
-              );
+              return ColoredBox(color: Colors.green, child: child);
             },
           ),
         );
@@ -71,17 +63,15 @@ void main() {
       });
 
       testWidgets('works with multiple blocks', (WidgetTester tester) async {
-        const html = 'Hello <div class="inlineBuildOp" '
+        const html =
+            'Hello <div class="inlineBuildOp" '
             '><div>foo</div><div>bar</div></div>';
         final explained = await explain(
           tester,
           html,
           inlineBuildOp: BuildOp.inline(
             onRenderInlineBlock: (tree, child) {
-              return ColoredBox(
-                color: Colors.green,
-                child: child,
-              );
+              return ColoredBox(color: Colors.green, child: child);
             },
           ),
         );
@@ -100,7 +90,8 @@ void main() {
       });
 
       group('works with inline-block', () {
-        const html = 'Hello <span class="inlineBuildOp" '
+        const html =
+            'Hello <span class="inlineBuildOp" '
             'style="display: inline-block">foo</span>';
 
         testWidgets('reuse placeholder', (WidgetTester tester) async {
@@ -110,10 +101,7 @@ void main() {
             inlineBuildOp: BuildOp.inline(
               debugLabel: 'inlineBuildOp',
               onRenderInlineBlock: (tree, child) {
-                return ColoredBox(
-                  color: Colors.green,
-                  child: child,
-                );
+                return ColoredBox(color: Colors.green, child: child);
               },
             ),
           );
@@ -135,10 +123,7 @@ void main() {
               alignment: PlaceholderAlignment.top,
               debugLabel: 'inlineBuildOp',
               onRenderInlineBlock: (tree, child) {
-                return ColoredBox(
-                  color: Colors.green,
-                  child: child,
-                );
+                return ColoredBox(color: Colors.green, child: child);
               },
             ),
           );
@@ -161,9 +146,7 @@ void main() {
 class _BuildOpWidgetFactory extends WidgetFactory {
   final BuildOp? inlineBuildOp;
 
-  _BuildOpWidgetFactory({
-    this.inlineBuildOp,
-  });
+  _BuildOpWidgetFactory({this.inlineBuildOp});
 
   @override
   void parse(BuildTree tree) {
