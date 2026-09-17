@@ -220,6 +220,20 @@ class _RenderCssSizing extends RenderProxyBox {
   }
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final scopedChild = child;
+    if (scopedChild == null) {
+      return null;
+    }
+
+    final cc = _applyContraints(constraints);
+    return scopedChild.getDryBaseline(cc, baseline);
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) {
     final scopedChild = child;
     if (scopedChild == null) {

@@ -837,6 +837,40 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    double? result;
+
+    var child = firstChild;
+    while (child != null) {
+      final data = child.parentData! as _TableCellData;
+
+      if (data.rowStart == 0) {
+        // only compute cells in the first row
+        // use the child's dry baseline with loosened constraints
+        // since exact cell constraints require full table layout
+        final candidate = child.getDryBaseline(constraints.loosen(), baseline);
+        if (candidate != null) {
+          final adjusted = candidate + paddingTop + rowGap;
+          if (result != null) {
+            if (adjusted < result) {
+              result = adjusted;
+            }
+          } else {
+            result = adjusted;
+          }
+        }
+      }
+
+      child = data.nextSibling;
+    }
+
+    return result;
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _TableRenderLayouter.dry(this, constraints).compute(firstChild).totalSize;
 

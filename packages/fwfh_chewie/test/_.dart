@@ -50,7 +50,7 @@ Future<String> explain(
   await tester.runAsync(() => Future.delayed(delay));
   await tester.pump();
 
-  return helper.explainWithoutPumping(
+  return await helper.explainWithoutPumping(
     explainer: videoPlayerExplainer,
     useExplainer: useExplainer,
   );

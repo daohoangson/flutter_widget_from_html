@@ -799,6 +799,33 @@ void main() {
       expect(drySize, equals(const Size(50, 10)));
     });
 
+    testWidgets('computeDryBaseline', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              child: HorizontalMargin(
+                key: key,
+                left: 10,
+                right: 10,
+                child: const Text('Hello'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      final baseline = renderBox.getDryBaseline(
+        renderBox.constraints,
+        TextBaseline.alphabetic,
+      );
+      expect(baseline, isNotNull);
+    });
+
     group('computeMaxIntrinsicWidth', () {
       testWidgets('computes with child', (tester) async {
         await tester.pumpSizedBox(left: 1, right: 2);

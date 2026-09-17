@@ -40,6 +40,37 @@ class _RubyRenderObject extends RenderBox
   }
 
   @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final ruby = firstChild;
+    if (ruby == null) {
+      return null;
+    }
+
+    final rubyConstraints = constraints.loosen();
+    final rubySize = ruby.getDryLayout(rubyConstraints);
+    final rubyBaseline = ruby.getDryBaseline(rubyConstraints, baseline);
+    if (rubyBaseline == null) {
+      return null;
+    }
+
+    final rt = (ruby.parentData! as _RubyParentData).nextSibling;
+    final rtHeight = rt != null
+        ? rt
+            .getDryLayout(
+              rubyConstraints.copyWith(
+                maxHeight: rubyConstraints.maxHeight - rubySize.height,
+              ),
+            )
+            .height
+        : 0.0;
+
+    return rtHeight + rubyBaseline;
+  }
+
+  @override
   Size computeDryLayout(BoxConstraints constraints) =>
       _compute(firstChild, constraints, ChildLayoutHelper.dryLayoutChild);
 

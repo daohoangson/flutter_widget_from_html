@@ -1,3 +1,7 @@
+## 0.15.8
+
+- Fix platform support metadata on pub.dev (#1630)
+
 ## 0.15.7
 
 - Forward `allowfullscreen` and `allow` iframe attributes to WebView (#1566)

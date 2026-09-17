@@ -1,3 +1,17 @@
+## 0.17.4
+
+- Add support for CSS `font-size: xxx-large` (#1593, authored by @dariyooo)
+- Improve `<summary>` keyboard and screen reader accessibility (#1626)
+- Fix obsolete async parses resetting the widget factory (#1625)
+
+## 0.17.3
+
+- Add support for standalone CSS `border-*` properties (#1570, authored by @CaptainDario)
+- Add support for 3-value CSS shorthand for `margin` and `padding` (#1577)
+- Fix `text-align` handling for `<li>` content layout (#1578)
+- Fix incorrect Hebrew characters in the `list-style-type: hebrew` counter (#1612)
+- Fix missing `computeDryBaseline` override breaking custom `RenderBox` subclasses on Flutter 3.32+ (#1584)
+
 ## 0.17.2
 
 - Add `text-emphasis` / `text-emphasis-style` support (#1561, authored by @CaptainDario)

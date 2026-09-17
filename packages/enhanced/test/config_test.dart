@@ -382,7 +382,7 @@ void main() {
         (_, __) {},
       );
 
-      return helper.explainWithoutPumping(useExplainer: false);
+      return await helper.explainWithoutPumping(useExplainer: false);
     }
 
     testWidgets('[sync] renders default', (tester) async {

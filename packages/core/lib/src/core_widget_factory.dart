@@ -635,7 +635,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Returns `true` if there is a callback and it has handled the tap.
   Future<bool> onTapCallback(String url) async {
     final callback = _widget?.onTapUrl;
-    return callback != null ? callback(url) : false;
+    return callback != null && await callback(url);
   }
 
   /// Handles user tapping a link.

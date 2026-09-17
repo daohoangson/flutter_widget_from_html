@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
@@ -277,5 +279,30 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, contains('Foo'));
     });
+  });
+
+  testWidgets('ValignBaseline computeDryBaseline', (tester) async {
+    final key = GlobalKey();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ValignBaselineContainer(
+            child: ValignBaseline(
+              key: key,
+              index: 0,
+              child: const Text('Hello'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final renderBox = key.renderBox;
+    final baseline = renderBox.getDryBaseline(
+      renderBox.constraints,
+      TextBaseline.alphabetic,
+    );
+    expect(baseline, isNotNull);
   });
 }

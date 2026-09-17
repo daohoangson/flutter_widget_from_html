@@ -120,6 +120,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   late final InheritanceResolvers _rootResolvers;
   late final WidgetFactory _wf;
 
+  int _buildGeneration = 0;
   Widget? _cache;
   Future<Widget>? _future;
   InheritedProperties? _rootProperties;
@@ -180,6 +181,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
     }
 
     if (needsRebuild) {
+      _buildGeneration++;
       _cache = null;
       _future = buildAsync ? _buildAsync() : null;
     }
@@ -225,11 +227,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     if (widget.html.isEmpty) {
-      return Future.sync(() => _sliverOrWidget0);
+      return await Future.sync(() => _sliverOrWidget0);
     }
 
+    final generation = _buildGeneration;
     final domNodes = await compute(_parseHtml, widget.html);
-    if (!mounted) {
+    // An obsolete parse must not reset the factory used by the current body.
+    if (!mounted || generation != _buildGeneration) {
       return _sliverOrWidget0;
     }
 
