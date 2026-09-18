@@ -209,7 +209,7 @@ void main() {
         equals(
           '[Column:children='
           '[CssBlock:child=[RichText:(:1)]],'
-          '[SizedBox:0.0x10.0],'
+          '[_LineBox],'
           '[CssBlock:child=[RichText:(:2)]]'
           ']',
         ),
@@ -238,7 +238,7 @@ void main() {
         equals(
           '[Column:children='
           '[CssBlock:child=[RichText:(:Foo)]],'
-          '[SizedBox:0.0x10.0]'
+          '[_LineBox]'
           ']',
         ),
       );

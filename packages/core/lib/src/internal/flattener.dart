@@ -411,13 +411,10 @@ class Flattener implements Flattened {
           return widget0;
         }
 
-        final painter = TextPainter(
-          text: TextSpan(style: resolved.prepareTextStyle(), text: '\u200B'),
+        return _LineBox(
+          style: resolved.prepareTextStyle(),
           textDirection: resolved.get<TextDirection>() ?? TextDirection.ltr,
-        )..layout();
-        final height = painter.height;
-        painter.dispose();
-        return SizedBox(width: .0, height: height);
+        );
       },
       debugLabel: '${tree.element.localName}--line-break',
     );
@@ -490,6 +487,26 @@ extension on BuildBit {
 
 extension on InheritedProperties {
   CssWhitespace get whitespaceOrNormal => get() ?? CssWhitespace.normal;
+}
+
+class _LineBox extends StatelessWidget {
+  final TextStyle style;
+  final TextDirection textDirection;
+
+  const _LineBox({
+    required this.style,
+    required this.textDirection,
+  });
+
+  @override
+  Widget build(BuildContext context) => RichText(
+        text: TextSpan(
+          style: style,
+          text: '\u200B',
+          semanticsLabel: '',
+        ),
+        textDirection: textDirection,
+      );
 }
 
 @immutable
