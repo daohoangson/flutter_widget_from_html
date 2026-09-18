@@ -84,6 +84,7 @@ mixin WebViewFactory on WidgetFactory {
       },
       js: js,
       mediaPlaybackAlwaysAllow: webViewMediaPlaybackAlwaysAllow,
+      materialThemeMode: materialThemeMode,
       onAndroidHideCustomWidget: webViewOnAndroidHideCustomWidget,
       onAndroidShowCustomWidget: webViewOnAndroidShowCustomWidget,
       unsupportedWorkaroundForIssue37: webViewUnsupportedWorkaroundForIssue37,

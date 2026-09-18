@@ -436,8 +436,6 @@ HttpClient _createMockSvgImageHttpClient() {
   final response = _MockHttpClientResponse();
   final headers = _MockHttpHeaders();
 
-  // TODO: remove when our minimum flutter_svg version >=2.0.10
-  when(() => client.getUrl(any())).thenAnswer((_) async => request);
   when(
     () => response.listen(
       any(),

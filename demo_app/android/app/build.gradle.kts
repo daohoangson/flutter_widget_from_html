@@ -9,9 +9,7 @@ android {
     namespace = "dev.fwfh.demo_app"
     compileSdk = flutter.compileSdkVersion
 
-    // TODO: remove hard-coded value when `flutter.ndkVersion` is sufficient
-    // open $(dirname $(dirname $(which flutter)))/packages/flutter_tools
-    ndkVersion = "27.0.12077973"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

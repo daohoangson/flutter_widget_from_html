@@ -11,6 +11,7 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/core_build_tree.dart';
+import 'material_theme.dart';
 
 final _logger = Logger('fwfh.HtmlWidget');
 
@@ -40,6 +41,13 @@ class HtmlWidget extends StatefulWidget {
   /// The input string.
   final String html;
 
+  /// Selects the Material library used by links, loading indicators and
+  /// tooltips.
+  ///
+  /// Defaults to [MaterialThemeMode.auto], which follows the nearest Material
+  /// theme ancestor and falls back to Flutter's in-framework Material library.
+  final MaterialThemeMode materialThemeMode;
+
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
 
@@ -66,6 +74,7 @@ class HtmlWidget extends StatefulWidget {
   /// - [buildAsync]
   /// - [enableCaching]
   /// - [html]
+  /// - [materialThemeMode]
   /// - [renderMode]
   /// - [textStyle]
   List<dynamic> get rebuildTriggers => [
@@ -73,6 +82,7 @@ class HtmlWidget extends StatefulWidget {
         buildAsync,
         enableCaching,
         html,
+        materialThemeMode,
         renderMode,
         textStyle,
         ..._rebuildTriggers ?? const [],
@@ -106,6 +116,7 @@ class HtmlWidget extends StatefulWidget {
     this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
+    this.materialThemeMode = MaterialThemeMode.auto,
     List<dynamic>? rebuildTriggers,
     this.renderMode = RenderMode.column,
     this.textStyle,
@@ -175,7 +186,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
       needsRebuild = true;
     }
 
-    if (widget.textStyle != oldWidget.textStyle) {
+    if (widget.materialThemeMode != oldWidget.materialThemeMode ||
+        widget.textStyle != oldWidget.textStyle) {
       // performance critical
       _rootProperties = null;
     }

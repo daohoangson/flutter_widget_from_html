@@ -25,6 +25,7 @@ mixin JustAudioFactory on WidgetFactory {
         autoplay: autoplay,
         loop: loop,
         muted: muted,
+        materialThemeMode: materialThemeMode,
         preload: preload,
       );
 

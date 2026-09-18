@@ -70,7 +70,7 @@ class TagA {
           ? resolving
           : resolving.copyWith(
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
+                color: resolving.get<MaterialThemeModeData>()?.primaryColor,
                 debugLabel: 'fwfh: a[href] default color',
               ),
             );

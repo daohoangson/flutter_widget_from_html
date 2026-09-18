@@ -11,6 +11,8 @@ linter:
   rules:
     always_put_control_body_on_new_line: true
     missing_whitespace_between_adjacent_strings: false
+    # Initializing private fields via named formals makes their names private.
+    prefer_initializing_formals: false
 
     # relative vs. package imports
     always_use_package_imports: false
