@@ -262,19 +262,27 @@ class Flattener implements Flattened {
     _hasInlineContent = false;
     _lastInlineContentResolvers = null;
 
-    _addPendingLineMetrics(
-      pending,
-      hasInlineContent: hasInlineContent,
-      lastInlineContentResolvers: lastInlineContentResolvers,
-    );
+    final usesTextBoundary = tree.maxLines > 0 && _childrenBuilder != null;
+    if (usesTextBoundary) {
+      _pending.addAll(pending);
+      _flushPending();
+    } else {
+      _addPendingLineMetrics(
+        pending,
+        hasInlineContent: hasInlineContent,
+        lastInlineContentResolvers: lastInlineContentResolvers,
+      );
+    }
     _saveSpan();
 
     final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
     if (reversedBuilders == null) {
-      _addPendingLineBoxes(
-        pending,
-        hasInlineContent: hasInlineContent,
-      );
+      if (!usesTextBoundary) {
+        _addPendingLineBoxes(
+          pending,
+          hasInlineContent: hasInlineContent,
+        );
+      }
       return;
     }
 
@@ -329,10 +337,12 @@ class Flattener implements Flattened {
       _logger.finest('Added ${placeholder.debugLabel} widget');
     }
 
-    _addPendingLineBoxes(
-      pending,
-      hasInlineContent: hasInlineContent,
-    );
+    if (!usesTextBoundary) {
+      _addPendingLineBoxes(
+        pending,
+        hasInlineContent: hasInlineContent,
+      );
+    }
   }
 
   void _addPendingLineMetrics(
@@ -368,16 +378,6 @@ class Flattener implements Flattened {
     List<_PendingString> pending, {
     required bool hasInlineContent,
   }) {
-    final maxLines = tree.maxLines;
-    if (maxLines > 0) {
-      _addLimitedLineBoxes(
-        pending,
-        hasInlineContent: hasInlineContent,
-        maxLines: maxLines,
-      );
-      return;
-    }
-
     var isFirstLineBreak = true;
     for (final item in pending) {
       final string = item.string;
@@ -403,62 +403,6 @@ class Flattener implements Flattened {
         }
       }
     }
-  }
-
-  void _addLimitedLineBoxes(
-    List<_PendingString> pending, {
-    required bool hasInlineContent,
-    required int maxLines,
-  }) {
-    final placeholder = WidgetPlaceholder(
-      builder: (context, _) {
-        var remaining = maxLines - (hasInlineContent ? 1 : 0);
-        var isFirstLineBreak = true;
-        final children = <Widget>[];
-
-        for (final item in pending) {
-          final string = item.string;
-          final resolved = item.inheritanceResolvers.resolve(context);
-          final whitespace = resolved.whitespaceOrNormal;
-          var count = 0;
-          if (string.isLineBreak) {
-            final skipNormally = isFirstLineBreak && hasInlineContent;
-            isFirstLineBreak = false;
-            if (!skipNormally || whitespace == CssWhitespace.pre) {
-              count = 1;
-            }
-          } else if (string.isWhitespace && whitespace == CssWhitespace.pre) {
-            count = string.data.codeUnits.where((unit) => unit == 0xA).length;
-          }
-
-          for (var i = 0; i < count && remaining > 0; i++) {
-            children.add(
-              _LineBox(
-                style: resolved.prepareTextStyle(),
-                textDirection:
-                    resolved.get<TextDirection>() ?? TextDirection.ltr,
-              ),
-            );
-            remaining--;
-          }
-        }
-
-        if (children.isEmpty) {
-          return widget0;
-        }
-        if (children.length == 1) {
-          return children.single;
-        }
-
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: children,
-        );
-      },
-      debugLabel: '${tree.element.localName}--line-break',
-    );
-    _widgets.add(placeholder);
-    _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
   void _addLineBox(

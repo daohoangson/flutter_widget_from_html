@@ -78,6 +78,17 @@ void main() {
       expect(afterTop - rootTop, 10.0);
     });
 
+    testWidgets('counts inline breaks toward max-lines', (tester) async {
+      const html = '<div style="max-lines:2">'
+          'Foo<br>Bar<br><br><div>After</div>'
+          '</div>';
+      await helper.explain(tester, html);
+
+      final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 20.0);
+    });
+
     testWidgets('uses scaled text metrics', (tester) async {
       tester.setTextScaleFactor(2);
       const html = 'Before<br><br><div>After</div>';
