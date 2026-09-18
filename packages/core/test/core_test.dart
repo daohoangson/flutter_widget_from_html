@@ -228,8 +228,9 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('renders new line at bottom after block content',
-        (tester) async {
+    testWidgets('renders a BR-only anonymous block after block content', (
+      tester,
+    ) async {
       const html = '<div>Foo</div><br />';
       final explained = await explain(tester, html);
       expect(
