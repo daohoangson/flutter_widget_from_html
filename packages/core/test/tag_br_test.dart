@@ -109,6 +109,25 @@ void main() {
       expect(afterTop - rootTop, 20.0);
     });
 
+    testWidgets('limits soft-wrapped content before trailing breaks', (
+      tester,
+    ) async {
+      const html = '<div style="max-lines:2;width:30px">'
+          'Foo Foo Foo Foo Foo<br><br><div>After</div>'
+          '</div>';
+      final htmlWidgetKey = GlobalKey<HtmlWidgetState>();
+      await helper.explain(
+        tester,
+        null,
+        hw: HtmlWidget(html, key: htmlWidgetKey),
+        key: htmlWidgetKey,
+      );
+
+      final rootTop = tester.getTopLeft(find.byKey(htmlWidgetKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 20.0);
+    });
+
     testWidgets('uses scaled text metrics', (tester) async {
       tester.setTextScaleFactor(2);
       const html = 'Before<br><br><div>After</div>';
