@@ -22,6 +22,7 @@ class Flattener implements Flattened {
   late BuildBit _bit;
   late InheritanceResolvers _inheritanceResolvers;
   var _hasInlineContent = false;
+  InheritanceResolvers? _lastInlineContentResolvers;
   final _pending = <_PendingString>[];
   var _swallowWhitespace = false;
   late List<_String> _strings;
@@ -56,6 +57,7 @@ class Flattener implements Flattened {
     _flushPending();
     _saveSpan();
     _hasInlineContent = true;
+    _lastInlineContentResolvers = _inheritanceResolvers;
 
     final scopedTree = _bit.parent;
     final scopedInheritanceResolvers = _inheritanceResolvers;
@@ -99,6 +101,7 @@ class Flattener implements Flattened {
       _flushPending();
       _strings.add(_String(text));
       _hasInlineContent = true;
+      _lastInlineContentResolvers = _inheritanceResolvers;
     }
 
     if (whitespace != null) {
@@ -170,6 +173,7 @@ class Flattener implements Flattened {
 
     _inheritanceResolvers = _firstInheritanceResolvers;
     _strings = _firstStrings;
+    _lastInlineContentResolvers = null;
   }
 
   void _loopSubTree(BuildTree someTree, {required bool flatten}) {
@@ -252,10 +256,17 @@ class Flattener implements Flattened {
 
   void _completeLoop() {
     final hasInlineContent = _hasInlineContent;
+    final lastInlineContentResolvers = _lastInlineContentResolvers;
     final pending = _pending.toList(growable: false);
     _pending.clear();
     _hasInlineContent = false;
+    _lastInlineContentResolvers = null;
 
+    _addPendingLineMetrics(
+      pending,
+      hasInlineContent: hasInlineContent,
+      lastInlineContentResolvers: lastInlineContentResolvers,
+    );
     _saveSpan();
 
     final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
@@ -322,6 +333,35 @@ class Flattener implements Flattened {
       pending,
       hasInlineContent: hasInlineContent,
     );
+  }
+
+  void _addPendingLineMetrics(
+    List<_PendingString> pending, {
+    required bool hasInlineContent,
+    required InheritanceResolvers? lastInlineContentResolvers,
+  }) {
+    if (!hasInlineContent ||
+        lastInlineContentResolvers == null ||
+        pending.isEmpty ||
+        !pending.first.string.isLineBreak) {
+      return;
+    }
+
+    final inheritanceResolvers = pending.first.inheritanceResolvers;
+    if (inheritanceResolvers.isIdenticalWith(lastInlineContentResolvers)) {
+      return;
+    }
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final resolved = inheritanceResolvers.resolve(context);
+      if (resolved.whitespaceOrNormal == CssWhitespace.pre) {
+        return null;
+      }
+
+      return wf.buildTextSpan(
+        style: resolved.prepareTextStyle(),
+        text: '\u200B',
+      );
+    });
   }
 
   void _addPendingLineBoxes(

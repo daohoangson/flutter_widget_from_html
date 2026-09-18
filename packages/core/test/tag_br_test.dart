@@ -57,6 +57,16 @@ void main() {
       expect(afterTop - rootTop, 60.0);
     });
 
+    testWidgets('uses terminal break metrics before a block', (tester) async {
+      const html = 'Foo<br style="font-size:30px;line-height:1">'
+          '<div>After</div>';
+      await helper.explain(tester, html);
+
+      final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 30.0);
+    });
+
     testWidgets('uses scaled text metrics', (tester) async {
       tester.setTextScaleFactor(2);
       const html = 'Before<br><br><div>After</div>';
