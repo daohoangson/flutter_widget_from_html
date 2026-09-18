@@ -11,8 +11,9 @@ Finder findRichText(String text) => find.byWidgetPredicate(
 
 void main() {
   group('BR geometry', () {
-    testWidgets('uses stable line boxes after an inline widget',
-        (tester) async {
+    testWidgets('uses stable line boxes after an inline widget', (
+      tester,
+    ) async {
       for (var count = 1; count <= 4; count++) {
         final inlineKey = GlobalKey();
         final htmlWidgetKey = GlobalKey<HtmlWidgetState>();
@@ -83,6 +84,15 @@ void main() {
       final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
       final afterTop = tester.getTopLeft(findRichText('After')).dy;
       expect(afterTop - rootTop, 20.0);
+    });
+
+    testWidgets('preserves a break-only block', (tester) async {
+      const html = '<p style="margin:0"><br></p><div>After</div>';
+      await helper.explain(tester, html);
+
+      final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 10.0);
     });
 
     testWidgets('preserves the terminal break with white-space pre', (

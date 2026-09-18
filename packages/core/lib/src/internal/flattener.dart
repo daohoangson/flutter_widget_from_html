@@ -33,7 +33,7 @@ class Flattener implements Flattened {
     for (final bit in tree.bits) {
       _loop(bit);
     }
-    _completeLoop(beforeBlock: false);
+    _completeLoop();
   }
 
   Iterable<WidgetPlaceholder> get widgets => _widgets;
@@ -85,7 +85,7 @@ class Flattener implements Flattened {
 
   @override
   void widget(Widget value) {
-    _completeLoop(beforeBlock: true);
+    _completeLoop();
 
     final debugLabel = '${_bit.parent.element.localName}--Flattener.widget';
     final placeholder = WidgetPlaceholder.lazy(value, debugLabel: debugLabel);
@@ -132,8 +132,9 @@ class Flattener implements Flattened {
 
     final canAppendToFirst = _childrenBuilder?.isEmpty == true &&
         _pending.every(
-          (pending) => pending.inheritanceResolvers
-              .isIdenticalWith(_firstInheritanceResolvers),
+          (pending) => pending.inheritanceResolvers.isIdenticalWith(
+            _firstInheritanceResolvers,
+          ),
         );
     if (canAppendToFirst) {
       _firstStrings.addAll(_pending.map((pending) => pending.string));
@@ -147,16 +148,15 @@ class Flattener implements Flattened {
       final inheritanceResolvers = _pending[start].inheritanceResolvers;
       var end = start + 1;
       while (end < _pending.length &&
-          _pending[end]
-              .inheritanceResolvers
-              .isIdenticalWith(inheritanceResolvers)) {
+          _pending[end].inheritanceResolvers.isIdenticalWith(
+                inheritanceResolvers,
+              )) {
         end++;
       }
 
-      _addTextBuilder(
-        inheritanceResolvers,
-        [for (var i = start; i < end; i++) _pending[i].string],
-      );
+      _addTextBuilder(inheritanceResolvers, [
+        for (var i = start; i < end; i++) _pending[i].string,
+      ]);
       start = end;
     }
 
@@ -231,28 +231,26 @@ class Flattener implements Flattened {
     InheritanceResolvers inheritanceResolvers,
     List<_String> strings,
   ) {
-    _childrenBuilder?.add(
-      (context, {bool? isLast}) {
-        final resolved = inheritanceResolvers.resolve(context);
-        final text = strings.toText(
-          resolved.whitespaceOrNormal,
-          isFirst: false,
-          isLast: isLast != false,
-        );
-        if (text.isEmpty) {
-          return null;
-        }
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final resolved = inheritanceResolvers.resolve(context);
+      final text = strings.toText(
+        resolved.whitespaceOrNormal,
+        isFirst: false,
+        isLast: isLast != false,
+      );
+      if (text.isEmpty) {
+        return null;
+      }
 
-        return wf.buildTextSpan(
-          recognizer: _getInlineRecognizer(context, resolved),
-          style: resolved.prepareTextStyle(),
-          text: text,
-        );
-      },
-    );
+      return wf.buildTextSpan(
+        recognizer: _getInlineRecognizer(context, resolved),
+        style: resolved.prepareTextStyle(),
+        text: text,
+      );
+    });
   }
 
-  void _completeLoop({required bool beforeBlock}) {
+  void _completeLoop() {
     final hasInlineContent = _hasInlineContent;
     final pending = _pending.toList(growable: false);
     _pending.clear();
@@ -264,7 +262,6 @@ class Flattener implements Flattened {
     if (reversedBuilders == null) {
       _addPendingLineBoxes(
         pending,
-        beforeBlock: beforeBlock,
         hasInlineContent: hasInlineContent,
       );
       return;
@@ -323,14 +320,12 @@ class Flattener implements Flattened {
 
     _addPendingLineBoxes(
       pending,
-      beforeBlock: beforeBlock,
       hasInlineContent: hasInlineContent,
     );
   }
 
   void _addPendingLineBoxes(
     List<_PendingString> pending, {
-    required bool beforeBlock,
     required bool hasInlineContent,
   }) {
     var isFirstLineBreak = true;
@@ -341,7 +336,7 @@ class Flattener implements Flattened {
         isFirstLineBreak = false;
         _addLineBox(
           item.inheritanceResolvers,
-          onlyForPre: !beforeBlock && !hasInlineContent,
+          onlyForPre: false,
           skipNormally: skipNormally,
         );
         continue;
@@ -377,10 +372,7 @@ class Flattener implements Flattened {
         }
 
         final painter = TextPainter(
-          text: TextSpan(
-            style: resolved.prepareTextStyle(),
-            text: '\u200B',
-          ),
+          text: TextSpan(style: resolved.prepareTextStyle(), text: '\u200B'),
           textDirection: resolved.get<TextDirection>() ?? TextDirection.ltr,
         )..layout();
         final height = painter.height;
