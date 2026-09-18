@@ -133,11 +133,11 @@ AlignmentGeometry? _tryParseAlignmentGeometry(TextDirection dir, String value) {
 
 PlaceholderAlignment? _tryParsePlaceholderAlignment(String value) {
   switch (value) {
-    case kCssVerticalAlignTop:
+    case kCssVerticalAlignBottom:
     case kCssVerticalAlignSub:
       return PlaceholderAlignment.top;
     case kCssVerticalAlignSuper:
-    case kCssVerticalAlignBottom:
+    case kCssVerticalAlignTop:
       return PlaceholderAlignment.bottom;
     case kCssVerticalAlignMiddle:
       return PlaceholderAlignment.middle;
