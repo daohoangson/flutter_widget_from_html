@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   csslib: ">=0.17.0 <2.0.0"
-  cupertino_ui: ">=1.0.2 <1.1.0"
+  cupertino_ui: "<1.2.0"
   flutter:
     sdk: flutter
   html: ^0.15.0
