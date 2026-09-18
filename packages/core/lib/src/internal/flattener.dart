@@ -264,16 +264,20 @@ class Flattener implements Flattened {
 
     final usesTextBoundary = tree.maxLines > 0 && _childrenBuilder != null;
     if (usesTextBoundary) {
-      _pending.addAll(pending);
-      _flushPending();
+      _saveSpan();
+      _addPendingTextBuilder(
+        pending,
+        hasInlineContent: hasInlineContent,
+        lastInlineContentResolvers: lastInlineContentResolvers,
+      );
     } else {
       _addPendingLineMetrics(
         pending,
         hasInlineContent: hasInlineContent,
         lastInlineContentResolvers: lastInlineContentResolvers,
       );
+      _saveSpan();
     }
-    _saveSpan();
 
     final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
     if (reversedBuilders == null) {
@@ -371,6 +375,70 @@ class Flattener implements Flattened {
         style: resolved.prepareTextStyle(),
         text: '\u200B',
       );
+    });
+  }
+
+  void _addPendingTextBuilder(
+    List<_PendingString> pending, {
+    required bool hasInlineContent,
+    required InheritanceResolvers? lastInlineContentResolvers,
+  }) {
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final children = <InlineSpan>[];
+      var hasTextOnLine = hasInlineContent;
+      var isFirstLineBreak = true;
+
+      void addLine(InheritedProperties resolved) {
+        final span = wf.buildTextSpan(
+          recognizer: _getInlineRecognizer(context, resolved),
+          style: resolved.prepareTextStyle(),
+          text: hasTextOnLine ? '\n\u200B' : '\u200B',
+        );
+        if (span != null) {
+          children.add(span);
+          hasTextOnLine = true;
+        }
+      }
+
+      void addInlineMetric(InheritedProperties resolved) {
+        final span = wf.buildTextSpan(
+          recognizer: _getInlineRecognizer(context, resolved),
+          style: resolved.prepareTextStyle(),
+          text: '\u200B',
+        );
+        if (span != null) {
+          children.add(span);
+        }
+      }
+
+      for (final item in pending) {
+        final string = item.string;
+        final resolved = item.inheritanceResolvers.resolve(context);
+        final whitespace = resolved.whitespaceOrNormal;
+        if (string.isLineBreak) {
+          if (whitespace == CssWhitespace.pre) {
+            addLine(resolved);
+          } else if (isFirstLineBreak && hasInlineContent) {
+            if (lastInlineContentResolvers != null &&
+                !item.inheritanceResolvers.isIdenticalWith(
+                  lastInlineContentResolvers,
+                )) {
+              addInlineMetric(resolved);
+            }
+          } else {
+            addLine(resolved);
+          }
+          isFirstLineBreak = false;
+        } else if (string.isWhitespace && whitespace == CssWhitespace.pre) {
+          final count =
+              string.data.codeUnits.where((unit) => unit == 0xA).length;
+          for (var i = 0; i < count; i++) {
+            addLine(resolved);
+          }
+        }
+      }
+
+      return children.isEmpty ? null : wf.buildTextSpan(children: children);
     });
   }
 

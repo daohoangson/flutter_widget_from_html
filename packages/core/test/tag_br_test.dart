@@ -78,6 +78,26 @@ void main() {
       expect(afterTop - rootTop, 10.0);
     });
 
+    testWidgets('preserves a leading break with max-lines', (tester) async {
+      const html = '<div style="max-lines:1"><br><div>After</div></div>';
+      await helper.explain(tester, html);
+
+      final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 10.0);
+    });
+
+    testWidgets('uses terminal break metrics with max-lines', (tester) async {
+      const html = '<div style="max-lines:1">'
+          'Foo<br style="font-size:30px;line-height:1"><div>After</div>'
+          '</div>';
+      await helper.explain(tester, html);
+
+      final rootTop = tester.getTopLeft(find.byKey(helper.hwKey)).dy;
+      final afterTop = tester.getTopLeft(findRichText('After')).dy;
+      expect(afterTop - rootTop, 30.0);
+    });
+
     testWidgets('counts inline breaks toward max-lines', (tester) async {
       const html = '<div style="max-lines:2">'
           'Foo<br>Bar<br><br><div>After</div>'
