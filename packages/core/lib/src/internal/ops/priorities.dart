@@ -44,7 +44,8 @@ class Early {
   static const first = Priority._baseEarly00;
   static const attributeAlign = first + _step;
   static const attributeDir = attributeAlign + _step;
-  static const cssTextAlign = attributeDir + _step;
+  static const attributeWidth = attributeDir + _step;
+  static const cssTextAlign = attributeWidth + _step;
   static const tagAcronym = cssTextAlign + _step;
   static const tagAddress = tagAcronym + _step;
   static const tagCenter = tagAddress + _step;

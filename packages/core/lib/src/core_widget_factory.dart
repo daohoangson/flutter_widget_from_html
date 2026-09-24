@@ -16,6 +16,9 @@ import 'internal/text_ops.dart' as text_ops;
 import 'material_theme.dart';
 import 'utils/css_counter_style.dart';
 
+// https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-dimension-values
+final _dimensionRegExp = RegExp(r'^[\t\n\f\r ]*(\d+)(?:\.(\d*))?(%)?');
+
 final _logger = Logger('fwfh.WidgetFactory');
 
 /// A factory to build widgets.
@@ -986,6 +989,19 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           );
         case kAttributeId:
           tree.register(Anchor(this, attribute.value).buildOp);
+        case kAttributeWidth:
+          switch (localName) {
+            case kTagTable:
+            case kTagTableCell:
+            case kTagTableHeaderCell:
+              tree.register(
+                const BuildOp.v2(
+                  debugLabel: kAttributeWidth,
+                  defaultStyles: _cssWidthFromAttribute,
+                  priority: Early.attributeWidth,
+                ),
+              );
+          }
       }
     }
   }
@@ -1220,6 +1236,22 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   static StylesMap _cssVerticalAlignMiddle(dom.Element _) =>
       {kCssVerticalAlign: kCssVerticalAlignMiddle};
+
+  static StylesMap _cssWidthFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeWidth];
+    final match = value != null ? _dimensionRegExp.firstMatch(value) : null;
+    if (match == null) {
+      return const {};
+    }
+
+    final fraction = match[2] ?? '';
+    final number = fraction.isEmpty ? match[1]! : '${match[1]}.$fraction';
+    if (double.parse(number) == 0) {
+      return const {};
+    }
+
+    return {kCssWidth: '$number${match[3] ?? 'px'}'};
+  }
 
   static StylesMap _tagAcronym(dom.Element _) => {
         kCssTextDecorationLine: kCssTextDecorationUnderline,

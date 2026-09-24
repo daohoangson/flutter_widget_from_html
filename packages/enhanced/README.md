@@ -160,8 +160,8 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` with 50+ predefined counter styles including `decimal`, `disc`, `circle`, `square`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`, `lower-greek`, `cjk-decimal`, `cjk-ideographic`, `hiragana`, `katakana`, `hebrew`, `georgian`, `armenian`, `korean-hangul-formal`, and more. Also supports custom string literals (e.g., `'★'`).
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - TABLE attributes `border`, `cellpadding`, `cellspacing`
-  - TD/TH attributes `colspan`, `rowspan`, `valign`
+  - TABLE attributes `border`, `cellpadding`, `cellspacing`, `width`
+  - TD/TH attributes `colspan`, `rowspan`, `valign`, `width`
   - Table is scrollable if columns are too wide
 - SVG via [flutter_svg](https://pub.dev/packages/flutter_svg)
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
