@@ -390,6 +390,65 @@ Future<void> main() async {
     });
   });
 
+  group('align', () {
+    const windowSize = 100.0;
+    const foo = '<tr><td>Foo</td></tr>';
+
+    testWidgets('renders TABLE align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table><table align="center">$foo</table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getRect(tables.last);
+      expect(actual.width, equals(expected.width));
+      expect(actual.left, equals(windowSize - actual.right));
+    });
+
+    testWidgets('renders TD align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table><tr><td align="center">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:align=center,(:Foo)]'));
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getSize(tables.last);
+      expect(actual.width, equals(expected.width));
+    });
+
+    testWidgets('renders TR align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table><tr align="center"><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:align=center,(:Foo)]'));
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getSize(tables.last);
+      expect(actual.width, equals(expected.width));
+    });
+
+    testWidgets('renders nested align=center', (WidgetTester tester) async {
+      // the usual email button markup
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table style="width: 100%"><tr><td align="center">'
+          '<table align="center"><tr><td align="center">Foo</td></tr></table>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getRect(tables.last);
+      expect(actual.width, equals(expected.width));
+      expect(actual.left, equals(windowSize - actual.right));
+    });
+  });
+
   group('valign', () {
     testWidgets('renders without align', (WidgetTester tester) async {
       const html = '<table><tr><td>Foo</td></tr></table>';

@@ -1189,6 +1189,22 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final value = element.attributes[kAttributeAlign];
 
     if (value == kCssTextAlignCenter) {
+      // https://html.spec.whatwg.org/multipage/rendering.html#tables-2
+      switch (element.localName) {
+        case kTagTable:
+          return const {
+            '$kCssMargin$kSuffixInlineStart': kCssLengthAuto,
+            '$kCssMargin$kSuffixInlineEnd': kCssLengthAuto,
+          };
+        case kTagTableHeaderGroup:
+        case kTagTableRowGroup:
+        case kTagTableFooterGroup:
+        case kTagTableRow:
+        case kTagTableCell:
+        case kTagTableHeaderCell:
+          return const {kCssTextAlign: kCssTextAlignWebkitCenter};
+      }
+
       // `align=center` works more like `CENTER` tag, not `text-align: center`
       return _tagCenter(element);
     }
