@@ -9,6 +9,7 @@ const kTagTableHeaderCell = 'th';
 const kTagTableCell = 'td';
 const kTagTableCaption = 'caption';
 
+const kAttributeBgColor = 'bgcolor';
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
 const kAttributeColspan = 'colspan';
