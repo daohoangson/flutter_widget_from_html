@@ -39,67 +39,38 @@ jobs:
       GOLDEN_SKIP: "yes"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
       - name: Update pubspec.yaml
         run: |
           set -e
 
           sudo snap install yq
 
-          pin_minimums() {
-            _pubspec=$1
-
-            # back up SDK constraint
-            _sdkVersion=$( yq e .environment.sdk "$_pubspec" )
-
-            # replace:
-            #   foo: ^1.0.0
-            #   bar: ^2.0.0-0
-            # into:
-            #   foo: 1.0.0
-            #   bar: ^2.0.0-0 (unchanged)
-            sed -i'' -e 's#^\(  [^:]*\): ^\([0-9.]*\)$#\1: \2#' "$_pubspec"
-
-            # replace:
-            #   foo: ">=1.0.0"
-            #   bar: ">=2.0.0 <4.0.0"
-            #   yolo: ">=3.0.0-0"
-            # into:
-            #   foo: 1.0.0
-            #   bar: 2.0.0
-            #   yolo: ">=3.0.0-0" (unchanged)
-            sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"$#\1: \2#' \
-              "$_pubspec"
-
-            # restore SDK constraint
-            yq e ".environment.sdk = \"${_sdkVersion}\"" -i "$_pubspec"
-          }
-
           # delete all overrides and use pub.dev versions
           yq e 'del(.dependency_overrides)' -i pubspec.yaml
 
-          # Release PRs must test explicit prerelease dependencies before they
-          # are published. Resolve matching workspace prereleases locally;
-          # stable dependencies still use their declared pub.dev minimums.
-          for _pubspec in ../*/pubspec.yaml; do
-            _name=$(yq e '.name' "$_pubspec")
-            _version=$(yq e '.version' "$_pubspec")
-            _constraint=$(yq e ".dependencies.${_name}" pubspec.yaml)
-            case "$_version" in
-              *-*) ;;
-              *) continue ;;
-            esac
-            case "$_constraint" in
-              "^$_version"|">=$_version "*|"$_version") ;;
-              *) continue ;;
-            esac
-            _path=$(dirname "$_pubspec")
-            yq e ".dependency_overrides.${_name}.path = \"${_path}\"" \
-              -i pubspec.yaml
-          done
+          # back up SDK constraint
+          _sdkVersion=$( yq e .environment.sdk pubspec.yaml )
 
-          pin_minimums pubspec.yaml
+          # replace:
+          #   foo: ^1.0.0
+          #   bar: ^2.0.0-0
+          # into:
+          #   foo: 1.0.0
+          #   bar: ^2.0.0-0 (unchanged)
+          sed -i'' -e 's#^\(  [^:]*\): ^\([0-9.]*\)$#\1: \2#' pubspec.yaml
+
+          # replace:
+          #   foo: ">=1.0.0"
+          #   bar: ">=2.0.0 <4.0.0"
+          #   yolo: ">=3.0.0-0"
+          # into:
+          #   foo: 1.0.0
+          #   bar: 2.0.0
+          #   yolo: ">=3.0.0-0" (unchanged)
+          sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"$#\1: \2#' pubspec.yaml
+
+          # restore SDK constraint
+          yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # output for debugging
           cat pubspec.yaml
