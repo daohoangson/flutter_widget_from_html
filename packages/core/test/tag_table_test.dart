@@ -390,6 +390,144 @@ Future<void> main() async {
     });
   });
 
+  group('align', () {
+    const windowSize = 100.0;
+    const foo = '<tr><td>Foo</td></tr>';
+
+    testWidgets('renders TABLE align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table><table align="center">$foo</table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getRect(tables.last);
+      expect(actual.width, equals(expected.width));
+      expect(actual.left, equals(windowSize - actual.right));
+    });
+
+    testWidgets('renders TD align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table><tr><td align="center">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:align=center,(:Foo)]'));
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getSize(tables.last);
+      expect(actual.width, equals(expected.width));
+    });
+
+    testWidgets('renders TR align=center', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table><tr align="center"><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[RichText:align=center,(:Foo)]'));
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getSize(tables.last);
+      expect(actual.width, equals(expected.width));
+    });
+
+    testWidgets('renders nested align=center', (WidgetTester tester) async {
+      // the usual email button markup
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table style="width: 100%"><tr><td align="center">'
+          '<table align="center"><tr><td align="center">Foo</td></tr></table>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getRect(tables.last);
+      expect(actual.width, equals(expected.width));
+      expect(actual.left, equals(windowSize - actual.right));
+    });
+  });
+
+  group('width', () {
+    const windowSize = 100.0;
+    const foo = '<tr><td>Foo</td></tr>';
+
+    testWidgets('renders TABLE width=100%', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/971
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      await explain(tester, '<table width="100%">$foo</table>');
+      expect(tester.getSize(find.byType(HtmlTable)).width, equals(windowSize));
+    });
+
+    testWidgets('renders TABLE width=50', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      await explain(tester, '<table width="50">$foo</table>');
+      expect(tester.getSize(find.byType(HtmlTable)).width, equals(50.0));
+    });
+
+    testWidgets('renders TD/TH width=50', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table><tr><td style="width: 50px">Foo</td></tr></table>'
+          '<table><tr><td width="50">Foo</td></tr></table>'
+          '<table><tr><th width="50">Foo</th></tr></table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.at(0)).width;
+      expect(tester.getSize(tables.at(1)).width, equals(expected));
+      expect(tester.getSize(tables.at(2)).width, equals(expected));
+    });
+
+    testWidgets('parses like browsers', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table width="100%;direction:ltr">$foo</table>'
+          '<table width=" 50.px">$foo</table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      expect(tester.getSize(tables.at(0)).width, equals(windowSize));
+      expect(tester.getSize(tables.at(1)).width, equals(50.0));
+    });
+
+    testWidgets('skips invalid values', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table width="0">$foo</table>'
+          '<table width="auto">$foo</table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.at(0)).width;
+      expect(expected, lessThan(windowSize));
+      expect(tester.getSize(tables.at(1)).width, equals(expected));
+      expect(tester.getSize(tables.at(2)).width, equals(expected));
+    });
+
+    testWidgets('renders inline style over it', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table width="100%" style="width: 50px">$foo</table>';
+      await explain(tester, html);
+      expect(tester.getSize(find.byType(HtmlTable)).width, equals(50.0));
+    });
+
+    testWidgets('renders TD align=center inside', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1070
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table>$foo</table>'
+          '<table width="100%;direction:ltr"><tr><td align="center">'
+          '<table>$foo</table>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final tables = find.byType(HtmlTable);
+      final expected = tester.getSize(tables.first);
+      final actual = tester.getRect(tables.last);
+      expect(actual.width, equals(expected.width));
+      expect(actual.left, equals(windowSize - actual.right));
+    });
+  });
+
   group('valign', () {
     testWidgets('renders without align', (WidgetTester tester) async {
       const html = '<table><tr><td>Foo</td></tr></table>';

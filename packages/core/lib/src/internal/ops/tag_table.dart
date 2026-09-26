@@ -15,6 +15,7 @@ const kAttributeColspan = 'colspan';
 const kAttributeCellSpacing = 'cellspacing';
 const kAttributeRowspan = 'rowspan';
 const kAttributeValign = 'valign';
+const kAttributeWidth = 'width';
 
 const kCssBorderCollapse = 'border-collapse';
 const kCssBorderCollapseCollapse = 'collapse';
