@@ -109,10 +109,10 @@ packages:
     dependency: transitive
     description:
       name: chewie
-      sha256: "4db9b1b037b35c8781bd06978f5a33ca2ab0c91bf621ba6558609740982547cf"
+      sha256: "56b6641693ddd72f0cd54ddfedf4f3e9390e6d7b7b22dc2503b7e6ad91476f7f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.3"
+    version: "1.17.2"
   cli_config:
     dependency: transitive
     description:
