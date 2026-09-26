@@ -1,5 +1,5 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:material_ui/material_ui.dart';
 
 class AudioScreen extends StatefulWidget {
   const AudioScreen({super.key});

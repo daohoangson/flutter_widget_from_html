@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:material_ui/material_ui.dart';
 
 const kHtml = '''
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ac metus urna. Proin mollis dictum faucibus. Sed tellus leo, aliquam nec gravida sit amet, feugiat nec orci. Nulla eget neque bibendum, gravida elit eget, volutpat purus. Nullam convallis eros neque, ac rhoncus felis pretium a. Maecenas et pulvinar risus. Duis consequat ac magna a ornare. Fusce eget ante efficitur, fermentum turpis id, ullamcorper neque. Duis sed tellus tellus.</p>

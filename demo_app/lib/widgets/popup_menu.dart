@@ -1,5 +1,5 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 extension PopupBuildContext on BuildContext {

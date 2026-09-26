@@ -1,7 +1,7 @@
 import 'package:demo_app/screens/custom_widget_builder.dart'
     as custom_widget_builder;
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:photo_view/photo_view.dart';
 
 class PhotoViewScreen extends StatelessWidget {

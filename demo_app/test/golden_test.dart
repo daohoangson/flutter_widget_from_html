@@ -4,15 +4,14 @@ import 'dart:io';
 import 'package:demo_app/screens/golden.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '../../packages/fwfh_chewie/test/mock_video_player_platform.dart';
 import '../../packages/fwfh_webview/test/mock_webview_platform.dart';
-import 'material_app.dart';
 
 final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
 final goldenSkip = goldenSkipEnvVar == null
@@ -37,7 +36,9 @@ void _test(
       PopupMenuStateProvider(
         builder: (_) => Golden(name, html, targetKey: key),
       ),
-      wrapper: materialUiAppWrapper,
+      wrapper: materialAppWrapper(
+        theme: ThemeData.light(),
+      ),
       surfaceSize: const Size(400, 1200),
       textScaleSize: textScaleSize,
     );

@@ -1,8 +1,8 @@
 import 'package:demo_app/screens/home.dart';
-import 'package:demo_app/widgets/material_compatibility.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:material_ui/material_ui.dart';
 
 void main() {
   Logger.root.level = Level.FINE;
@@ -31,16 +31,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) => PopupMenuStateProvider(
     builder: (context) => MaterialApp(
       title: 'Flutter Widget from HTML',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0061A4)),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0061A4),
-          brightness: Brightness.dark,
-        ),
-      ),
-      builder: (context, child) => MaterialCompatibility(child: child!),
+      theme: FlexThemeData.light(scheme: FlexScheme.blueM3),
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.blueM3),
       showPerformanceOverlay: context.showPerformanceOverlay,
 
       // let HomeScreen handle all the routings

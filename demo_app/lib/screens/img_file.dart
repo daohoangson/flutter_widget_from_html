@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImgFileScreen extends StatelessWidget {
