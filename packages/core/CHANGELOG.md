@@ -1,3 +1,8 @@
+## 0.18.0-beta.1
+
+- Add support for Flutter and material_ui Material themes with automatic detection and a materialThemeMode override (#1632)
+- Requires Flutter 3.44 or later (#1632)
+
 ## 0.17.4
 
 - Add support for CSS `font-size: xxx-large` (#1593, authored by @dariyooo)
