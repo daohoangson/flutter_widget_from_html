@@ -1,3 +1,11 @@
+## 0.18.0-beta.1
+
+- Add support for Flutter and material_ui Material themes with automatic detection and a materialThemeMode override (#1632)
+- Add Material theme support to audio controls and Android fullscreen video routes (#1632)
+- Update minimum chewie to 1.16.2, video_player to 2.14.0 and flutter_svg to 2.3.0 (#1632)
+- Update minimum webview_flutter to 4.14.1, webview_flutter_android to 4.14.0 and webview_flutter_wkwebview to 3.25.1 (#1632)
+- Requires Flutter 3.44 or later (#1632)
+
 ## 0.17.4
 
 - Add support for CSS `font-size: xxx-large` (#1593, authored by @dariyooo)
