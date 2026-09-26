@@ -1,3 +1,9 @@
+## 0.17.0-beta.1
+
+- Add support for flutter_widget_from_html_core@0.18.0-beta.1 (#1632)
+- Update minimum flutter_svg to 2.3.0 (#1632)
+- Requires Flutter 3.44 or later (#1632)
+
 ## 0.16.1
 
 - Add support for flutter_widget_from_html_core@0.17.0 (#1475)
