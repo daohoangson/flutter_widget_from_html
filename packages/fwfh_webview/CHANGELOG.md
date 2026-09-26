@@ -1,3 +1,10 @@
+## 0.16.0-beta.1
+
+- Add support for Flutter and material_ui Material themes in Android fullscreen video routes (#1632)
+- Add support for flutter_widget_from_html_core@0.18.0-beta.1 (#1632)
+- Update minimum webview_flutter to 4.14.1, webview_flutter_android to 4.14.0 and webview_flutter_wkwebview to 3.25.1 (#1632)
+- Requires Flutter 3.44 or later (#1632)
+
 ## 0.15.8
 
 - Fix platform support metadata on pub.dev (#1630)
