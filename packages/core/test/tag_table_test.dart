@@ -142,6 +142,24 @@ Future<void> main() async {
       expect(explained, contains('[RichText:(+b:Value 2)]'));
     });
 
+    testWidgets('renders row stylings with single cell', (tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td style="background-color: #0f0">Foo</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '[HtmlTableCell:child=[Container:color=#FF00FF00,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[CssBlock:child=[RichText:(:Foo)]]]]]]'
+          ']]',
+        ),
+      );
+    });
+
     testWidgets('renders section stylings', (WidgetTester tester) async {
       const html = '<table>'
           '<tbody style="text-align: right">'
