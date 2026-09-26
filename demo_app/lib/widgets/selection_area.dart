@@ -1,5 +1,5 @@
 import 'package:demo_app/widgets/popup_menu.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SelectionAreaScaffold extends StatelessWidget {
   final PreferredSizeWidget appBar;

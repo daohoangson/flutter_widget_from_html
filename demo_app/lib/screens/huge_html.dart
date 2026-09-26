@@ -1,6 +1,6 @@
 import 'package:demo_app/widgets/popup_menu.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:material_ui/material_ui.dart';
 
 const kHtml = r'''
 <div class="mw-parser-output">

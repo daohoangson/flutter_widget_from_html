@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:demo_app/screens/smilie.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
+
+import 'material_app.dart';
 
 void main() {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
@@ -17,7 +19,7 @@ void main() {
     (tester) async {
       await tester.pumpWidgetBuilder(
         const SmilieScreen(),
-        wrapper: materialAppWrapper(theme: ThemeData.light()),
+        wrapper: materialUiAppWrapper,
         surfaceSize: const Size(400, 200),
       );
 
