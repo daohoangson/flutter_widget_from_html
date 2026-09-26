@@ -42,8 +42,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Update pubspec.yaml
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           set -e
 
@@ -81,23 +79,26 @@ jobs:
           # delete all overrides and use pub.dev versions
           yq e 'del(.dependency_overrides)' -i pubspec.yaml
 
-          # These packages consume core APIs introduced in this branch. When
-          # they change alongside core, test every other dependency at its
-          # declared minimum while resolving the unreleased core locally.
-          git diff --name-only "$BASE_SHA"...HEAD > "$RUNNER_TEMP/changed-files"
-          case "${{ matrix.package }}" in
-            enhanced|fwfh_just_audio|fwfh_webview) _requiresWorkspaceCore=yes ;;
-            *) _requiresWorkspaceCore=no ;;
-          esac
-          if [ "$_requiresWorkspaceCore" = yes ] &&
-            grep -q '^packages/core/' "$RUNNER_TEMP/changed-files" &&
-            grep -q '^packages/${{ matrix.package }}/' "$RUNNER_TEMP/changed-files"; then
-            yq e '.dependency_overrides.flutter_widget_from_html_core.path = "../core"' \
+          # Release PRs must test explicit prerelease dependencies before they
+          # are published. Resolve matching workspace prereleases locally;
+          # stable dependencies still use their declared pub.dev minimums.
+          for _pubspec in ../*/pubspec.yaml; do
+            _name=$(yq e '.name' "$_pubspec")
+            _version=$(yq e '.version' "$_pubspec")
+            _constraint=$(yq e ".dependencies.${_name}" pubspec.yaml)
+            case "$_version" in
+              *-*) ;;
+              *) continue ;;
+            esac
+            case "$_constraint" in
+              "^$_version"|">=$_version "*|"$_version") ;;
+              *) continue ;;
+            esac
+            _path=$(dirname "$_pubspec")
+            yq e ".dependency_overrides.${_name}.path = \"${_path}\"" \
               -i pubspec.yaml
-            yq e 'del(.dependency_overrides)' -i ../core/pubspec.yaml
-            pin_minimums ../core/pubspec.yaml
-            cat ../core/pubspec.yaml
-          fi
+            pin_minimums "$_pubspec"
+          done
 
           pin_minimums pubspec.yaml
 
