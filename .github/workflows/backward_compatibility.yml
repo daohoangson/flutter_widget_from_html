@@ -97,7 +97,6 @@ jobs:
             _path=$(dirname "$_pubspec")
             yq e ".dependency_overrides.${_name}.path = \"${_path}\"" \
               -i pubspec.yaml
-            pin_minimums "$_pubspec"
           done
 
           pin_minimums pubspec.yaml
