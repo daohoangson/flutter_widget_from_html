@@ -6,7 +6,6 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
-import 'margin_vertical.dart';
 
 final _logger = Logger('fwfh.Flattener');
 
@@ -22,6 +21,9 @@ class Flattener implements Flattened {
 
   late BuildBit _bit;
   late InheritanceResolvers _inheritanceResolvers;
+  var _hasInlineContent = false;
+  InheritanceResolvers? _lastInlineContentResolvers;
+  final _pending = <_PendingString>[];
   var _swallowWhitespace = false;
   late List<_String> _strings;
 
@@ -37,13 +39,25 @@ class Flattener implements Flattened {
 
   Iterable<WidgetPlaceholder> get widgets => _widgets;
 
+  void _lineBreak() {
+    _pending.add(
+      _PendingString(
+        _inheritanceResolvers,
+        const _String('\n', isLineBreak: true),
+      ),
+    );
+  }
+
   @override
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
     required Widget child,
   }) {
+    _flushPending();
     _saveSpan();
+    _hasInlineContent = true;
+    _lastInlineContentResolvers = _inheritanceResolvers;
 
     final scopedTree = _bit.parent;
     final scopedInheritanceResolvers = _inheritanceResolvers;
@@ -84,18 +98,72 @@ class Flattener implements Flattened {
   @override
   void write({String? text, String? whitespace}) {
     if (text != null) {
+      _flushPending();
       _strings.add(_String(text));
+      _hasInlineContent = true;
+      _lastInlineContentResolvers = _inheritanceResolvers;
     }
 
     if (whitespace != null) {
-      _strings.add(
-        _String(
-          whitespace,
-          isWhitespace: true,
-          shouldBeSwallowed: _shouldSwallow(_bit),
-        ),
+      final string = _String(
+        whitespace,
+        isWhitespace: true,
+        shouldBeSwallowed: _shouldSwallow(_bit),
       );
+      if (_pending.isNotEmpty) {
+        _pending.add(_PendingString(_inheritanceResolvers, string));
+      } else {
+        _strings.add(string);
+      }
     }
+  }
+
+  void _flushPending() {
+    if (_pending.isEmpty) {
+      return;
+    }
+
+    final canAppend = _pending.every(
+      (pending) =>
+          pending.inheritanceResolvers.isIdenticalWith(_inheritanceResolvers),
+    );
+    if (canAppend) {
+      _strings.addAll(_pending.map((pending) => pending.string));
+      _pending.clear();
+      return;
+    }
+
+    final canAppendToFirst = _childrenBuilder?.isEmpty == true &&
+        _pending.every(
+          (pending) => pending.inheritanceResolvers.isIdenticalWith(
+            _firstInheritanceResolvers,
+          ),
+        );
+    if (canAppendToFirst) {
+      _firstStrings.addAll(_pending.map((pending) => pending.string));
+      _pending.clear();
+      return;
+    }
+
+    _saveSpan();
+    var start = 0;
+    while (start < _pending.length) {
+      final inheritanceResolvers = _pending[start].inheritanceResolvers;
+      var end = start + 1;
+      while (end < _pending.length &&
+          _pending[end].inheritanceResolvers.isIdenticalWith(
+                inheritanceResolvers,
+              )) {
+        end++;
+      }
+
+      _addTextBuilder(inheritanceResolvers, [
+        for (var i = start; i < end; i++) _pending[i].string,
+      ]);
+      start = end;
+    }
+
+    _pending.clear();
   }
 
   void _resetLoop(InheritanceResolvers inheritanceResolvers) {
@@ -105,6 +173,7 @@ class Flattener implements Flattened {
 
     _inheritanceResolvers = _firstInheritanceResolvers;
     _strings = _firstStrings;
+    _lastInlineContentResolvers = null;
   }
 
   void _loopSubTree(BuildTree someTree, {required bool flatten}) {
@@ -131,7 +200,11 @@ class Flattener implements Flattened {
     }
     _inheritanceResolvers = thisInheritanceResolvers;
 
-    bit.flatten(this);
+    if (bit is TagBrBit) {
+      _lineBreak();
+    } else {
+      bit.flatten(this);
+    }
 
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
@@ -152,107 +225,277 @@ class Flattener implements Flattened {
 
   void _saveSpan() {
     if (_strings != _firstStrings && _strings.isNotEmpty) {
-      final scopedInheritanceResolvers = _inheritanceResolvers;
-      final scopedStrings = _strings;
-
-      _childrenBuilder?.add(
-        (context, {bool? isLast}) {
-          final resolved = scopedInheritanceResolvers.resolve(context);
-          final text = scopedStrings.toText(
-            resolved.whitespaceOrNormal,
-            isFirst: false,
-            isLast: isLast != false,
-          );
-          if (text.isEmpty) {
-            return null;
-          }
-
-          return wf.buildTextSpan(
-            recognizer: _getInlineRecognizer(context, resolved),
-            style: resolved.prepareTextStyle(),
-            text: text,
-          );
-        },
-      );
+      _addTextBuilder(_inheritanceResolvers, _strings);
     }
 
     _strings = [];
   }
 
+  void _addTextBuilder(
+    InheritanceResolvers inheritanceResolvers,
+    List<_String> strings,
+  ) {
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final resolved = inheritanceResolvers.resolve(context);
+      final text = strings.toText(
+        resolved.whitespaceOrNormal,
+        isFirst: false,
+        isLast: isLast != false,
+      );
+      if (text.isEmpty) {
+        return null;
+      }
+
+      return wf.buildTextSpan(
+        recognizer: _getInlineRecognizer(context, resolved),
+        style: resolved.prepareTextStyle(),
+        text: text,
+      );
+    });
+  }
+
   void _completeLoop() {
-    _saveSpan();
+    final hasInlineContent = _hasInlineContent;
+    final lastInlineContentResolvers = _lastInlineContentResolvers;
+    final pending = _pending.toList(growable: false);
+    _pending.clear();
+    _hasInlineContent = false;
+    _lastInlineContentResolvers = null;
+
+    final usesTextBoundary = tree.maxLines > 0 && _childrenBuilder != null;
+    if (usesTextBoundary) {
+      _saveSpan();
+      _addPendingTextBuilder(
+        pending,
+        hasInlineContent: hasInlineContent,
+        lastInlineContentResolvers: lastInlineContentResolvers,
+      );
+    } else {
+      _addPendingLineMetrics(
+        pending,
+        hasInlineContent: hasInlineContent,
+        lastInlineContentResolvers: lastInlineContentResolvers,
+      );
+      _saveSpan();
+    }
 
     final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
     if (reversedBuilders == null) {
+      if (!usesTextBoundary) {
+        _addPendingLineBoxes(
+          pending,
+          hasInlineContent: hasInlineContent,
+        );
+      }
       return;
     }
 
     _childrenBuilder = null;
-    if (reversedBuilders.isEmpty && _firstStrings.isEmpty) {
-      return;
-    }
-    final scopedStrings = _firstStrings;
-    final scopedInheritanceResolvers = _firstInheritanceResolvers;
+    if (reversedBuilders.isNotEmpty || _firstStrings.isNotEmpty) {
+      final scopedStrings = _firstStrings;
+      final scopedInheritanceResolvers = _firstInheritanceResolvers;
 
-    final placeholder = WidgetPlaceholder(
-      builder: (context, _) {
-        final resolved = scopedInheritanceResolvers.resolve(context);
-        final children = <InlineSpan>[];
+      final placeholder = WidgetPlaceholder(
+        builder: (context, _) {
+          final resolved = scopedInheritanceResolvers.resolve(context);
+          final children = <InlineSpan>[];
 
-        var isLast_ = true;
-        for (final builder in reversedBuilders) {
-          final child = builder(context, isLast: isLast_);
-          if (child != null) {
-            isLast_ = false;
-            children.insert(0, child);
+          var isLast_ = true;
+          for (final builder in reversedBuilders) {
+            final child = builder(context, isLast: isLast_);
+            if (child != null) {
+              isLast_ = false;
+              children.insert(0, child);
+            }
           }
-        }
 
-        final text = scopedStrings.toText(
-          resolved.whitespaceOrNormal,
-          isFirst: true,
-          isLast: isLast_,
-        );
-        InlineSpan? span;
-        if (text.isEmpty && children.isEmpty) {
-          final nonWhitespaceStrings = scopedStrings
-              .where((str) => !str.isWhitespace)
-              .toList(growable: false);
-          if (nonWhitespaceStrings.length == 1 &&
-              nonWhitespaceStrings[0].data == '\n') {
-            // special handling for paragraph with <BR /> only
-            const oneEm = CssLength(1, CssLengthUnit.em);
-            span = WidgetSpan(
-              child: HeightPlaceholder(
-                oneEm,
-                scopedInheritanceResolvers,
-                debugLabel: '${tree.element.localName}--$oneEm',
-              ),
-            );
+          final text = scopedStrings.toText(
+            resolved.whitespaceOrNormal,
+            isFirst: true,
+            isLast: isLast_,
+          );
+          if (text.isEmpty && children.isEmpty) {
+            return widget0;
           }
-        } else {
-          span = wf.buildTextSpan(
+          final span = wf.buildTextSpan(
             children: children,
             recognizer: _getInlineRecognizer(context, resolved),
             style: resolved.prepareTextStyle(),
             text: text,
           );
-        }
+          if (span == null) {
+            return widget0;
+          }
 
-        if (span == null) {
+          final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
+          if (span is WidgetSpan && textAlign == TextAlign.start) {
+            return span.child;
+          }
+
+          return wf.buildText(tree, resolved, span);
+        },
+        debugLabel: '${tree.element.localName}--text',
+      );
+
+      _widgets.add(placeholder);
+      _logger.finest('Added ${placeholder.debugLabel} widget');
+    }
+
+    if (!usesTextBoundary) {
+      _addPendingLineBoxes(
+        pending,
+        hasInlineContent: hasInlineContent,
+      );
+    }
+  }
+
+  void _addPendingLineMetrics(
+    List<_PendingString> pending, {
+    required bool hasInlineContent,
+    required InheritanceResolvers? lastInlineContentResolvers,
+  }) {
+    if (!hasInlineContent ||
+        lastInlineContentResolvers == null ||
+        pending.isEmpty ||
+        !pending.first.string.isLineBreak) {
+      return;
+    }
+
+    final inheritanceResolvers = pending.first.inheritanceResolvers;
+    if (inheritanceResolvers.isIdenticalWith(lastInlineContentResolvers)) {
+      return;
+    }
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final resolved = inheritanceResolvers.resolve(context);
+      if (resolved.whitespaceOrNormal == CssWhitespace.pre) {
+        return null;
+      }
+
+      return wf.buildTextSpan(
+        style: resolved.prepareTextStyle(),
+        text: '\u200B',
+      );
+    });
+  }
+
+  void _addPendingTextBuilder(
+    List<_PendingString> pending, {
+    required bool hasInlineContent,
+    required InheritanceResolvers? lastInlineContentResolvers,
+  }) {
+    _childrenBuilder?.add((context, {bool? isLast}) {
+      final children = <InlineSpan>[];
+      var hasTextOnLine = hasInlineContent;
+      var isFirstLineBreak = true;
+
+      void addLine(InheritedProperties resolved) {
+        final span = wf.buildTextSpan(
+          recognizer: _getInlineRecognizer(context, resolved),
+          style: resolved.prepareTextStyle(),
+          text: hasTextOnLine ? '\n\u200B' : '\u200B',
+        );
+        if (span != null) {
+          children.add(span);
+          hasTextOnLine = true;
+        }
+      }
+
+      void addInlineMetric(InheritedProperties resolved) {
+        final span = wf.buildTextSpan(
+          recognizer: _getInlineRecognizer(context, resolved),
+          style: resolved.prepareTextStyle(),
+          text: '\u200B',
+        );
+        if (span != null) {
+          children.add(span);
+        }
+      }
+
+      for (final item in pending) {
+        final string = item.string;
+        final resolved = item.inheritanceResolvers.resolve(context);
+        final whitespace = resolved.whitespaceOrNormal;
+        if (string.isLineBreak) {
+          if (whitespace == CssWhitespace.pre) {
+            addLine(resolved);
+          } else if (isFirstLineBreak && hasInlineContent) {
+            if (lastInlineContentResolvers != null &&
+                !item.inheritanceResolvers.isIdenticalWith(
+                  lastInlineContentResolvers,
+                )) {
+              addInlineMetric(resolved);
+            }
+          } else {
+            addLine(resolved);
+          }
+          isFirstLineBreak = false;
+        } else if (string.isWhitespace && whitespace == CssWhitespace.pre) {
+          final count =
+              string.data.codeUnits.where((unit) => unit == 0xA).length;
+          for (var i = 0; i < count; i++) {
+            addLine(resolved);
+          }
+        }
+      }
+
+      return children.isEmpty ? null : wf.buildTextSpan(children: children);
+    });
+  }
+
+  void _addPendingLineBoxes(
+    List<_PendingString> pending, {
+    required bool hasInlineContent,
+  }) {
+    var isFirstLineBreak = true;
+    for (final item in pending) {
+      final string = item.string;
+      if (string.isLineBreak) {
+        final skipNormally = isFirstLineBreak && hasInlineContent;
+        isFirstLineBreak = false;
+        _addLineBox(
+          item.inheritanceResolvers,
+          onlyForPre: false,
+          skipNormally: skipNormally,
+        );
+        continue;
+      }
+
+      if (string.isWhitespace) {
+        final count = string.data.codeUnits.where((unit) => unit == 0xA).length;
+        for (var i = 0; i < count; i++) {
+          _addLineBox(
+            item.inheritanceResolvers,
+            onlyForPre: true,
+            skipNormally: false,
+          );
+        }
+      }
+    }
+  }
+
+  void _addLineBox(
+    InheritanceResolvers inheritanceResolvers, {
+    required bool onlyForPre,
+    required bool skipNormally,
+  }) {
+    final placeholder = WidgetPlaceholder(
+      builder: (context, _) {
+        final resolved = inheritanceResolvers.resolve(context);
+        final whitespace = resolved.whitespaceOrNormal;
+        if (onlyForPre && whitespace != CssWhitespace.pre) {
+          return widget0;
+        }
+        if (skipNormally && whitespace != CssWhitespace.pre) {
           return widget0;
         }
 
-        final textAlign = resolved.get<TextAlign>() ?? TextAlign.start;
-        if (span is WidgetSpan && textAlign == TextAlign.start) {
-          return span.child;
-        }
-
-        return wf.buildText(tree, resolved, span);
+        return _LineBox(
+          style: resolved.prepareTextStyle(),
+          textDirection: resolved.get<TextDirection>() ?? TextDirection.ltr,
+        );
       },
-      debugLabel: '${tree.element.localName}--text',
+      debugLabel: '${tree.element.localName}--line-break',
     );
-
     _widgets.add(placeholder);
     _logger.finest('Added ${placeholder.debugLabel} widget');
   }
@@ -324,17 +567,47 @@ extension on InheritedProperties {
   CssWhitespace get whitespaceOrNormal => get() ?? CssWhitespace.normal;
 }
 
+class _LineBox extends StatelessWidget {
+  final TextStyle style;
+  final TextDirection textDirection;
+
+  const _LineBox({
+    required this.style,
+    required this.textDirection,
+  });
+
+  @override
+  Widget build(BuildContext context) => RichText(
+        text: TextSpan(
+          style: style,
+          text: '\u200B',
+          semanticsLabel: '',
+        ),
+        textDirection: textDirection,
+      );
+}
+
 @immutable
 class _String {
   final String data;
+  final bool isLineBreak;
   final bool isWhitespace;
   final bool shouldBeSwallowed;
 
   const _String(
     this.data, {
+    this.isLineBreak = false,
     this.isWhitespace = false,
     this.shouldBeSwallowed = false,
   });
+}
+
+@immutable
+class _PendingString {
+  final InheritanceResolvers inheritanceResolvers;
+  final _String string;
+
+  const _PendingString(this.inheritanceResolvers, this.string);
 }
 
 extension on List<_String> {

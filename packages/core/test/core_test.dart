@@ -209,7 +209,7 @@ void main() {
         equals(
           '[Column:children='
           '[CssBlock:child=[RichText:(:1)]],'
-          '[SizedBox:0.0x10.0],'
+          '[_LineBox],'
           '[CssBlock:child=[RichText:(:2)]]'
           ']',
         ),
@@ -228,10 +228,20 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('renders without new line at bottom, 3 of 3', (tester) async {
+    testWidgets('renders a BR-only anonymous block after block content', (
+      tester,
+    ) async {
       const html = '<div>Foo</div><br />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[CssBlock:child=[RichText:(:Foo)]],'
+          '[_LineBox]'
+          ']',
+        ),
+      );
     });
   });
 
