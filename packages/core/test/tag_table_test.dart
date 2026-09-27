@@ -142,6 +142,24 @@ Future<void> main() async {
       expect(explained, contains('[RichText:(+b:Value 2)]'));
     });
 
+    testWidgets('renders row stylings with single cell', (tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td style="background-color: #0f0">Foo</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '[HtmlTableCell:child=[Container:color=#FF00FF00,child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[CssBlock:child=[RichText:(:Foo)]]]]]]'
+          ']]',
+        ),
+      );
+    });
+
     testWidgets('renders section stylings', (WidgetTester tester) async {
       const html = '<table>'
           '<tbody style="text-align: right">'
@@ -154,6 +172,105 @@ Future<void> main() async {
       expect(explained, contains('[RichText:align=center,(+b:Header 2)]'));
       expect(explained, contains('[RichText:align=right,(:Value (+i:1))]'));
       expect(explained, contains('[RichText:align=right,(+b:Value 2)]'));
+    });
+  });
+
+  group('bgcolor', () {
+    testWidgets('renders TABLE bgcolor', (WidgetTester tester) async {
+      const html = '<table bgcolor="#f00"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:color=#FFFF0000,child='
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_richtext('Foo')}'
+          ']]]',
+        ),
+      );
+    });
+
+    testWidgets('renders TR bgcolor', (WidgetTester tester) async {
+      const html = '<table><tr bgcolor="#f00">'
+          '<td>Foo</td><td bgcolor="#0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_background('#FFFF0000', '[RichText:(:Foo)]')},'
+          '${_background('#FF00FF00', '[RichText:(:Bar)]')}'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders TD/TH bgcolor', (WidgetTester tester) async {
+      const html = '<table><tr>'
+          '<th bgcolor="#f00">Foo</th><td bgcolor="#0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_background('#FFFF0000', '[RichText:(+b:Foo)]')},'
+          '${_background('#FF00FF00', '[RichText:(:Bar)]')}'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders cell bgcolor over row style', (tester) async {
+      const html = '<table><tr style="background-color: #f00">'
+          '<td>Foo</td><td bgcolor="#0f0">Bar</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_background('#FFFF0000', '[RichText:(:Foo)]')},'
+          '${_background('#FF00FF00', '[RichText:(:Bar)]')}'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders style over bgcolor', (WidgetTester tester) async {
+      const html = '<table><tr><td bgcolor="#f00" '
+          'style="background-color: #0f0">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_background('#FF00FF00', '[RichText:(:Foo)]')}'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('skips TBODY bgcolor', (WidgetTester tester) async {
+      const html = '<table><tbody bgcolor="#f00">'
+          '<tr><td>Foo</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_richtext('Foo')}'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('skips DIV bgcolor', (WidgetTester tester) async {
+      const html = '<div bgcolor="#f00">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -1571,6 +1688,12 @@ Future<String> explain(
   _loggerMessages.clear();
   return helper.explain(tester, html, hw: hw, useExplainer: useExplainer);
 }
+
+String _background(String color, String child) => '[HtmlTableCell:child='
+    '[Container:color=$color,child='
+    '[Padding:(1,1,1,1),child='
+    '[Align:alignment=centerLeft,widthFactor=1.0,child=[CssBlock:child='
+    '$child]]]]]';
 
 String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='

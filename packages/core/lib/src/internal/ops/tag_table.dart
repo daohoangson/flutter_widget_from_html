@@ -9,6 +9,7 @@ const kTagTableHeaderCell = 'th';
 const kTagTableCell = 'td';
 const kTagTableCaption = 'caption';
 
+const kAttributeBgColor = 'bgcolor';
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
 const kAttributeColspan = 'colspan';
@@ -351,6 +352,7 @@ class _TagTableRow {
     _rowOp = BuildOp(
       alwaysRenderBlock: true,
       debugLabel: kTagTableRow,
+      onRenderedChildren: _onRowRenderedChildren,
       onVisitChild: _onRowChild,
       priority: Priority.tagTableRow,
     );
@@ -410,6 +412,13 @@ class _TagTableRow {
     final value = element.attributes[kAttributeValign];
     return value != null ? {kCssVerticalAlign: value} : const {};
   }
+
+  // keep row ops off the only cell, row styles are forwarded to cells already
+  static WidgetPlaceholder? _onRowRenderedChildren(
+    BuildTree _,
+    Iterable<WidgetPlaceholder> children,
+  ) =>
+      children.length == 1 ? WidgetPlaceholder(child: children.first) : null;
 }
 
 class _TagTableRowGroup {
