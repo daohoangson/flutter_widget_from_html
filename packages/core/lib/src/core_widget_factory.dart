@@ -976,6 +976,20 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
               priority: Early.attributeAlign,
             ),
           );
+        case kAttributeBgColor:
+          switch (localName) {
+            case kTagTable:
+            case kTagTableRow:
+            case kTagTableHeaderCell:
+            case kTagTableCell:
+              tree.register(
+                const BuildOp.v2(
+                  debugLabel: kAttributeBgColor,
+                  defaultStyles: _cssBackgroundColorFromAttribute,
+                  priority: Early.attributeBgColor,
+                ),
+              );
+          }
         case kAttributeDir:
           tree.register(
             const BuildOp.v2(
@@ -1168,6 +1182,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   // TODO: switch to use constant function literal when available
   // https://github.com/dart-lang/language/issues/1048
+  static StylesMap _cssBackgroundColorFromAttribute(dom.Element element) {
+    final value = element.attributes[kAttributeBgColor];
+    return value != null ? {kCssBackgroundColor: value} : const {};
+  }
+
   static StylesMap _cssDirectionFromAttribute(dom.Element element) {
     final value = element.attributes[kAttributeDir];
     return value != null ? {kCssDirection: value} : const {};

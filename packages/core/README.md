@@ -129,8 +129,9 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` with 50+ predefined counter styles including `decimal`, `disc`, `circle`, `square`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`, `lower-greek`, `cjk-decimal`, `cjk-ideographic`, `hiragana`, `katakana`, `hebrew`, `georgian`, `armenian`, `korean-hangul-formal`, and more. Also supports custom string literals (e.g., `'★'`).
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - TABLE attributes `border`, `cellpadding`, `cellspacing`
-  - TD/TH attributes `colspan`, `rowspan`, `valign`
+  - TABLE attributes `bgcolor`, `border`, `cellpadding`, `cellspacing`
+  - TR attribute `bgcolor`
+  - TD/TH attributes `bgcolor`, `colspan`, `rowspan`, `valign`
   - Table is scrollable if columns are too wide
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,

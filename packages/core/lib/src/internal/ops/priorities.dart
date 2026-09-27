@@ -43,7 +43,8 @@ class Early {
 
   static const first = Priority._baseEarly00;
   static const attributeAlign = first + _step;
-  static const attributeDir = attributeAlign + _step;
+  static const attributeBgColor = attributeAlign + _step;
+  static const attributeDir = attributeBgColor + _step;
   static const cssTextAlign = attributeDir + _step;
   static const tagAcronym = cssTextAlign + _step;
   static const tagAddress = tagAcronym + _step;
