@@ -4,6 +4,13 @@ analyzer:
   exclude:
     # TODO: remove this when it auto ignores `depend_on_referenced_packages`
     - lib/generated_plugin_registrant.dart
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 formatter:
   trailing_commas: preserve
