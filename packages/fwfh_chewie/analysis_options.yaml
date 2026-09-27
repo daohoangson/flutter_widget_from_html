@@ -3,6 +3,14 @@ include: package:lint/analysis_options_package.yaml
 analyzer:
   errors:
     todo: info
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:

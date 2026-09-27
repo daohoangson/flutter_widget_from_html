@@ -50,12 +50,11 @@ function publish {
     yq e 'del(.flutter)' -i pubspec.yaml
 
     # Analyze a disposable copy because pana modifies its input. Most packages
-    # must score 160/160. The enhanced package is not yet Wasm-ready, while the
-    # two media add-ons intentionally support four of six platforms, so their
-    # honest maximum is currently 150/160.
+    # must score 160/160. Enhanced, the two media add-ons, and WebView currently
+    # lose 10 platform points for limited platform support or Wasm compatibility.
     _pana_threshold=0
     case "$_name" in
-      flutter_widget_from_html | fwfh_chewie | fwfh_just_audio)
+      flutter_widget_from_html | fwfh_chewie | fwfh_just_audio | fwfh_webview)
         _pana_threshold=10
         ;;
     esac

@@ -1,3 +1,7 @@
+## 0.16.4-beta.1
+
+- Add support for flutter_widget_from_html_core@0.18.0-beta.1 (#1632)
+
 ## 0.16.3
 
 - Fix platform support metadata on pub.dev (#1630)
