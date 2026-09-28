@@ -46,8 +46,15 @@ class StyleBorder {
           }
 
           skip(tree);
+          // sizing skips empty blocks but the border still needs their box
+          final child = placeholder.isEmpty && tree.isInline != true
+              ? StyleSizing._sizingBlock(
+                  tree,
+                  WidgetPlaceholder(child: const CssBlock(child: widget0)),
+                )
+              : placeholder;
           return WidgetPlaceholder(
-            builder: (ctx, _) => _buildBorder(tree, ctx, placeholder, border),
+            builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
             debugLabel: '${tree.element.localName}--$kCssBorder',
           );
         },

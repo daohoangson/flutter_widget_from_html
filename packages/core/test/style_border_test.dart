@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -1377,6 +1378,67 @@ void main() {
       expect(
         explained,
         equals('[Container:border=2.0@solid#FFFF0000,child=[RichText:(:Foo)]]'),
+      );
+    });
+  });
+
+  group('empty', () {
+    const windowSize = 100.0;
+
+    testWidgets('renders DIV full width', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<div style="border: 1px solid"></div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Container:border=$_border1,child=[CssBlock:child=[widget0]]]'),
+      );
+
+      final size = tester.getSize(find.byType(Container));
+      expect(size, equals(const Size(windowSize, 2)));
+    });
+
+    testWidgets('renders DIV with width', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<div style="border: 1px solid; width: 50px"></div>';
+      await explain(tester, html);
+
+      final size = tester.getSize(find.byType(Container));
+      expect(size, equals(const Size(52, 2)));
+    });
+
+    testWidgets('renders DIV with height', (WidgetTester tester) async {
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<div style="border: 1px solid; height: 10px"></div>';
+      await explain(tester, html);
+
+      final size = tester.getSize(find.byType(Container));
+      expect(size, equals(const Size(windowSize, 12)));
+    });
+
+    testWidgets('renders P in TD full width', (WidgetTester tester) async {
+      // the usual email separator markup
+      tester.setWindowSize(const Size(windowSize, windowSize));
+      const html = '<table width="100%"><tr><td>Foo</td></tr>'
+          '<tr><td><p style="border-top: 1px solid; width: 100%"></p>'
+          '</td></tr></table>';
+      await explain(tester, html);
+
+      final cell = tester.getSize(find.byType(HtmlTableCell).last);
+      final size = tester.getSize(find.byType(Container));
+      expect(size, equals(Size(cell.width - 2, 1)));
+    });
+
+    testWidgets('renders SPAN inline', (WidgetTester tester) async {
+      const html = 'Foo <span style="border: 1px solid"></span> bar';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[RichText:(:Foo '
+          '[Container:border=$_border1,child=[widget0]]'
+          '(: bar))]',
+        ),
       );
     });
   });
