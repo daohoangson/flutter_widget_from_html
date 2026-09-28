@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>CSS vertical-align browser reference</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 16px; }
+  section { margin-bottom: 24px; }
+</style>
+<h1>CSS vertical-align browser reference</h1>
+<p>Companion to packages/core/test/style_vertical_align_golden_test.dart.
+Open this file in a browser. Font rendering varies; compare line-edge placement,
+not pixels. Equal-sized top/bottom spans filling a line should sit level.</p>
+<section>
+<h2>Font size and line height</h2>
+<div style="font-size:26px;line-height:1">M (1 / 10) <span style="vertical-align:top;font-size:10px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:10px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:1">M (1 / 26) <span style="vertical-align:top;font-size:26px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:26px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:1">M (1 / 40) <span style="vertical-align:top;font-size:40px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:40px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:1.4">M (1.4 / 10) <span style="vertical-align:top;font-size:10px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:10px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:1.4">M (1.4 / 26) <span style="vertical-align:top;font-size:26px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:26px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:1.4">M (1.4 / 40) <span style="vertical-align:top;font-size:40px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:40px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:2">M (2 / 10) <span style="vertical-align:top;font-size:10px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:10px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:2">M (2 / 26) <span style="vertical-align:top;font-size:26px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:26px;background:#bbdefb">bottom</span></div>
+<div style="font-size:26px;line-height:2">M (2 / 40) <span style="vertical-align:top;font-size:40px;background:#b2dfdb">top</span> <span style="vertical-align:bottom;font-size:40px;background:#bbdefb">bottom</span></div>
+</section>
+<section><h2>PR #1613 example (ltr)</h2><div dir="ltr" style="width:997px;font-size:26px;line-height:1.4">Normal text <span style="vertical-align:super;">Raised to full height</span> Normal text <span style="vertical-align:sub;">lowered to full height</span>
+<span style="vertical-align:top;">Relegated to the bottom of the line</span> Normal text <span style="vertical-align:bottom;">Raised to the top of the line</span></div></section>
+<section><h2>PR #1613 example (rtl)</h2><div dir="rtl" style="width:997px;font-size:26px;line-height:1.4">Normal text <span style="vertical-align:super;">Raised to full height</span> Normal text <span style="vertical-align:sub;">lowered to full height</span>
+<span style="vertical-align:top;">Relegated to the bottom of the line</span> Normal text <span style="vertical-align:bottom;">Raised to the top of the line</span></div></section>
+</html>
