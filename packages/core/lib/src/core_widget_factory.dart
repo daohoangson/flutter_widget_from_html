@@ -33,6 +33,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
   BuildOp? _styleBackground;
   BuildOp? _styleBorder;
+  BuildOp? _styleBoxShadow;
   BuildOp? _styleDisplayFlex;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
@@ -149,11 +150,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     Widget child, {
     BoxBorder? border,
     BorderRadius? borderRadius,
+    List<BoxShadow>? boxShadow,
     Color? color,
     DecorationImage? image,
   }) {
     if (border == null &&
         borderRadius == null &&
+        boxShadow == null &&
         color == null &&
         image == null) {
       return child;
@@ -166,6 +169,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     var decoration = baseDeco.copyWith(
       border: border,
+      boxShadow: boxShadow,
       color: color,
       image: image,
     );
@@ -1025,6 +1029,9 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   void parseStyle(BuildTree tree, css.Declaration style) {
     final key = style.property;
     switch (key) {
+      case kCssBoxShadow:
+        tree.register(_styleBoxShadow ??= StyleBoxShadow(this).buildOp);
+
       case kCssColor:
         final color = tryParseColor(style.value)?.rawValue;
         if (color != null) {
