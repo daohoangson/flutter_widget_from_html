@@ -45,7 +45,8 @@ class Early {
   static const attributeAlign = first + _step;
   static const attributeBgColor = attributeAlign + _step;
   static const attributeDir = attributeBgColor + _step;
-  static const cssTextAlign = attributeDir + _step;
+  static const attributeWidth = attributeDir + _step;
+  static const cssTextAlign = attributeWidth + _step;
   static const tagAcronym = cssTextAlign + _step;
   static const tagAddress = tagAcronym + _step;
   static const tagCenter = tagAddress + _step;
