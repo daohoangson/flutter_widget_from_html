@@ -306,6 +306,64 @@ Future<void> main() async {
     });
   });
 
+  group('border-radius', () {
+    testWidgets('renders TABLE border-radius', (WidgetTester tester) async {
+      const html = '<table style="background: #f00; border-radius: 5px">'
+          '<tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:color=#FFFF0000,'
+          'radius=[5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],child='
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '${_richtext('Foo')}'
+          ']]]',
+        ),
+      );
+      expect(tester.table.borderRadius, equals(BorderRadius.circular(5)));
+    });
+
+    testWidgets('renders TD border-radius', (WidgetTester tester) async {
+      const html = '<table><tr><td bgcolor="#f00" style="border-radius: 5px">'
+          'Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[SingleChildScrollView:child=[HtmlTable:children='
+          '[HtmlTableCell:child=[Container:color=#FFFF0000,'
+          'radius=[5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],child='
+          '[Padding:(1,1,1,1),child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child=[CssBlock:child='
+          '[RichText:(:Foo)]]]]]]'
+          ']]',
+        ),
+      );
+      expect(tester.cell.borderRadius, equals(BorderRadius.circular(5)));
+    });
+
+    testWidgets('renders TD border-radius inside border', (tester) async {
+      const html = '<table><tr><td bgcolor="#f00" '
+          'style="border: 2px solid; border-radius: 5px">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        contains('[Container:color=#FFFF0000,'
+            'radius=[3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0],child='),
+      );
+      expect(tester.cell.borderRadius, equals(BorderRadius.circular(5)));
+    });
+
+    testWidgets('skips TD border-radius with non-uniform border', (t) async {
+      const html = '<table><tr><td bgcolor="#f00" '
+          'style="border-top: 2px solid; border-radius: 5px">Foo</td></tr>'
+          '</table>';
+      final explained = await explain(t, html);
+      expect(explained, isNot(contains('radius=')));
+    });
+  });
+
   group('cellpadding', () {
     testWidgets('renders without cellpadding', (WidgetTester tester) async {
       const html = '<table><tr><td>Foo</td></tr></table>';
@@ -1773,6 +1831,8 @@ void _loggerSetup() {
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 extension on WidgetTester {
+  HtmlTableCell get cell => widget(find.byType(HtmlTableCell));
+
   HtmlTable get table => widget(find.byType(HtmlTable));
 }
 

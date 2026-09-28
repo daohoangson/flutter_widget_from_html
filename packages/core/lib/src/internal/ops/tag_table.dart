@@ -92,6 +92,7 @@ class TagTable {
           child: HtmlTable(
             border: border.getBorder(resolved),
             borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
+            borderRadius: border.getBorderRadius(resolved),
             borderSpacing: borderSpacing?.getValue(resolved) ?? 0.0,
             textDirection: resolved.directionOrLtr,
             children: List.from(
@@ -202,6 +203,7 @@ class TagTable {
 
           return HtmlTableCell(
             border: border,
+            borderRadius: cssBorder.getBorderRadius(resolved),
             columnSpan: min(columnSpan, data.columns - columnStart),
             columnStart: columnStart,
             rowSpan: rowSpan,
@@ -327,7 +329,7 @@ class TagTable {
   }
 
   static BuildTree _onTableParsed(BuildTree tableTree) {
-    StyleBorder.skip(tableTree);
+    StyleBorder.skipSides(tableTree);
     return tableTree;
   }
 }
@@ -404,7 +406,7 @@ class _TagTableRow {
     }
 
     cellTree.register(_cellOp);
-    StyleBorder.skip(cellTree);
+    StyleBorder.skipSides(cellTree, radiusInsideSides: true);
     StyleSizing.registerBlockOp(cellTree);
   }
 
