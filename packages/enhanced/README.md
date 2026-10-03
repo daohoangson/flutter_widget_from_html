@@ -221,7 +221,7 @@ These tags and their contents will be ignored:
   - padding-top, padding-right, padding-bottom, padding-left
   - padding-block-start, padding-block-end
   - padding-inline-start, padding-inline-end
-- vertical-align: baseline/top/bottom/middle/sub/super
+- vertical-align: baseline/top/bottom/middle/sub/super (inline top/bottom align to the line box)
 - text-align (similar to `align` attribute)
 - text-decoration
   - text-decoration-color: `currentcolor`, hex values, `rgb()`, `hsl()` or named colors

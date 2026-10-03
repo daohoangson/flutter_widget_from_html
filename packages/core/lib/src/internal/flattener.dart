@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import '../widgets/line_aligned_rich_text.dart';
 import 'core_ops.dart';
 
 final _logger = Logger('fwfh.Flattener');
@@ -75,6 +76,16 @@ class Flattener implements Flattened {
 
       return widget;
     });
+
+    if (child is CssLinePlaceholder) {
+      _childrenBuilder?.add(
+        (_, {bool? isLast}) => CssLineSpan(
+          alignment: alignment,
+          child: placeholder,
+        ),
+      );
+      return;
+    }
 
     _childrenBuilder?.add(
       (_, {bool? isLast}) => WidgetSpan(
