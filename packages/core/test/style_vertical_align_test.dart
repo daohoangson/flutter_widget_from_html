@@ -41,14 +41,15 @@ void main() {
   testWidgets('renders top text', (WidgetTester tester) async {
     const html = '<span style="vertical-align: top">Foo</span> bar';
     final explained = await explain(tester, html);
-    expect(explained, equals('[CssRichText:(:[RichText:(:Foo)]@top(: bar))]'));
+    expect(explained,
+        equals('[LineAlignedRichText:(:[RichText:(:Foo)]@top(: bar))]'));
   });
 
   testWidgets('renders bottom text', (WidgetTester tester) async {
     const html = '<span style="vertical-align: bottom">Foo</span> bar';
     final explained = await explain(tester, html);
-    expect(
-        explained, equals('[CssRichText:(:[RichText:(:Foo)]@bottom(: bar))]'));
+    expect(explained,
+        equals('[LineAlignedRichText:(:[RichText:(:Foo)]@bottom(: bar))]'));
   });
 
   testWidgets('renders middle text', (WidgetTester tester) async {
@@ -92,14 +93,17 @@ void main() {
   testWidgets('renders styling', (WidgetTester tester) async {
     const html = '<span style="vertical-align: top">F<em>o</em>o</span> bar';
     final e = await explain(tester, html);
-    expect(e, equals('[CssRichText:(:[RichText:(:F(+i:o)(:o))]@top(: bar))]'));
+    expect(
+        e,
+        equals(
+            '[LineAlignedRichText:(:[RichText:(:F(+i:o)(:o))]@top(: bar))]'));
   });
 
   testWidgets('renders styling from outside', (WidgetTester tester) async {
     const html = '<em><span style="vertical-align: top">Foo</span></em> bar';
     final explained = await explain(tester, html);
-    expect(
-        explained, equals('[CssRichText:(:[RichText:(+i:Foo)]@top(: bar))]'));
+    expect(explained,
+        equals('[LineAlignedRichText:(:[RichText:(+i:Foo)]@top(: bar))]'));
   });
 
   group('isBlockElement', () {
@@ -193,14 +197,16 @@ void main() {
       const html = 'Foo <span style="display: inline; '
           'vertical-align: top">bar</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssRichText:(:Foo [RichText:(:bar)]@top)]'));
+      expect(explained,
+          equals('[LineAlignedRichText:(:Foo [RichText:(:bar)]@top)]'));
     });
 
     testWidgets('display: inline-block', (WidgetTester tester) async {
       const html = 'Foo <span style="display: inline-block; '
           'vertical-align: top">bar</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssRichText:(:Foo [RichText:(:bar)]@top)]'));
+      expect(explained,
+          equals('[LineAlignedRichText:(:Foo [RichText:(:bar)]@top)]'));
     });
 
     testWidgets('display: block', (WidgetTester tester) async {
@@ -244,7 +250,8 @@ void main() {
       testWidgets('renders top image', (WidgetTester tester) async {
         const html = '<img src="$imgSrc" style="vertical-align: top" /> foo';
         final explained = await imgExplain(tester, html);
-        expect(explained, equals('[CssRichText:(:$imgRendered@top(: foo))]'));
+        expect(explained,
+            equals('[LineAlignedRichText:(:$imgRendered@top(: foo))]'));
       });
 
       testWidgets('renders after image', (WidgetTester tester) async {

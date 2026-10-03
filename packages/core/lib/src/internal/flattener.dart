@@ -5,7 +5,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
-import '../widgets/css_rich_text.dart';
+import '../widgets/line_aligned_rich_text.dart';
 import 'core_ops.dart';
 
 final _logger = Logger('fwfh.Flattener');

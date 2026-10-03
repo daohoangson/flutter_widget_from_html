@@ -15,7 +15,7 @@ import 'internal/platform_specific/fallback.dart'
 import 'internal/text_ops.dart' as text_ops;
 import 'material_theme.dart';
 import 'utils/css_counter_style.dart';
-import 'widgets/css_rich_text.dart';
+import 'widgets/line_aligned_rich_text.dart';
 
 // https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-dimension-values
 final _dimensionRegExp = RegExp(r'^[\t\n\f\r ]*(\d+)(?:\.(\d*))?(%)?');
@@ -435,7 +435,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             : null;
 
         final buildRichText =
-            CssLineSpan.contains(text) ? CssRichText.new : RichText.new;
+            CssLineSpan.contains(text) ? LineAlignedRichText.new : RichText.new;
         Widget built = buildRichText(
           maxLines: maxLines,
           overflow: tree.overflow,

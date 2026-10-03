@@ -49,9 +49,9 @@ class CssLineSpan extends WidgetSpan {
 /// Flutter retains responsibility for painting, selection, semantics and hit
 /// testing. Only the placeholder offsets and corresponding dry measurements
 /// differ from [RichText].
-class CssRichText extends RichText {
+class LineAlignedRichText extends RichText {
   /// Creates a paragraph containing CSS line-aligned boxes.
-  CssRichText({
+  LineAlignedRichText({
     super.key,
     required super.text,
     super.textAlign,
@@ -70,7 +70,7 @@ class CssRichText extends RichText {
 
   @override
   RenderParagraph createRenderObject(BuildContext context) {
-    final paragraph = _RenderCssParagraph(
+    final paragraph = _RenderLineAlignedParagraph(
       text,
       textDirection: textDirection ?? Directionality.of(context),
     );
@@ -80,10 +80,10 @@ class CssRichText extends RichText {
   }
 }
 
-class _RenderCssParagraph extends RenderParagraph {
+class _RenderLineAlignedParagraph extends RenderParagraph {
   final _probe = TextPainter();
 
-  _RenderCssParagraph(super.text, {required super.textDirection});
+  _RenderLineAlignedParagraph(super.text, {required super.textDirection});
 
   @override
   List<PlaceholderDimensions> layoutInlineChildren(
