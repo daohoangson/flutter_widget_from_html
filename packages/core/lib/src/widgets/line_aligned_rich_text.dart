@@ -96,6 +96,16 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
     if (dimensions.isEmpty) {
       return dimensions;
     }
+    final edges = _collectLineEdges();
+    if (edges.isEmpty) {
+      return dimensions;
+    }
+
+    final probe = _layoutProbe(maxWidth, dimensions, edges);
+    return _resolveLineDimensions(dimensions, edges, probe);
+  }
+
+  Map<int, PlaceholderAlignment> _collectLineEdges() {
     final edges = <int, PlaceholderAlignment>{};
     var index = 0;
     text.visitChildren((span) {
@@ -108,13 +118,17 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
       return true;
     });
 
-    if (edges.isEmpty) {
-      return dimensions;
-    }
+    return edges;
+  }
 
+  TextPainter _layoutProbe(
+    double maxWidth,
+    List<PlaceholderDimensions> dimensions,
+    Map<int, PlaceholderAlignment> edges,
+  ) {
     // Retain widths to find the real wrapping, but exclude line-aligned boxes
     // from the first pass's ascent/descent. Baseline-aligned boxes still count.
-    final probe = _probe
+    return _probe
       ..text = text
       ..textAlign = textAlign
       ..textDirection = textDirection
@@ -142,6 +156,13 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
             ? maxWidth
             : double.infinity,
       );
+  }
+
+  List<PlaceholderDimensions> _resolveLineDimensions(
+    List<PlaceholderDimensions> dimensions,
+    Map<int, PlaceholderAlignment> edges,
+    TextPainter probe,
+  ) {
     final resolved = List<PlaceholderDimensions>.of(dimensions);
     final lines = probe.computeLineMetrics();
     final boxes = probe.inlinePlaceholderBoxes!;

@@ -9,6 +9,9 @@ Future<void> main() async {
   await loadAppFonts();
   final skip =
       !Platform.isLinux || Platform.environment.containsKey('GOLDEN_SKIP');
+  // Preserve the original reproduction verbatim: its top/bottom labels describe
+  // the reported bug, not the expected CSS alignment.
+  // https://github.com/daohoangson/flutter_widget_from_html/pull/1613#issuecomment-5356510230
   const authorHtml =
       'Normal text <span style="vertical-align:super;">Raised to full height</span> '
       'Normal text <span style="vertical-align:sub;">lowered to full height</span>\n'
