@@ -9,6 +9,7 @@ import '../core_helpers.dart';
 
 part 'parser/border.dart';
 part 'parser/color.dart';
+part 'parser/gradient.dart';
 part 'parser/length.dart';
 
 const kCssLengthAuto = 'auto';
