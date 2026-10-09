@@ -20,6 +20,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
+  leak_tracker_flutter_testing: any
   lint: any
   mocktail: any
   mocktail_image_network: ^1.0.0
