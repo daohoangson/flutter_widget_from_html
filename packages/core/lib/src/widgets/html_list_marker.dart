@@ -88,6 +88,7 @@ class _ListMarkerRenderObject extends RenderBox {
       return;
     }
 
+    __textPainter?.dispose();
     __textPainter = null;
     _textStyle = v;
     markNeedsLayout();
@@ -107,6 +108,13 @@ class _ListMarkerRenderObject extends RenderBox {
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
       constraints.constrain(_textPainter.size);
+
+  @override
+  void dispose() {
+    __textPainter?.dispose();
+    __textPainter = null;
+    super.dispose();
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) {
