@@ -74,6 +74,8 @@ jobs:
           npm install --global vercel@latest
 
           cd ./build/web
+          # Override the Node.js version selected in Vercel Project Settings.
+          echo '{"private":true,"engines":{"node":"24.x"}}' >package.json
           echo '{' >vercel.json
           echo '  "headers": [ { "source": "/(.*)", "headers": [' >>vercel.json
           echo '    { "key": "Cross-Origin-Embedder-Policy", "value": "credentialless" },' >>vercel.json
