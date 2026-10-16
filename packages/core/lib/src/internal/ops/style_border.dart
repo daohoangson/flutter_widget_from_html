@@ -3,6 +3,7 @@ part of '../core_ops.dart';
 class StyleBorder {
   final WidgetFactory wf;
 
+  static final _sidesPaintedElsewhere = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
   StyleBorder(this.wf);
@@ -63,6 +64,21 @@ class StyleBorder {
     final resolved = tree.inheritanceResolvers.resolve(context);
     final border = cssBorder.getBorder(resolved);
     final borderRadius = cssBorder.getBorderRadius(resolved);
+
+    final radiusInsideSides = _sidesPaintedElsewhere[tree];
+    if (radiusInsideSides != null) {
+      if (borderRadius == null || border?.isUniform == false) {
+        return child;
+      }
+
+      final width = radiusInsideSides ? border?.top.width ?? 0.0 : 0.0;
+      return wf.buildDecoration(
+        tree,
+        child,
+        borderRadius: _deflate(borderRadius, width),
+      );
+    }
+
     return wf.buildDecoration(
       tree,
       child,
@@ -72,4 +88,27 @@ class StyleBorder {
   }
 
   static void skip(BuildTree tree) => _skipBuilding[tree] = true;
+
+  /// Skips the border sides of [tree] because its parent widget paints them.
+  ///
+  /// The border radius is still applied to the decoration,
+  /// reduced by the sides width when [radiusInsideSides] is `true`.
+  static void skipSides(BuildTree tree, {bool radiusInsideSides = false}) =>
+      _sidesPaintedElsewhere[tree] = radiusInsideSides;
+
+  static BorderRadius _deflate(BorderRadius borderRadius, double width) {
+    if (width == 0) {
+      return borderRadius;
+    }
+
+    Radius deflate(Radius radius) =>
+        (radius - Radius.circular(width)).clamp(minimum: Radius.zero);
+
+    return BorderRadius.only(
+      topLeft: deflate(borderRadius.topLeft),
+      topRight: deflate(borderRadius.topRight),
+      bottomLeft: deflate(borderRadius.bottomLeft),
+      bottomRight: deflate(borderRadius.bottomRight),
+    );
+  }
 }
