@@ -309,16 +309,17 @@ class Flattener implements Flattened {
       final placeholder = WidgetPlaceholder(
         builder: (context, _) {
           final resolved = scopedInheritanceResolvers.resolve(context);
-          final children = <InlineSpan>[];
+          final reversedChildren = <InlineSpan>[];
 
           var isLast_ = true;
           for (final builder in reversedBuilders) {
             final child = builder(context, isLast: isLast_);
             if (child != null) {
               isLast_ = false;
-              children.insert(0, child);
+              reversedChildren.add(child);
             }
           }
+          final children = reversedChildren.reversed.toList();
 
           final text = scopedStrings.toText(
             resolved.whitespaceOrNormal,
@@ -685,7 +686,9 @@ extension on List<_String> {
     }
 
     if (isLast) {
-      return result.replaceFirst(RegExp(r'\n$'), '');
+      return result.endsWith('\n')
+          ? result.substring(0, result.length - 1)
+          : result;
     }
 
     return result;
