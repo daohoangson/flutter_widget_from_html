@@ -1,14 +1,12 @@
-import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
 import '../core_widget_factory.dart';
+import '../internal/declarations_cache.dart';
 
 /// An extension on [dom.Element].
 extension DomElementExtension on dom.Element {
-  static Expando<List<css.Declaration>>? _expando;
-
   /// Returns CSS declarations from the element's `style` attribute.
   ///
   /// This is different from [BuildTree.styles] as it doesn't include
@@ -17,18 +15,8 @@ extension DomElementExtension on dom.Element {
   /// Parsing CSS is a non-trivial task but the result is cached
   /// so it's safe to call this again and again.
   List<css.Declaration> get styles {
-    final expando = _expando ??= Expando();
-    final existing = expando[this];
-    if (existing != null) {
-      return existing;
-    }
-
-    if (!attributes.containsKey('style')) {
-      return expando[this] = const [];
-    }
-
-    final styleSheet = css.parse('*{${attributes['style']}}');
-    return expando[this] = styleSheet.collectDeclarations();
+    final style = attributes['style'];
+    return style == null ? const [] : parseDeclarations(style);
   }
 }
 
