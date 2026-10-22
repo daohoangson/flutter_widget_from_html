@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -10,6 +9,7 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
+import 'declarations_cache.dart';
 import 'flattener.dart';
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
@@ -64,8 +64,7 @@ class CoreBuildTree extends BuildTree {
 
   @override
   void operator []=(String key, String value) {
-    final styleSheet = css.parse('*{$key: $value;}');
-    _styles.addAll(styleSheet.collectDeclarations());
+    _styles.addAll(parseDeclarations('$key: $value'));
   }
 
   void addBitsFromNodes(dom.NodeList domNodes) {
@@ -310,10 +309,7 @@ class CoreBuildTree extends BuildTree {
 
     _logger.fine('Custom styles for ${element.localName?.toUpperCase()}: $map');
     final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-    final styleSheet = css.parse('*{$str}');
-
-    final customStyles = styleSheet.collectDeclarations();
-    _styles.addAll(customStyles);
+    _styles.addAll(parseDeclarations(str));
   }
 
   void _parseEverything() {
@@ -382,8 +378,7 @@ class _CoreBuildOp {
     }
 
     final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-    final styleSheet = css.parse('*{$str}');
-    return styleSheet.collectDeclarations();
+    return parseDeclarations(str);
   }
 
   BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
