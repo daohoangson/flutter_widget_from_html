@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:logging/logging.dart';
@@ -93,7 +94,9 @@ class CoreBuildTree extends BuildTree {
     for (final op in ops) {
       placeholder = WidgetPlaceholder.lazy(
         op.onRenderBlock(placeholder),
-        debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
+        debugLabel: kDebugMode
+            ? '${element.localName}--${op.op.debugLabel ?? 'lazy'}'
+            : null,
       );
     }
 
@@ -186,8 +189,8 @@ class CoreBuildTree extends BuildTree {
     final scopedBuildOps = _buildOps ??= _CoreBuildOp._newSet();
     scopedBuildOps.add(_CoreBuildOp(this, op));
     _logger.finest(
-      'Registered ${op.debugLabel ?? 'a build op'} '
-      'for ${element.localName?.toUpperCase()} tag',
+      () => 'Registered ${op.debugLabel ?? 'a build op'} '
+          'for ${element.localName?.toUpperCase()} tag',
     );
   }
 
@@ -220,11 +223,11 @@ class CoreBuildTree extends BuildTree {
             baseline: customWidget.baseline,
           ),
         );
-        _logger.fine('Custom inline widget: ${element.localName} tag');
+        _logger.fine(() => 'Custom inline widget: ${element.localName} tag');
       } else {
         // mmd: appendWidgetBitBlock
         append(WidgetBit.block(this, customWidget));
-        _logger.fine('Custom block widget: ${element.localName} tag');
+        _logger.fine(() => 'Custom block widget: ${element.localName} tag');
       }
       return;
     }
@@ -308,7 +311,8 @@ class CoreBuildTree extends BuildTree {
       return;
     }
 
-    _logger.fine('Custom styles for ${element.localName?.toUpperCase()}: $map');
+    _logger.fine(
+        () => 'Custom styles for ${element.localName?.toUpperCase()}: $map');
     final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
     final styleSheet = css.parse('*{$str}');
 
