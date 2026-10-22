@@ -620,6 +620,13 @@ void main() {
       );
     });
 
+    testWidgets('skips invalid hex values', (WidgetTester tester) async {
+      const html = '<span style="color: #ggg">a</span>'
+          '<span style="color: #F00">b</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:a(#FFFF0000:b))]'));
+    });
+
     testWidgets('renders overlaps', (WidgetTester tester) async {
       const html = '<span style="color: #FF0000">red '
           '<span style="color: #00FF00">green</span> red again</span>';
