@@ -64,19 +64,17 @@ CssColor? tryParseColor(css.Expression? expression) {
   } else if (expression is css.HexColorTerm) {
     // cannot use expression.value directory due to issue with #f00 etc.
     final hex = expression.text.toUpperCase();
-    switch (hex.length) {
-      case 3:
-        return CssColor(int.parse('0xFF${_x2(hex)}'));
-      case 4:
-        final alpha = hex[3];
-        final rgb = hex.substring(0, 3);
-        return CssColor(int.parse('0x${_x2(alpha)}${_x2(rgb)}'));
-      case 6:
-        return CssColor(int.parse('0xFF$hex'));
-      case 8:
-        final alpha = hex.substring(6, 8);
-        final rgb = hex.substring(0, 6);
-        return CssColor(int.parse('0x$alpha$rgb'));
+    final argb = switch (hex.length) {
+      3 => 'FF${_x2(hex)}',
+      4 => '${_x2(hex[3])}${_x2(hex.substring(0, 3))}',
+      6 => 'FF$hex',
+      8 => '${hex.substring(6, 8)}${hex.substring(0, 6)}',
+      _ => null,
+    };
+    // csslib also tokenizes invalid hex digits (e.g. `#ggg`) as a hex term.
+    final value = argb != null ? int.tryParse(argb, radix: 16) : null;
+    if (value != null) {
+      return CssColor(value);
     }
   } else if (expression is css.LiteralTerm) {
     switch (expression.valueAsString) {
