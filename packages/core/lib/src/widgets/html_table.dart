@@ -16,6 +16,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: `false`.
   final bool borderCollapse;
 
+  /// The table border radius.
+  final BorderRadius? borderRadius;
+
   /// The gap between borders.
   ///
   /// Default: `0.0`.
@@ -30,6 +33,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   const HtmlTable({
     this.border,
     this.borderCollapse = false,
+    this.borderRadius,
     this.borderSpacing = 0.0,
     required super.children,
     this.textDirection = TextDirection.ltr,
@@ -43,6 +47,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       border,
       textDirection,
       borderCollapse: borderCollapse,
+      borderRadius: borderRadius,
       borderSpacing: borderSpacing,
       maxWidth: hint?.maxWidth,
       minWidth: hint?.minWidth,
@@ -61,6 +66,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
         ifTrue: 'borderCollapse: true',
       ),
     );
+    properties.add(
+      DiagnosticsProperty('borderRadius', borderRadius, defaultValue: null),
+    );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
     properties.add(
@@ -78,6 +86,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     (renderObject as _TableRenderObject)
       ..setBorder(border)
       ..setBorderCollapse(borderCollapse)
+      ..setBorderRadius(borderRadius)
       ..setBorderSpacing(borderSpacing)
       ..setMaxWidth(hint?.maxWidth)
       ..setMinWidth(hint?.minWidth)
@@ -105,6 +114,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// The cell border sides.
   final Border? border;
 
+  /// The cell border radius.
+  final BorderRadius? borderRadius;
+
   /// The number of columns this cell should span.
   final int columnSpan;
 
@@ -122,6 +134,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// Creates a TD (table cell) widget.
   const factory HtmlTableCell({
     Border? border,
+    BorderRadius? borderRadius,
     required Widget child,
     int columnSpan,
     required int columnStart,
@@ -132,6 +145,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   const HtmlTableCell._({
     this.border,
+    this.borderRadius,
     required super.child,
     this.columnSpan = 1,
     required this.columnStart,
@@ -152,6 +166,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
     if (data.border != border) {
       data.border = border;
+      needsLayout = true;
+    }
+
+    if (data.borderRadius != borderRadius) {
+      data.borderRadius = borderRadius;
       needsLayout = true;
     }
 
@@ -192,6 +211,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(DiagnosticsProperty('border', border, defaultValue: null));
+    properties.add(
+      DiagnosticsProperty('borderRadius', borderRadius, defaultValue: null),
+    );
     properties.add(IntProperty('columnSpan', columnSpan, defaultValue: 1));
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
@@ -248,6 +270,7 @@ extension on List<double> {
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
   Border? border;
+  BorderRadius? borderRadius;
   int columnSpan = 1;
   int columnStart = 0;
   bool isCaption = false;
@@ -726,10 +749,12 @@ class _TableRenderObject extends RenderBox
     this._textDirection, {
     required double borderSpacing,
     required bool borderCollapse,
+    required BorderRadius? borderRadius,
     required double? maxWidth,
     required double? minWidth,
   })  : logger = Logger('fwfh.HtmlTable${loggers++}'),
         _borderCollapse = borderCollapse,
+        _borderRadius = borderRadius,
         _borderSpacing = borderSpacing,
         _maxWidth = maxWidth,
         _minWidth = minWidth;
@@ -747,6 +772,14 @@ class _TableRenderObject extends RenderBox
     if (v != _borderCollapse) {
       _borderCollapse = v;
       markNeedsLayout();
+    }
+  }
+
+  BorderRadius? _borderRadius;
+  void setBorderRadius(BorderRadius? v) {
+    if (v != _borderRadius) {
+      _borderRadius = v;
+      markNeedsPaint();
     }
   }
 
@@ -882,7 +915,8 @@ class _TableRenderObject extends RenderBox
   void paint(PaintingContext context, Offset offset) {
     final cellRect = _layout.cellRect;
     if (!cellRect.isEmpty) {
-      _border?.paint(context.canvas, cellRect.shift(offset));
+      _paintBorder(
+          context.canvas, cellRect.shift(offset), _border, _borderRadius);
     }
 
     var child = firstChild;
@@ -893,7 +927,7 @@ class _TableRenderObject extends RenderBox
       context.paintChild(child, o);
 
       final borderRect = Rect.fromLTWH(o.dx, o.dy, s.width, s.height);
-      data.border?.paint(context.canvas, borderRect);
+      _paintBorder(context.canvas, borderRect, data.border, data.borderRadius);
 
       child = data.nextSibling;
     }
@@ -912,6 +946,18 @@ class _TableRenderObject extends RenderBox
       child.parentData = _TableCellData();
     }
   }
+
+  static void _paintBorder(
+    Canvas canvas,
+    Rect rect,
+    Border? border,
+    BorderRadius? borderRadius,
+  ) =>
+      border?.paint(
+        canvas,
+        rect,
+        borderRadius: border.isUniform ? borderRadius : null,
+      );
 
   double _calculateColumnGaps(_TableCellData data) {
     return (data.columnSpan - 1) * columnGap;
