@@ -272,6 +272,9 @@ class Explainer {
     return '($top,$right,$bottom,$left)';
   }
 
+  String _boxShadow(BoxShadow s) => '${_color(s.color)} '
+      '${s.offset.dx},${s.offset.dy} ${s.blurRadius} ${s.spreadRadius}';
+
   String _boxConstraints(BoxConstraints bc) =>
       'constraints=${bc.toString().replaceAll('BoxConstraints', '')}';
 
@@ -282,6 +285,11 @@ class Explainer {
       final border = d.border;
       if (border != null) {
         attr.add('border=${_boxBorder(border)}');
+      }
+
+      final boxShadow = d.boxShadow;
+      if (boxShadow != null) {
+        attr.add('boxShadow=[${boxShadow.map(_boxShadow).join(';')}]');
       }
 
       final color = d.color;
