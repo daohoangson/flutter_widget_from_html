@@ -712,6 +712,29 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         expect(key.renderBox.size, equals(const Size(30, 600)));
       });
+
+      testWidgets('child without dry baseline', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: RichText(
+                text: const WidgetSpan(
+                  alignment: PlaceholderAlignment.baseline,
+                  baseline: TextBaseline.alphabetic,
+                  child: RawImage(width: 10, height: 10),
+                ),
+                textDirection: TextDirection.ltr,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(100, 100)));
+      });
     });
 
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
