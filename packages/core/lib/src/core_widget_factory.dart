@@ -898,6 +898,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         tree.register(tagRuby);
 
       case 'style':
+      case 'title':
       case kTagScript:
         tree.register(
           const BuildOp.v2(

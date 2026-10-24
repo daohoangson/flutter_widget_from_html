@@ -395,6 +395,13 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('skips TITLE tag', (WidgetTester tester) async {
+      const html = '<html><head><title>Bar</title></head>'
+          '<body>Foo</body></html>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
     testWidgets('skips SVG tag', (WidgetTester tester) async {
       const html = '''
 <svg height="100px" width="100px">
