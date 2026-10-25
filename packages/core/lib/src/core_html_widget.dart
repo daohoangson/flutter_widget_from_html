@@ -206,7 +206,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return snapshot.requireData;
+            return _wrapper(snapshot.requireData);
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(
@@ -223,7 +223,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           }
         },
-        future: future.then(_wrapper),
+        future: future,
       );
     }
 

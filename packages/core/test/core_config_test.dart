@@ -47,6 +47,23 @@ void main() {
       expect(success, contains(rendered));
     });
 
+    testWidgets('keeps FutureBuilder future on rebuild', (tester) async {
+      const html = 'Foo';
+      await explain(tester, html, buildAsync: true);
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      await tester.pump();
+
+      Future<Widget>? future() => tester
+          .widget<FutureBuilder<Widget>>(find.byType(FutureBuilder<Widget>))
+          .future;
+      final before = future();
+
+      final rebuilt = await explain(tester, html, buildAsync: true);
+      expect(future(), same(before));
+      expect(tester.binding.hasScheduledFrame, isFalse);
+      expect(rebuilt, contains('RichText(text: "Foo")'));
+    });
+
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
