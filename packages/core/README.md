@@ -1,6 +1,6 @@
 # Flutter Widget from HTML (core)
 
-[![Flutter](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml)
+[![Flutter](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=daohoangson_flutter_widget_from_html&metric=coverage)](https://sonarcloud.io/summary/new_code?id=daohoangson_flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
@@ -229,6 +229,6 @@ The [enhanced](https://pub.dev/packages/flutter_widget_from_html) package uses a
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
 - [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
 
-See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
+See [the extensibility document](https://github.com/gadgetsteach/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
 
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

@@ -1,7 +1,7 @@
 name: fintel_fwfh_chewie
 version: 0.17.0-beta.1
 description: WidgetFactory extension to render VIDEO with the chewie plugin.
-homepage: https://github.com/daohoangson/flutter_widget_from_html
+homepage: https://github.com/gadgetsteach/flutter_widget_from_html
 
 environment:
   flutter: ">=3.44.0"

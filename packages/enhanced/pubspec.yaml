@@ -1,7 +1,7 @@
 name: fintel_widget_from_html
 version: 0.18.0-beta.1
 description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
-homepage: https://github.com/daohoangson/flutter_widget_from_html
+homepage: https://github.com/gadgetsteach/flutter_widget_from_html
 
 environment:
   flutter: ">=3.44.0"

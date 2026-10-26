@@ -1,7 +1,7 @@
 name: fintel_fwfh_url_launcher
 version: 0.16.2-beta.1
 description: WidgetFactory extension to launch A tag via url_launcher plugin.
-homepage: https://github.com/daohoangson/flutter_widget_from_html
+homepage: https://github.com/gadgetsteach/flutter_widget_from_html
 
 environment:
   flutter: ">=3.10.0"

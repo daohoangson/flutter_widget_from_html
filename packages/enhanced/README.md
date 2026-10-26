@@ -1,6 +1,6 @@
 # Flutter Widget from HTML
 
-[![Flutter](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml)
+[![Flutter](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=daohoangson_flutter_widget_from_html&metric=coverage)](https://sonarcloud.io/summary/new_code?id=daohoangson_flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
@@ -246,6 +246,6 @@ These tags and their contents will be ignored:
 
 The [core](https://pub.dev/packages/flutter_widget_from_html_core) package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize.
 
-See [the extensibility document](https://github.com/daohoangson/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
+See [the extensibility document](https://github.com/gadgetsteach/flutter_widget_from_html/blob/master/docs/extensibility.md) for detailed information.
 
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

@@ -1,7 +1,7 @@
 name: fintel_fwfh_webview
 version: 0.16.0-beta.1
 description: WidgetFactory extension to render IFRAME with the official WebView plugin.
-homepage: https://github.com/daohoangson/flutter_widget_from_html
+homepage: https://github.com/gadgetsteach/flutter_widget_from_html
 environment:
   flutter: ">=3.44.0"
   sdk: ">=3.2.0 <4.0.0"

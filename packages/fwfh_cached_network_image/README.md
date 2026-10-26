@@ -1,6 +1,6 @@
 # CachedNetworkImageFactory
 
-[![Flutter](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/daohoangson/flutter_widget_from_html/actions/workflows/flutter.yml)
+[![Flutter](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml/badge.svg)](https://github.com/gadgetsteach/flutter_widget_from_html/actions/workflows/flutter.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=daohoangson_flutter_widget_from_html&metric=coverage)](https://sonarcloud.io/summary/new_code?id=daohoangson_flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/fwfh_cached_network_image.svg)](https://pub.dev/packages/fwfh_cached_network_image)
 
