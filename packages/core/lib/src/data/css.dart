@@ -210,7 +210,6 @@ class CssBorderSide {
 
     return BorderSide(
       color: scopedColor,
-      // TODO: add proper support for other border styles
       style: style != null ? BorderStyle.solid : BorderStyle.none,
       width: scopedWidth,
     );

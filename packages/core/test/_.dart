@@ -648,13 +648,13 @@ class Explainer {
     }
 
     if (widget.runtimeType.toString() == 'InlineCustomWidget') {
-      // TODO: remove ignore when our minimum core version >= 1.0
+      //  remove ignore when our minimum core version >= 1.0
       // ignore: avoid_dynamic_calls
       return _widget((widget as dynamic).child as Widget);
     }
 
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
-      // TODO: remove ignore when our minimum core version >= 1.0
+      //  remove ignore when our minimum core version >= 1.0
       // ignore: avoid_dynamic_calls
       return _widget((widget as dynamic).child as Widget);
     }
@@ -665,7 +665,7 @@ class Explainer {
 
     if (widget.runtimeType.toString() == '_MinWidthZero' &&
         widget is ConstraintsTransformBox) {
-      // TODO: verify min-width resetter in tests when it's stable
+      //  verify min-width resetter in tests when it's stable
       return _widget(widget.child!);
     }
 
@@ -772,24 +772,24 @@ class Explainer {
       // Keep compatibility with core versions that do not expose this type.
       if (widget.runtimeType.toString() == 'HtmlFlex') {
         attr.add(
-          // TODO: remove ignore when our minimum core version >= 1.0
+          //  remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
           'crossAxisAlignment=${dynamicWidget.crossAxisAlignment}'
               .replaceAll('CrossAxisAlignment.', ''),
         );
         attr.add(
-          // TODO: remove ignore when our minimum core version >= 1.0
+          //  remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
           'direction=${dynamicWidget.direction}'.replaceAll('Axis.', ''),
         );
         attr.add(
-          // TODO: remove ignore when our minimum core version >= 1.0
+          //  remove ignore when our minimum core version >= 1.0
           // ignore: avoid_dynamic_calls
           'mainAxisAlignment=${dynamicWidget.mainAxisAlignment}'
               .replaceAll('MainAxisAlignment.', ''),
         );
 
-        // TODO: remove ignore when our minimum core version >= 1.0
+        //  remove ignore when our minimum core version >= 1.0
         // ignore: avoid_dynamic_calls
         final spacing = dynamicWidget.spacing as double;
         if (spacing != 0.0) {
@@ -813,10 +813,10 @@ class Explainer {
       final dynamicWidget = widget as dynamic;
       // Keep compatibility with core versions that do not expose this type.
       if (widget.runtimeType.toString() == 'HorizontalMargin') {
-        // TODO: remove ignore when our minimum core version >= 1.0
+        //  remove ignore when our minimum core version >= 1.0
         // ignore: avoid_dynamic_calls
         final left = dynamicWidget.left as double;
-        // TODO: remove ignore when our minimum core version >= 1.0
+        //  remove ignore when our minimum core version >= 1.0
         // ignore: avoid_dynamic_calls
         final right = dynamicWidget.right as double;
         attr.add(

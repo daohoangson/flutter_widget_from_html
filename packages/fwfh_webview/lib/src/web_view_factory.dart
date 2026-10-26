@@ -1,4 +1,4 @@
-// TODO: remove ignore for file when our minimum core version >= 1.0
+//  remove ignore for file when our minimum core version >= 1.0
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/foundation.dart';
@@ -105,7 +105,7 @@ mixin WebViewFactory on WidgetFactory {
       case kTagIframe:
         meta.register(
           _tagIframe ??= BuildOp(
-            // TODO: set debugLabel when our minimum core version >= 1.0
+            //  set debugLabel when our minimum core version >= 1.0
             defaultStyles: (element) {
               // other tags that share the same logic:
               // - IMG

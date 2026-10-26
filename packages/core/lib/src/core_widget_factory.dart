@@ -178,7 +178,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     if (effectiveRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
-        // TODO: add support for non-uniform border
         // https://github.com/flutter/flutter/commit/5054b6e
         // https://pub.dev/packages/non_uniform_border
         decoration = decoration.copyWith(borderRadius: effectiveRadius);
@@ -427,7 +426,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     return Builder(
       builder: (context) {
-        // TODO: remove Builder when ListView stops providing its own registrar
         final selectionRegistrar = SelectionContainer.maybeOf(context);
         final selectionColor = selectionRegistrar != null
             ? DefaultSelectionStyle.of(context).selectionColor ??
@@ -1200,7 +1198,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  // TODO: switch to use constant function literal when available
   // https://github.com/dart-lang/language/issues/1048
   static StylesMap _cssBackgroundColorFromAttribute(dom.Element element) {
     final value = element.attributes[kAttributeBgColor];

@@ -101,7 +101,6 @@ class CoreBuildTree extends BuildTree {
       return null;
     }
 
-    // TODO: avoid special handling of anchors
     Anchor.wrapWidgetAnchors(this, placeholder);
 
     for (final op in ops) {
@@ -172,7 +171,7 @@ class CoreBuildTree extends BuildTree {
 
     for (final style in values.reversed) {
       if (style.property == property) {
-        // TODO: add support for `!important`
+        //add support for `!important`
         // https://github.com/daohoangson/flutter_widget_from_html/issues/773
         return style;
       }

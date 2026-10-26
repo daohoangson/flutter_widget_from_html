@@ -49,7 +49,7 @@ class TagDetails {
                           alignment: _markerMarkerAlignment,
                           child: HtmlDetailsMarker(style: textStyle),
                         ),
-                        // TODO: i18n
+                        //  i18n
                         TextSpan(text: 'Details', style: textStyle),
                       ],
                     ),

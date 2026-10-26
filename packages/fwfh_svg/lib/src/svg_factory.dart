@@ -1,4 +1,4 @@
-// TODO: remove ignore for file when our minimum core version >= 1.0
+//  remove ignore for file when our minimum core version >= 1.0
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/widgets.dart';
@@ -96,7 +96,7 @@ mixin SvgFactory on WidgetFactory {
       case kTagSvg:
         meta.register(
           _tagSvg ??= BuildOp(
-            // TODO: set debugLabel when our minimum core version >= 1.0
+            //  set debugLabel when our minimum core version >= 1.0
             defaultStyles: (element) {
               // other tags that share the same logic:
               // - IFRAME
