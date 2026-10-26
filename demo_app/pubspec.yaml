@@ -17,7 +17,7 @@ dependencies:
   fintel_fwfh_chewie: any
   fintel_fwfh_webview: any
   html: any
-  http: any
+  http: 1.6.0
   logging: any
   path_provider: any
   photo_view: ^0.15.0
