@@ -16,20 +16,18 @@ platforms:
   windows:
 
 dependencies:
-  flutter:
-    sdk: flutter
-  fintel_widget_from_html_core: ^0.18.0-beta.1
   fintel_fwfh_cached_network_image: ^0.16.4-beta.1
   fintel_fwfh_chewie: ^0.17.0-beta.1
   fintel_fwfh_just_audio: ^0.18.0-beta.1
   fintel_fwfh_svg: ^0.17.0-beta.1
   fintel_fwfh_url_launcher: ^0.16.2-beta.1
   fintel_fwfh_webview: ^0.16.0-beta.1
+  fintel_widget_from_html_core: ^0.18.0-beta.1
+  flutter:
+    sdk: flutter
   html: ^0.15.7
 
 dependency_overrides:
-  fintel_widget_from_html_core:
-    path: ../core
   fintel_fwfh_cached_network_image:
     path: ../fwfh_cached_network_image
   fintel_fwfh_chewie:
@@ -42,6 +40,8 @@ dependency_overrides:
     path: ../fwfh_url_launcher
   fintel_fwfh_webview:
     path: ../fwfh_webview
+  fintel_widget_from_html_core:
+    path: ../core
 
 dev_dependencies:
   file:
