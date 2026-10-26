@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:logging/logging.dart';
 
@@ -1352,7 +1352,7 @@ Future<void> main() async {
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
   <tr><td>Bar</td></tr>
 </table>''',
-              // TODO: doesn't match browser output
+              //  doesn't match browser output
               'sizing_height_1px': '''
 Above
 
@@ -1447,7 +1447,7 @@ Below''',
   </tr>
 </table>
 ''',
-              // TODO: doesn't match browser output
+              //  doesn't match browser output
               // `LayoutBuilder` prevents baseline alignment from working properly since #1073
               'table_in_list': '''
 <ul>
@@ -1455,7 +1455,7 @@ Below''',
     <table border="1"><tr><td>Foo</td></tr></table>
   </li>
 </ul>''',
-              // TODO: doesn't match browser output
+              //  doesn't match browser output
               // `LayoutBuilder` prevents baseline alignment from working properly since #1073
               'table_with_2_cells_in_list': '''
 <ul>
@@ -1511,7 +1511,7 @@ Below''',
     </tr>
   </table>
 </div>''',
-              // TODO: doesn't match browser output
+              //  doesn't match browser output
               'width_in_percent': '''
 <table border="1">
   <tr>

@@ -1,8 +1,8 @@
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fintel_widget_from_html_core/src/internal/core_build_tree.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/core_build_tree.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 

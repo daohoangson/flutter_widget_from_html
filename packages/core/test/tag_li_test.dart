@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
@@ -732,7 +732,7 @@ Future<void> main() async {
     });
 
     testWidgets('standalone LI', (WidgetTester tester) async {
-      // TODO: doesn't match browser output
+      //  doesn't match browser output
       const html = '<li>Foo</li>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
@@ -1083,7 +1083,7 @@ Future<void> main() async {
                   'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
               'img_inline_then_text':
                   '<img src="asset:$assetName" style="height: 30px;" /> foo',
-              // TODO: doesn't match browser output
+              //  doesn't match browser output
               'li_within_li': '<li>Foo</li>',
               'list_within_li': '<ul><li>Foo</li></ul>',
               'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',

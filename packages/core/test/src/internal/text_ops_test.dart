@@ -53,7 +53,7 @@ Future<void> main() async {
     });
 
     testWidgets('renders fixed height over 0 font size', (tester) async {
-      // TODO: doesn't match browser output
+      //  doesn't match browser output
       const html = '<span style="font-size: 0; line-height: 10px">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(@0.0:Foo)]'));

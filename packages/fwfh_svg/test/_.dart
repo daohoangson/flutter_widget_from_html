@@ -1,8 +1,8 @@
+import 'package:fintel_fwfh_svg/fwfh_svg.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_svg/fwfh_svg.dart';
 
 import '../../core/test/_.dart' as helper;
 

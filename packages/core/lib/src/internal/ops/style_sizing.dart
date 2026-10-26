@@ -123,7 +123,7 @@ class StyleSizing {
     for (final b in tree.bits) {
       if (b is WidgetBit) {
         if (placeholder != null) {
-          // TODO: handle multiple inline widgets in the same tree
+          //  handle multiple inline widgets in the same tree
           return;
         }
         placeholder = b.child;

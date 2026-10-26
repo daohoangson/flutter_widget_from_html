@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:demo_app/screens/golden.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '../../packages/fwfh_chewie/test/mock_video_player_platform.dart';

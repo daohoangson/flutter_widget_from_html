@@ -1,6 +1,7 @@
 import 'dart:convert';
+
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class ImgScreen extends StatefulWidget {
   const ImgScreen({super.key});

@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:demo_app/widgets/selection_area.dart';
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart'
+    as enhanced;
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart'
+    as core;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
-    as enhanced;
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core;
 
 class Golden extends StatelessWidget {
   final String html;

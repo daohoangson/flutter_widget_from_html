@@ -1,9 +1,9 @@
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget;
 
 import 'widget_factory.dart';
 
-export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+export 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart'
     show HtmlWidgetState, MaterialThemeMode;
 
 /// A widget that builds Flutter widget tree from HTML

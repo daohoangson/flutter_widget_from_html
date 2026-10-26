@@ -1,21 +1,18 @@
-name: flutter_widget_from_html_core
+name: fintel_widget_from_html_core
 version: 0.18.0-beta.1
 description: Flutter package to render html as widgets that focuses on correctness and extensibility.
-homepage: https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/core
-
+homepage: https://github.com/gadgetsteach/flutter_widget_from_html/tree/master/packages/core
 environment:
   flutter: ">=3.44.0"
   sdk: ">=3.4.0 <4.0.0"
-
 dependencies:
-  csslib: ">=0.17.0 <2.0.0"
-  cupertino_ui: ">=1.0.2 <1.1.0"
+  csslib: ^1.0.2
+  cupertino_ui: ^1.1.4
   flutter:
     sdk: flutter
-  html: ^0.15.0
-  logging: ^1.0.0
-  material_ui: ^1.2.0
-
+  html: ^0.15.7
+  logging: ^1.3.0
+  material_ui: ^1.8.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -25,21 +22,17 @@ dev_dependencies:
   mocktail: any
   mocktail_image_network: ^1.0.0
   test: any
-
 flutter:
   assets:
     - test/images/
-
 funding:
   - https://www.patreon.com/daohoangson
   - https://buymeacoffee.com/daohoangson
-
 screenshots:
   - description: Demo rendering of HTML tags
     path: example/HelloWorldCoreScreen1.gif
   - description: Demo rendering of HTML tags
     path: example/HelloWorldCoreScreen2.jpg
-
 topics:
   - widget
   - html

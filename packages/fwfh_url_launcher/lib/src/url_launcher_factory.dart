@@ -1,5 +1,5 @@
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A mixin that can launch A tag via `url_launcher` plugin.

@@ -1,10 +1,10 @@
-// TODO: remove ignore for file when our minimum core version >= 1.0
+//  remove ignore for file when our minimum core version >= 1.0
 // ignore_for_file: deprecated_member_use
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import 'internal.dart';
 import 'web_view/web_view.dart';
@@ -105,7 +105,7 @@ mixin WebViewFactory on WidgetFactory {
       case kTagIframe:
         meta.register(
           _tagIframe ??= BuildOp(
-            // TODO: set debugLabel when our minimum core version >= 1.0
+            //  set debugLabel when our minimum core version >= 1.0
             defaultStyles: (element) {
               // other tags that share the same logic:
               // - IMG

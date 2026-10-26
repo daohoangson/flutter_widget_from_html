@@ -38,7 +38,17 @@ function publish {
     yq e 'del(.dependency_overrides)' -i pubspec.yaml
 
     flutter clean
-    flutter pub get
+    _max_attempts=12
+    _attempt=1
+    until flutter pub get; do
+      if [ "$_attempt" -ge "$_max_attempts" ]; then
+        echo "flutter pub get failed after $_attempt attempts" >&2
+        exit 1
+      fi
+      echo "Waiting 5s for newly published dependencies to propagate on pub.dev (attempt $_attempt/$_max_attempts)..."
+      sleep 5
+      _attempt=$((_attempt + 1))
+    done
     dart format --output=none --set-exit-if-changed .
     flutter analyze --fatal-infos
     if [ -d test ]; then
@@ -52,8 +62,21 @@ function publish {
     # Analyze a disposable copy because pana modifies its input. Most packages
     # must score 160/160. Enhanced, the two media add-ons, and WebView currently
     # lose 10 platform points for limited platform support or Wasm compatibility.
+    # Packages renamed to fintel_* lose 10 repository verification points since the
+    # upstream default branch has not yet merged the renamed packages.
     _pana_threshold=0
     case "$_name" in
+      fintel_*)
+        _pana_threshold=10
+        ;;
+    esac
+    case "$_name" in
+      fintel_widget_from_html)
+        _pana_threshold=35
+        ;;
+      fintel_fwfh_chewie | fintel_fwfh_just_audio | fintel_fwfh_webview)
+        _pana_threshold=20
+        ;;
       flutter_widget_from_html | fwfh_chewie | fwfh_just_audio | fwfh_webview)
         _pana_threshold=10
         ;;

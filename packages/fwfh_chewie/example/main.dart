@@ -1,6 +1,6 @@
+import 'package:fintel_fwfh_chewie/fwfh_chewie.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_chewie/fwfh_chewie.dart';
 
 void main() => runApp(const MyApp());
 

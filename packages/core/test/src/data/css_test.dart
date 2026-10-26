@@ -1,4 +1,4 @@
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:test/test.dart';
 
 void main() {

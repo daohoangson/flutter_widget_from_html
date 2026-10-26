@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fintel_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
@@ -141,7 +141,7 @@ Future<void> main() async {
       });
 
       testWidgets('renders asset (specified package)', (tester) async {
-        const package = 'flutter_widget_from_html_core';
+        const package = 'fintel_widget_from_html_core';
         const html =
             '<div style="background-image: url(asset:$assetName?package=$package)">Foo</div>';
         final explained = await explain(tester, html);

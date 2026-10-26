@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:webview_flutter/webview_flutter.dart' as lib;

@@ -1,7 +1,7 @@
+import 'package:fintel_fwfh_just_audio/fwfh_just_audio.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_just_audio/fwfh_just_audio.dart';
 
 import '../../core/test/_.dart' as helper;
 
