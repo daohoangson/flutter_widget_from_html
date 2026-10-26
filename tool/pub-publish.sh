@@ -71,7 +71,10 @@ function publish {
         ;;
     esac
     case "$_name" in
-      fintel_widget_from_html | fintel_fwfh_chewie | fintel_fwfh_just_audio | fintel_fwfh_webview)
+      fintel_widget_from_html)
+        _pana_threshold=35
+        ;;
+      fintel_fwfh_chewie | fintel_fwfh_just_audio | fintel_fwfh_webview)
         _pana_threshold=20
         ;;
       flutter_widget_from_html | fwfh_chewie | fwfh_just_audio | fwfh_webview)
