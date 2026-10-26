@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^2.3.0
-  flutter_widget_from_html_core: ">=0.8.0 <0.19.0"
+  flutter_widget_from_html_core: ">=0.17.4"
 
 dependency_overrides:
   flutter_widget_from_html_core:
@@ -22,7 +22,7 @@ dev_dependencies:
     sdk: flutter
   golden_toolkit: ^0.15.0
   lint: any
-  mocktail: ^1.0.0
+  mocktail: ^1.0.5
 
 flutter:
   assets:
