@@ -141,7 +141,7 @@ void main() {
 
   group('poster', () {
     testWidgets('renders video player with asset', (tester) async {
-      const package = 'flutter_widget_from_html_core';
+      const package = 'fintel_widget_from_html_core';
       const assetName = 'test/images/logo.png';
       const h = '<video poster="asset:$assetName?package=$package">'
           '<source src="$src"></video>';

@@ -141,7 +141,7 @@ Future<void> main() async {
       });
 
       testWidgets('renders asset (specified package)', (tester) async {
-        const package = 'flutter_widget_from_html_core';
+        const package = 'fintel_widget_from_html_core';
         const html =
             '<div style="background-image: url(asset:$assetName?package=$package)">Foo</div>';
         final explained = await explain(tester, html);
