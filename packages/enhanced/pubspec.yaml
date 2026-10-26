@@ -2,11 +2,9 @@ name: fintel_widget_from_html
 version: 0.18.0-beta.1
 description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/gadgetsteach/flutter_widget_from_html
-
 environment:
   flutter: ">=3.44.0"
   sdk: ">=3.4.0 <4.0.0"
-
 platforms:
   android:
   ios:
@@ -14,7 +12,6 @@ platforms:
   macos:
   web:
   windows:
-
 dependencies:
   fintel_fwfh_cached_network_image: ^0.16.4-beta.1
   fintel_fwfh_chewie: ^0.17.0-beta.1
@@ -26,23 +23,6 @@ dependencies:
   flutter:
     sdk: flutter
   html: ^0.15.7
-
-dependency_overrides:
-  fintel_fwfh_cached_network_image:
-    path: ../fwfh_cached_network_image
-  fintel_fwfh_chewie:
-    path: ../fwfh_chewie
-  fintel_fwfh_just_audio:
-    path: ../fwfh_just_audio
-  fintel_fwfh_svg:
-    path: ../fwfh_svg
-  fintel_fwfh_url_launcher:
-    path: ../fwfh_url_launcher
-  fintel_fwfh_webview:
-    path: ../fwfh_webview
-  fintel_widget_from_html_core:
-    path: ../core
-
 dev_dependencies:
   file:
   flutter_test:
@@ -51,15 +31,12 @@ dev_dependencies:
   lint: any
   material_ui: ^1.8.0
   mocktail: ^1.0.5
-
 flutter:
   assets:
     - test/images/
-
 funding:
   - https://www.patreon.com/daohoangson
   - https://buymeacoffee.com/daohoangson
-
 screenshots:
   - description: Demo rendering of HTML tags
     path: example/HelloWorldScreen1.gif
@@ -67,7 +44,6 @@ screenshots:
     path: example/HelloWorldScreen2.gif
   - description: Demo rendering of HTML tags
     path: example/HelloWorldScreen3.gif
-
 topics:
   - widget
   - html
