@@ -2,16 +2,13 @@ name: fintel_fwfh_webview
 version: 0.16.0-beta.1
 description: WidgetFactory extension to render IFRAME with the official WebView plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
-
 environment:
   flutter: ">=3.44.0"
   sdk: ">=3.2.0 <4.0.0"
-
 platforms:
   android:
   ios:
   web:
-
 dependencies:
   fintel_widget_from_html_core: ">=0.18.0-beta.1 <0.19.0"
   flutter:
@@ -22,11 +19,6 @@ dependencies:
   webview_flutter: ^4.14.1
   webview_flutter_android: ">=4.14.1"
   webview_flutter_wkwebview: ^3.27.2
-
-dependency_overrides:
-  fintel_widget_from_html_core:
-    path: ../core
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -36,11 +28,9 @@ dev_dependencies:
   measurer: ^2.1.1
   plugin_platform_interface: any
   webview_flutter_platform_interface: ^2.15.1
-
 funding:
   - https://www.patreon.com/daohoangson
   - https://buymeacoffee.com/daohoangson
-
 topics:
   - iframe
   - fwfh
