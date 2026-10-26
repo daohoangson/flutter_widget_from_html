@@ -1,8 +1,8 @@
 //  remove ignore for file when our minimum core version >= 1.0
 // ignore_for_file: deprecated_member_use
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '../just_audio_factory.dart';
 

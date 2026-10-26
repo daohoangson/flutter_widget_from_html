@@ -1,7 +1,7 @@
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:demo_app/widgets/selection_area.dart';
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class FontSizeScreen extends StatelessWidget {
   const FontSizeScreen({super.key});

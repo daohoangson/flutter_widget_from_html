@@ -1,6 +1,6 @@
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
 import '../../fwfh_cached_network_image/test/_.dart'

@@ -1,11 +1,11 @@
 import 'dart:ui' show SemanticsActionEvent, Tristate;
 
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 // Deliberately independent of _.dart, whose harness excludes semantics.
 Future<void> pumpHtml(

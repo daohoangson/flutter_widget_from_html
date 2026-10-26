@@ -1,8 +1,8 @@
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/cupertino.dart' as flutter_cupertino;
 import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
 const _flutterColor = Color(0xFF123456);

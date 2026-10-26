@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../fwfh_url_launcher/test/mock_url_launcher_platform.dart';

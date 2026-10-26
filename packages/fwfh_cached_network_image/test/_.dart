@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file/memory.dart';
+import 'package:fintel_fwfh_cached_network_image/fwfh_cached_network_image.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../core/test/_.dart' as helper;

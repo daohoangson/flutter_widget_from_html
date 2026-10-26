@@ -1,5 +1,5 @@
+import 'package:fintel_widget_from_html_core/src/utils/css_counter_style.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/src/utils/css_counter_style.dart';
 
 void main() {
   group('CssCounterStyle', () {

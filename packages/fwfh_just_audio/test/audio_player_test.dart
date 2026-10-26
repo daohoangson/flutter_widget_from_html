@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:fintel_fwfh_just_audio/fwfh_just_audio.dart' as fwfh;
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_just_audio/fwfh_just_audio.dart' as fwfh;
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:just_audio_platform_interface/just_audio_platform_interface.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;

@@ -249,6 +249,62 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  fintel_fwfh_cached_network_image:
+    dependency: "direct overridden"
+    description:
+      path: "../packages/fwfh_cached_network_image"
+      relative: true
+    source: path
+    version: "0.16.4-beta.1"
+  fintel_fwfh_chewie:
+    dependency: "direct main"
+    description:
+      path: "../packages/fwfh_chewie"
+      relative: true
+    source: path
+    version: "0.17.0-beta.1"
+  fintel_fwfh_just_audio:
+    dependency: "direct overridden"
+    description:
+      path: "../packages/fwfh_just_audio"
+      relative: true
+    source: path
+    version: "0.18.0-beta.1"
+  fintel_fwfh_svg:
+    dependency: "direct overridden"
+    description:
+      path: "../packages/fwfh_svg"
+      relative: true
+    source: path
+    version: "0.17.0-beta.1"
+  fintel_fwfh_url_launcher:
+    dependency: "direct overridden"
+    description:
+      path: "../packages/fwfh_url_launcher"
+      relative: true
+    source: path
+    version: "0.16.2-beta.1"
+  fintel_fwfh_webview:
+    dependency: "direct main"
+    description:
+      path: "../packages/fwfh_webview"
+      relative: true
+    source: path
+    version: "0.16.0-beta.1"
+  fintel_widget_from_html:
+    dependency: "direct main"
+    description:
+      path: "../packages/enhanced"
+      relative: true
+    source: path
+    version: "0.18.0-beta.1"
+  fintel_widget_from_html_core:
+    dependency: "direct main"
+    description:
+      path: "../packages/core"
+      relative: true
+    source: path
+    version: "0.18.0-beta.1"
   fixnum:
     dependency: transitive
     description:
@@ -317,20 +373,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_widget_from_html:
-    dependency: "direct main"
-    description:
-      path: "../packages/enhanced"
-      relative: true
-    source: path
-    version: "0.18.0-beta.1"
-  flutter_widget_from_html_core:
-    dependency: "direct main"
-    description:
-      path: "../packages/core"
-      relative: true
-    source: path
-    version: "0.18.0-beta.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -339,48 +381,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
-  fwfh_cached_network_image:
-    dependency: "direct overridden"
-    description:
-      path: "../packages/fwfh_cached_network_image"
-      relative: true
-    source: path
-    version: "0.16.4-beta.1"
-  fwfh_chewie:
-    dependency: "direct main"
-    description:
-      path: "../packages/fwfh_chewie"
-      relative: true
-    source: path
-    version: "0.17.0-beta.1"
-  fwfh_just_audio:
-    dependency: "direct overridden"
-    description:
-      path: "../packages/fwfh_just_audio"
-      relative: true
-    source: path
-    version: "0.18.0-beta.1"
-  fwfh_svg:
-    dependency: "direct overridden"
-    description:
-      path: "../packages/fwfh_svg"
-      relative: true
-    source: path
-    version: "0.17.0-beta.1"
-  fwfh_url_launcher:
-    dependency: "direct overridden"
-    description:
-      path: "../packages/fwfh_url_launcher"
-      relative: true
-    source: path
-    version: "0.16.2-beta.1"
-  fwfh_webview:
-    dependency: "direct main"
-    description:
-      path: "../packages/fwfh_webview"
-      relative: true
-    source: path
-    version: "0.16.0-beta.1"
   glob:
     dependency: transitive
     description:

@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:fintel_fwfh_chewie/fwfh_chewie.dart';
+import 'package:fintel_fwfh_webview/fwfh_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fwfh_chewie/fwfh_chewie.dart';
-import 'package:fwfh_webview/fwfh_webview.dart';
 import 'package:measurer/measurer.dart';
 import 'package:patrol/patrol.dart';
 

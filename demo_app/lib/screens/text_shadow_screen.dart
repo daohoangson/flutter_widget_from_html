@@ -1,5 +1,5 @@
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 const _kHtml = '''
   <h3>text-shadow: 1px 1px 2px #FC0;</h3>

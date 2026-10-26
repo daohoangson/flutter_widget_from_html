@@ -1,7 +1,7 @@
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:demo_app/widgets/selection_area.dart';
+import 'package:fintel_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 const kHtml = '''
 <h1>Heading 1</h1>

@@ -2,9 +2,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 /// A mixin that can render IMG with `cached_network_image` plugin.
 mixin CachedNetworkImageFactory on WidgetFactory {

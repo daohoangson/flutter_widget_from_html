@@ -1,7 +1,7 @@
+import 'package:fintel_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fintel_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
