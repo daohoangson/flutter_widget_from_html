@@ -13,7 +13,7 @@ dependencies:
   fintel_fwfh_webview: any
   fintel_widget_from_html: any
   fintel_widget_from_html_core: any
-  flex_color_scheme: ^9.0.0
+  flex_color_scheme: ^8.0.0
   flutter:
     sdk: flutter
   html: any
