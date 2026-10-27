@@ -27,7 +27,8 @@ class Anchor {
                   ?.fontSize,
               key: anchor,
             ),
-            debugLabel: '${tree.element.localName}--anchor#$id',
+            debugLabel:
+                kDebugMode ? '${tree.element.localName}--anchor#$id' : null,
           );
 
           tree.prepend(WidgetBit.inline(tree, widget));
