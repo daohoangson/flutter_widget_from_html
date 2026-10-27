@@ -92,7 +92,7 @@ jobs:
           echo "url=${_url}" >> $GITHUB_OUTPUT
       - name: Create comment
         if: steps.now.conclusion == 'success'
-        uses: daohoangson/comment-on-github@35b21121fdbadf807678bec8210cdd7f22a934fe # v2.2.2
+        uses: daohoangson/comment-on-github@728d4f729944c04faa5feda57291d3675875cb1a # v2.2.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
