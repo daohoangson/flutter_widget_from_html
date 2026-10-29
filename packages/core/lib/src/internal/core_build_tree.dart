@@ -255,7 +255,10 @@ class CoreBuildTree extends BuildTree {
     }
   }
 
-  void _addText(String data) {
+  void _addText(String raw) {
+    // Transform before whitespace is split so `capitalize` sees word
+    // boundaries, and before later ops (ruby, text-emphasis) rewrite bits.
+    final data = transformInheritedText(this, raw);
     final leading = _regExpSpaceLeading.firstMatch(data);
     final trailing = _regExpSpaceTrailing.firstMatch(data);
     final start = leading?.end ?? 0;

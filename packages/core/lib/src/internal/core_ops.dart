@@ -33,6 +33,7 @@ part 'ops/style_text_align.dart';
 part 'ops/style_text_decoration.dart';
 part 'ops/style_text_emphasis.dart';
 part 'ops/style_text_shadow.dart';
+part 'ops/style_text_transform.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_br.dart';
