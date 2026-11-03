@@ -4,6 +4,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:fwfh_webview/fwfh_webview.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:web/web.dart' as web;
+import 'package:webview_all/webview_all.dart' as lib;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,8 @@ void main() {
   testWidgets('IFRAME app', (WidgetTester tester) async {
     runApp(const IframeApp());
     await tester.pumpAndSettle();
+
+    expect(find.byType(lib.WebViewWidget), findsOneWidget);
 
     final elements = web.document.getElementsByTagName('iframe');
     expect(elements.length, 1);

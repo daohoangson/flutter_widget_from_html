@@ -56,6 +56,7 @@ if [ -z ${UPDATE_GOLDENS+x} ]; then
   if [ ! -z ${CHROMEDRIVER_PORT_4444+x} ]; then
     (
       cd ./packages/fwfh_webview &&
+        flutter test --platform chrome test/web_view_web_test.dart &&
         flutter drive \
           -d web-server \
           --driver=test_driver/integration_test.dart \
