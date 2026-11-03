@@ -349,10 +349,7 @@ void main() {
       const html =
           '<iframe src="$src" allow="accelerometer; autoplay; fullscreen"></iframe>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        contains('allow=accelerometer; autoplay; fullscreen'),
-      );
+      expect(explained, contains('allow=accelerometer; autoplay; fullscreen'));
     });
 
     testWidgets('renders without allow', (tester) async {
@@ -416,9 +413,7 @@ class _WebViewDebuggingEnabled extends WidgetFactory with WebViewFactory {
 class _WebViewEagerGestureRecognizer extends WidgetFactory with WebViewFactory {
   @override
   Set<Factory<OneSequenceGestureRecognizer>> get webViewGestureRecognizers =>
-      const {
-        Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
-      };
+      const {Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new)};
 }
 
 class _WebViewMediaPlaybackAlwaysAllow extends WidgetFactory

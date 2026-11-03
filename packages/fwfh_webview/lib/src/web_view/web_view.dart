@@ -3,9 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-import 'fallback.dart'
-    if (dart.library.io) 'io.dart'
-    if (dart.library.js_interop) 'js_interop.dart';
+import 'web_view_state.dart';
 
 /// An embedded web view.
 class WebView extends StatefulWidget {

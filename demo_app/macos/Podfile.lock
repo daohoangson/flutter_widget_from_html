@@ -25,7 +25,7 @@ PODS:
     - FlutterMacOS
   - wakelock_plus (0.0.1):
     - FlutterMacOS
-  - webview_flutter_wkwebview (0.0.1):
+  - webview_all_wkwebview (0.0.1):
     - Flutter
     - FlutterMacOS
 
@@ -40,7 +40,7 @@ DEPENDENCIES:
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
   - video_player_avfoundation (from `Flutter/ephemeral/.symlinks/plugins/video_player_avfoundation/darwin`)
   - wakelock_plus (from `Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos`)
-  - webview_flutter_wkwebview (from `Flutter/ephemeral/.symlinks/plugins/webview_flutter_wkwebview/darwin`)
+  - webview_all_wkwebview (from `Flutter/ephemeral/.symlinks/plugins/webview_all_wkwebview/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -67,8 +67,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/video_player_avfoundation/darwin
   wakelock_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos
-  webview_flutter_wkwebview:
-    :path: Flutter/ephemeral/.symlinks/plugins/webview_flutter_wkwebview/darwin
+  webview_all_wkwebview:
+    :path: Flutter/ephemeral/.symlinks/plugins/webview_all_wkwebview/darwin
 
 SPEC CHECKSUMS:
   audio_session: eaca2512cf2b39212d724f35d11f46180ad3a33e
@@ -82,7 +82,7 @@ SPEC CHECKSUMS:
   url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
   wakelock_plus: 21ddc249ac4b8d018838dbdabd65c5976c308497
-  webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
+  webview_all_wkwebview: 552f6bf5ee38936a1b51c2195ac66b085aeb152f
 
 PODFILE CHECKSUM: 7eb978b976557c8c1cd717d8185ec483fd090a82
 
