@@ -154,7 +154,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Launch URL via [url_launcher](https://pub.dev/packages/url_launcher) with base URL resolver
 - AUDIO via [just_audio](https://pub.dev/packages/just_audio)
 - H1/H2/H3/H4/H5/H6
-- IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
+- IFRAME via [webview_all](https://pub.dev/packages/webview_all)
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`

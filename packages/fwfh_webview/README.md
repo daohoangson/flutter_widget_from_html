@@ -4,7 +4,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=daohoangson_flutter_widget_from_html&metric=coverage)](https://sonarcloud.io/summary/new_code?id=daohoangson_flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)
 
-WidgetFactory extension to render IFRAME with the official WebView plugin.
+WidgetFactory extension to render IFRAME with [webview_all](https://pub.dev/packages/webview_all).
 This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.
 
 Live demo: https://demo.fwfh.dev/#/iframe
