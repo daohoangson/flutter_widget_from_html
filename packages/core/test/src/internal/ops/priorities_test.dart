@@ -17,6 +17,10 @@ void main() {
       expect(BoxModel.background - BoxModel.border, equals(Priority.step));
     });
 
+    test('background and box shadow should be next to each other', () {
+      expect(BoxModel.boxShadow - BoxModel.background, equals(Priority.step));
+    });
+
     test('Late.displayInlineBlock is before inline block default', () {
       expect(Late.displayInlineBlock, lessThan(kPriorityInlineBlockDefault));
     });
