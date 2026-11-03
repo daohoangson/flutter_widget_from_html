@@ -267,11 +267,14 @@ class _FakeWebViewPlatform extends Fake
   PlatformWebViewController createPlatformWebViewController(
     PlatformWebViewControllerCreationParams params,
   ) {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       return __FakeWebKitWebViewController(params);
-    } else {
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
       return __FakeAndroidWebViewController(params);
     }
+
+    return _FakeDesktopWebViewController(params);
   }
 
   @override
@@ -280,4 +283,8 @@ class _FakeWebViewPlatform extends Fake
   ) {
     return _FakeWebViewWidget(params);
   }
+}
+
+class _FakeDesktopWebViewController extends FakeWebViewController {
+  _FakeDesktopWebViewController(super.params);
 }

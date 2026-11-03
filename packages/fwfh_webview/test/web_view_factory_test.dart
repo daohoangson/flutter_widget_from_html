@@ -205,11 +205,15 @@ void main() {
       TargetPlatform.windows,
       TargetPlatform.fuchsia,
     ]) {
-      testWidgets('skips unsupported web views ($platform)', (tester) async {
+      final supported = platform != TargetPlatform.fuchsia;
+      testWidgets('${supported ? 'renders' : 'skips'} web view ($platform)', (
+        tester,
+      ) async {
         debugDefaultTargetPlatformOverride = platform;
         try {
           final explained = await explainWithoutExplainer(tester);
-          expect(explained, isNot(contains('└WebViewWidget')));
+          final matcher = contains('└WebViewWidget');
+          expect(explained, supported ? matcher : isNot(matcher));
         } finally {
           debugDefaultTargetPlatformOverride = null;
         }

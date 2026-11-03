@@ -125,9 +125,7 @@ mixin WebViewFactory on WidgetFactory {
               };
             },
             onWidgets: (meta, widgets) {
-              if (defaultTargetPlatform != TargetPlatform.android &&
-                  defaultTargetPlatform != TargetPlatform.iOS &&
-                  !kIsWeb) {
+              if (!kIsWeb && defaultTargetPlatform == TargetPlatform.fuchsia) {
                 return widgets;
               }
 
