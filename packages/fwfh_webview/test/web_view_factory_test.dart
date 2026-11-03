@@ -199,12 +199,22 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     });
 
-    testWidgets('skips web view (linux)', (tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final explained = await explainWithoutExplainer(tester);
-      expect(explained, isNot(contains('└WebViewWidget')));
-      debugDefaultTargetPlatformOverride = null;
-    });
+    for (final platform in [
+      TargetPlatform.linux,
+      TargetPlatform.macOS,
+      TargetPlatform.windows,
+      TargetPlatform.fuchsia,
+    ]) {
+      testWidgets('skips unsupported web views ($platform)', (tester) async {
+        debugDefaultTargetPlatformOverride = platform;
+        try {
+          final explained = await explainWithoutExplainer(tester);
+          expect(explained, isNot(contains('└WebViewWidget')));
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      });
+    }
   });
 
   testWidgets('renders web view with specified dimensions', (tester) async {

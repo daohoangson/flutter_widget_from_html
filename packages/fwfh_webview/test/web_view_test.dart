@@ -462,6 +462,18 @@ void main() {
     });
   });
 
+  testWidgets('closes its controller when disposed', (tester) async {
+    await tester.pumpWidget(
+      const WebView('https://example.com', aspectRatio: 16 / 9),
+    );
+    final controller = FakeWebViewController.instance!;
+    expect(controller.isClosed, isFalse);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    expect(controller.isClosed, isTrue);
+  });
+
   group('userAgent', () {
     const html = 'foo';
     final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
