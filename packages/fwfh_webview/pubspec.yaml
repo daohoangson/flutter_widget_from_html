@@ -10,7 +10,10 @@ environment:
 platforms:
   android:
   ios:
+  linux:
+  macos:
   web:
+  windows:
 
 dependencies:
   flutter:
@@ -21,7 +24,9 @@ dependencies:
   web: ">=0.3.0 <2.0.0"
   webview_all: ^1.4.11
   webview_all_android: ^1.4.11
+  webview_all_linux: ^1.4.11
   webview_all_web: ^1.4.11
+  webview_all_windows: ^1.4.11
   webview_all_wkwebview: ^1.4.11
 
 dependency_overrides:

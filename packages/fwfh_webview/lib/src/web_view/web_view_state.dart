@@ -32,7 +32,10 @@ class WebViewState extends State<WebView> {
   _ResizeObserver? _resizeObserver;
 
   bool get _applyWorkaroundForIssue37 =>
-      !kIsWeb && widget.unsupportedWorkaroundForIssue37;
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS) &&
+      widget.unsupportedWorkaroundForIssue37;
 
   @override
   void initState() {
