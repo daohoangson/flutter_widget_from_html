@@ -6,24 +6,20 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 
 class HeightPlaceholder extends WidgetPlaceholder {
-  final List<_Height> _heights;
+  final InheritanceResolvers inheritanceResolvers;
+
+  final List<CssLength> _heights = [];
 
   HeightPlaceholder(
     CssLength height,
-    InheritanceResolvers inheritanceResolvers, {
-    String? debugLabel,
-    Key? key,
-  }) : this._(
-          [_Height(height, inheritanceResolvers)],
-          debugLabel: debugLabel,
-          key: key,
-        );
-
-  HeightPlaceholder._(
-    this._heights, {
+    this.inheritanceResolvers, {
     super.debugLabel,
     super.key,
-  }) : super(builder: (c, w) => _build(c, w, _heights));
+  }) : super(builder: (c, w) => _build(c, w, height, inheritanceResolvers)) {
+    _heights.add(height);
+  }
+
+  CssLength get height => _heights.first;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +30,12 @@ class HeightPlaceholder extends WidgetPlaceholder {
     }
   }
 
-  /// Returns a new placeholder that renders the largest height of both.
-  ///
-  /// Neither placeholder is modified: they are reused across rebuilds.
-  HeightPlaceholder mergedWith(HeightPlaceholder other) => HeightPlaceholder._(
-        [..._heights, ...other._heights],
-        debugLabel: debugLabel,
-        key: key,
-      );
+  void mergeWith(HeightPlaceholder other) {
+    final height = other.height;
+    _heights.add(height);
+
+    super.wrapWith((c, w) => _build(c, w, height, other.inheritanceResolvers));
+  }
 
   @override
   HeightPlaceholder wrapWith(
@@ -52,29 +46,16 @@ class HeightPlaceholder extends WidgetPlaceholder {
   static Widget _build(
     BuildContext context,
     Widget child,
-    List<_Height> heights,
+    CssLength height,
+    InheritanceResolvers inheritanceResolvers,
   ) {
-    var max = 0.0;
-    for (final height in heights) {
-      final value = height.height.getValue(
-        height.inheritanceResolvers.resolve(context),
-      );
-      if (value != null && value > max) {
-        max = value;
-      }
-    }
-
     final existing = (child is SizedBox ? child.height : null) ?? 0.0;
-    return max > existing ? SizedBox(height: max) : child;
+    final value = height.getValue(inheritanceResolvers.resolve(context));
+    if (value != null && value > existing) {
+      return SizedBox(height: value);
+    }
+    return child;
   }
-}
-
-@immutable
-class _Height {
-  final CssLength height;
-  final InheritanceResolvers inheritanceResolvers;
-
-  const _Height(this.height, this.inheritanceResolvers);
 }
 
 /// An extension on [BuildContext].
