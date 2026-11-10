@@ -65,7 +65,11 @@ class ColumnPlaceholder extends WidgetPlaceholder {
     for (final child in iterable) {
       if (state == 0) {
         if (child is HeightPlaceholder) {
-          marginTop = marginTop?.mergedWith(child) ?? child;
+          if (marginTop != null) {
+            marginTop.mergeWith(child);
+          } else {
+            marginTop = child;
+          }
         } else {
           state++;
         }
@@ -73,7 +77,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
       if (state == 1) {
         if (child is HeightPlaceholder && prev is HeightPlaceholder) {
-          prev = contents.last = prev.mergedWith(child);
+          prev.mergeWith(child);
           continue;
         }
 
