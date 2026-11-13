@@ -90,9 +90,6 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
       ),
     );
 
-    // Small delay to simulate loading
-    await Future.delayed(Duration.zero);
-
     playbackEvents.add(
       PlaybackEventMessage(
         processingState: ProcessingStateMessage.ready,

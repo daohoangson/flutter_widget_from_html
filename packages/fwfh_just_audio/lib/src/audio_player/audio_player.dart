@@ -70,9 +70,21 @@ class _AudioPlayerState extends State<AudioPlayer> {
       }
     });
 
-    _player
-      ..setUrl(widget.url, preload: widget.preload)
-      ..setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
+    // setUrl is intentionally not awaited. If the widget is disposed while
+    // it is still loading, just_audio completes the future with
+    // PlayerInterruptedException. Swallow that once we are unmounted so
+    // Flutter 3.50's test binding does not fail the test. Errors while
+    // mounted stay uncaught, as before.
+    unawaited(() async {
+      try {
+        await _player.setUrl(widget.url, preload: widget.preload);
+      } catch (_) {
+        if (mounted) {
+          rethrow;
+        }
+      }
+    }());
+    _player.setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
 
     if (widget.autoplay) {
       _player.play();
