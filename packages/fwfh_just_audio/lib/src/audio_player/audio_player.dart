@@ -6,6 +6,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:just_audio/just_audio.dart' as lib;
 import 'package:material_ui/material_ui.dart' as material_ui;
 
+import '../internal/guard_audio_source_load.dart';
+
 /// An audio player.
 class AudioPlayer extends StatefulWidget {
   /// The source URL.
@@ -70,20 +72,14 @@ class _AudioPlayerState extends State<AudioPlayer> {
       }
     });
 
-    // setUrl is intentionally not awaited. If the widget is disposed while
-    // it is still loading, just_audio completes the future with
-    // PlayerInterruptedException. Swallow that once we are unmounted so
-    // Flutter 3.50's test binding does not fail the test. Errors while
-    // mounted stay uncaught, as before.
-    unawaited(() async {
-      try {
-        await _player.setUrl(widget.url, preload: widget.preload);
-      } catch (_) {
-        if (mounted) {
-          rethrow;
-        }
-      }
-    }());
+    // setUrl is not awaited. guardAudioSourceLoad ignores only the
+    // interruption just_audio reports when the player is disposed mid-load.
+    unawaited(
+      guardAudioSourceLoad(
+        _player.setUrl(widget.url, preload: widget.preload),
+        isMounted: () => mounted,
+      ),
+    );
     _player.setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
 
     if (widget.autoplay) {

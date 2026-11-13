@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -222,6 +223,47 @@ Future<void> main() async {
 
         await tester.cleanupWidget();
       });
+    });
+
+    Future<void> pumpUntilLoad(WidgetTester tester) async {
+      await tester.runAsync(() async {
+        for (var i = 0; i < 50; i++) {
+          if (commands.any((command) => command.item1 == CommandType.load)) {
+            return;
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+        }
+      });
+      if (!commands.any((command) => command.item1 == CommandType.load)) {
+        fail('platform load was not called: $commands');
+      }
+    }
+
+    Future<void> startLoad(WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src),
+          ),
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await pumpUntilLoad(tester);
+    }
+
+    testWidgets('swallows PlayerInterruptedException after unmount', (
+      tester,
+    ) async {
+      loadGate = Completer<void>();
+      await startLoad(tester);
+      await tester.pumpWidget(const SizedBox.shrink());
+      loadGate!.complete();
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
     });
 
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
