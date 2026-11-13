@@ -322,7 +322,7 @@ class _RenderCssSizing extends RenderProxyBox {
     final tightHeight = BoxConstraints.tightFor(height: preferredHeight);
     late Size sizeHeight;
     try {
-      sizeHeight = scopedChild.getDryLayout(tightHeight);
+      sizeHeight = _getDryLayout(scopedChild, tightHeight);
     } catch (error, stackTrace) {
       _logger.fine(
         'Skipped guessing child size on tight height '
@@ -336,7 +336,7 @@ class _RenderCssSizing extends RenderProxyBox {
     // it's unlikely that `getDryLayout` works for tight height constraints
     // then fails for tight width so we are not doing error trapping for this:
     final tightWidth = BoxConstraints.tightFor(width: preferredWidth);
-    final sizeWidth = scopedChild.getDryLayout(tightWidth);
+    final sizeWidth = _getDryLayout(scopedChild, tightWidth);
 
     final childAspectRatio = sizeWidth.width / sizeWidth.height;
     final sizeHeightRatio = sizeHeight.width / sizeHeight.height;
@@ -368,6 +368,26 @@ class _RenderCssSizing extends RenderProxyBox {
     }
 
     return Size(childWidth, childHeight);
+  }
+}
+
+// Runs as in release mode: in debug, a descendant without dry layout support
+// (e.g. `RenderImage` baseline) throws midway and leaves the subtree unusable.
+Size _getDryLayout(RenderBox box, BoxConstraints constraints) {
+  var wasCheckingIntrinsics = false;
+  assert(() {
+    wasCheckingIntrinsics = RenderObject.debugCheckingIntrinsics;
+    RenderObject.debugCheckingIntrinsics = true;
+    return true;
+  }());
+
+  try {
+    return box.getDryLayout(constraints);
+  } finally {
+    assert(() {
+      RenderObject.debugCheckingIntrinsics = wasCheckingIntrinsics;
+      return true;
+    }());
   }
 }
 
