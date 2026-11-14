@@ -237,6 +237,7 @@ These tags and their contents will be ignored:
   - 3 values (x y color, color x y)
   - Or 2 values (x y)
   - Multiple shadows
+- text-transform: capitalize/lowercase/none/uppercase
 - white-space: pre/normal/nowrap
 - Sizing: `auto` or values in `em`, `%`, `pt` and `px`
   - width, max-width, min-width
