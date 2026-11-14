@@ -1,6 +1,14 @@
 include: package:lint/analysis_options.yaml
 
 analyzer:
+  errors:
+    # TODO: Remove when the Flutter floor can move to >=3.50.
+    # package:flutter/material.dart and package:flutter/cupertino.dart are
+    # deprecated after v3.47.0-0.0.pre. Keep importing them: MaterialThemeMode
+    # still reads the in-framework Theme, and material_ui requires Flutter
+    # >=3.44 while fwfh_cached_network_image and fwfh_url_launcher still
+    # support 3.10. Migrating the imports would fail that floor.
+    deprecated_member_use: ignore
   exclude:
     # TODO: remove this when it auto ignores `depend_on_referenced_packages`
     - lib/generated_plugin_registrant.dart

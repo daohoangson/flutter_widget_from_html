@@ -27,7 +27,8 @@ jobs:
         with:
           # only update gradle cache from demo_app.yml jobs
           cache-read-only: true
-      - run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
+      # AGP 9.3.1's release lint calls List.removeLast(), which JDK 17 does not have.
+      - run: echo JAVA_HOME=$JAVA_HOME_21_X64 >> $GITHUB_ENV
 
       - name: Run patrol build
         run: |

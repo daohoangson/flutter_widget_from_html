@@ -6,6 +6,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:just_audio/just_audio.dart' as lib;
 import 'package:material_ui/material_ui.dart' as material_ui;
 
+import '../internal/guard_audio_source_load.dart';
+
 /// An audio player.
 class AudioPlayer extends StatefulWidget {
   /// The source URL.
@@ -70,9 +72,15 @@ class _AudioPlayerState extends State<AudioPlayer> {
       }
     });
 
-    _player
-      ..setUrl(widget.url, preload: widget.preload)
-      ..setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
+    // setUrl is not awaited. guardAudioSourceLoad ignores only the
+    // interruption just_audio reports when the player is disposed mid-load.
+    unawaited(
+      guardAudioSourceLoad(
+        _player.setUrl(widget.url, preload: widget.preload),
+        isMounted: () => mounted,
+      ),
+    );
+    _player.setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
 
     if (widget.autoplay) {
       _player.play();

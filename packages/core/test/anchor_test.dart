@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// ScrollCacheExtent is exported through material.dart only from Flutter 3.50.
+// The backward-compatibility job still compiles this test on Flutter 3.44.
+// ignore: unnecessary_import
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';

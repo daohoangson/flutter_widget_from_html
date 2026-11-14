@@ -9,6 +9,12 @@ final commands = <Tuple2>[];
 late Duration duration;
 late StreamController<PlaybackEventMessage> playbackEvents;
 
+/// When set, [load] waits for this before finishing.
+Completer<void>? loadGate;
+
+/// When set, [load] throws this after [loadGate] completes.
+Object? loadError;
+
 void mockJustAudioPlatform() {
   _FakeJustAudioPlatform();
 }
@@ -16,6 +22,8 @@ void mockJustAudioPlatform() {
 void initializeMockPlatform() {
   commands.clear();
   duration = const Duration(milliseconds: 10);
+  loadError = null;
+  loadGate = null;
   playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
 }
 
@@ -76,6 +84,15 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
 
     commands.add(Tuple2(CommandType.load, uri ?? map));
 
+    final gate = loadGate;
+    if (gate != null) {
+      await gate.future;
+    }
+    final error = loadError;
+    if (error != null) {
+      throw error;
+    }
+
     // Send multiple events to properly simulate the loading process
     playbackEvents.add(
       PlaybackEventMessage(
@@ -89,9 +106,6 @@ class _FakeAudioPlayerPlatform extends Fake implements AudioPlayerPlatform {
         androidAudioSessionId: null,
       ),
     );
-
-    // Small delay to simulate loading
-    await Future.delayed(Duration.zero);
 
     playbackEvents.add(
       PlaybackEventMessage(
