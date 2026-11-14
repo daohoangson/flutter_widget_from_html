@@ -199,12 +199,26 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     });
 
-    testWidgets('skips web view (linux)', (tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final explained = await explainWithoutExplainer(tester);
-      expect(explained, isNot(contains('└WebViewWidget')));
-      debugDefaultTargetPlatformOverride = null;
-    });
+    for (final platform in [
+      TargetPlatform.linux,
+      TargetPlatform.macOS,
+      TargetPlatform.windows,
+      TargetPlatform.fuchsia,
+    ]) {
+      final supported = platform != TargetPlatform.fuchsia;
+      testWidgets('${supported ? 'renders' : 'skips'} web view ($platform)', (
+        tester,
+      ) async {
+        debugDefaultTargetPlatformOverride = platform;
+        try {
+          final explained = await explainWithoutExplainer(tester);
+          final matcher = contains('└WebViewWidget');
+          expect(explained, supported ? matcher : isNot(matcher));
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      });
+    }
   });
 
   testWidgets('renders web view with specified dimensions', (tester) async {
@@ -349,10 +363,7 @@ void main() {
       const html =
           '<iframe src="$src" allow="accelerometer; autoplay; fullscreen"></iframe>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        contains('allow=accelerometer; autoplay; fullscreen'),
-      );
+      expect(explained, contains('allow=accelerometer; autoplay; fullscreen'));
     });
 
     testWidgets('renders without allow', (tester) async {
@@ -416,9 +427,7 @@ class _WebViewDebuggingEnabled extends WidgetFactory with WebViewFactory {
 class _WebViewEagerGestureRecognizer extends WidgetFactory with WebViewFactory {
   @override
   Set<Factory<OneSequenceGestureRecognizer>> get webViewGestureRecognizers =>
-      const {
-        Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
-      };
+      const {Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new)};
 }
 
 class _WebViewMediaPlaybackAlwaysAllow extends WidgetFactory

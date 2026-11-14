@@ -7,61 +7,73 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
-import 'package:webview_flutter/webview_flutter.dart' as lib;
-import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
-    as lib;
+import 'package:webview_all/webview_all.dart' as lib;
+import 'package:webview_all_android/webview_all_android.dart' as lib;
+import 'package:webview_all_wkwebview/webview_all_wkwebview.dart' as lib;
 
+import 'platform.dart' if (dart.library.js_interop) 'platform_web.dart'
+    as platform;
 import 'web_view.dart';
 
 final _logger = Logger('fwfh_webview');
 
-Future<void>? _ignoreError(Future<void>? future) => future?.onError(
-      (error, stackTrace) {
-        _logger.warning('Ignored controller error', error, stackTrace);
-      },
-    );
+Future<void>? _ignoreError(Future<void>? future) =>
+    future?.onError((error, stackTrace) {
+      _logger.warning('Ignored controller error', error, stackTrace);
+    });
 
 class WebViewState extends State<WebView> {
   late final lib.WebViewController _controller;
+  late final Future<void> _initialization;
 
   late double _aspectRatio;
   String? _firstFinishedUrl;
   _Issue37? _issue37;
   _ResizeObserver? _resizeObserver;
 
+  bool get _applyWorkaroundForIssue37 =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS) &&
+      widget.unsupportedWorkaroundForIssue37;
+
   @override
   void initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
+    _controller = lib.WebViewController.fromPlatformCreationParams(
+      platform.controllerCreationParams(widget),
+    );
 
-    if (widget.autoResize) {
+    if (!kIsWeb && widget.autoResize) {
       _resizeObserver = _ResizeObserver(this);
       _resizeObserver?.stream.stream.listen(_autoResize);
     }
 
-    unawaited(_ignoreError(_initController()));
+    unawaited(_initialization = _ignoreError(_initController())!);
 
-    if (widget.unsupportedWorkaroundForIssue37) {
+    if (_applyWorkaroundForIssue37) {
       WidgetsBinding.instance.addObserver(_issue37 = _Issue37(this));
     }
   }
 
   Future<void> _initController() async {
-    var params = const lib.PlatformWebViewControllerCreationParams();
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      params = lib.WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: widget.mediaPlaybackAlwaysAllow
-            ? {}
-            : {...lib.PlaybackMediaTypes.values},
-      );
+    await _controller.setJavaScriptMode(
+      kIsWeb || widget.js
+          ? lib.JavaScriptMode.unrestricted
+          : lib.JavaScriptMode.disabled,
+    );
+    if (!kIsWeb) {
+      await _configureNativeController();
     }
 
-    _controller = lib.WebViewController.fromPlatformCreationParams(params);
-    await _controller.setJavaScriptMode(
-      widget.js ? lib.JavaScriptMode.unrestricted : lib.JavaScriptMode.disabled,
-    );
+    final uri = platform.parseUrl(widget.url);
+    if (mounted && uri != null) {
+      await _controller.loadRequest(uri);
+    }
+  }
+
+  Future<void> _configureNativeController() async {
     if (widget.js) {
       await _ignoreError(_resizeObserver?.initialize());
     }
@@ -98,17 +110,12 @@ class WebViewState extends State<WebView> {
         platformController.setInspectable(widget.debuggingEnabled),
       );
     }
-
-    final uri = Uri.tryParse(widget.url);
-    if (mounted && uri != null) {
-      await _controller.loadRequest(uri);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: _aspectRatio,
+      aspectRatio: kIsWeb ? widget.aspectRatio : _aspectRatio,
       child: _buildWebView(),
     );
   }
@@ -117,8 +124,8 @@ class WebViewState extends State<WebView> {
   void deactivate() {
     super.deactivate();
 
-    if (widget.unsupportedWorkaroundForIssue37) {
-      _controller.reload();
+    if (_applyWorkaroundForIssue37) {
+      unawaited(_ignoreError(_controller.reload()));
     }
   }
 
@@ -130,6 +137,11 @@ class WebViewState extends State<WebView> {
     }
 
     _resizeObserver?.close();
+    unawaited(
+      _ignoreError(
+        _initialization.then((_) => _controller.platform.closeWebViewSession()),
+      ),
+    );
 
     super.dispose();
   }
@@ -150,8 +162,8 @@ class WebViewState extends State<WebView> {
 
   Widget _buildWebView() => lib.WebViewWidget(
         controller: _controller,
-        gestureRecognizers: widget.gestureRecognizers,
-        key: Key(widget.url),
+        gestureRecognizers: kIsWeb ? const {} : widget.gestureRecognizers,
+        key: kIsWeb ? null : Key(widget.url),
       );
 
   lib.NavigationDecision _interceptNavigationRequest(
@@ -177,8 +189,10 @@ class WebViewState extends State<WebView> {
   }
 
   void _onAndroidShowCustomWidgetDefault(Widget child) {
-    final mode =
-        resolveMaterialThemeMode(context, widget.materialThemeMode).mode;
+    final mode = resolveMaterialThemeMode(
+      context,
+      widget.materialThemeMode,
+    ).mode;
     Navigator.of(context).push(
       mode == MaterialThemeMode.materialUi
           ? material_ui.MaterialPageRoute<void>(
@@ -193,6 +207,10 @@ class WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
+    if (!mounted) {
+      return;
+    }
+
     _firstFinishedUrl ??= url;
     unawaited(_ignoreError(_resizeObserver?.observe('document.body')));
   }
@@ -206,7 +224,7 @@ class _Issue37 with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      wvs._controller.reload();
+      unawaited(_ignoreError(wvs._controller.reload()));
     }
   }
 }
@@ -225,6 +243,10 @@ class _ResizeObserver {
     await wvs._controller.addJavaScriptChannel(
       channelName,
       onMessageReceived: (message) {
+        if (stream.isClosed) {
+          return;
+        }
+
         final parsed = jsonDecode(message.message);
         if (parsed is List && parsed.length == 2) {
           final width = parsed[0];

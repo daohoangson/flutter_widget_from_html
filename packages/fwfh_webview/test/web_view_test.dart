@@ -5,8 +5,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:fwfh_webview/src/web_view/web_view.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:measurer/measurer.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:webview_all/webview_all.dart';
+import 'package:webview_all_wkwebview/webview_all_wkwebview.dart';
 
 import 'mock_webview_platform.dart';
 
@@ -146,8 +146,10 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance
-          ?.onNavigationRequest(url: url2, isMainFrame: true);
+      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
+        url: url2,
+        isMainFrame: true,
+      );
 
       expect(navigationRequestUrls, equals([url2]));
       expect(result2, equals(NavigationDecision.prevent));
@@ -174,8 +176,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result = await FakeWebViewController.instance
-          ?.onNavigationRequest(url: url, isMainFrame: true);
+      final result = await FakeWebViewController.instance?.onNavigationRequest(
+        url: url,
+        isMainFrame: true,
+      );
 
       expect(navigationRequestUrls, equals([]));
       expect(result, equals(NavigationDecision.navigate));
@@ -203,8 +207,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result2 = await FakeWebViewController.instance
-          ?.onNavigationRequest(url: url2, isMainFrame: true);
+      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
+        url: url2,
+        isMainFrame: true,
+      );
 
       expect(navigationRequestUrls, equals([]));
       expect(result2, equals(NavigationDecision.navigate));
@@ -232,8 +238,10 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance
-          ?.onNavigationRequest(url: url2, isMainFrame: false);
+      final result2 = await FakeWebViewController.instance?.onNavigationRequest(
+        url: url2,
+        isMainFrame: false,
+      );
 
       expect(navigationRequestUrls, equals([]));
       expect(result2, equals(NavigationDecision.navigate));
@@ -366,12 +374,7 @@ void main() {
 
     runApp(
       MaterialApp(
-        home: Scaffold(
-          body: WebView(
-            url,
-            aspectRatio: aspectRatio,
-          ),
-        ),
+        home: Scaffold(body: WebView(url, aspectRatio: aspectRatio)),
       ),
     );
 
@@ -383,11 +386,7 @@ void main() {
 
     // video goes fullscreen
     FakeWebViewController.instance?.androidOnShowCustomWidget?.call(
-      const Scaffold(
-        body: Center(
-          child: Text('Fullscreen'),
-        ),
-      ),
+      const Scaffold(body: Center(child: Text('Fullscreen'))),
       () {},
     );
     await tester.pumpAndSettle();
@@ -461,6 +460,18 @@ void main() {
         ),
       );
     });
+  });
+
+  testWidgets('closes its controller when disposed', (tester) async {
+    await tester.pumpWidget(
+      const WebView('https://example.com', aspectRatio: 16 / 9),
+    );
+    final controller = FakeWebViewController.instance!;
+    expect(controller.isClosed, isFalse);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    expect(controller.isClosed, isTrue);
   });
 
   group('userAgent', () {

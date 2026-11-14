@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:webview_all_android/webview_all_android.dart';
+import 'package:webview_all_wkwebview/webview_all_wkwebview.dart';
+import 'package:webview_platform_interface/webview_platform_interface.dart';
 
 void mockWebViewPlatform() {
   _FakeWebViewPlatform();
@@ -18,11 +18,11 @@ void mockWebViewPlatform() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
   messenger.setMockMessageHandler(
-    'dev.flutter.pigeon.webview_flutter_android.PigeonInternalInstanceManager.clear',
+    'com.abandoft.pigeon.webview_all_android.PigeonInternalInstanceManager.clear',
     (_) => Future.value(emptyList),
   );
   messenger.setMockMessageHandler(
-    'dev.flutter.pigeon.webview_flutter_android.WebView.setWebContentsDebuggingEnabled',
+    'com.abandoft.pigeon.webview_all_android.WebView.setWebContentsDebuggingEnabled',
     (message) async {
       final decodedMessage = codec.decodeMessage(message) as List<Object?>;
       FakeWebViewController.instance?.debuggingEnabled =
@@ -40,6 +40,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   OnHideCustomWidgetCallback? androidOnHideCustomWidget;
   OnShowCustomWidgetCallback? androidOnShowCustomWidget;
   bool? debuggingEnabled;
+  bool isClosed = false;
   JavaScriptMode? javaScriptMode;
   String? userAgent;
 
@@ -66,6 +67,12 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   @override
   Future<void> addJavaScriptChannel(JavaScriptChannelParams params) async {
     _channels[params.name] = params;
+  }
+
+  @override
+  Future<void> closeWebViewSession() async {
+    isClosed = true;
+    _onPageFinishedTimer?.cancel();
   }
 
   @override
@@ -128,43 +135,32 @@ abstract class FakeWebViewController extends PlatformWebViewController {
     userAgent = value;
   }
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
   Future<void> _onPageStarted(Uri uri) async {
     _uris.add(_currentUri = uri);
 
     _onPageFinishedTimer?.cancel();
-    _onPageFinishedTimer = Timer(
-      const Duration(milliseconds: 10),
-      () {
-        final redirectToString =
-            _currentUri?.queryParameters['redirect_to'] ?? '';
-        if (redirectToString.isNotEmpty) {
-          final redirectTo = Uri.tryParse(redirectToString);
-          if (redirectTo != null) {
-            _onPageStarted(redirectTo);
-            return;
-          }
+    _onPageFinishedTimer = Timer(const Duration(milliseconds: 10), () {
+      final redirectToString =
+          _currentUri?.queryParameters['redirect_to'] ?? '';
+      if (redirectToString.isNotEmpty) {
+        final redirectTo = Uri.tryParse(redirectToString);
+        if (redirectTo != null) {
+          _onPageStarted(redirectTo);
+          return;
         }
+      }
 
-        _handler?._onPageFinished?.call(uri.toString());
-      },
-    );
+      _handler?._onPageFinished?.call(uri.toString());
+    });
   }
 }
 
 class __FakeAndroidWebViewController extends FakeWebViewController
     implements AndroidWebViewController {
   __FakeAndroidWebViewController(super.params);
-
-  @override
-  Future<bool> isWebViewFeatureSupported(dynamic featureType) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setAllowContentAccess(bool enabled) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setAllowFileAccess(bool allow) => throw UnimplementedError();
 
   @override
   Future<void> setCustomWidgetCallbacks({
@@ -176,51 +172,9 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   }
 
   @override
-  Future<void> setGeolocationEnabled(bool enabled) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setGeolocationPermissionsPromptCallbacks({
-    OnGeolocationPermissionsShowPrompt? onShowPrompt,
-    OnGeolocationPermissionsHidePrompt? onHidePrompt,
-  }) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setInsetsForWebContentToIgnore(dynamic insets) =>
-      throw UnimplementedError();
-
-  @override
   Future<void> setMediaPlaybackRequiresUserGesture(bool require) async {
     androidMediaPlaybackRequiresUserGesture = require;
   }
-
-  @override
-  Future<void> setMixedContentMode(dynamic mode) => throw UnimplementedError();
-
-  @override
-  Future<void> setOnShowFileSelector(
-    Future<List<String>> Function(FileSelectorParams params)?
-        onShowFileSelector,
-  ) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setPaymentRequestEnabled(bool enabled) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setTextZoom(int textZoom) => throw UnimplementedError();
-
-  @override
-  Future<void> setUseWideViewPort(bool use) => throw UnimplementedError();
-
-  @override
-  Future<void> setWebAuthenticationSupport(WebAuthenticationSupport support) =>
-      throw UnimplementedError();
-
-  @override
-  int get webViewIdentifier => throw UnimplementedError();
 }
 
 class __FakeWebKitWebViewController extends FakeWebViewController
@@ -228,25 +182,9 @@ class __FakeWebKitWebViewController extends FakeWebViewController
   __FakeWebKitWebViewController(super.params);
 
   @override
-  Future<void> setAllowsBackForwardNavigationGestures(bool enabled) =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> setAllowsLinkPreview(bool allow) => throw UnimplementedError();
-
-  @override
-  Future<void> setOnCanGoBackChange(
-    void Function(bool) onCanGoBackChangeCallback,
-  ) =>
-      throw UnimplementedError();
-
-  @override
   Future<void> setInspectable(bool value) async {
     debuggingEnabled = value;
   }
-
-  @override
-  int get webViewIdentifier => throw UnimplementedError();
 }
 
 class _FakeNavigationDelegate extends PlatformNavigationDelegate {
@@ -305,9 +243,7 @@ class _FakeWebViewWidget extends PlatformWebViewWidget {
       controller: params.controller as FakeWebViewController,
       child: const ColoredBox(
         color: Colors.grey,
-        child: Placeholder(
-          color: Colors.black,
-        ),
+        child: Placeholder(color: Colors.black),
       ),
     );
   }
@@ -331,11 +267,14 @@ class _FakeWebViewPlatform extends Fake
   PlatformWebViewController createPlatformWebViewController(
     PlatformWebViewControllerCreationParams params,
   ) {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       return __FakeWebKitWebViewController(params);
-    } else {
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
       return __FakeAndroidWebViewController(params);
     }
+
+    return _FakeDesktopWebViewController(params);
   }
 
   @override
@@ -344,4 +283,8 @@ class _FakeWebViewPlatform extends Fake
   ) {
     return _FakeWebViewWidget(params);
   }
+}
+
+class _FakeDesktopWebViewController extends FakeWebViewController {
+  _FakeDesktopWebViewController(super.params);
 }

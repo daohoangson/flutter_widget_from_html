@@ -94,10 +94,7 @@ mixin WebViewFactory on WidgetFactory {
 
   /// Builds fallback link when [HtmlWidget.webView] is disabled.
   Widget? buildWebViewLinkOnly(BuildMetadata meta, String url) =>
-      GestureDetector(
-        onTap: gestureTapCallback(url),
-        child: Text(url),
-      );
+      GestureDetector(onTap: gestureTapCallback(url), child: Text(url));
 
   @override
   void parse(BuildMetadata meta) {
@@ -128,12 +125,7 @@ mixin WebViewFactory on WidgetFactory {
               };
             },
             onWidgets: (meta, widgets) {
-              if (defaultTargetPlatform != TargetPlatform.android &&
-                  defaultTargetPlatform != TargetPlatform.iOS &&
-                  !kIsWeb) {
-                // Android & iOS are the webview_flutter's supported platforms
-                // Flutter web support is implemented by this package
-                // https://pub.dev/packages/webview_flutter/versions/2.0.12
+              if (!kIsWeb && defaultTargetPlatform == TargetPlatform.fuchsia) {
                 return widgets;
               }
 
@@ -141,7 +133,8 @@ mixin WebViewFactory on WidgetFactory {
               final dataSrc = a[kAttributeIframeDataSrc];
               final srcAttr = a[kAttributeIframeSrc];
               final src = urlFull(
-                  (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? ''));
+                (srcAttr?.isNotEmpty == true) ? srcAttr! : (dataSrc ?? ''),
+              );
               if (src == null) {
                 return widgets;
               }
