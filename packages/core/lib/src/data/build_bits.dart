@@ -323,7 +323,9 @@ abstract class WidgetBit<T> extends BuildBit {
         parent,
         WidgetPlaceholder.lazy(
           child,
-          debugLabel: '${parent.element.localName}--WidgetBit.block',
+          debugLabel: kDebugMode
+              ? '${parent.element.localName}--WidgetBit.block'
+              : null,
         ),
       );
 
@@ -338,7 +340,9 @@ abstract class WidgetBit<T> extends BuildBit {
         parent,
         WidgetPlaceholder.lazy(
           child,
-          debugLabel: '${parent.element.localName}--WidgetBit.inline',
+          debugLabel: kDebugMode
+              ? '${parent.element.localName}--WidgetBit.inline'
+              : null,
         ),
         alignment,
         baseline,

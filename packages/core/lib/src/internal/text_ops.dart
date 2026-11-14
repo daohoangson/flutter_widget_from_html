@@ -1,4 +1,5 @@
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
@@ -34,7 +35,7 @@ InheritedProperties fontSize(InheritedProperties resolving, css.Expression v) =>
 InheritedProperties fontSizeEm(InheritedProperties resolving, double v) =>
     resolving.copyWith(
       style: TextStyle(
-        debugLabel: 'fwfh: $kCssFontSize ${v}em',
+        debugLabel: kDebugMode ? 'fwfh: $kCssFontSize ${v}em' : null,
         fontSize: _fontSizeTryParseCssLength(
           resolving,
           CssLength(v, CssLengthUnit.em),

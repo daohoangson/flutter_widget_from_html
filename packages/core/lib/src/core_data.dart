@@ -1,4 +1,5 @@
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 

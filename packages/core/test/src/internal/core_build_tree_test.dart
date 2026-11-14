@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter_test/flutter_test.dart';
@@ -82,6 +84,17 @@ void main() {
       });
     });
   });
+
+  group('logging', () {
+    test('skips building messages when not loggable', () {
+      final styles = _ToStringCountingMap({'color': 'red'});
+      final tree = _newTree(
+        wf: _WidgetFactory(onCustomStyles: (_) => styles),
+      );
+      tree.addBitsFromNodes(_parseHtml('<span>Foo</span>'));
+      expect(styles.toStringCount, equals(0));
+    });
+  });
 }
 
 CoreBuildTree _newTree({
@@ -101,11 +114,17 @@ dom.NodeList _parseHtml(String html) =>
 class _WidgetFactory extends WidgetFactory {
   final void Function(BuildTree value)? onParse;
   final void Function(BuildTree value)? onParseStyle;
+  final Map<String, String>? Function(dom.Element element)? onCustomStyles;
 
   _WidgetFactory({
+    this.onCustomStyles,
     this.onParse,
     this.onParseStyle,
   });
+
+  @override
+  StylesMap? customStylesBuilder(dom.Element element) =>
+      onCustomStyles?.call(element);
 
   @override
   void parse(BuildTree tree) {
@@ -117,5 +136,17 @@ class _WidgetFactory extends WidgetFactory {
   void parseStyle(BuildTree tree, css.Declaration style) {
     onParseStyle?.call(tree);
     super.parseStyle(tree, style);
+  }
+}
+
+class _ToStringCountingMap extends MapView<String, String> {
+  int toStringCount = 0;
+
+  _ToStringCountingMap(super.map);
+
+  @override
+  String toString() {
+    toStringCount++;
+    return super.toString();
   }
 }

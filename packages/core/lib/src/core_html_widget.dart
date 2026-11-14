@@ -249,7 +249,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       return _sliverOrWidget0;
     }
 
-    Timeline.startSync('Build $widget (async)');
+    Timeline.startSync('Build ${widget.toStringShort()} (async)');
     final built = _buildBody(this, domNodes);
     Timeline.finishSync();
 
@@ -261,7 +261,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       return _sliverOrWidget0;
     }
 
-    Timeline.startSync('Build $widget (sync)');
+    Timeline.startSync('Build ${widget.toStringShort()} (sync)');
 
     Widget built;
     try {

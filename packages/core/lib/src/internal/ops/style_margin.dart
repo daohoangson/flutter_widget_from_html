@@ -41,7 +41,8 @@ class StyleMargin {
               HeightPlaceholder(
                 marginTop,
                 inheritanceResolvers,
-                debugLabel: '${tree.element.localName}--marginTop',
+                debugLabel:
+                    kDebugMode ? '${tree.element.localName}--marginTop' : null,
               ),
             if (margin.mayHaveLeft || margin.mayHaveRight)
               placeholder.wrapWith(
@@ -56,7 +57,9 @@ class StyleMargin {
               HeightPlaceholder(
                 marginBottom,
                 inheritanceResolvers,
-                debugLabel: '${tree.element.localName}--marginBottom',
+                debugLabel: kDebugMode
+                    ? '${tree.element.localName}--marginBottom'
+                    : null,
               ),
           ]);
           return column ?? placeholder;

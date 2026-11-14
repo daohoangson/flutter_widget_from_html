@@ -40,7 +40,9 @@ class StyleVerticalAlign {
                   ? CssLinePlaceholder.new
                   : WidgetPlaceholder.new;
           final placeholder = createPlaceholder(
-            debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
+            debugLabel: kDebugMode
+                ? '${tree.element.localName}--$kCssVerticalAlign'
+                : null,
             child: tree.build(),
           );
 

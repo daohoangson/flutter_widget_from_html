@@ -9,7 +9,8 @@ WidgetPlaceholder _paddingInlineAfter(BuildTree tree, CssLengthBox box) =>
         final right = box.getRight(resolved);
         return _paddingInlineSizedBox(right?.getValue(resolved));
       },
-      debugLabel: '${tree.element.localName}--paddingInlineAfter',
+      debugLabel:
+          kDebugMode ? '${tree.element.localName}--paddingInlineAfter' : null,
     );
 
 WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox box) =>
@@ -19,7 +20,8 @@ WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox box) =>
         final left = box.getLeft(resolved);
         return _paddingInlineSizedBox(left?.getValue(resolved));
       },
-      debugLabel: '${tree.element.localName}--paddingInlineBefore',
+      debugLabel:
+          kDebugMode ? '${tree.element.localName}--paddingInlineBefore' : null,
     );
 
 Widget _paddingInlineSizedBox(double? width) =>
@@ -41,7 +43,8 @@ class StylePadding {
 
           return WidgetPlaceholder(
             builder: (context, child) => _build(tree, context, child, padding),
-            debugLabel: '${tree.element.localName}--paddingBlock',
+            debugLabel:
+                kDebugMode ? '${tree.element.localName}--paddingBlock' : null,
             child: placeholder,
           );
         },
