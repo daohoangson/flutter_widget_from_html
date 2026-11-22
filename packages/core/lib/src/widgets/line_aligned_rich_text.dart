@@ -80,6 +80,8 @@ class LineAlignedRichText extends RichText {
   }
 }
 
+typedef _LineEdge = ({PlaceholderAlignment alignment, int offset});
+
 class _RenderLineAlignedParagraph extends RenderParagraph {
   final _probe = TextPainter();
 
@@ -105,15 +107,19 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
     return _resolveLineDimensions(dimensions, edges, probe);
   }
 
-  Map<int, PlaceholderAlignment> _collectLineEdges() {
-    final edges = <int, PlaceholderAlignment>{};
+  Map<int, _LineEdge> _collectLineEdges() {
+    final edges = <int, _LineEdge>{};
     var index = 0;
+    var offset = 0;
     text.visitChildren((span) {
       if (span is PlaceholderSpan) {
         if (span is CssLineSpan) {
-          edges[index] = span.alignment;
+          edges[index] = (alignment: span.alignment, offset: offset);
         }
         index++;
+        offset++;
+      } else if (span is TextSpan) {
+        offset += span.text?.length ?? 0;
       }
       return true;
     });
@@ -124,7 +130,7 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
   TextPainter _layoutProbe(
     double maxWidth,
     List<PlaceholderDimensions> dimensions,
-    Map<int, PlaceholderAlignment> edges,
+    Map<int, _LineEdge> edges,
   ) {
     // Retain widths to find the real wrapping, but exclude line-aligned boxes
     // from the first pass's ascent/descent. Baseline-aligned boxes still count.
@@ -160,16 +166,17 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
 
   List<PlaceholderDimensions> _resolveLineDimensions(
     List<PlaceholderDimensions> dimensions,
-    Map<int, PlaceholderAlignment> edges,
+    Map<int, _LineEdge> edges,
     TextPainter probe,
   ) {
     final resolved = List<PlaceholderDimensions>.of(dimensions);
     final lines = probe.computeLineMetrics();
     final boxes = probe.inlinePlaceholderBoxes!;
+    final ascents = lines.map((line) => line.ascent).toList();
     final descents = lines.map((line) => line.descent).toList();
     final assignments = <int, int>{};
     var lineIndex = 0;
-    for (final i in edges.keys) {
+    for (final MapEntry(key: i, value: edge) in edges.entries) {
       if (i >= boxes.length || lines.isEmpty) {
         break; // This placeholder is hidden by maxLines or ellipsis.
       }
@@ -181,9 +188,24 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
         lineIndex++;
       }
       assignments[i] = lineIndex;
+
+      // A line without text keeps the default font's ascent and descent,
+      // which its LineMetrics leave out.
+      final baseline = lines[lineIndex].baseline;
+      final extent = probe.getBoxesForSelection(
+        TextSelection(baseOffset: edge.offset, extentOffset: edge.offset + 1),
+        boxHeightStyle: ui.BoxHeightStyle.max,
+      );
+      if (extent.isNotEmpty) {
+        ascents[lineIndex] =
+            max(ascents[lineIndex], baseline - extent.first.top);
+        descents[lineIndex] =
+            max(descents[lineIndex], extent.first.bottom - baseline);
+      }
+
       descents[lineIndex] = max(
         descents[lineIndex],
-        dimensions[i].size.height - lines[lineIndex].ascent,
+        dimensions[i].size.height - ascents[lineIndex],
       );
     }
     for (final entry in assignments.entries) {
@@ -193,8 +215,8 @@ class _RenderLineAlignedParagraph extends RenderParagraph {
         size: dimensions[i].size,
         alignment: PlaceholderAlignment.baseline,
         baseline: TextBaseline.alphabetic,
-        baselineOffset: edges[i] == PlaceholderAlignment.top
-            ? lines[line].ascent
+        baselineOffset: edges[i]!.alignment == PlaceholderAlignment.top
+            ? ascents[line]
             : dimensions[i].size.height - descents[line],
       );
     }
