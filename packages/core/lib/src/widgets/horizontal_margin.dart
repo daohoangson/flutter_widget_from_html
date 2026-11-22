@@ -55,6 +55,15 @@ class _HorizontalMarginRenderObject extends RenderShiftedBox {
 
   double get marginsOrZero => _left.or(0) + _right.or(0);
 
+  BoxConstraints _childConstraints(BoxConstraints bc) {
+    final edges = EdgeInsets.only(left: _left.or(0), right: _right.or(0));
+    final cc = bc.deflate(edges);
+    // An auto margin takes the free space, so the child must be free to be narrower.
+    return _left.isInfinite || _right.isInfinite
+        ? cc.copyWith(minWidth: 0)
+        : cc;
+  }
+
   @override
   double? computeDryBaseline(
     BoxConstraints constraints,
@@ -65,9 +74,7 @@ class _HorizontalMarginRenderObject extends RenderShiftedBox {
       return null;
     }
 
-    final edges = EdgeInsets.only(left: _left.or(0), right: _right.or(0));
-    final cc = constraints.deflate(edges);
-    return scopedChild.getDryBaseline(cc, baseline);
+    return scopedChild.getDryBaseline(_childConstraints(constraints), baseline);
   }
 
   @override
@@ -103,9 +110,7 @@ class _HorizontalMarginRenderObject extends RenderShiftedBox {
       return bc.constrain(Size(marginsOrZero, 0));
     }
 
-    final edges = EdgeInsets.only(left: _left.or(0), right: _right.or(0));
-    final cc = bc.deflate(edges);
-    final childSize = fn(scopedChild, cc);
+    final childSize = fn(scopedChild, _childConstraints(bc));
     final width = bc.maxWidth.orChildWithMargins(childSize, _left, _right);
     final fullSize = bc.constrain(Size(width, childSize.height));
 

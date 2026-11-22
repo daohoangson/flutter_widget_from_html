@@ -878,6 +878,17 @@ void main() {
         expect(child, equals(const Rect.fromLTWH(45, 0, 10, 10)));
       });
 
+      testWidgets('aligns center with tight constraints', (tester) async {
+        final key = await tester.pumpSizedBox(
+          left: double.infinity,
+          right: double.infinity,
+          tight: true,
+        );
+
+        final child = tester.getRect(find.byKey(key));
+        expect(child, equals(const Rect.fromLTWH(45, 0, 10, 10)));
+      });
+
       testWidgets('aligns right', (tester) async {
         final key = await tester.pumpSizedBox(left: double.infinity);
 
@@ -919,24 +930,26 @@ extension on WidgetTester {
     bool isNull = false,
     double left = .0,
     double right = .0,
+    bool tight = false,
   }) async {
     setWindowSize(const Size(100, 100));
 
     final key = GlobalKey();
+    final margin = HorizontalMargin(
+      left: left,
+      right: right,
+      child: isNull
+          ? null
+          : SizedBox(
+              height: 10,
+              key: key,
+              width: 10,
+            ),
+    );
     await pumpWidget(
       Align(
         alignment: Alignment.topLeft,
-        child: HorizontalMargin(
-          left: left,
-          right: right,
-          child: isNull
-              ? null
-              : SizedBox(
-                  height: 10,
-                  key: key,
-                  width: 10,
-                ),
-        ),
+        child: tight ? SizedBox(width: 100, child: margin) : margin,
       ),
     );
 
