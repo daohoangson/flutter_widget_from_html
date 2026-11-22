@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -107,6 +109,19 @@ void main() {
           '<span style="text-decoration-color: currentcolor">bar</span></span>';
       final e = await explain(tester, html);
       expect(e, equals('[RichText:(:(+l/#FFFF0000:foo )(+l:bar))]'));
+    });
+
+    testWidgets('ignores theme decorationColor', (WidgetTester tester) async {
+      const html = '<u style="color: red">foo</u>';
+      final e = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle.merge(
+          style: const TextStyle(decorationColor: Color(0xFF00FF00)),
+          child: HtmlWidget(html, key: hwKey),
+        ),
+      );
+      expect(e, equals('[RichText:(#FFFF0000+u:foo)]'));
     });
   });
 

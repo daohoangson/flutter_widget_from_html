@@ -5,11 +5,14 @@ TextStyle _prepareDecorationColor(
   InheritedProperties resolved,
 ) {
   final property = resolved.get<TextStyleDecorationColor>();
-  if (property == null) {
+  if (property == null &&
+      (style.decoration ?? TextDecoration.none) == TextDecoration.none) {
     return style;
   }
 
-  final decorationColor = property.value.getValue(resolved);
+  // the initial value is currentcolor, not the theme decorationColor
+  final value = property?.value ?? CssColor.current();
+  final decorationColor = value.getValue(resolved);
   if (decorationColor == null) {
     return style;
   }
