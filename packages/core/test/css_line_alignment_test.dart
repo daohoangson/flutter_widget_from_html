@@ -76,6 +76,22 @@ void main() {
     }
   }
 
+  for (final edge in ['top', 'bottom']) {
+    testWidgets('line without text keeps the $edge box at its edges',
+        (tester) async {
+      await pumpHtml(
+        tester,
+        '<div style="text-align:center">'
+        '<span style="display:inline-block;vertical-align:$edge">'
+        '<div>T</div></span></div>',
+      );
+      final paragraph = tester.getRect(textFinder('￼'));
+      final box = tester.getRect(textFinder('T'));
+      expect(box.top, closeTo(paragraph.top, 1));
+      expect(paragraph.height, closeTo(box.height, 1));
+    });
+  }
+
   testWidgets('mixed sub/super and explicit line breaks', (tester) async {
     await pumpHtml(
       tester,
